@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fiche hotel — Pullman Hotels & Resorts</title>
+  <link rel="stylesheet" href="../../core/tokens/brands.css"/>
+  <link rel="stylesheet" href="../../core/styles/base.css"/>
+  <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body.brand-pullman { font-family: var(--font-sans, 'Inter', sans-serif); background: #fff !important; color: #222 !important; }
+
+    /* ── HEADER ── */
+    .hd-header { background: var(--pul-olive, #445047); }
+    .hd-header-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 40px; max-width: 1280px; margin: 0 auto; }
+    .hd-logo { display: inline-flex; align-items: center; text-decoration: none; }
+    .hd-logo svg { height: 22px; width: auto; }
+    .hd-nav { display: flex; align-items: center; gap: 20px; }
+    .hd-nav a { color: rgba(255,255,255,.7); font-size: 13px; text-decoration: none; transition: color .15s; }
+    .hd-nav a:hover { color: #fff; }
+
+    /* ── GALLERY ── */
+    .hd-gallery { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; max-width: 1280px; margin: 0 auto; padding: 24px 40px 0; height: 420px; border-radius: 16px; overflow: hidden; }
+    .hd-gallery-main { grid-row: 1 / 3; border-radius: 16px 0 0 16px; overflow: hidden; cursor: pointer; position: relative; }
+    .hd-gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .hd-gallery-main:hover img { transform: scale(1.03); }
+    .hd-gallery-side { overflow: hidden; cursor: pointer; position: relative; }
+    .hd-gallery-side:nth-child(3) { border-radius: 0 16px 0 0; }
+    .hd-gallery-side:nth-child(4) { border-radius: 0 0 16px 0; }
+    .hd-gallery-side img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+    .hd-gallery-side:hover img { transform: scale(1.05); }
+    .hd-gallery-more { position: absolute; bottom: 14px; right: 14px; background: #fff; color: #222; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 8px; border: 1px solid #222; cursor: pointer; transition: background .15s; }
+    .hd-gallery-more:hover { background: #f5f5f5; }
+
+    /* ── CONTENT ── */
+    .hd-content { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: grid; grid-template-columns: 1fr 380px; gap: 48px; }
+
+    /* LEFT */
+    .hd-main {}
+    .hd-title { font-size: 28px; font-weight: 700; color: #222; margin-bottom: 4px; }
+    .hd-subtitle { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #717171; margin-bottom: 20px; flex-wrap: wrap; }
+    .hd-stars { color: var(--pul-olive, #445047); font-size: 13px; letter-spacing: 1px; }
+    .hd-rating-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #222; }
+    .hd-rating-badge span { font-weight: 400; color: #717171; }
+    .hd-divider { height: 1px; background: #ebebeb; margin: 24px 0; }
+
+    .hd-section-title { font-size: 20px; font-weight: 700; color: #222; margin-bottom: 16px; }
+    .hd-description { font-size: 15px; line-height: 1.7; color: #444; margin-bottom: 8px; }
+
+    /* AMENITIES */
+    .hd-amenities { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .hd-amenity { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #444; padding: 10px 0; }
+    .hd-amenity-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hd-amenity-icon svg { width: 20px; height: 20px; stroke: var(--pul-olive, #445047); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* MAP */
+    .hd-map-wrap { margin-top: 8px; }
+    .hd-map { width: 100%; height: 280px; border-radius: 12px; overflow: hidden; }
+
+    /* RIGHT SIDEBAR */
+    .hd-sidebar {}
+    .hd-booking-card { position: sticky; top: 24px; background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+    .hd-booking-price { font-size: 22px; font-weight: 700; color: #222; margin-bottom: 4px; }
+    .hd-booking-price span { font-size: 15px; font-weight: 400; color: #717171; }
+    .hd-booking-dates { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #bbb; border-radius: 8px; overflow: hidden; margin: 16px 0 12px; }
+    .hd-booking-date { padding: 10px 12px; border-right: 1px solid #bbb; }
+    .hd-booking-date:last-child { border-right: none; }
+    .hd-booking-date-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #222; }
+    .hd-booking-date-value { font-size: 13px; color: #717171; margin-top: 2px; }
+    .hd-booking-guests { padding: 10px 12px; border: 1px solid #bbb; border-top: none; border-radius: 0 0 8px 8px; }
+    .hd-booking-guests-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: #222; }
+    .hd-booking-guests-value { font-size: 13px; color: #717171; margin-top: 2px; }
+    .hd-booking-cta { display: block; width: 100%; padding: 14px; background: var(--pul-highlight, #5FEF91); color: var(--pul-olive, #445047); border: none; border-radius: 8px; font-family: inherit; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; cursor: pointer; transition: opacity .15s; text-align: center; text-decoration: none; margin-top: 16px; }
+    .hd-booking-cta:hover { opacity: .85; }
+    .hd-booking-detail { display: flex; justify-content: space-between; font-size: 14px; color: #444; margin-top: 16px; padding-top: 16px; border-top: 1px solid #ebebeb; }
+    .hd-booking-detail-total { font-weight: 700; }
+
+    /* ── BACK LINK ── */
+    .hd-back { display: inline-flex; align-items: center; gap: 6px; color: #717171; font-size: 13px; text-decoration: none; transition: color .15s; max-width: 1280px; margin: 16px auto 0; padding: 0 40px; }
+    .hd-back:hover { color: var(--pul-olive, #445047); }
+
+    .leaflet-container { background: #f2efe9; }
+  </style>
+</head>
+<body class="brand-pullman">
+
+<!-- HEADER -->
+<header class="hd-header">
+  <div class="hd-header-inner">
+    <a href="brand-homepage.html" class="hd-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 688.581 178.328"><path fill="#fff" d="M204.107,54.242h14.213v33.36c0,20.203-14.523,32.263-38.847,32.263s-38.841-12.06-38.841-32.263v-33.36h14.21v33.36c0,12.997,9.209,20.756,24.631,20.756s24.634-7.758,24.634-20.756v-33.36ZM245.217,118.286h14.204V27.972h-14.204v90.313ZM291.279,118.286h14.204V27.972h-14.204v90.313ZM621.762,52.661c-24.323,0-38.842,12.062-38.842,32.263v33.363h14.214v-33.363c0-13.191,8.978-20.757,24.628-20.757s24.635,7.566,24.635,20.757v65.435h14.211v-65.435c0-20.201-14.523-32.263-38.847-32.263ZM118.781,85.631c0,9.212-4.161,17.509-11.714,23.362-8.113,6.287-19.763,9.611-33.687,9.611-11.832,0-22.928-3.25-31.422-9.177v40.929h-13.985l.022-63.93c-.01-.265-.016-.53-.016-.795,0-15.209,11.89-32.97,45.401-32.97s45.401,17.761,45.401,32.97ZM104.331,85.631c0-13.293-12.149-21.882-30.951-21.882s-30.951,8.589-30.951,21.882c0,14.214,15.947,21.884,30.951,21.884,18.803,0,30.951-8.589,30.951-21.884ZM560.27,85.632l-.006,32.654h-13.977v-8.867c-8.157,5.686-19.223,9.186-31.42,9.186-29.211,0-45.404-14.763-45.404-32.973s15.345-32.97,45.404-32.97,45.403,14.761,45.403,32.97ZM545.814,85.632c0-12.085-10.458-21.882-30.947-21.882s-30.952,9.797-30.952,21.882,11.041,21.882,30.952,21.882c17.091,0,30.947-9.797,30.947-21.882ZM414.936,52.826c-10.922,0-20.459,4.194-25.65,10.453-5.104-6.259-14.473-10.453-25.209-10.453-17.64,0-31.915,12.325-31.915,27.556v37.736h13.291v-36.14c0-10.068,8.307-18.229,18.552-18.229s18.552,8.161,18.552,18.229v36.141h13.572v-36.141c0-10.068,8.452-18.229,18.88-18.229s18.878,8.161,18.878,18.229v36.14h13.527v-37.736c0-15.231-14.527-27.556-32.48-27.556Z"/></svg></a>
+    <div class="hd-nav">
+      <a href="#">Destinations</a>
+      <a href="#">Experiences</a>
+      <a href="#">Offres</a>
+      <a href="#">Fidelite</a>
+      <a href="#">Me connecter</a>
+    </div>
+  </div>
+</header>
+
+<a class="hd-back" href="search-results.html" id="hd-back">&larr; Retour aux resultats</a>
+
+<!-- GALLERY -->
+<div class="hd-gallery" id="hd-gallery"></div>
+
+<!-- CONTENT -->
+<div class="hd-content">
+  <div class="hd-main">
+    <h1 class="hd-title" id="hd-title"></h1>
+    <div class="hd-subtitle" id="hd-subtitle"></div>
+    <div class="hd-divider"></div>
+    <h2 class="hd-section-title">A propos</h2>
+    <p class="hd-description" id="hd-desc"></p>
+    <div class="hd-divider"></div>
+    <h2 class="hd-section-title">Equipements et services</h2>
+    <div class="hd-amenities" id="hd-amenities"></div>
+    <div class="hd-divider"></div>
+    <h2 class="hd-section-title">Situation</h2>
+    <div class="hd-map-wrap"><div class="hd-map" id="hd-map"></div></div>
+  </div>
+  <div class="hd-sidebar">
+    <div class="hd-booking-card">
+      <div class="hd-booking-price" id="hd-price"></div>
+      <div class="hd-booking-dates">
+        <div class="hd-booking-date">
+          <div class="hd-booking-date-label">Arrivee</div>
+          <div class="hd-booking-date-value">Ajouter une date</div>
+        </div>
+        <div class="hd-booking-date">
+          <div class="hd-booking-date-label">Depart</div>
+          <div class="hd-booking-date-value">Ajouter une date</div>
+        </div>
+      </div>
+      <div class="hd-booking-guests">
+        <div class="hd-booking-guests-label">Voyageurs</div>
+        <div class="hd-booking-guests-value">1 adulte</div>
+      </div>
+      <a class="hd-booking-cta" href="#">Reserver</a>
+      <div class="hd-booking-detail">
+        <span>Total estimatif (1 nuit)</span>
+        <span class="hd-booking-detail-total" id="hd-total"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var IMG_BASE = 'https://m.ahstatic.com/is/image/accorhotels/';
+  var ALL_HOTELS = [
+    { name: "Pullman Paris Montparnasse", loc: "Paris, France", lat: 48.8422, lng: 2.3219, stars: 4, price: 189, badge: "Nouveau", features: "Rooftop bar . Spa . Restaurant gastronomique", rating: 8.7, reviews: 1243, desc: "Idealement situe au coeur de Paris, le Pullman Paris Montparnasse vous accueille dans un cadre contemporain et elegant. Profitez d'une vue imprenable depuis le rooftop bar, d'un spa relaxant et d'une cuisine gastronomique raffinee. A deux pas de la Tour Montparnasse, du Jardin du Luxembourg et des Catacombes.", imgs: [IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600"], amenities: ["Spa","Restaurant","Rooftop bar","Salle de fitness","Wi-Fi haut debit","Room service","Conciergerie","Parking"], pois: [{name:"Tour Montparnasse",lat:48.8421,lng:2.3219},{name:"Jardin du Luxembourg",lat:48.8462,lng:2.3372},{name:"Catacombes",lat:48.8338,lng:2.3324},{name:"Fondation Cartier",lat:48.8388,lng:2.3316}] },
+    { name: "Pullman Paris Tour Eiffel", loc: "Paris, France", lat: 48.8559, lng: 2.2930, stars: 5, price: 259, badge: "Renove", features: "Vue Tour Eiffel . Spa . Restaurant", rating: 9.1, reviews: 2187, desc: "Avec sa vue exceptionnelle sur la Tour Eiffel, le Pullman Paris Tour Eiffel est une adresse d'exception. Son spa, son restaurant gastronomique et ses chambres renovees offrent une experience luxueuse au coeur du 15e arrondissement. Le Trocadero et le Champ-de-Mars sont a quelques minutes a pied.", imgs: [IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"PullmanHeritageImage:6by5?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600"], amenities: ["Spa","Restaurant","Vue Tour Eiffel","Piscine","Wi-Fi haut debit","Bar cocktails","Room service","Parking"], pois: [{name:"Tour Eiffel",lat:48.8584,lng:2.2945},{name:"Trocadero",lat:48.8616,lng:2.2878},{name:"Musee du Quai Branly",lat:48.8609,lng:2.2976},{name:"Champ-de-Mars",lat:48.8556,lng:2.2986}] },
+    { name: "Pullman Paris Bercy", loc: "Paris, France", lat: 48.8396, lng: 2.3826, stars: 4, price: 175, features: "AccorArena . Piscine . Business center", rating: 8.3, reviews: 876, desc: "A proximite de l'AccorArena et de la gare de Lyon, le Pullman Paris Bercy est le choix ideal pour les voyageurs d'affaires et les amateurs d'evenements. Profitez de sa piscine, de son business center moderne et de la tranquillite du Parc de Bercy.", imgs: [IMG_BASE+"aja_p_7258-60:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600",IMG_BASE+"aja_p_1029-36:1by1?wid=800&hei=600",IMG_BASE+"PullmanEvent:1by1?wid=800&hei=600"], amenities: ["Piscine","Business center","Restaurant","Salle de fitness","Wi-Fi haut debit","Salle de reunion","Room service","Parking"], pois: [{name:"AccorArena",lat:48.8388,lng:2.3786},{name:"Parc de Bercy",lat:48.8337,lng:2.3828},{name:"Cinematheque",lat:48.8335,lng:2.3817},{name:"Gare de Lyon",lat:48.8443,lng:2.3735}] },
+    { name: "Pullman Lyon Part-Dieu", loc: "Lyon, France", lat: 45.7602, lng: 4.8590, stars: 4, price: 159, features: "Gare Part-Dieu . Restaurant . Fitness", rating: 8.5, reviews: 654, desc: "En face de la gare Part-Dieu, cet hotel allie praticite et confort. Son restaurant propose une cuisine lyonnaise revisitee, et sa salle de fitness est ouverte 24h/24. Le Parc de la Tete d'Or et les Halles de Lyon sont facilement accessibles.", imgs: [IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600"], amenities: ["Restaurant","Fitness 24h","Wi-Fi haut debit","Business center","Room service","Conciergerie","Bar","Parking"], pois: [{name:"Parc de la Tete d'Or",lat:45.7740,lng:4.8555},{name:"Les Halles de Lyon",lat:45.7630,lng:4.8559},{name:"Musee des Beaux-Arts",lat:45.7669,lng:4.8339}] },
+    { name: "Pullman Lyon Centre", loc: "Lyon, France", lat: 45.7640, lng: 4.8357, stars: 4, price: 169, features: "Presqu'ile . Bar lounge . Spa", rating: 8.8, reviews: 432, desc: "Au coeur de la Presqu'ile lyonnaise, ce Pullman offre un cadre raffine entre Rhone et Saone. Son bar lounge et son spa en font un havre de paix en centre-ville. La Place Bellecour et le Vieux Lyon sont a quelques pas.", imgs: [IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600"], amenities: ["Spa","Bar lounge","Restaurant","Wi-Fi haut debit","Room service","Conciergerie","Fitness","Parking"], pois: [{name:"Place Bellecour",lat:45.7578,lng:4.8320},{name:"Vieux Lyon",lat:45.7622,lng:4.8268},{name:"Theatre des Celestins",lat:45.7597,lng:4.8351},{name:"Opera de Lyon",lat:45.7677,lng:4.8368}] },
+    { name: "Pullman Marseille Provence", loc: "Marseille, France", lat: 43.4370, lng: 5.2148, stars: 4, price: 145, features: "Aeroport . Piscine exterieure . Restaurant", rating: 8.1, reviews: 398, desc: "Aux portes de la Provence, le Pullman Marseille Provence propose une piscine exterieure avec terrasse, un restaurant aux saveurs mediterraneennes et un acces facile aux Calanques et au Vieux-Port.", imgs: [IMG_BASE+"aja_p_1029-36:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600",IMG_BASE+"aja_p_7258-60:1by1?wid=800&hei=600",IMG_BASE+"PullmanEvent:1by1?wid=800&hei=600"], amenities: ["Piscine exterieure","Restaurant","Terrasse","Wi-Fi haut debit","Navette aeroport","Fitness","Parking","Bar"], pois: [{name:"Calanques",lat:43.2100,lng:5.4500},{name:"Vieux-Port",lat:43.2951,lng:5.3740},{name:"Notre-Dame de la Garde",lat:43.2838,lng:5.3714}] },
+    { name: "Pullman Marrakech Palmeraie", loc: "Marrakech, Maroc", lat: 31.6690, lng: -7.9811, stars: 5, price: 179, badge: "Populaire", features: "Golf . Piscine . Spa . Jardins", rating: 9.0, reviews: 1567, desc: "Niché dans la Palmeraie de Marrakech, cet hotel 5 etoiles offre un cadre enchanteur entre jardins luxuriants, piscine et spa. Son parcours de golf, ses restaurants et sa proximite avec la Medina et la Place Jemaa el-Fna en font un lieu de sejour unique.", imgs: [IMG_BASE+"aja_p_0795-31:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600"], amenities: ["Golf","Piscine","Spa","Jardins","Restaurant","Bar","Kids club","Fitness"], pois: [{name:"Palmeraie",lat:31.6750,lng:-7.9750},{name:"Jardin Majorelle",lat:31.6416,lng:-8.0032},{name:"Medina",lat:31.6295,lng:-7.9811},{name:"Jemaa el-Fna",lat:31.6258,lng:-7.9891}] },
+    { name: "Pullman London St Pancras", loc: "Londres, Royaume-Uni", lat: 51.5305, lng: -0.1240, stars: 5, price: 289, features: "King's Cross . Restaurant . Bar cocktails", rating: 9.2, reviews: 1890, desc: "Situe a King's Cross, cet hotel iconique marie heritage victorien et design contemporain. Son restaurant, son bar a cocktails et sa situation exceptionnelle en font un point de depart ideal pour explorer Londres.", imgs: [IMG_BASE+"PullmanHeritageImage:6by5?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600"], amenities: ["Restaurant","Bar cocktails","Fitness","Wi-Fi haut debit","Room service","Conciergerie","Business center","Parking"], pois: [{name:"British Museum",lat:51.5194,lng:-0.1270},{name:"King's Cross",lat:51.5320,lng:-0.1240},{name:"Regent's Park",lat:51.5313,lng:-0.1570},{name:"Camden Market",lat:51.5414,lng:-0.1469}] },
+    { name: "Pullman Barcelona Skipper", loc: "Barcelone, Espagne", lat: 41.3851, lng: 2.1994, stars: 5, price: 219, features: "Front de mer . Piscine . Rooftop", rating: 8.9, reviews: 1102, desc: "En front de mer a Barcelone, le Pullman Barcelona Skipper offre une piscine, un rooftop avec vue et un acces direct a la plage de la Barceloneta. La Sagrada Familia et le Parc de la Ciutadella sont facilement accessibles.", imgs: [IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"aja_p_0795-31:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600"], amenities: ["Piscine","Rooftop","Plage","Restaurant","Spa","Fitness","Wi-Fi haut debit","Parking"], pois: [{name:"Sagrada Familia",lat:41.4036,lng:2.1744},{name:"La Barceloneta",lat:41.3785,lng:2.1892},{name:"Parc de la Ciutadella",lat:41.3879,lng:2.1860},{name:"Museu Picasso",lat:41.3851,lng:2.1808}] },
+    { name: "Pullman Dubai Creek City Centre", loc: "Dubai, EAU", lat: 25.2532, lng: 55.3320, stars: 5, price: 199, badge: "Nouveau", features: "Creek views . Piscine . Spa . Restaurant", rating: 8.6, reviews: 743, desc: "Avec ses vues imprenables sur la Dubai Creek, cet hotel offre une piscine, un spa et des restaurants d'exception. Le Gold Souk, le Dubai Museum et le Burj Khalifa sont facilement accessibles.", imgs: [IMG_BASE+"6556-1:1by1?wid=800&hei=600",IMG_BASE+"aja_p_7258-60:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600"], amenities: ["Piscine","Spa","Restaurant","Vue Creek","Wi-Fi haut debit","Fitness","Room service","Parking"], pois: [{name:"Dubai Creek",lat:25.2560,lng:55.3290},{name:"Gold Souk",lat:25.2867,lng:55.2969},{name:"Dubai Museum",lat:25.2634,lng:55.2975},{name:"Burj Khalifa",lat:25.1972,lng:55.2744}] },
+    { name: "Pullman Singapore Orchard", loc: "Singapour", lat: 1.3048, lng: 103.8318, stars: 5, price: 229, features: "Orchard Road . Piscine . Fitness 24h", rating: 8.8, reviews: 921, desc: "Sur la celebre Orchard Road, cet hotel 5 etoiles propose une piscine, un fitness 24h et un acces direct au shopping. Les Botanic Gardens et Marina Bay Sands sont a proximite.", imgs: [IMG_BASE+"HCM_P_4528724:1by1?wid=800&hei=600",IMG_BASE+"PullmanHeritageImage:6by5?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600"], amenities: ["Piscine","Fitness 24h","Restaurant","Wi-Fi haut debit","Conciergerie","Business center","Bar","Parking"], pois: [{name:"Orchard Road",lat:1.3048,lng:103.8320},{name:"Botanic Gardens",lat:1.3138,lng:103.8159},{name:"National Museum",lat:1.2966,lng:103.8485},{name:"Marina Bay Sands",lat:1.2834,lng:103.8607}] },
+    { name: "Pullman Nice Cote d'Azur", loc: "Nice, France", lat: 43.6653, lng: 7.2150, stars: 4, price: 185, features: "Promenade des Anglais . Piscine . Spa", rating: 8.4, reviews: 567, desc: "Face a la Mediterranee et a la Promenade des Anglais, ce Pullman propose une piscine, un spa et une vue mer. La Vieille Ville de Nice, le Musee Matisse et la Colline du Chateau sont a quelques minutes.", imgs: [IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"aja_p_1029-36:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600"], amenities: ["Piscine","Spa","Vue mer","Restaurant","Wi-Fi haut debit","Fitness","Room service","Parking"], pois: [{name:"Promenade des Anglais",lat:43.6943,lng:7.2562},{name:"Vieille Ville",lat:43.6970,lng:7.2758},{name:"Musee Matisse",lat:43.7196,lng:7.2767},{name:"Colline du Chateau",lat:43.6952,lng:7.2815}] },
+    { name: "Pullman Bordeaux Lac", loc: "Bordeaux, France", lat: 44.8799, lng: -0.5640, stars: 4, price: 155, features: "Parc des expositions . Restaurant . Bar", rating: 8.2, reviews: 389, desc: "A proximite du Parc des Expositions et du Lac de Bordeaux, cet hotel propose un restaurant, un bar et un acces facile a la Cite du Vin et au centre historique de Bordeaux.", imgs: [IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6409-72:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600",IMG_BASE+"aja_p_7258-60:1by1?wid=800&hei=600"], amenities: ["Restaurant","Bar","Terrasse","Wi-Fi haut debit","Fitness","Salle de reunion","Parking","Conciergerie"], pois: [{name:"Cite du Vin",lat:44.8625,lng:-0.5507},{name:"Place de la Bourse",lat:44.8412,lng:-0.5696},{name:"Jardin Public",lat:44.8500,lng:-0.5778},{name:"Grand Theatre",lat:44.8428,lng:-0.5740}] },
+    { name: "Pullman Bangkok Hotel G", loc: "Bangkok, Thailande", lat: 13.7248, lng: 100.5170, stars: 5, price: 139, features: "Silom . Rooftop pool . Sky bar", rating: 8.7, reviews: 1456, desc: "Au coeur du quartier de Silom, cet hotel design propose une piscine rooftop avec vue panoramique et un sky bar. Wat Pho, le Grand Palais et Chinatown sont facilement accessibles.", imgs: [IMG_BASE+"aja_p_7258-60:1by1?wid=800&hei=600",IMG_BASE+"aja_p_0795-31:1by1?wid=800&hei=600",IMG_BASE+"6556-1:1by1?wid=800&hei=600",IMG_BASE+"PullmanHeritageImage:6by5?wid=800&hei=600"], amenities: ["Rooftop pool","Sky bar","Restaurant","Spa","Wi-Fi haut debit","Fitness","Room service","Conciergerie"], pois: [{name:"Wat Pho",lat:13.7468,lng:100.4927},{name:"Grand Palais",lat:13.7500,lng:100.4913},{name:"Chinatown",lat:13.7411,lng:100.5102},{name:"Lumphini Park",lat:13.7308,lng:100.5418}] },
+    { name: "Pullman Bali Legian Beach", loc: "Bali, Indonesie", lat: -8.7055, lng: 115.1700, stars: 5, price: 159, features: "Plage privee . Piscine . Spa balinais", rating: 9.0, reviews: 2034, desc: "Sur la plage de Legian, ce resort 5 etoiles offre une plage privee, une piscine et un spa balinais traditionnel. Seminyak et le temple de Tanah Lot sont a proximite pour des excursions inoubliables.", imgs: [IMG_BASE+"aja_p_6935-96:1by1?wid=800&hei=600",IMG_BASE+"aja_p_0795-31:1by1?wid=800&hei=600",IMG_BASE+"aja_p_1029-36:1by1?wid=800&hei=600",IMG_BASE+"pullman-dinner-2:1by1?wid=800&hei=600"], amenities: ["Plage privee","Piscine","Spa balinais","Restaurant","Kids club","Wi-Fi haut debit","Fitness","Bar de plage"], pois: [{name:"Legian Beach",lat:-8.7035,lng:115.1680},{name:"Tanah Lot",lat:-8.6213,lng:115.0868},{name:"Seminyak",lat:-8.6910,lng:115.1589},{name:"Potato Head",lat:-8.6866,lng:115.1558}] },
+    { name: "Pullman Tokyo Tamachi", loc: "Tokyo, Japon", lat: 35.6453, lng: 139.7479, stars: 5, price: 249, features: "Shinagawa . Restaurant japonais . Fitness", rating: 9.1, reviews: 876, desc: "Dans le quartier de Tamachi, cet hotel contemporain offre un restaurant japonais authentique, un fitness et un acces direct aux lignes de metro. La Tokyo Tower, les jardins Hama-rikyu et le temple Zojo-ji sont a proximite.", imgs: [IMG_BASE+"PullmanEvent:1by1?wid=800&hei=600",IMG_BASE+"HCM_P_4528724:1by1?wid=800&hei=600",IMG_BASE+"aja_p_6783-26:1by1?wid=800&hei=600",IMG_BASE+"Pullman-bar:1by1?wid=800&hei=600"], amenities: ["Restaurant japonais","Fitness","Wi-Fi haut debit","Business center","Room service","Conciergerie","Bar","Parking"], pois: [{name:"Tokyo Tower",lat:35.6586,lng:139.7454},{name:"Temple Zojo-ji",lat:35.6579,lng:139.7517},{name:"Hama-rikyu Gardens",lat:35.6596,lng:139.7636},{name:"Shinagawa Aquarium",lat:35.6089,lng:139.7332}] }
+  ];
+
+  var svgI = function(d) { return '<svg viewBox="0 0 24 24"><path d="' + d + '"/></svg>'; };
+  var AMENITY_ICONS = {
+    'Spa': svgI('M12 6c0-3 2.5-5 5-5 0 3-2.5 5-5 5zm0 0c0-3-2.5-5-5-5 0 3 2.5 5 5 5zm0 0v6m-4 6c0-2.2 1.8-4 4-4s4 1.8 4 4H8z'),
+    'Restaurant': svgI('M3 2v20h2v-8h4v8h2V2H9v8H5V2H3zm14 0v8l-2 2v10h2V12l4-2V2h-2v6l-2 2V2h-2z'),
+    'Piscine': svgI('M2 12c2-2 4 0 6-2s4 0 6-2 4 0 6-2M2 18c2-2 4 0 6-2s4 0 6-2 4 0 6-2M12 2a4 4 0 014 4v2'),
+    'Rooftop bar': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6'),
+    'Salle de fitness': svgI('M6.5 6.5a2 2 0 10-4 0 2 2 0 004 0zM4 9v6m-2-4h4m14-4.5a2 2 0 10-4 0 2 2 0 004 0zM18 9v6m-2-4h4M8 14h8'),
+    'Wi-Fi haut debit': svgI('M12 20h.01M8.5 16.5a5 5 0 017 0M5 13a9 9 0 0114 0M1.5 9.5a13 13 0 0121 0'),
+    'Room service': svgI('M3 20h18M5 20v-2a9 9 0 0114 0v2M12 4a1 1 0 110-2 1 1 0 010 2z'),
+    'Conciergerie': svgI('M12 2a4 4 0 00-4 4v1H4v2h16V7h-4V6a4 4 0 00-4-4zM4 13h16v2H4v-2zm2 5h12v2H6v-2z'),
+    'Parking': svgI('M3 3h18v18H3V3zm5 4h4a3 3 0 010 6H8V7zm0 10v-4'),
+    'Bar cocktails': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6M8 22h8'),
+    'Vue Tour Eiffel': svgI('M12 2l-4 20M12 2l4 20M8 10h8M7 14h10M6 18h12'),
+    'Business center': svgI('M4 7h16v13H4V7zm4-4h8v4H8V3zm4 10v2'),
+    'Salle de reunion': svgI('M3 18v-2a4 4 0 014-4h2m8 6v-2a4 4 0 00-4-4h-2m-3-4a3 3 0 110-6 3 3 0 010 6zm8 0a3 3 0 110-6 3 3 0 010 6z'),
+    'Fitness': svgI('M6.5 6.5a2 2 0 10-4 0 2 2 0 004 0zM4 9v6m-2-4h4m14-4.5a2 2 0 10-4 0 2 2 0 004 0zM18 9v6m-2-4h4M8 14h8'),
+    'Bar': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6'),
+    'Terrasse': svgI('M12 2v2m6.4.6l-1.4 1.4M20 12h2M17.7 17.7l1.4 1.4M12 20v2M6.3 17.7l-1.4 1.4M2 12h2M6.3 6.3L4.9 4.9M16 12a4 4 0 11-8 0 4 4 0 018 0z'),
+    'Navette aeroport': svgI('M2 12l19-7-7 19-3-8-9-4zM11 13l6-6'),
+    'Golf': svgI('M12 18V2l7 5-7 5m-4 10a4 4 0 100-4'),
+    'Jardins': svgI('M12 22V8m-4 6c-3 0-5-2-5-5s2-5 5-5c0-2 2-4 4-4s4 2 4 4c3 0 5 2 5 5s-2 5-5 5'),
+    'Kids club': svgI('M12 8a3 3 0 100-6 3 3 0 000 6zm-5 14l2-9m6 9l2-9m-7-3h6'),
+    'Vue mer': svgI('M2 12c2-3 6-3 8 0s6 3 8 0M2 18c2-3 6-3 8 0s6 3 8 0M12 2v4'),
+    'Vue Creek': svgI('M2 12c2-3 6-3 8 0s6 3 8 0M2 18c2-3 6-3 8 0s6 3 8 0M12 2v4'),
+    'Fitness 24h': svgI('M6.5 6.5a2 2 0 10-4 0 2 2 0 004 0zM4 9v6m-2-4h4m14-4.5a2 2 0 10-4 0 2 2 0 004 0zM18 9v6m-2-4h4M8 14h8'),
+    'Piscine exterieure': svgI('M2 12c2-2 4 0 6-2s4 0 6-2 4 0 6-2M2 18c2-2 4 0 6-2s4 0 6-2 4 0 6-2M12 2a4 4 0 014 4v2'),
+    'Plage': svgI('M17 20H2m15 0c0-4-3-7-7-7s-7 3-7 7m17-3l-3-3m3 3l3-3M19 4a3 3 0 11-6 0 3 3 0 016 0z'),
+    'Plage privee': svgI('M17 20H2m15 0c0-4-3-7-7-7s-7 3-7 7m17-3l-3-3m3 3l3-3M19 4a3 3 0 11-6 0 3 3 0 016 0z'),
+    'Spa balinais': svgI('M12 6c0-3 2.5-5 5-5 0 3-2.5 5-5 5zm0 0c0-3-2.5-5-5-5 0 3 2.5 5 5 5zm0 0v6m-4 6c0-2.2 1.8-4 4-4s4 1.8 4 4H8z'),
+    'Bar de plage': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6M8 22h8'),
+    'Rooftop pool': svgI('M2 12c2-2 4 0 6-2s4 0 6-2 4 0 6-2M2 18c2-2 4 0 6-2s4 0 6-2 4 0 6-2M12 2a4 4 0 014 4v2'),
+    'Sky bar': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6'),
+    'Rooftop': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6'),
+    'Restaurant japonais': svgI('M3 2v20h2v-8h4v8h2V2H9v8H5V2H3zm14 0v8l-2 2v10h2V12l4-2V2h-2v6l-2 2V2h-2z'),
+    'Bar lounge': svgI('M8 2l1 6H4l4 8h8l4-8h-5l1-6M12 16v6')
+  };
+
+  var params = new URLSearchParams(window.location.search);
+  var hotelName = params.get('hotel');
+  var hotel = null;
+  if (hotelName) {
+    hotel = ALL_HOTELS.find(function(h) { return h.name === hotelName; });
+  }
+  if (!hotel) hotel = ALL_HOTELS[0];
+
+  // Back link
+  var backEl = document.getElementById('hd-back');
+  if (document.referrer && document.referrer.indexOf('search-results') >= 0) {
+    backEl.href = document.referrer;
+  }
+
+  // Title
+  document.title = hotel.name + ' — Pullman Hotels & Resorts';
+  document.getElementById('hd-title').textContent = hotel.name;
+
+  // Subtitle
+  var starsHtml = '';
+  for (var s = 0; s < hotel.stars; s++) starsHtml += '★';
+  document.getElementById('hd-subtitle').innerHTML =
+    '<span class="hd-stars">' + starsHtml + '</span>' +
+    '<span>' + hotel.loc + '</span>' +
+    (hotel.rating ? '<span class="hd-rating-badge">★ ' + hotel.rating.toFixed(1) + ' <span>(' + hotel.reviews + ' avis)</span></span>' : '');
+
+  // Gallery
+  var galleryEl = document.getElementById('hd-gallery');
+  var imgs = hotel.imgs || [];
+  if (imgs.length >= 4) {
+    galleryEl.innerHTML =
+      '<div class="hd-gallery-main"><img src="' + imgs[0] + '" alt="' + hotel.name + '"/></div>' +
+      '<div class="hd-gallery-side"><img src="' + imgs[1] + '" alt=""/></div>' +
+      '<div class="hd-gallery-side"><img src="' + imgs[2] + '" alt=""/></div>';
+  } else if (imgs.length) {
+    galleryEl.style.gridTemplateColumns = '1fr';
+    galleryEl.style.gridTemplateRows = '1fr';
+    galleryEl.innerHTML = '<div class="hd-gallery-main" style="grid-row:auto"><img src="' + imgs[0] + '" alt="' + hotel.name + '"/></div>';
+  }
+
+  // Description
+  document.getElementById('hd-desc').textContent = hotel.desc || hotel.features;
+
+  // Amenities
+  var amenEl = document.getElementById('hd-amenities');
+  var amenities = hotel.amenities || hotel.features.split(' . ');
+  var fallbackIcon = svgI('M5 13l4 4L19 7');
+  amenEl.innerHTML = amenities.map(function(a) {
+    var icon = AMENITY_ICONS[a] || fallbackIcon;
+    return '<div class="hd-amenity"><span class="hd-amenity-icon">' + icon + '</span>' + a + '</div>';
+  }).join('');
+
+  // Price
+  document.getElementById('hd-price').innerHTML = hotel.price + ' &euro; <span>/ nuit</span>';
+  document.getElementById('hd-total').textContent = hotel.price + ' €';
+
+  // Map
+  var map = L.map('hd-map', { zoomControl: false, attributionControl: false }).setView([hotel.lat, hotel.lng], 14);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
+  L.control.zoom({ position: 'topright' }).addTo(map);
+
+  var hotelIcon = L.divIcon({
+    className: '',
+    html: '<div style="background:var(--pul-olive,#445047);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2)">' + hotel.price + ' €</div>',
+    iconSize: null, iconAnchor: [30, 15]
+  });
+  L.marker([hotel.lat, hotel.lng], { icon: hotelIcon }).addTo(map);
+
+  if (hotel.pois) {
+    hotel.pois.forEach(function(poi) {
+      var poiIcon = L.divIcon({
+        className: '',
+        html: '<div style="background:#fff;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:500;color:#445047;box-shadow:0 1px 4px rgba(0,0,0,.12);white-space:nowrap;border:1px solid rgba(68,80,71,.15);display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#445047;flex-shrink:0"></span>' + poi.name + '</div>',
+        iconSize: null, iconAnchor: [12, 12]
+      });
+      L.marker([poi.lat, poi.lng], { icon: poiIcon, interactive: false }).addTo(map);
+    });
+  }
+})();
+</script>
+</body>
+</html>

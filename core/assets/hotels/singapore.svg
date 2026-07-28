@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="tropical" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a2540"/><stop offset="50%" stop-color="#0f3d5e"/><stop offset="100%" stop-color="#1a5a3a"/></linearGradient>
+    <linearGradient id="pool" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a8090" stop-opacity=".6"/><stop offset="100%" stop-color="#0a4050"/></linearGradient>
+  </defs>
+  <rect width="200" height="140" fill="url(#tropical)"/>
+  <!-- Marina Bay Sands inspired -->
+  <rect x="45" y="35" width="14" height="55" rx="1" fill="#1a2a40" opacity=".7"/>
+  <rect x="85" y="35" width="14" height="55" rx="1" fill="#1a2a40" opacity=".7"/>
+  <rect x="125" y="35" width="14" height="55" rx="1" fill="#1a2a40" opacity=".7"/>
+  <!-- Sky bridge / boat on top -->
+  <rect x="40" y="28" width="104" height="8" rx="4" fill="#1a2a40" opacity=".6"/>
+  <ellipse cx="92" cy="28" rx="52" ry="3" fill="#1a3a50" opacity=".4"/>
+  <!-- Windows -->
+  <rect x="48" y="40" width="4" height="4" fill="#5FEF91" opacity=".4"/><rect x="54" y="40" width="4" height="4" fill="#5FEF91" opacity=".6"/>
+  <rect x="48" y="48" width="4" height="4" fill="#f4d98c" opacity=".5"/><rect x="54" y="48" width="4" height="4" fill="#f4d98c" opacity=".7"/>
+  <rect x="48" y="56" width="4" height="4" fill="#5FEF91" opacity=".3"/><rect x="54" y="56" width="4" height="4" fill="#f4d98c" opacity=".5"/>
+  <rect x="88" y="40" width="4" height="4" fill="#f4d98c" opacity=".6"/><rect x="94" y="40" width="4" height="4" fill="#5FEF91" opacity=".4"/>
+  <rect x="88" y="48" width="4" height="4" fill="#5FEF91" opacity=".5"/><rect x="94" y="48" width="4" height="4" fill="#f4d98c" opacity=".8"/>
+  <rect x="88" y="56" width="4" height="4" fill="#f4d98c" opacity=".4"/><rect x="94" y="56" width="4" height="4" fill="#5FEF91" opacity=".6"/>
+  <rect x="128" y="40" width="4" height="4" fill="#5FEF91" opacity=".5"/><rect x="134" y="40" width="4" height="4" fill="#f4d98c" opacity=".4"/>
+  <rect x="128" y="48" width="4" height="4" fill="#f4d98c" opacity=".7"/><rect x="134" y="48" width="4" height="4" fill="#5FEF91" opacity=".3"/>
+  <rect x="128" y="56" width="4" height="4" fill="#5FEF91" opacity=".6"/><rect x="134" y="56" width="4" height="4" fill="#f4d98c" opacity=".5"/>
+  <!-- Pool / water area -->
+  <rect y="95" width="200" height="45" fill="url(#pool)" rx="0"/>
+  <!-- Tropical trees -->
+  <rect x="10" y="65" width="2" height="30" fill="#0a3020" opacity=".6"/>
+  <path d="M11,65 Q5,55 0,62 Q5,58 11,65 Z" fill="#1a5a35" opacity=".5"/>
+  <path d="M11,65 Q17,55 22,62 Q17,58 11,65 Z" fill="#1a5a35" opacity=".4"/>
+  <rect x="170" y="60" width="2" height="35" fill="#0a3020" opacity=".6"/>
+  <path d="M171,60 Q165,50 160,57 Q165,53 171,60 Z" fill="#1a5a35" opacity=".5"/>
+  <path d="M171,60 Q177,50 182,57 Q177,53 171,60 Z" fill="#1a5a35" opacity=".4"/>
+  <!-- Water reflections -->
+  <rect x="45" y="100" width="14" height="1" fill="#5FEF91" opacity=".1"/>
+  <rect x="85" y="100" width="14" height="1" fill="#5FEF91" opacity=".12"/>
+  <rect x="125" y="100" width="14" height="1" fill="#5FEF91" opacity=".1"/>
+  <rect x="40" y="105" width="104" height="1" fill="#5FEF91" opacity=".06"/>
+  <!-- Stars -->
+  <circle cx="30" cy="15" r="1" fill="#fff" opacity=".4"/>
+  <circle cx="80" cy="10" r=".8" fill="#fff" opacity=".3"/>
+  <circle cx="150" cy="18" r="1" fill="#fff" opacity=".35"/>
+  <circle cx="120" cy="8" r=".6" fill="#fff" opacity=".25"/>
+</svg>

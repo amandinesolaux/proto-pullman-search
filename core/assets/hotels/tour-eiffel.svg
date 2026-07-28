@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2d1b4e"/><stop offset="50%" stop-color="#44296b"/><stop offset="100%" stop-color="#e8846b"/></linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a3a5c" stop-opacity=".8"/><stop offset="100%" stop-color="#0f2540"/></linearGradient>
+  </defs>
+  <rect width="200" height="140" fill="url(#dusk)"/>
+  <rect y="100" width="200" height="40" fill="url(#water)"/>
+  <!-- Eiffel tower silhouette -->
+  <polygon points="100,15 95,75 85,95 115,95 105,75" fill="#1a1025" opacity=".7"/>
+  <polygon points="97,75 88,95 112,95 103,75" fill="#1a1025" opacity=".5"/>
+  <rect x="98" y="10" width="4" height="8" fill="#1a1025" opacity=".7"/>
+  <line x1="100" y1="40" x2="88" y2="55" stroke="#1a1025" stroke-width="1.5" opacity=".5"/>
+  <line x1="100" y1="40" x2="112" y2="55" stroke="#1a1025" stroke-width="1.5" opacity=".5"/>
+  <!-- Hotel building right -->
+  <rect x="135" y="50" width="45" height="50" rx="2" fill="#1a1025" opacity=".6"/>
+  <rect x="140" y="55" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".7"/>
+  <rect x="150" y="55" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".5"/>
+  <rect x="160" y="55" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".8"/>
+  <rect x="140" y="64" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".4"/>
+  <rect x="150" y="64" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".9"/>
+  <rect x="160" y="64" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".6"/>
+  <rect x="140" y="73" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".8"/>
+  <rect x="150" y="73" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".3"/>
+  <rect x="160" y="73" width="6" height="5" rx=".5" fill="#f4d98c" opacity=".7"/>
+  <!-- Trees left -->
+  <ellipse cx="25" cy="88" rx="15" ry="12" fill="#1a3a2e" opacity=".6"/>
+  <ellipse cx="50" cy="90" rx="12" ry="10" fill="#1a3a2e" opacity=".5"/>
+  <!-- Water reflections -->
+  <rect x="90" y="105" width="20" height="1" rx=".5" fill="#e8846b" opacity=".3"/>
+  <rect x="85" y="110" width="30" height="1" rx=".5" fill="#e8846b" opacity=".2"/>
+  <rect x="88" y="115" width="24" height="1" rx=".5" fill="#e8846b" opacity=".15"/>
+  <rect x="140" y="108" width="15" height="1" rx=".5" fill="#f4d98c" opacity=".2"/>
+  <rect x="143" y="113" width="10" height="1" rx=".5" fill="#f4d98c" opacity=".15"/>
+  <!-- Moon -->
+  <circle cx="35" cy="25" r="10" fill="#f0e6d0" opacity=".2"/>
+  <circle cx="35" cy="25" r="6" fill="#f0e6d0" opacity=".3"/>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="desert" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4956b"/><stop offset="40%" stop-color="#c47a4a"/><stop offset="100%" stop-color="#8b4513"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a90b8"/><stop offset="100%" stop-color="#2a6090"/></linearGradient>
+  </defs>
+  <rect width="200" height="140" fill="url(#desert)"/>
+  <!-- Burj-like tower -->
+  <path d="M80,95 L80,25 Q80,15 85,10 Q90,15 90,25 L90,95 Z" fill="url(#glass)" opacity=".7"/>
+  <rect x="82" y="30" width="6" height="3" fill="#fff" opacity=".2"/>
+  <rect x="82" y="37" width="6" height="3" fill="#fff" opacity=".15"/>
+  <rect x="82" y="44" width="6" height="3" fill="#fff" opacity=".2"/>
+  <rect x="82" y="51" width="6" height="3" fill="#fff" opacity=".1"/>
+  <rect x="82" y="58" width="6" height="3" fill="#fff" opacity=".2"/>
+  <!-- Modern buildings -->
+  <rect x="105" y="40" width="20" height="55" rx="1" fill="#3a7ca5" opacity=".6"/>
+  <rect x="108" y="44" width="4" height="4" fill="#fff" opacity=".15"/>
+  <rect x="115" y="44" width="4" height="4" fill="#fff" opacity=".2"/>
+  <rect x="108" y="52" width="4" height="4" fill="#fff" opacity=".2"/>
+  <rect x="115" y="52" width="4" height="4" fill="#fff" opacity=".1"/>
+  <rect x="108" y="60" width="4" height="4" fill="#fff" opacity=".15"/>
+  <rect x="115" y="60" width="4" height="4" fill="#fff" opacity=".2"/>
+  <rect x="130" y="55" width="25" height="40" rx="1" fill="#2d6080" opacity=".5"/>
+  <rect x="134" y="60" width="5" height="4" fill="#fff" opacity=".15"/>
+  <rect x="143" y="60" width="5" height="4" fill="#fff" opacity=".2"/>
+  <rect x="134" y="68" width="5" height="4" fill="#fff" opacity=".2"/>
+  <rect x="143" y="68" width="5" height="4" fill="#fff" opacity=".1"/>
+  <!-- Small building left -->
+  <rect x="30" y="65" width="35" height="30" rx="2" fill="#a06030" opacity=".5"/>
+  <rect x="35" y="70" width="6" height="5" fill="#f4d98c" opacity=".4"/>
+  <rect x="45" y="70" width="6" height="5" fill="#f4d98c" opacity=".6"/>
+  <rect x="55" y="70" width="6" height="5" fill="#f4d98c" opacity=".3"/>
+  <!-- Ground -->
+  <rect y="95" width="200" height="45" fill="#6b3a1a" opacity=".4"/>
+  <!-- Palm trees -->
+  <rect x="15" y="70" width="2" height="25" fill="#5a3010" opacity=".5"/>
+  <ellipse cx="16" cy="68" rx="10" ry="5" fill="#2d5a30" opacity=".5"/>
+  <rect x="170" y="72" width="2" height="23" fill="#5a3010" opacity=".5"/>
+  <ellipse cx="171" cy="70" rx="10" ry="5" fill="#2d5a30" opacity=".5"/>
+  <!-- Sun -->
+  <circle cx="170" cy="20" r="14" fill="#f0d080" opacity=".35"/>
+  <circle cx="170" cy="20" r="8" fill="#f0d080" opacity=".5"/>
+</svg>

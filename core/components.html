@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>welDS — Storybook (base vanilla)</title>
+  <link rel="stylesheet" href="./tokens/base.css" />
+  <link rel="stylesheet" href="./tokens/brands.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <style>
+    /* Chrome du storybook (neutre, hors DS). Réutilise cette structure pour tes démos. */
+    body { padding: 0; }
+    .sb-head { padding: 48px 64px 0; }
+    .sb-head h1 { font-family: var(--font-serif); font-weight: 400; font-size: 40px; margin: 0 0 8px; }
+    .sb-head p { color: var(--ink-2); max-width: 720px; margin: 0; }
+    .sb-grid { padding: 32px 64px 80px; display: flex; flex-direction: column; gap: 32px; }
+    .sb-item { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .sb-item__label { display: flex; align-items: baseline; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--badge-soft); }
+    .sb-item__label h2 { font-family: var(--font-sans); font-weight: 400; font-size: 16px; margin: 0; }
+    .sb-item__label code { font-family: ui-monospace, monospace; font-size: 13px; color: var(--ink-2); }
+    .sb-stage { padding: 28px 20px; }
+    .sb-note { margin: 0; padding: 0 20px 16px; font-size: 13px; color: var(--ink-3); }
+    .sb-empty { padding: 48px 20px; text-align: center; color: var(--ink-3); }
+  </style>
+</head>
+
+<!-- STORYBOOK welDS — base VANILLA.
+     La base ne fournit AUCUN master <wd-*> : c'est un framework. Crée tes masters via
+     la skill « welds-component » (ils s'ajoutent à core/components/components.js), puis
+     ajoute ici une section <section class="sb-item"> par master pour les visualiser.
+     body.brand-brandbook = thème Accor neutre ; remplace par ta marque (ex. brand-sofitel)
+     une fois ta couche brands/<marque> en place. -->
+
+<body class="brand-brandbook">
+
+  <div class="sb-head">
+    <h1>welDS — Storybook</h1>
+    <p>Base <strong>vanilla</strong> : framework de composants, tokens des marques Accor, primitives
+      (typo, layout, boutons). Aucun master fourni — ajoute les tiens via la skill <code>welds-component</code>.</p>
+  </div>
+
+  <div class="sb-grid">
+
+    <!-- Démo de référence : un master minimal défini dans CETTE page (preuve que le framework rend).
+         En vrai, tes masters vivent dans core/components/components.js. -->
+    <section class="sb-item">
+      <div class="sb-item__label"><h2>Exemple — master minimal</h2><code>&lt;wd-hello&gt;</code></div>
+      <div class="sb-stage">
+        <wd-hello name="welDS"></wd-hello>
+      </div>
+      <p class="sb-note">Composant à attributs : <code>extends WdEl</code> + <code>render()</code>. Défini ici en inline pour la démo.</p>
+    </section>
+
+    <!-- Gabarit à dupliquer pour chaque master réel :
+    <section class="sb-item">
+      <div class="sb-item__label"><h2>Nom</h2><code>&lt;wd-xxx&gt;</code></div>
+      <div class="sb-stage"> … instance … </div>
+      <p class="sb-note">Note éventuelle.</p>
+    </section>
+    -->
+
+    <section class="sb-item">
+      <div class="sb-empty">Aucun master dans la base vanilla. Crée les tiens (skill <code>welds-component</code>) puis ajoute leurs démos ici.</div>
+    </section>
+
+  </div>
+
+  <script src="./components/components.js"></script>
+  <!-- Démo inline (à NE PAS faire en prod : les masters vont dans components.js). -->
+  <script>
+    customElements.define("wd-hello", class extends HTMLElement {
+      connectedCallback() {
+        const name = this.getAttribute("name") || "monde";
+        this.innerHTML = `<p class="t-sans-md">Bonjour, <strong>${name}</strong> — le framework rend correctement.</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

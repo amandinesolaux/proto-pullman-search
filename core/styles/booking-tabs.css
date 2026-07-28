@@ -1,0 +1,306 @@
+/* ============================================================
+   WD-BOOKING-TABS — Airbnb-style search avec tabs + tokens Pullman
+   ============================================================ */
+
+.wd-booking-tabs {
+  background: rgba(0, 0, 0, 0.54);
+  backdrop-filter: blur(96px);
+  -webkit-backdrop-filter: blur(96px);
+  border-radius: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  max-width: 100%;
+  margin: -40px 0 0;
+  padding: 40px 80px;
+  position: relative;
+  z-index: 10;
+  overflow: visible;
+}
+
+/* Navigation tabs */
+.wd-booking-tabs__nav {
+  display: flex;
+  gap: 0;
+  padding: 0 0 16px;
+  border-bottom: var(--border-default, 1px) solid rgba(255, 255, 255, 0.1);
+}
+
+.wd-booking-tabs__tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font-family: var(--font-family-body, var(--font-sans));
+  font-size: 14px;
+  font-weight: var(--font-weight-body-default, 400);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.wd-booking-tabs__tab:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+}
+
+.wd-booking-tabs__tab--active {
+  color: rgba(255, 255, 255, 1);
+  background: transparent;
+}
+
+.wd-booking-tabs__tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -17px;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.wd-booking-tabs__tab-icon {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  opacity: 0.7;
+}
+
+.wd-booking-tabs__tab--active .wd-booking-tabs__tab-icon {
+  opacity: 1;
+}
+
+/* Panels */
+.wd-booking-tabs__panels {
+  position: relative;
+  min-height: 80px;
+}
+
+.wd-booking-tabs__panel {
+  display: none;
+  padding: 8px;
+}
+
+.wd-booking-tabs__panel--active {
+  display: block;
+}
+
+/* Search bar */
+.wd-booking-tabs__search-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  transition: box-shadow 0.2s;
+}
+
+/* Fields */
+.wd-booking-tabs__field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  cursor: pointer;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.95);
+  transition: background 0.15s;
+  position: relative;
+  border-bottom: 2px solid transparent;
+}
+
+.wd-booking-tabs__field:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.wd-booking-tabs__field:focus-within {
+  background: rgba(255, 255, 255, 1);
+  border-bottom-color: var(--color-on-surface-hi, #222);
+}
+
+.wd-booking-tabs__field-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+  color: #222;
+}
+
+.wd-booking-tabs__field-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.wd-booking-tabs__field--destination {
+  flex: 1.5;
+}
+
+.wd-booking-tabs__field--large {
+  flex: 2;
+}
+
+.wd-booking-tabs__field--xlarge {
+  flex: 2.5;
+}
+
+.wd-booking-tabs__field--dates {
+  flex: 1.2;
+}
+
+.wd-booking-tabs__field--guests {
+  flex: 1;
+}
+
+.wd-booking-tabs__label {
+  display: block;
+  font-family: var(--font-family-label, var(--font-sans));
+  font-size: 12px;
+  font-weight: var(--font-weight-label-strong, 600);
+  color: var(--color-on-surface-hi, #222);
+  margin-bottom: 4px;
+}
+
+.wd-booking-tabs__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-family-input, var(--font-sans));
+  font-size: 14px;
+  color: var(--color-on-surface-low, #717171);
+  outline: none;
+  padding: 0;
+}
+
+.wd-booking-tabs__input::placeholder {
+  color: var(--color-on-surface-low, #717171);
+}
+
+.wd-booking-tabs__input:focus {
+  color: var(--color-on-surface-hi, #222);
+}
+
+/* Separator */
+.wd-booking-tabs__separator {
+  width: var(--border-default, 1px);
+  height: 32px;
+  background: var(--color-outline-low, #DDDDDD);
+  flex-shrink: 0;
+}
+
+/* Search button */
+.wd-booking-tabs__search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #5fef91;
+  color: #445047;
+  border: none;
+  border-radius: 99px;
+  padding: 12px 24px;
+  margin-right: 8px;
+  font-family: var(--font-family-body, var(--font-sans));
+  font-size: 16px;
+  font-weight: var(--font-weight-body-strong, 600);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-height: 56px;
+}
+
+.wd-booking-tabs__search-btn:hover {
+  background: var(--color-hover-success, #4cd67d);
+  transform: scale(1.02);
+}
+
+.wd-booking-tabs__search-btn svg {
+  flex-shrink: 0;
+}
+
+.wd-booking-tabs__search-text {
+  display: block;
+}
+
+/* Plus de critères */
+.wd-booking-tabs__more {
+  padding: 8px 16px;
+  text-align: center;
+}
+
+.wd-booking-tabs__more-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: var(--font-family-body, var(--font-sans));
+  font-size: 13px;
+  font-weight: var(--font-weight-body-default, 400);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.wd-booking-tabs__more-link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .wd-booking-tabs {
+    margin: -24px 16px 0;
+    border-radius: var(--radius-container-high, 6px);
+  }
+
+  .wd-booking-tabs__search-bar {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .wd-booking-tabs__field {
+    width: 100%;
+    border-radius: 0;
+    padding: 16px 20px;
+  }
+
+  .wd-booking-tabs__field:first-of-type {
+    border-radius: var(--radius-element-interactive-high, 100px) var(--radius-element-interactive-high, 100px) 0 0;
+  }
+
+  .wd-booking-tabs__separator {
+    display: none;
+  }
+
+  .wd-booking-tabs__search-btn {
+    width: calc(100% - 16px);
+    margin: 8px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .wd-booking-tabs__nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .wd-booking-tabs__tab {
+    flex-shrink: 0;
+    min-width: 120px;
+    font-size: 13px;
+  }
+
+  .wd-booking-tabs__search-text {
+    display: none;
+  }
+
+  .wd-booking-tabs__search-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+  }
+}

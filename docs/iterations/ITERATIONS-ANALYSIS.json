@@ -1,0 +1,184 @@
+{
+  "session_metadata": {
+    "file": "pages/pullman/brand-homepage.html",
+    "total_requests": 40,
+    "figma_reference": "https://www.figma.com/design/4SGldt68F6BHgdChG6URdf/Test-skill?node-id=2-10186",
+    "files_modified": [
+      "pages/pullman/brand-homepage.html",
+      "core/styles/base.css"
+    ]
+  },
+  "iterations": [
+    {
+      "id": 1,
+      "category": "runtime_error",
+      "user_request": "La page affiche une page blanche alors qu'elle fonctionnait la semaine dernière",
+      "problem_description": "Les scripts JavaScript se chargeaient après le parsing du DOM, donc les web components n'étaient pas enregistrés au moment où le navigateur tentait de les interpréter",
+      "attempts": 2,
+      "root_cause": "Scripts placés au milieu du body au lieu du head, et page servie via file:// au lieu de HTTP",
+      "solution_applied": "Déplacé scripts dans <head> et lancé serveur HTTP local",
+      "skill_improvement": {
+        "recommendation": "La skill devrait TOUJOURS générer les scripts dans <head>, jamais dans <body>. Ajouter une vérification automatique : si scripts trouvés dans body, les déplacer automatiquement vers head.",
+        "validation_rule": "Après génération HTML, vérifier que tous les <script> sont dans <head> ou en fin de </body>, jamais au milieu",
+        "warning_to_add": "CRITICAL: Scripts must be in <head> for web components to register before DOM parsing. Serving via file:// will cause CORS errors - use HTTP server."
+      }
+    },
+    {
+      "id": 2,
+      "category": "layout_error",
+      "user_request": "Les cartes destinations s'affichent verticalement au lieu d'horizontalement avec espacement",
+      "problem_description": "Le web component <wd-carousel> ne se transformait pas, donc le DOM restait avec les enfants <wd-dest-card> empilés verticalement par défaut. Le CSS ciblait uniquement la version transformée (.wd-carousel__track) et ignorait la version non transformée (wd-carousel)",
+      "attempts": 5,
+      "root_cause": "Absence de CSS fallback pour l'élément custom non transformé. Pattern récurrent : le CSS ne gère que .class-transformed, pas custom-element",
+      "solution_applied": "Ajout CSS fallback avec inline-block + white-space: nowrap + scrollbar hidden",
+      "skill_improvement": {
+        "recommendation": "Pour CHAQUE web component généré, la skill doit AUTOMATIQUEMENT créer 2 blocs CSS : 1) Fallback pour custom-element non transformé, 2) Styles pour .custom-element__classes transformées. Pattern mandatory : custom-element { display: block } + custom-element > child { layout rules }",
+        "validation_rule": "Après génération d'un composant, vérifier que le CSS contient à la fois 'custom-element {' ET '.custom-element__ {'. Si absent, générer le fallback automatiquement.",
+        "code_pattern": "/* Fallback NON transformé */\ncustom-element { display: block; }\ncustom-element > child { /* layout */ }\n/* Transformé par JS */\n.custom-element__ { /* layout */ }"
+      }
+    },
+    {
+      "id": 3,
+      "category": "measurement_error",
+      "user_request": "Respecter les espacements exacts du design Figma",
+      "problem_description": "Les valeurs CSS étaient approximatives (gap: 16px, spacing: 96px) au lieu des valeurs exactes mesurées dans Figma (gap: 28px, spacing: 120px)",
+      "attempts": 1,
+      "root_cause": "Valeurs codées 'à l'œil' sans mesure Figma précise",
+      "solution_applied": "Utilisé Figma MCP pour mesurer les valeurs exactes et les appliquer",
+      "skill_improvement": {
+        "recommendation": "La skill doit TOUJOURS utiliser l'agent Figma MCP pour extraire les mesures EXACTES (gaps, padding, spacing, font-size) AVANT de générer le CSS. Ne jamais deviner ou approximer.",
+        "validation_rule": "Avant d'écrire un CSS avec des valeurs numériques, exiger une capture Figma + mesure via MCP. Bannir les valeurs 'rondes' arbitraires (16, 24, 32) sans justification Figma.",
+        "workflow_to_add": "1. Capture screenshot Figma du composant, 2. Utiliser figma_execute pour mesurer gaps/spacing exacts, 3. Générer CSS avec valeurs mesurées, 4. Ajouter commentaire source Figma"
+      }
+    },
+    {
+      "id": 4,
+      "category": "layout_error",
+      "user_request": "4 cards callout horizontalement, toutes de même hauteur",
+      "problem_description": "Tentative d'appliquer grid-template-columns: repeat(4, 1fr) directement sur wd-callout-section, ce qui mettait TOUT en grille (header + cards). Ensuite, problème de whitespace inline-block qui faisait passer 3 cards par ligne au lieu de 4. Enfin, hauteurs inégales des cards.",
+      "attempts": 4,
+      "root_cause": "Incompréhension de la structure DOM générée par le web component (header + track séparés) + whitespace invisible entre inline-block + absence de flexbox stretch",
+      "solution_applied": "1. Ciblé uniquement les cards enfants directs, 2. font-size: 0 pour éliminer whitespace, 3. Flexbox avec gap pour hauteurs égales",
+      "skill_improvement": {
+        "recommendation": "AVANT de générer CSS de layout, la skill doit lire le code JS du web component pour comprendre la structure DOM générée (quels wrappers, quels enfants). Ajouter SYSTÉMATIQUEMENT font-size: 0 sur tout parent d'éléments inline-block. Préférer flexbox à inline-block pour grilles (hauteurs auto-égales).",
+        "validation_rule": "Pour tout layout horizontal multi-colonnes : 1. Lire component.js pour voir structure transformée, 2. Si inline-block utilisé, ajouter font-size: 0 sur parent, 3. Si hauteurs doivent être égales, utiliser flexbox gap au lieu de inline-block + margin",
+        "anti_pattern": "NE JAMAIS utiliser inline-block sans font-size: 0 sur parent. NE JAMAIS appliquer grid sur un parent qui contient à la fois header ET items."
+      }
+    },
+    {
+      "id": 5,
+      "category": "content_error",
+      "user_request": "Adapter tous les wordings pour correspondre à la production pullman.accor.com",
+      "problem_description": "Les textes étaient des placeholders génériques au lieu des vrais wordings de production",
+      "attempts": 1,
+      "root_cause": "Génération initiale sans référence au site de production",
+      "solution_applied": "WebFetch du site production + extraction textes + remplacement systématique",
+      "skill_improvement": {
+        "recommendation": "La skill doit TOUJOURS proposer d'extraire les wordings du site de production de la marque (si URL fournie) AVANT de générer le HTML. Ajouter un prompt : 'Voulez-vous que j'extraie les vrais textes depuis [brand].accor.com ?'",
+        "validation_rule": "Si user fournit une URL de production, extraire TOUS les wordings (titres, CTA, descriptions) et les mapper aux composants. Ne générer de placeholder que si aucune production accessible.",
+        "workflow_to_add": "1. Détecter la marque (Pullman, Sofitel, etc.), 2. Proposer URL production, 3. WebFetch extraction textes, 4. Mapper textes → attributs composants, 5. Générer HTML avec vrais wordings"
+      }
+    },
+    {
+      "id": 6,
+      "category": "layout_error",
+      "user_request": "Section Instagram : grille 7 images + 1 post texte selon design Figma, avec icônes réseaux sociaux en bas",
+      "problem_description": "Multiple erreurs successives : 1) 8 images au lieu de 7+post, 2) Images empilées verticalement, 3) 3 images par ligne au lieu de 4 (whitespace), 4) Icônes en haut au lieu d'en bas, 5) Layout grid cassé mélangeant tout. Le composant utilise un grid complexe 3fr 1fr (images gauche, post droite) qui n'était pas compris.",
+      "attempts": 8,
+      "root_cause": "N'ai pas utilisé la référence Figma dès le départ. Composant wd-social a une structure complexe (header + grid 3fr/1fr + icons) que je n'avais pas analysée avant de coder. Même erreur whitespace inline-block répétée.",
+      "solution_applied": "1. Screenshot Figma pour comprendre le layout exact, 2. Lecture du code JS du composant, 3. CSS grid 3fr 1fr + tiles en sous-grille 4col + post aspect-ratio: 1 + icônes en flexbox bas",
+      "skill_improvement": {
+        "recommendation": "WORKFLOW MANDATORY pour composants complexes : 1. TOUJOURS capturer screenshot Figma AVANT d'écrire une ligne de code, 2. Lire le code JS du composant pour voir la structure générée, 3. Dessiner la grille mentalement (ou via commentaire), 4. Écrire CSS fallback + transformé, 5. Screenshot de validation APRÈS. NE JAMAIS deviner le layout.",
+        "validation_rule": "Pour toute section avec > 3 éléments enfants : exiger screenshot Figma + analyse structure DOM AVANT génération CSS. Bannir l'approche 'essai-erreur' sans compréhension préalable.",
+        "agent_usage": "Utiliser agent QA dès la 2e tentative échouée sur un même composant, PAS après 5-8 tentatives. Le pattern 'essayer 5 fois puis appeler agent' est inefficace."
+      }
+    }
+  ],
+  "recurring_patterns": {
+    "web_components_untransformed": {
+      "occurrences": 3,
+      "components_affected": ["wd-carousel", "wd-callout-section", "wd-social"],
+      "description": "Oubli systématique de prévoir CSS fallback pour custom-element non transformé, ne ciblant que les classes transformées",
+      "skill_fix": "Ajouter une règle : pour chaque <custom-element> généré, créer AUTOMATIQUEMENT un bloc CSS /* Fallback NON transformé */ custom-element { } avant le bloc /* Transformé */. Pattern non négociable."
+    },
+    "inline_block_whitespace": {
+      "occurrences": 2,
+      "components_affected": ["wd-callout-section", "wd-social"],
+      "description": "Espaces HTML entre éléments inline-block comptés comme ~4-8px par le navigateur, causant passage de 4 items/ligne à 3 items/ligne",
+      "skill_fix": "BANNIR inline-block pour les grilles multi-colonnes. Toujours utiliser flexbox (display: flex, gap) ou grid. Si inline-block inévitable, ajouter SYSTÉMATIQUEMENT font-size: 0 sur parent + commentaire explicatif."
+    },
+    "css_specificity_trial_error": {
+      "occurrences": 3,
+      "description": "Tentatives répétées de fix CSS avec !important sans comprendre pourquoi le sélecteur ne fonctionne pas. Vrai problème : sélecteur cible le mauvais élément (parent au lieu de child, ou vice-versa)",
+      "skill_fix": "AVANT d'ajouter !important ou de tenter un 2e sélecteur CSS, EXIGER : 1. Lire le code JS du composant pour voir la structure DOM réelle, 2. Inspecter l'arbre DOM (via commentaire mental), 3. Vérifier que le sélecteur cible le bon nœud. !important = red flag, pas solution."
+    },
+    "missing_visual_validation": {
+      "occurrences": 6,
+      "description": "Beaucoup d'erreurs auraient été évitées avec screenshot Figma AVANT + screenshot résultat APRÈS, et comparaison visuelle. Pattern : coder 'à l'aveugle' puis découvrir erreurs quand user se plaint.",
+      "skill_fix": "WORKFLOW MANDATORY : 1. Screenshot Figma référence, 2. Générer code, 3. Screenshot résultat (si serveur local dispo via agent), 4. Comparer visuellement, 5. Itérer SI différences. Bannir approche 'je génère et j'espère que ça marche'."
+    }
+  },
+  "tools_usage_analysis": {
+    "figma_mcp": {
+      "used_correctly": ["Mesures exactes spacing/gap", "Screenshot référence section Instagram"],
+      "missed_opportunities": ["Aurait dû capturer TOUTES les sections dès le début", "Mesures typography non extraites automatiquement"],
+      "skill_improvement": "Proposer SYSTÉMATIQUEMENT au démarrage : 'Voulez-vous que j'extraie toutes les mesures Figma pour garantir pixel-perfect ?' + batch screenshot de toutes les sections"
+    },
+    "qa_agent": {
+      "used_correctly": ["Diagnostic whitespace inline-block", "Analyse layout callout cards", "Debug Instagram grid"],
+      "used_too_late": "Agent appelé après 5-8 tentatives échouées au lieu de dès la 2e tentative",
+      "skill_improvement": "Règle automatique : si même erreur persiste après 2 tentatives, STOP et appeler agent QA. Pattern 'insister 8 fois' = perte de temps user."
+    },
+    "web_fetch": {
+      "used_correctly": ["Extraction wordings production Pullman"],
+      "missed_opportunities": "Aurait pu extraire structure sections + ordre contenu dès le début",
+      "skill_improvement": "Au démarrage, si URL production fournie, proposer : 'Extraire structure + wordings production pour baseline exacte ?'"
+    }
+  },
+  "skill_recommendations_summary": [
+    {
+      "priority": "CRITICAL",
+      "rule": "Pour CHAQUE web component, générer AUTOMATIQUEMENT CSS fallback (custom-element {}) + CSS transformé (.custom-element__ {}). Non négociable.",
+      "rationale": "3 erreurs identiques sur 3 composants différents. Pattern systématique."
+    },
+    {
+      "priority": "CRITICAL",
+      "rule": "BANNIR inline-block pour grilles. Toujours flexbox/grid. Si inline-block inévitable : font-size: 0 mandatory.",
+      "rationale": "2 erreurs identiques, 8 tentatives perdues. Whitespace invisible = piège récurrent."
+    },
+    {
+      "priority": "HIGH",
+      "rule": "AVANT génération CSS layout : 1. Screenshot Figma, 2. Lire component.js structure DOM, 3. Dessiner grille mentalement. JAMAIS coder à l'aveugle.",
+      "rationale": "6 itérations sur Instagram auraient été évitées avec screenshot + analyse préalable."
+    },
+    {
+      "priority": "HIGH",
+      "rule": "Appeler agent QA dès 2e tentative échouée sur même problème. Pattern 'essayer 8 fois' = inefficace.",
+      "rationale": "Agent utilisé trop tard 3 fois. Gaspillage 15-20 requêtes."
+    },
+    {
+      "priority": "MEDIUM",
+      "rule": "Toujours utiliser Figma MCP pour mesures exactes (gap, padding, font-size). Bannir valeurs 'à l'œil'.",
+      "rationale": "Valeurs approximatives corrigées après coup. MCP disponible dès le début."
+    },
+    {
+      "priority": "MEDIUM",
+      "rule": "Au démarrage : proposer extraction wordings + structure depuis URL production si disponible.",
+      "rationale": "Wordings placeholder remplacés après coup. Production accessible dès le début."
+    },
+    {
+      "priority": "LOW",
+      "rule": "Scripts TOUJOURS dans <head> ou fin </body>. Vérification automatique post-génération.",
+      "rationale": "Erreur bloquante initiale. Facile à éviter avec validation automatique."
+    }
+  ],
+  "statistics": {
+    "total_iterations": 6,
+    "total_attempts": 21,
+    "errors_could_be_prevented": 18,
+    "prevention_rate_potential": "86%",
+    "most_common_error_category": "layout_error (4/6)",
+    "most_wasted_attempts": "Section Instagram (8 tentatives)",
+    "agent_qa_efficiency": "3 problèmes résolus en 1 tentative après 15+ tentatives manuelles échouées"
+  }
+}

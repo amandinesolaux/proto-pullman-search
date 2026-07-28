@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Immersive Carousel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #1a1a1a;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .carousel-container {
+      width: 100%;
+      max-width: 1200px;
+      position: relative;
+      padding: 100px 0;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      perspective: 1500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      position: absolute;
+      width: 300px;
+      height: 400px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      transform-style: preserve-3d;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: flex-end;
+      padding: 40px 30px;
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
+      border-radius: 20px;
+    }
+
+    .card span {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Active card - center */
+    .card.active {
+      transform: translateX(0) translateZ(0) rotateY(0deg) scale(1.1);
+      z-index: 10;
+      opacity: 1;
+      filter: brightness(1);
+    }
+
+    /* Previous card */
+    .card.prev {
+      transform: translateX(-400px) translateZ(-250px) rotateY(45deg) scale(0.8);
+      z-index: 5;
+      opacity: 0.6;
+      filter: brightness(0.7);
+    }
+
+    /* Next card */
+    .card.next {
+      transform: translateX(400px) translateZ(-250px) rotateY(-45deg) scale(0.8);
+      z-index: 5;
+      opacity: 0.6;
+      filter: brightness(0.7);
+    }
+
+    /* Far left */
+    .card.far-left {
+      transform: translateX(-700px) translateZ(-500px) rotateY(60deg) scale(0.6);
+      z-index: 1;
+      opacity: 0.3;
+      filter: brightness(0.5);
+      pointer-events: none;
+    }
+
+    /* Far right */
+    .card.far-right {
+      transform: translateX(700px) translateZ(-500px) rotateY(-60deg) scale(0.6);
+      z-index: 1;
+      opacity: 0.3;
+      filter: brightness(0.5);
+      pointer-events: none;
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 50px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .dot.active {
+      background: white;
+      width: 30px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carousel-container">
+    <div class="carousel" id="carousel">
+      <div class="card" data-index="0" style="background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600')">
+        <span>Solo</span>
+      </div>
+      <div class="card" data-index="1" style="background-image: url('https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600')">
+        <span>En couple</span>
+      </div>
+      <div class="card active" data-index="2" style="background-image: url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600')">
+        <span>En famille</span>
+      </div>
+      <div class="card" data-index="3" style="background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600')">
+        <span>Entre amis</span>
+      </div>
+      <div class="card" data-index="4" style="background-image: url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600')">
+        <span>Business</span>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="dot" data-index="0"></div>
+      <div class="dot" data-index="1"></div>
+      <div class="dot active" data-index="2"></div>
+      <div class="dot" data-index="3"></div>
+      <div class="dot" data-index="4"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentIndex = 2;
+    const cards = document.querySelectorAll('.card');
+    const dots = document.querySelectorAll('.dot');
+    const total = cards.length;
+
+    function updateCarousel() {
+      cards.forEach((card, i) => {
+        card.classList.remove('active', 'prev', 'next', 'far-left', 'far-right');
+
+        const diff = i - currentIndex;
+
+        if (diff === 0) {
+          card.classList.add('active');
+        } else if (diff === -1 || (currentIndex === 0 && i === total - 1)) {
+          card.classList.add('prev');
+        } else if (diff === 1 || (currentIndex === total - 1 && i === 0)) {
+          card.classList.add('next');
+        } else if (diff < -1 || (currentIndex <= 1 && i > currentIndex + 1)) {
+          card.classList.add('far-left');
+        } else {
+          card.classList.add('far-right');
+        }
+      });
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+      });
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        if (!card.classList.contains('active')) {
+          currentIndex = parseInt(card.dataset.index);
+          updateCarousel();
+        }
+      });
+    });
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        currentIndex = parseInt(dot.dataset.index);
+        updateCarousel();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        currentIndex = (currentIndex - 1 + total) % total;
+        updateCarousel();
+      } else if (e.key === 'ArrowRight') {
+        currentIndex = (currentIndex + 1) % total;
+        updateCarousel();
+      }
+    });
+
+    updateCarousel();
+  </script>
+
+</body>
+</html>

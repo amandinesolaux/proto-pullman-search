@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pullman Prototypes</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #445047 0%, #2a3329 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+    h1 {
+      color: #ffffff;
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .subtitle {
+      color: #b8c4bb;
+      font-size: 18px;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .versions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      text-decoration: none;
+      display: block;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    }
+    .card-label {
+      display: inline-block;
+      background: #5fef91;
+      color: #1a1f1c;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .card h2 {
+      color: #1a1f1c;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .card p {
+      color: #6b7570;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+    .features li {
+      color: #445047;
+      font-size: 14px;
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+    .features li:before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #5fef91;
+      font-weight: 700;
+    }
+    .cta {
+      background: #445047;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-align: center;
+      display: block;
+      transition: background 0.2s ease;
+    }
+    .card:hover .cta {
+      background: #2a3329;
+    }
+    footer {
+      text-align: center;
+      color: #b8c4bb;
+      font-size: 14px;
+      margin-top: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pullman Prototypes</h1>
+    <p class="subtitle">Explorez les deux versions de la homepage</p>
+
+    <div class="versions">
+      <a href="/pages/pullman/proto-pullman-v1-map-filters.html" class="card">
+        <span class="card-label">Version 1</span>
+        <h2>Map & Filtres</h2>
+        <p>Découverte guidée par destination avec carte interactive et filtres thématiques</p>
+        <ul class="features">
+          <li>Booking engine avec tabs</li>
+          <li>Carte interactive des destinations</li>
+          <li>Filtres thématiques (Asie, Europe, etc.)</li>
+          <li>Carrousel de destinations</li>
+        </ul>
+        <span class="cta">Voir la V1 →</span>
+      </a>
+
+      <a href="/pages/pullman/proto-pullman-v2-discovery-wizard.html" class="card">
+        <span class="card-label">Version 2</span>
+        <h2>Discovery Wizard</h2>
+        <p>Questionnaire immersif pour guider les visiteurs indécis vers leur destination idéale</p>
+        <ul class="features">
+          <li>Questionnaire en 7 étapes</li>
+          <li>Carrousel 3D immersif</li>
+          <li>Modale full-screen</li>
+          <li>Résultats personnalisés</li>
+        </ul>
+        <span class="cta">Voir la V2 →</span>
+      </a>
+    </div>
+
+    <footer>
+      Pullman Hotels & Resorts • Prototypes Factory 2026
+    </footer>
+  </div>
+</body>
+</html>

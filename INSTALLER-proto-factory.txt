@@ -1,0 +1,36 @@
+════════════════════════════════════════════════════════════
+  proto-factory — kit de prototypage welDS (Accor/ALL)
+  Comment l'installer (aucune compétence technique requise)
+════════════════════════════════════════════════════════════
+
+1) DÉCOMPRESSE ce dossier où tu veux (par ex. dans « Documents »).
+
+2) RÉCUPÈRE LE CHEMIN du dossier décompressé :
+   • Sur Mac : clic droit sur le dossier « proto-factory » →
+     maintiens la touche ⌥ Option → clique « Copier "proto-factory"
+     comme nom de chemin ». (Le chemin est maintenant dans ton presse-papier.)
+
+3) DANS CLAUDE CODE, tape ces 2 lignes (colle ton chemin à la 1re) :
+
+     /plugin marketplace add <colle-ton-chemin-ici>
+     /plugin install proto-factory@proto-factory-marketplace
+
+   Exemple :
+     /plugin marketplace add /Users/toi/Documents/proto-factory
+     /plugin install proto-factory@proto-factory-marketplace
+
+4) C'EST PRÊT. Les outils apparaissent (tape « / » pour les voir) :
+
+     /proto-factory:welds-create-template   créer un type de page (depuis Figma)
+     /proto-factory:welds-fill-template     remplir une page avec un vrai contenu
+     /proto-factory:welds-component         créer / maintenir un composant
+     /proto-factory:welds                   esquisse rapide
+
+────────────────────────────────────────────────────────────
+À SAVOIR
+• La base est NEUTRE : aucun composant ni marque livrés d'avance.
+  Tu construis tes pages et composants via les outils ci-dessus.
+• Les polices et logos sous licence d'une marque s'ajoutent en local
+  (dossier brands/<marque>/). Voir docs/guide.html pour tout comprendre.
+• Pour désinstaller : /plugin  (menu) → tu peux le retirer.
+════════════════════════════════════════════════════════════

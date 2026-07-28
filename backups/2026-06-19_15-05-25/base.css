@@ -1,0 +1,394 @@
+/* ============================================================
+   welDS — PRIMITIVES de styles AGNOSTIQUES (base vanilla, AUCUN composant).
+   Couleurs + noms de police = tokens par marque (tokens/brands.css). Aucune marque ici.
+   Les vraies polices et le logo viennent des couches brands/<marque>.(css|js).
+   → Les styles PAR COMPOSANT (.wd-header, .wd-card…) s'ajoutent ici au fur et à
+     mesure que tu crées tes masters (skill welds-component). La base ne fournit que
+     les tokens, la typo, le layout et les boutons.
+   ============================================================ */
+
+/* ---- Polices : la BASE ne fournit que des FALLBACKS libres bundlés (agnostiques, OSS).
+   Les vraies polices de MARQUE (sous licence) sont déclarées par la couche brands/<marque>.css,
+   qui les place AVANT ces fallbacks dans --font-serif/-sans. Sans fichier → fallback (pas d'erreur).
+   'Serif Fallback' = Playfair Display ; 'Sans Fallback' = Poppins (woff2 dans /assets). ---- */
+@font-face {
+  font-family: 'Serif Fallback';
+  src: url('../assets/PlayfairDisplay-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Serif Fallback';
+  src: url('../assets/PlayfairDisplay-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sans Fallback';
+  src: url('../assets/Poppins-Light.woff2') format('woff2');
+  font-weight: 300; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sans Fallback';
+  src: url('../assets/Poppins-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Sans Fallback';
+  src: url('../assets/Poppins-SemiBold.woff2') format('woff2');
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+
+/* Alias définis sur l'ÉLÉMENT qui porte la classe brand (body), pas :root, sinon les
+   var(--color-*) se résolvent avec les valeurs brandbook héritées de <html>.
+   Sélecteur GÉNÉRIQUE [class*="brand-"] → marche pour TOUTE marque (brand-sofitel,
+   brand-fairmont, brand-ibis…) : les --color-* viennent du bloc de marque de brands.css,
+   donc les couleurs se re-skinnent toutes seules. POLICES : --font-serif/-sans/-meta pointent
+   sur les tokens de marque --font-family-display/-body (définis par marque dans brands.css), avec
+   les fallbacks OSS de la base ('Serif/Sans Fallback'). La VRAIE police de marque est branchée par
+   la couche brands/<marque>.css (qui réécrit --font-serif/-sans pour la placer en tête). Le wordmark
+   et le monogramme (ICON.wordmark / ICON.mono = NEUTRES) sont surchargés via window.WD_BRAND. */
+body[class*="brand-"] {
+  --font-serif: var(--font-family-display, 'Serif Fallback'), 'Times New Roman', Georgia, serif;
+  --font-sans: var(--font-family-body, 'Sans Fallback'), 'Helvetica Neue', Arial, sans-serif;
+  /* libellés méta (labels, pager) — suit la police de corps de la marque */
+  --font-meta: var(--font-family-body, 'Sans Fallback'), 'Helvetica Neue', Arial, sans-serif;
+
+  --ink: var(--color-on-surface-hi);     /* #29201E côté Sofitel */
+  --ink-2: var(--color-on-surface-mid);  /* #342A28 */
+  --ink-3: var(--color-on-surface-low);  /* #3D3231 */
+  --accent: var(--color-accent);         /* #916F41 doré côté Sofitel */
+  --member: var(--color-loyalty);
+  --on-member: var(--color-on-loyalty);
+  --promo: var(--color-offer);
+  --on-promo: var(--color-on-offer);
+  --badge-soft: var(--color-surface-container-mid);
+  --surface: var(--color-surface);
+  --tint: var(--color-surface-container-mid);   /* le -low résout en blanc côté Sofitel */
+  --on-primary: var(--color-on-primary);
+  --line: var(--color-outline-low);
+  --line-mid: var(--color-outline-mid);
+  --black: var(--color-primary);         /* #030403 */
+  --black-hover: var(--color-hover-primary);
+
+  --wd-track-gap: 28px;   /* espace entre cartes d'un carrousel */
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--surface); color: var(--ink); -webkit-font-smoothing: antialiased; font-family: var(--font-sans); overflow-x: clip; }
+body.brand-pullman { background: var(--pul-bg, #445047); color: #fff; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; border-radius: 2px; }
+
+/* Convention : un master <wd-*> est inline par défaut (custom element). Chaque master
+   déclare son propre display dans son bloc CSS (ex. `wd-header { display: block; }`). */
+
+/* ---------- Layout ---------- */
+.wd-container { width: 100%; max-width: 1340px; margin: 0 auto; padding: 0 64px; }
+@media (max-width: 900px) { .wd-container { padding: 0 24px; } }
+/* rythme vertical commun des sections */
+.wd-section { padding: 48px 0; }
+/* grille générique de cartes (hors carrousel) */
+.wd-grid { display: grid; gap: 32px; }
+.wd-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.wd-grid--2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1023px) { .wd-grid--3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 680px) { .wd-grid--3, .wd-grid--2 { grid-template-columns: 1fr; } }
+
+/* ---------- Typographie (specs Figma) ---------- */
+.t-serif-2xl { font-family: var(--font-serif); font-weight: 400; font-size: 64px; line-height: 72px; }
+.t-serif-xl  { font-family: var(--font-serif); font-weight: 400; font-size: 48px; line-height: 56px; }
+.t-serif-lg  { font-family: var(--font-serif); font-weight: 400; font-size: 40px; line-height: 48px; }
+.t-serif-md  { font-family: var(--font-serif); font-weight: 400; font-size: 28px; line-height: 36px; }
+.t-sans-xl   { font-family: var(--font-sans); font-weight: 300; font-size: 32px; line-height: 40px; }
+.t-sans-lg   { font-family: var(--font-sans); font-weight: 300; font-size: 20px; line-height: 28px; }
+.t-sans-md   { font-family: var(--font-sans); font-weight: 300; font-size: 16px; line-height: 24px; }
+.t-sans-sm   { font-family: var(--font-sans); font-weight: 300; font-size: 14px; line-height: 20px; }
+.t-eyebrow   { font-family: var(--font-sans); font-weight: 300; font-size: 14px; line-height: 20px; color: var(--ink-2); }
+
+/* ---------- Boutons / liens ---------- */
+.wd-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 48px; padding: 12px 20px; border: 1px solid transparent; cursor: pointer; text-decoration: none;
+  font-family: var(--font-sans); font-weight: 400; font-size: 16px; line-height: 24px;
+}
+.wd-btn--primary { background: var(--black); color: var(--on-primary); }
+.wd-btn--primary:hover { background: var(--black-hover); }
+.wd-btn--outline { background: transparent; color: var(--ink); border-color: var(--ink); }
+.wd-btn--outline:hover { background: var(--ink); color: var(--surface); }
+.wd-btn--accent { background: var(--accent); color: var(--color-on-accent); }
+.wd-btn--accent:hover { background: var(--color-hover-accent); }
+.wd-link {
+  display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+  font-family: var(--font-sans); font-weight: 300; font-size: 16px; line-height: 24px; color: var(--black);
+  border-bottom: 1px solid currentColor; padding-bottom: 2px; align-self: flex-start;
+}
+.wd-link:hover { color: var(--accent); }
+
+/* ---------- Header (two-row, single translucent overlay) ---------- */
+wd-header { display: block; position: absolute; top: 0; left: 0; width: 100%; z-index: 100; }
+.wd-header { background: #445047; }
+
+/* Row 1 : logo + params + account */
+.wd-header__top { border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+.wd-header__top-inner { display: flex; align-items: center; justify-content: space-between; height: 76px; max-width: 1920px; margin: 0 auto; padding: 0 64px; }
+.wd-header__logo { color: #fff; text-decoration: none; }
+.wd-header__logo .wd-wordmark { height: 32px; width: auto; }
+.wd-header__top-right { display: flex; align-items: center; gap: 24px; height: 48px; }
+.wd-header__params { display: flex; gap: 16px; align-items: center; }
+.wd-header__param { font-family: var(--font-sans); font-weight: 400; font-size: 12px; line-height: 16px; text-transform: uppercase; color: #fff; text-decoration: none; white-space: nowrap; }
+.wd-header__param:hover { color: var(--pul-highlight); }
+.wd-header__account { display: flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 24px; border-radius: 100px; border: 1px solid rgba(255, 255, 255, 0.8); color: #fff; text-decoration: none; font-family: var(--font-sans); font-size: 14px; font-weight: 400; white-space: nowrap; }
+.wd-header__account svg { width: 18px; height: 18px; }
+.wd-header__account-label { }
+
+/* Row 2 : nav links */
+.wd-header__bottom-inner { display: flex; align-items: center; gap: 24px; max-width: 1920px; margin: 0 auto; padding: 16px 64px; }
+.wd-header__link { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-family: var(--font-sans); font-weight: 400; font-size: 16px; line-height: 24px; color: #fff; white-space: nowrap; }
+.wd-header__link svg { width: 14px; height: 14px; }
+.wd-header__link:hover { color: var(--pul-highlight); }
+
+/* ---------- Hero ---------- */
+wd-hero { display: block; }
+.wd-hero { position: relative; height: 700px; background-size: cover; background-position: center; display: flex; align-items: flex-end; color: #fff; overflow: hidden; }
+.wd-hero__overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--color-gradient-black-hi, rgba(0,0,0,.6)) 0%, var(--color-gradient-black-min, transparent) 60%); }
+.wd-hero__content { position: relative; z-index: 1; max-width: 1340px; width: 100%; margin: 0 auto; padding: 0 64px 120px; }
+.wd-hero__kicker { color: #fff; margin: 0 0 8px; }
+.wd-hero__title { margin: 0 0 12px; }
+.wd-hero__sub { margin: 0 0 24px; font-size: 20px; line-height: 32px; }
+.wd-hero__actions { display: flex; gap: 12px; margin-top: 24px; }
+.wd-hero__caption { position: absolute; bottom: 16px; left: 64px; z-index: 1; display: flex; gap: 24px; font-size: 12px; color: var(--pul-bg); }
+.wd-hero__pager { position: absolute; bottom: 16px; right: 64px; z-index: 1; font-size: 16px; color: #fff; }
+
+/* ---------- Booking ---------- */
+wd-booking { display: block; }
+.wd-booking { max-width: 1212px; margin: 0 auto; padding: 0 64px; }
+.wd-booking__fields { display: flex; align-items: center; gap: 0; background: var(--color-hover-primary, #28332B); border-radius: 0; padding: 20px 24px; }
+.wd-booking__field { display: flex; align-items: center; gap: 12px; flex: 1; color: #fff; }
+.wd-booking__field svg { flex-shrink: 0; color: #fff; }
+.wd-booking__label { display: block; font-family: var(--font-sans); font-weight: 500; font-size: 14px; color: #fff; }
+.wd-booking__value { display: block; font-family: var(--font-sans); font-weight: 400; font-size: 14px; color: var(--pul-muted, #D9E6D0); }
+.wd-booking__sep { width: 1px; height: 40px; background: rgba(255,255,255,.2); margin: 0 20px; flex-shrink: 0; }
+.wd-booking__cta { flex-shrink: 0; margin-left: 16px; }
+.wd-booking__special { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 16px 0; font-family: var(--font-sans); font-size: 14px; color: #fff; text-decoration: none; border-top: 1px solid rgba(255,255,255,.15); margin-top: 0; }
+
+/* ---------- Section heading ---------- */
+wd-section-heading { display: block; }
+.wd-sh { margin-bottom: 40px; }
+.wd-sh__desc { color: #fff; margin: 8px 0 16px; max-width: 720px; }
+.wd-sh--split { display: flex; justify-content: space-between; align-items: flex-end; }
+
+/* ---------- Destination card ---------- */
+wd-dest-card { display: block; }
+.wd-dest-card { display: flex; flex-direction: column; justify-content: flex-end; width: 223px; aspect-ratio: 223/396; background-size: cover; background-position: center; border-radius: 0; overflow: hidden; position: relative; text-decoration: none; color: #fff; flex-shrink: 0; }
+.wd-dest-card__overlay { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.wd-dest-card__overlay-gradient { flex: 1; background: linear-gradient(to bottom, rgba(7,5,24,0) 0%, rgba(7,5,24,.54) 100%); }
+.wd-dest-card__overlay-solid { background: rgba(7,5,24,.54); }
+.wd-dest-card__text { position: relative; z-index: 1; padding: 28px; display: flex; flex-direction: column; gap: 8px; }
+.wd-dest-card__kicker { font-family: var(--font-sans); font-weight: 400; font-size: 11px; line-height: 14px; text-transform: uppercase; color: #c4c7c9; letter-spacing: .5px; }
+.wd-dest-card__title { font-family: var(--font-serif); font-weight: 700; font-size: 20px; line-height: 24px; text-transform: uppercase; letter-spacing: .5px; }
+
+/* ---------- Carousel ---------- */
+/* Styles pour wd-carousel NON transformé (fallback si JS ne charge pas) */
+wd-carousel {
+  display: block;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+wd-carousel::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+wd-carousel > wd-dest-card {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 28px;
+  white-space: normal;
+}
+/* Styles pour .wd-carousel transformé par JS */
+.wd-carousel {
+  display: block;
+}
+.wd-carousel__track {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 28px !important;
+  overflow-x: auto !important;
+}
+.wd-carousel__header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.wd-carousel__tabs { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+.wd-carousel__tab { background: none; border: none; color: #fff; font-family: var(--font-sans); font-size: 12px; text-transform: uppercase; cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+.wd-carousel__tab.is-active { color: var(--pul-highlight, #5FEF91); border-bottom-color: var(--pul-highlight, #5FEF91); }
+.wd-carousel__count { font-size: 16px; text-transform: none; }
+.wd-carousel__controls { display: flex; align-items: center; gap: 16px; }
+.wd-carousel__map { height: 40px; font-size: 14px; gap: 6px; }
+.wd-carousel__map svg { width: 16px; height: 16px; }
+.wd-carousel__track { display: flex; gap: var(--wd-track-gap, 16px); overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 8px; flex-wrap: nowrap; }
+.wd-carousel__track::-webkit-scrollbar { display: none; }
+.wd-carousel__footer { display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-top: 16px; }
+.wd-carousel__dots { display: flex; gap: 6px; }
+.wd-carousel__dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.3); }
+.wd-carousel__dots span.is-active { background: #fff; }
+.wd-carousel__pager { font-family: var(--font-sans); font-size: 14px; color: #fff; }
+
+/* ---------- Editorial ---------- */
+wd-editorial { display: block; }
+.wd-editorial { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.wd-editorial--img-left { direction: ltr; }
+.wd-editorial:not(.wd-editorial--img-left) .wd-editorial__img { order: 2; }
+.wd-editorial:not(.wd-editorial--img-left) .wd-editorial__body { order: 1; }
+.wd-editorial__img { position: relative; }
+.wd-editorial__img img { width: 100%; height: 100%; object-fit: cover; }
+.wd-editorial__caption { position: absolute; bottom: 8px; left: 12px; font-size: 12px; color: var(--pul-caption, #8B8A93); }
+.wd-editorial__body { display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+.wd-editorial--white .wd-editorial__body { background: #fff; color: var(--pul-bg, #445047); }
+.wd-editorial__title { margin: 8px 0 16px; }
+.wd-editorial__nav { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 24px; border-top: 1px solid var(--color-outline-low, #BCCABE); }
+.wd-editorial__arrow { background: none; border: none; cursor: pointer; padding: 8px; color: var(--pul-bg, #445047); display: flex; align-items: center; justify-content: center; }
+.wd-editorial__arrow svg { width: 20px; height: 20px; }
+.wd-editorial__arrow:hover { color: var(--pul-highlight, #5FEF91); }
+.wd-editorial__pager { font-family: var(--font-sans); font-size: 14px; color: var(--pul-bg, #445047); }
+
+/* ---------- Callout section ---------- */
+/* Styles pour wd-callout-section NON transformé (fallback si JS ne charge pas) */
+wd-callout-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+wd-callout-section > wd-callout-card {
+  flex: 0 0 calc((100% - 72px) / 4); /* 4 cards with 3 gaps of 24px = 72px total gap space */
+}
+/* Styles pour .wd-callout-section transformé par JS */
+.wd-callout-section__track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-top: 40px; }
+
+/* ---------- Callout card ---------- */
+wd-callout-card { display: block; }
+.wd-callout-card { background: #fff; overflow: hidden; text-decoration: none; display: flex; flex-direction: column; height: 100%; }
+.wd-callout-card__img { aspect-ratio: 16/9; overflow: hidden; flex-shrink: 0; }
+.wd-callout-card__img img { width: 100%; height: 100%; object-fit: cover; }
+.wd-callout-card__body { flex: 1; padding: 24px; color: var(--pul-bg, #445047); }
+.wd-callout-card__title { font-family: var(--font-sans); font-weight: 500; font-size: 18px; line-height: 24px; margin: 0 0 12px; }
+
+/* ---------- Marketing ---------- */
+wd-marketing { display: block; }
+.wd-marketing { padding: 0; }
+.wd-marketing__header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; color: #fff; }
+.wd-marketing__tabs { display: flex; gap: 24px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,.15); padding-bottom: 0; }
+.wd-marketing__tab { background: none; border: none; color: #fff; font-family: var(--font-sans); font-size: 16px; cursor: pointer; padding: 8px 0 12px; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 6px; }
+.wd-marketing__tab.is-active { color: var(--pul-highlight, #5FEF91); border-bottom-color: var(--pul-highlight, #5FEF91); font-weight: 700; }
+.wd-marketing__content { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 500px; }
+.wd-marketing__img { position: relative; }
+.wd-marketing__img img { width: 100%; height: 100%; object-fit: cover; }
+.wd-marketing__body { display: flex; flex-direction: column; justify-content: center; padding: 48px; color: #fff; }
+.wd-marketing__body .t-serif-lg { margin: 8px 0 16px; }
+.wd-marketing__body .wd-btn { margin-top: 24px; align-self: flex-start; color: #fff; border-color: #fff; }
+
+/* ---------- Highlight V2 ---------- */
+wd-highlight-v2 { display: block; }
+.wd-highlight-v2 { display: grid; grid-template-columns: 1fr 2fr; border-left: 4px solid var(--pul-highlight, #5FEF91); overflow: hidden; background: var(--pul-bg, #445047); }
+.wd-highlight-v2__img { position: relative; }
+.wd-highlight-v2__img img { width: 100%; height: 100%; object-fit: cover; }
+.wd-highlight-v2__body { display: flex; flex-direction: column; justify-content: center; padding: 40px 48px; color: #fff; }
+.wd-highlight-v2__body .t-serif-md { margin: 8px 0 16px; }
+.wd-highlight-v2__actions { display: flex; gap: 12px; margin-top: 24px; }
+
+/* ---------- Billboard ---------- */
+wd-billboard { display: block; }
+.wd-billboard { display: grid; grid-template-columns: 1fr 1fr; background: #fff; border: 1px solid var(--line, #BCCABE); color: var(--pul-bg, #445047); overflow: hidden; }
+.wd-billboard__body { display: flex; flex-direction: column; justify-content: center; padding: 48px; }
+.wd-billboard__body .t-eyebrow { margin: 0 0 16px; }
+.wd-billboard__body .t-serif-lg { margin: 0 0 16px; color: var(--pul-bg, #445047); }
+.wd-billboard__img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Social ---------- */
+/* Styles pour wd-social NON transformé (fallback si JS ne charge pas) */
+wd-social {
+  display: block;
+  font-size: 0; /* Élimine l'espace blanc entre images inline-block */
+}
+wd-social > img {
+  display: inline-block;
+  width: calc(25% - 3px); /* 4 colonnes avec gap de 4px */
+  margin-right: 4px;
+  margin-bottom: 4px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  vertical-align: top;
+}
+wd-social > img:nth-child(4n) {
+  margin-right: 0;
+}
+/* Styles pour .wd-social transformé par JS */
+.wd-social { font-size: 1rem; } /* Reset font-size après transformation */
+.wd-social__header { margin-bottom: 24px; color: #fff; }
+.wd-social__header h2 { color: var(--pul-highlight); }
+.wd-social__header .t-sans-md { margin-top: 8px; }
+.wd-social__grid { display: grid; grid-template-columns: 3fr 1fr; gap: 24px; align-items: start; }
+.wd-social__tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.wd-social__tile img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.wd-social__post {
+  background: var(--pul-bg-dark, #28332B);
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 24px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+}
+.wd-social__icons { display: flex; justify-content: flex-start; gap: 16px; margin-top: 32px; }
+.wd-social__icons a {
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.wd-social__icons a:hover { color: var(--pul-highlight, #5FEF91); border-color: var(--pul-highlight, #5FEF91); }
+
+/* ---------- Loyalty ---------- */
+wd-loyalty { display: block; }
+.wd-loyalty { display: grid; grid-template-columns: 1fr 1fr; background: #fff; color: var(--pul-bg, #445047); overflow: hidden; }
+.wd-loyalty__body { display: flex; flex-direction: column; justify-content: center; padding: 48px 64px; }
+.wd-loyalty__body .t-serif-lg { margin: 0 0 16px; }
+.wd-loyalty__list { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-direction: column; gap: 8px; }
+.wd-loyalty__list li { display: flex; align-items: center; gap: 8px; }
+.wd-loyalty__list svg { flex-shrink: 0; color: var(--pul-bg, #445047); }
+.wd-loyalty__actions { display: flex; gap: 12px; }
+.wd-loyalty__img { position: relative; }
+.wd-loyalty__img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Footer ---------- */
+wd-footer { display: block; }
+.wd-footer { background: var(--pul-bg, #445047); color: #fff; padding: 40px 64px 32px; max-width: 1340px; margin: 0 auto; }
+.wd-footer__breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-bottom: 40px; }
+.wd-footer__breadcrumb a { color: var(--pul-highlight, #5FEF91); text-decoration: none; }
+.wd-footer__breadcrumb span { color: #fff; }
+.wd-footer__breadcrumb svg { width: 12px; height: 12px; }
+.wd-footer__logo { text-align: center; padding: 24px 0; border-top: 1px solid rgba(255,255,255,.15); border-bottom: 1px solid rgba(255,255,255,.15); margin-bottom: 40px; }
+.wd-footer__logo .wd-wordmark { height: 28px; width: auto; margin: 0 auto; color: #fff; }
+.wd-footer__newsletter { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-bottom: 40px; }
+.wd-footer__nl-right { display: flex; flex-direction: column; gap: 8px; }
+.wd-footer__nl-right a { color: #fff; text-decoration: none; }
+.wd-footer__nl-right a:hover { color: var(--pul-highlight, #5FEF91); }
+.wd-footer__form { display: flex; gap: 12px; margin-top: 16px; }
+.wd-footer__input { flex: 1; height: 48px; padding: 0 16px; background: transparent; border: 1px solid rgba(255,255,255,.3); color: #fff; font-family: var(--font-sans); font-size: 14px; }
+.wd-footer__input::placeholder { color: rgba(255,255,255,.5); }
+.wd-footer__links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; padding: 40px 0; border-top: 1px solid rgba(255,255,255,.15); border-bottom: 1px solid rgba(255,255,255,.15); }
+.wd-footer__links h4 { font-family: var(--font-sans); font-weight: 700; font-size: 16px; margin: 0 0 12px; }
+.wd-footer__links a { display: block; color: #fff; text-decoration: none; font-size: 14px; line-height: 28px; }
+.wd-footer__links a:hover { color: var(--pul-highlight, #5FEF91); }
+.wd-footer__social { display: flex; justify-content: center; gap: 24px; padding: 32px 0; }
+.wd-footer__social a { color: #fff; }
+.wd-footer__social a:hover { color: var(--pul-highlight, #5FEF91); }
+.wd-footer__portfolio { padding: 40px 0; border-top: 1px solid rgba(255,255,255,.15); text-align: center; }
+.wd-footer__all-logo { margin-bottom: 32px; }
+.wd-footer__all-logo svg { height: 40px; width: auto; color: #fff; margin: 0 auto; display: block; }
+.wd-footer__brands { display: flex; flex-direction: column; gap: 16px; }
+.wd-footer__tier { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+.wd-footer__tier span:first-child { font-size: 20px; color: #fff; min-width: 120px; text-align: left; }
+.wd-footer__tier span:last-child { font-size: 14px; color: var(--pul-mid, #707070); }
+.wd-footer__legal { text-align: center; padding-top: 32px; border-top: 1px solid rgba(255,255,255,.15); }

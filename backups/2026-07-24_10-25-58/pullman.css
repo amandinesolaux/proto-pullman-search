@@ -1,0 +1,66 @@
+/* ============================================================
+   welDS — Couche marque PULLMAN
+   Polices : Neue Power Ultra (titres) + Noto Sans (body)
+   ============================================================ */
+
+/* ---- Font-face : Neue Power Ultra (vraie police de marque) ---- */
+@font-face {
+  font-family: 'Neue Power';
+  src: url('fonts/NeuePower-Ultra.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+/* ---- Fallback Poppins pour les graisses non-Ultra ---- */
+@font-face {
+  font-family: 'Pullman Neue Power';
+  src: url('../../assets/Poppins-SemiBold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Pullman Neue Power';
+  src: url('../../assets/Poppins-Regular.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+/* ---- Overrides de marque scopés sur body.brand-pullman ---- */
+body.brand-pullman {
+  --font-serif: 'Neue Power', 'Pullman Neue Power', 'Sans Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Noto Sans', 'Sans Fallback', 'Helvetica Neue', Arial, sans-serif;
+  --font-meta: 'Noto Sans', 'Sans Fallback', 'Helvetica Neue', Arial, sans-serif;
+
+  --pul-highlight: var(--color-on-success);          /* #5FEF91 — vert fluo titres */
+  --pul-highlight-hover: #4DD87A;
+  --pul-bg: var(--color-accent);                     /* #445047 — fond de page */
+  --pul-bg-dark: var(--color-hover-primary);         /* #28332B */
+  --pul-muted: #D9E6D0;                             /* texte atténué sur fond sombre */
+  --pul-mid: #707070;                               /* kickers/compteurs */
+  --pul-caption: #8B8A93;                            /* captions images */
+
+  background: var(--pul-bg);
+}
+
+/* ---- Échelle typo Pullman (mesurée depuis Figma) ---- */
+body.brand-pullman .t-serif-2xl { font-family: var(--font-serif); font-weight: 800; font-size: 62px; line-height: 76px; text-transform: uppercase; }
+body.brand-pullman .t-serif-xl  { font-family: var(--font-serif); font-weight: 800; font-size: 50px; line-height: 60px; text-transform: uppercase; }
+body.brand-pullman .t-serif-lg  { font-family: var(--font-serif); font-weight: 800; font-size: 40px; line-height: 48px; text-transform: uppercase; }
+body.brand-pullman .t-serif-md  { font-family: var(--font-serif); font-weight: 800; font-size: 30px; line-height: 30px; text-transform: uppercase; }
+body.brand-pullman .t-sans-xl   { font-family: var(--font-serif); font-weight: 800; font-size: 36px; line-height: 36px; text-transform: uppercase; }
+body.brand-pullman .t-sans-lg   { font-family: var(--font-sans); font-weight: 500; font-size: 22px; line-height: 28px; }
+body.brand-pullman .t-sans-md   { font-family: var(--font-sans); font-weight: 400; font-size: 16px; line-height: 24px; }
+body.brand-pullman .t-sans-sm   { font-family: var(--font-sans); font-weight: 400; font-size: 14px; line-height: 20px; }
+body.brand-pullman .t-eyebrow   { font-family: var(--font-sans); font-weight: 500; font-size: 12px; line-height: 16px; text-transform: uppercase; color: var(--pul-mid); }
+
+/* ---- Boutons Pullman : pilule (radius 100) ---- */
+body.brand-pullman .wd-btn { border-radius: 100px; font-family: var(--font-sans); font-weight: 500; }
+body.brand-pullman .wd-btn--primary { background: var(--pul-highlight); color: var(--pul-bg); border-color: var(--pul-highlight); }
+body.brand-pullman .wd-btn--primary:hover { background: var(--pul-highlight-hover); border-color: var(--pul-highlight-hover); }
+body.brand-pullman .wd-btn--outline { border-color: currentColor; }
+body.brand-pullman .wd-btn--dark { background: var(--color-primary); color: var(--color-on-primary); }
+body.brand-pullman .wd-btn--dark:hover { background: var(--color-hover-primary); }
+
+/* ---- Titres verts (sections sur fond sombre) ---- */
+body.brand-pullman .pul-title { color: var(--pul-highlight); }
+
+/* ---- Lien vert ---- */
+body.brand-pullman .wd-link--green { color: var(--pul-highlight); border-bottom-color: var(--pul-highlight); }
+body.brand-pullman .wd-link--green:hover { color: var(--pul-highlight-hover); }

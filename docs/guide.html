@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Kit de prototypage welDS — documentation</title>
+  <link rel="stylesheet" href="../core/tokens/base.css" />
+  <link rel="stylesheet" href="../core/tokens/brands.css" />
+  <link rel="stylesheet" href="../core/styles/base.css" />
+  <style>
+    html { scroll-behavior: smooth; }
+    body { background: var(--surface); color: var(--ink); font-family: var(--font-sans); line-height: 1.6; }
+    .doc { max-width: 880px; margin: 0 auto; padding: 0 24px 96px; }
+
+    /* en-tête */
+    .doc-head { padding: 64px 0 32px; border-bottom: 1px solid var(--line); }
+    .doc-kicker { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+    .doc-head h1 { font-size: 40px; line-height: 1.1; margin: 14px 0 12px; font-weight: 600; letter-spacing: -.01em; }
+    .doc-head p { font-size: 19px; color: var(--ink-2); margin: 0; max-width: 640px; }
+    .doc-meta { margin-top: 18px; font-size: 13px; color: var(--ink-3); }
+    .doc-meta b { color: var(--ink); font-weight: 600; }
+
+    /* sommaire */
+    .toc { margin: 32px 0; padding: 20px 24px; background: var(--tint); border: 1px solid var(--line); border-radius: 8px; }
+    .toc h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px; }
+    .toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+    .toc li { margin: 5px 0; }
+    .toc a { color: var(--ink-2); text-decoration: none; }
+    .toc a:hover { color: var(--accent); text-decoration: underline; }
+
+    /* sections */
+    section { padding-top: 40px; }
+    section > h2 { font-size: 26px; font-weight: 600; margin: 0 0 6px; letter-spacing: -.01em; scroll-margin-top: 20px; }
+    section > .lead { color: var(--ink-2); margin: 0 0 20px; font-size: 16px; }
+    h3 { font-size: 17px; font-weight: 600; margin: 26px 0 8px; }
+    p { margin: 0 0 14px; }
+    ul, ol.steps { margin: 0 0 16px; padding-left: 22px; }
+    li { margin: 6px 0; }
+    a { color: var(--accent); }
+    strong { font-weight: 600; }
+
+    .callout { border-left: 3px solid var(--accent); background: var(--tint); padding: 14px 18px; border-radius: 0 6px 6px 0; margin: 16px 0; }
+    .callout p:last-child { margin-bottom: 0; }
+    .callout .lbl { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; font-weight: 600; }
+
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; background: var(--tint); padding: 1px 6px; border-radius: 4px; }
+    pre { background: var(--ink); color: #fff; padding: 14px 16px; border-radius: 8px; overflow-x: auto; margin: 12px 0; }
+    pre code { background: none; padding: 0; color: inherit; font-size: 13px; line-height: 1.5; }
+    .cmd { display: block; background: var(--tint); border-left: 2px solid var(--accent); padding: 8px 12px; margin: 6px 0; font-family: ui-monospace, Menlo, monospace; font-size: 13px; border-radius: 0 4px 4px 0; }
+
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+    td code { white-space: nowrap; }
+
+    ol.steps { list-style: none; counter-reset: s; padding: 0; }
+    ol.steps > li { counter-increment: s; display: grid; grid-template-columns: 34px 1fr; gap: 14px; margin: 12px 0; }
+    ol.steps > li::before { content: counter(s); display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9999px; background: var(--accent); color: #fff; font-weight: 600; font-size: 14px; }
+
+    .pill { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 9px; font-weight: 600; }
+
+    /* équipe d'agents : flux + roster */
+    .agents-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 14px; margin: 22px 0 22px; padding: 18px; background: var(--tint); border: 1px solid var(--line); border-radius: 12px; text-align: center; }
+    .node { display: inline-block; padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 600; }
+    .node--src { background: var(--ink); color: #fff; }
+    .node--ok { background: #fff; color: var(--color-outline-eco, #237B00); border: 1px solid var(--color-outline-eco, #237B00); }
+    .conn { color: var(--ink-3); font-size: 13px; }
+    .roster { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 6px; }
+    .member { display: flex; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+    .member--lead { grid-column: 1 / -1; border-color: var(--color-outline-eco, #237B00); }
+    .m-ico { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 10px; background: var(--color-accent-container-low, #F7F5FF); display: flex; align-items: center; justify-content: center; }
+    .m-ico svg { width: 24px; height: 24px; color: var(--accent); }
+    .member--lead .m-ico { background: #EAF6E8; }
+    .member--lead .m-ico svg { color: var(--color-outline-eco, #237B00); }
+    .member h4 { margin: 0; font-size: 16px; font-weight: 600; }
+    .member h4 span { color: var(--ink-3); font-weight: 400; font-size: 14px; }
+    .m-role { margin: 2px 0 9px; font-size: 13px; color: var(--accent); font-weight: 600; }
+    .member--lead .m-role { color: var(--color-outline-eco, #237B00); }
+    .m-tasks { display: flex; flex-wrap: wrap; gap: 5px; }
+    .m-tasks span { font-size: 11.5px; background: var(--tint); color: var(--ink-2); padding: 3px 8px; border-radius: 999px; }
+
+    footer.doc-foot { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 14px; }
+    @media (max-width: 720px) { .toc ol { columns: 1; } .doc-head h1 { font-size: 32px; } .roster { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="brand-brandbook">
+  <div class="doc">
+
+    <header class="doc-head">
+      <span class="doc-kicker">Documentation · welDS</span>
+      <h1>Kit de prototypage welDS</h1>
+      <p>Construire des prototypes de pages welDS navigables et fidèles à la marque, pour les tests
+      utilisateurs. Vite, et pour n'importe quelle marque Accor.</p>
+      <div class="doc-meta">Statique (HTML/CSS/JS), aucun build · 12 marques Accor · base <b>framework</b> + 4 skills ·
+      partagé en plugin <b>proto-factory</b></div>
+    </header>
+
+    <nav class="toc">
+      <h2>Sommaire</h2>
+      <ol>
+        <li><a href="#why">Pourquoi ce kit</a></li>
+        <li><a href="#result">Ce que tu obtiens</a></li>
+        <li><a href="#archi">Comment c'est construit</a></li>
+        <li><a href="#skills">Les skills</a></li>
+        <li><a href="#workflow">Le workflow</a></li>
+        <li><a href="#agents">L'escouade de vérification</a></li>
+        <li><a href="#learn">Le kit apprend</a></li>
+        <li><a href="#deploy">Déploiement & partage</a></li>
+        <li><a href="#files">Fichiers de référence</a></li>
+      </ol>
+    </nav>
+
+    <section id="why">
+      <h2>Pourquoi ce kit</h2>
+      <p class="lead">Tester une idée auprès d'utilisateurs demande un proto qui ressemble vraiment au
+      produit. Le construire à la main, à chaque fois, c'est lent et vite incohérent avec le design system.</p>
+      <p>Le kit règle ça : tu décris l'écran que tu veux, il l'assemble à partir de composants welDS
+      déjà calés sur le design system, aux couleurs et polices de la marque. Tu passes de l'idée au proto
+      partageable en bien moins de temps, et le résultat est cohérent par construction.</p>
+      <p>Trois promesses :</p>
+      <ul>
+        <li><strong>Fidèle</strong> : calé sur les maquettes Figma, vraies polices, vraies couleurs, vrais comportements.</li>
+        <li><strong>Rapide</strong> : pas de dev, pas de build, un lien partageable à la fin.</li>
+        <li><strong>Réutilisable</strong> : un seul jeu de composants pour toutes les marques et tous les écrans.</li>
+      </ul>
+      <div class="callout">
+        <span class="lbl">À retenir</span>
+        <p>C'est un outil de <strong>prototypage pour test utilisateur</strong>, pas un site de
+        production. Le but est de tester une expérience, vite et fidèlement, quelle que soit l'idée.</p>
+      </div>
+    </section>
+
+    <section id="result">
+      <h2>Ce que tu obtiens</h2>
+      <p class="lead">Une page HTML statique, navigable, que tu ouvres dans un navigateur et que tu
+      déploies en un lien.</p>
+      <p>Ce que tu construis dépend de <strong>ton</strong> besoin : une page d'accueil, une page détail,
+      une landing d'offre, un nouveau parcours, un écran qui n'existe pas encore. Tu assembles les
+      composants qu'il te faut, et tu peux en créer de nouveaux.</p>
+      <p>Les briques interactives sont là quand tu en as besoin : sélecteur de dates, moteur de recherche,
+      carrousels à onglets, navigation sticky, modales, galeries… mais c'est toi qui décides de la page.</p>
+    </section>
+
+    <section id="archi">
+      <h2>Comment c'est construit</h2>
+      <p class="lead">Du HTML/CSS/JS statique, sans framework ni build. On l'ouvre direct, on le déploie tel quel.</p>
+      <h3>Des composants réutilisables</h3>
+      <p>Chaque bloc d'une page (un en-tête, une carte, un sélecteur de dates…) est un <strong>composant</strong>
+      défini une fois et réutilisé partout — appelé par une balise simple, par exemple
+      <code>&lt;wd-calendar&gt;</code>. La base fournit les outils pour les créer (les skills), pas une
+      bibliothèque figée : tu montes le vocabulaire dont tu as besoin.</p>
+      <h3>La marque : une seule classe</h3>
+      <p>La marque s'applique avec une classe sur le <code>&lt;body&gt;</code> :</p>
+      <span class="cmd">&lt;body class="brand-sofitel"&gt;   &lt;!-- ou brand-pullman, brand-ibis… --&gt;</span>
+      <p>Tous les composants lisent leurs couleurs et polices depuis des variables. Changer la classe
+      re-skinne toute la page, sans toucher au contenu.</p>
+    </section>
+
+
+    <section id="skills">
+      <h2>Les skills</h2>
+      <p class="lead">Quatre outils complémentaires, lancés en écrivant une phrase en langage naturel.
+      Deux pour les pages, un pour les briques, un pour explorer.</p>
+
+      <h3><span class="pill">le plus courant</span> &nbsp;Remplir un gabarit — <code>welds-fill-template</code></h3>
+      <p><strong>Quand</strong> : tu as déjà un gabarit et tu veux la version remplie avec un vrai contenu
+      (nom, textes, images, prix). La skill remplace les jetons <code>{{...}}</code> par le contenu réel,
+      sans toucher à la structure.</p>
+      <span class="cmd">remplis le template avec le contenu de l'hôtel X</span>
+
+      <h3><span class="pill">avancé</span> &nbsp;Créer un type de page — <code>welds-create-template</code></h3>
+      <p><strong>Quand</strong> : tu veux un écran qui n'existe pas encore. La skill reconstruit la
+      maquette Figma (source de vérité) en composants, en ajoute de nouveaux si besoin, et produit un
+      gabarit réutilisable, <strong>figé sur une marque</strong>.</p>
+      <span class="cmd">crée un template &lt;type de page&gt; welDS</span>
+
+      <h3>Créer / maintenir une brique — <code>welds-component</code></h3>
+      <p><strong>Quand</strong> : il te manque un composant, ou tu veux ajouter une variante / corriger un
+      master partagé. La skill code le master agnostique (0 hex, logo par marque), l'ajoute au storybook
+      et vérifie qu'aucune page existante ne régresse.</p>
+      <span class="cmd">crée un composant welDS &lt;…&gt;</span>
+      <span class="cmd">ajoute une variante à wd-card</span>
+
+      <h3>Explorer vite — <code>welds</code></h3>
+      <p><strong>Quand</strong> : esquisse ou exploration d'un écran, sans Figma ni pixel-perfect. Version
+      légère qui compose du HTML/CSS avec les tokens et quelques atomes, pour brainstormer.</p>
+      <span class="cmd">prototype un écran welDS &lt;…&gt;</span>
+    </section>
+
+    <section id="workflow">
+      <h2>Le workflow</h2>
+      <p class="lead">De la demande au lien partageable.</p>
+      <ol class="steps">
+        <li><div><strong>Tu lances la skill</strong><br>Une phrase suffit à la déclencher.</div></li>
+        <li><div><strong>Cadrage</strong><br>Quelques questions : quel écran, quel contenu, quelle marque, langue, devise.</div></li>
+        <li><div><strong>Un plan, validé</strong><br>Un plan court (sections → composants, nouveautés, limites, escouade proposée) soumis AVANT de coder. Tu peux activer le mode auto pour que la suite s'enchaîne sans te solliciter.</div></li>
+        <li><div><strong>Génération</strong><br>La page est assemblée en autonomie. Une checklist vivante (la Definition of Done) est cochée au fil de l'eau.</div></li>
+        <li><div><strong>Vérification</strong><br>Rendu contrôlé et comparé à la maquette. Pour les gros lots, une escouade d'agents valide en parallèle (ci-dessous).</div></li>
+        <li><div><strong>Validation</strong><br>Tu regardes, tu ajustes. Tout reste en local.</div></li>
+        <li><div><strong>Déploiement</strong><br>Mise en ligne uniquement sur ton feu vert.</div></li>
+      </ol>
+      <div class="callout">
+        <span class="lbl">Plan d'abord, puis autonomie</span>
+        <p>Sur une tâche lourde, le kit <strong>présente un plan et attend ton OK</strong> avant de toucher
+        aux fichiers, puis <strong>propose le mode auto</strong> pour exécuter d'une traite. La
+        <strong>checklist vivante</strong> évite d'oublier une étape : on ne dit « fini » que tout coché.</p>
+      </div>
+    </section>
+
+    <section id="agents">
+      <h2>L'escouade de vérification</h2>
+      <p class="lead">Le vrai atout du kit : la fidélité, on ne la déclare pas, on la fait vérifier. Sur
+      un changement important, le kit déclenche une <strong>escouade d'agents</strong> qui inspectent la
+      page <strong>en parallèle</strong>, chacun spécialiste de son domaine, tous adversariaux (leur
+      mission : trouver ce qui cloche). Voici l'équipe.</p>
+
+      <div class="agents-flow">
+        <span class="node node--src">Un changement</span>
+        <span class="conn">→ inspecté en parallèle par l'escouade →</span>
+        <span class="node node--ok">✓ Verdict : on ne garde que le confirmé</span>
+      </div>
+
+      <div class="roster">
+
+        <article class="member">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M7 9v3M11 9v3M15 9v3M19 9v3"/></svg></div>
+          <div>
+            <h4>Mira <span>· l'Arpenteuse</span></h4>
+            <p class="m-role">Dimensions & espacements</p>
+            <div class="m-tasks"><span>tailles px</span><span>espacements</span><span>alignements</span><span>grilles</span><span>marges</span></div>
+          </div>
+        </article>
+
+        <article class="member">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 10a6 6 0 0 1-12 0c0-3.5 6-10 6-10z"/></svg></div>
+          <div>
+            <h4>Iris <span>· la Coloriste</span></h4>
+            <p class="m-role">Couleurs & tokens</p>
+            <div class="m-tasks"><span>tokens couleur</span><span>re-skin marque</span><span>contrastes</span><span>états hover/actif</span></div>
+          </div>
+        </article>
+
+        <article class="member">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 3l14 8-6 1.5L11 19 5 3z"/></svg></div>
+          <div>
+            <h4>Pulse <span>· l'Interacteur</span></h4>
+            <p class="m-role">Comportements</p>
+            <div class="m-tasks"><span>clics</span><span>scroll</span><span>sticky</span><span>modales & popovers</span><span>ancres</span><span>états</span></div>
+          </div>
+        </article>
+
+        <article class="member">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.5"/></svg></div>
+          <div>
+            <h4>Ada <span>· la Veilleuse</span></h4>
+            <p class="m-role">Accessibilité</p>
+            <div class="m-tasks"><span>aria</span><span>focus clavier</span><span>alt images</span><span>lisibilité</span></div>
+          </div>
+        </article>
+
+        <article class="member">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></div>
+          <div>
+            <h4>Vera <span>· l'Œil Figma</span></h4>
+            <p class="m-role">Fidélité à la maquette</p>
+            <div class="m-tasks"><span>pixel vs Figma</span><span>écarts</span><span>section par section</span></div>
+          </div>
+        </article>
+
+        <article class="member member--lead">
+          <div class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5 5-5"/></svg></div>
+          <div>
+            <h4>Sol <span>· le Juge</span></h4>
+            <p class="m-role">Synthèse & verdict</p>
+            <div class="m-tasks"><span>rassemble les verdicts</span><span>tranche les désaccords</span><span>ne garde que le confirmé</span></div>
+          </div>
+        </article>
+
+      </div>
+
+      <p>Ils travaillent en même temps et <strong>mesurent</strong> vraiment (tailles, couleurs calculées,
+      positions) plutôt que de juger à l'œil. Sol rassemble leurs verdicts : ce qu'aucun spécialiste ne
+      confirme ne passe pas. Résultat, des protos validés au pixel, pas à la confiance.</p>
+      <p>Règle d'or de Vera : <strong>le visible prime</strong>. On valide sur la <em>capture rendue</em>,
+      jamais sur les données brutes d'un composant (qui peuvent contenir des éléments cachés ou d'une autre
+      slide). Et ça marche dans les deux sens : ne rien ajouter qui n'est pas à l'écran, ne rien oublier
+      qui y est — c'est exactement ce qu'une escouade rattrape qu'une relecture solo laisse passer.</p>
+      <div class="callout">
+        <span class="lbl">On déploie à la carte</span>
+        <p>L'escouade est une boîte à outils, pas un passage obligé : un petit ajustement ne mobilise
+        personne (juste un rendu et une mesure), un gros lot iso Figma réunit les bons spécialistes.
+        Sur un gros lot, le kit te la <strong>propose dans le plan</strong> — agents, coût estimé et
+        bénéfice de chacun — et c'est <strong>toi</strong> qui tranches le niveau. <strong>Ada</strong>
+        (accessibilité) n'intervient que si le test l'exige ou si le proto part en production.</p>
+      </div>
+    </section>
+
+
+    <section id="learn">
+      <h2>Le kit apprend tout seul</h2>
+      <p class="lead">Le skill n'est pas centralisé : chaque designer a sa copie et l'adapte à ses
+      besoins. Il s'améliore localement, au fil des protos.</p>
+      <table>
+        <tr><th>Mécanisme</th><th>Fichier</th><th>Ce qui se passe</th></tr>
+        <tr><td>Journal</td><td><code>LEARNINGS.md</code></td><td>Les pièges, astuces et besoins s'accumulent à chaque usage, relus au début du suivant.</td></tr>
+        <tr><td>Presets</td><td><code>brand-presets.md</code></td><td>Les réglages validés d'une marque sont sauvés et réutilisés.</td></tr>
+        <tr><td>Auto-édition</td><td><code>SKILL.md</code></td><td>Quand un apprentissage est assez général, le skill PROPOSE une règle ; il n'édite son SKILL.md qu'après ta validation.</td></tr>
+      </table>
+      <p>L'auto-édition reste <strong>sous contrôle</strong> : jamais de réécriture silencieuse, pour
+      qu'une copie ne dérive pas toute seule.</p>
+    </section>
+
+    <section id="deploy">
+      <h2>Déploiement & partage</h2>
+      <p class="lead">Le proto étant statique, l'hébergement se fait en une commande (voir <code>DEPLOY.md</code>).</p>
+      <span class="cmd">npx vercel --prod --yes</span>
+      <p>Tu obtiens un lien stable. Réglages retenus : <strong>public + non indexé</strong> (accessible à
+      qui a le lien, hors moteurs de recherche).</p>
+      <div class="callout">
+        <span class="lbl">Règle</span>
+        <p>La publication se fait <strong>uniquement sur validation</strong> du designer. Une modif est
+        appliquée et montrée en local ; rien ne part en ligne sans feu vert explicite.</p>
+      </div>
+    </section>
+
+    <section id="files">
+      <h2>Fichiers de référence</h2>
+      <table>
+        <tr><th>Fichier</th><th>À quoi il sert</th></tr>
+        <tr><td><code>BRANDING.md</code></td><td>Adapter le kit à une autre marque (3 étapes + table des polices).</td></tr>
+        <tr><td><code>DESIGN.md</code></td><td>Historique, conventions, pièges, mapping composants ↔ Figma.</td></tr>
+        <tr><td><code>LEARNINGS.md</code></td><td>Journal d'apprentissage + backlog des besoins.</td></tr>
+        <tr><td><code>brand-presets.md</code></td><td>Réglages de marque déjà validés, réutilisables.</td></tr>
+        <tr><td><code>DEPLOY.md</code></td><td>Comment déployer / mettre à jour.</td></tr>
+        <tr><td><code>templates/</code> · <code>scripts/</code></td><td>Gabarits disponibles et outils de rendu/contrôle (chacun son README).</td></tr>
+      </table>
+      <footer class="doc-foot">
+        Kit welDS pour prototypes de test utilisateur. Couleurs et composants pilotés par les tokens de
+        marque ; polices et logo surchargeables par marque. · Plugin <b>proto-factory</b>.
+      </footer>
+    </section>
+
+  </div>
+</body>
+</html>

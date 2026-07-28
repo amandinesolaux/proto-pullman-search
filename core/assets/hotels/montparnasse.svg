@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="140" viewBox="0 0 200 140">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="60%" stop-color="#16213e"/><stop offset="100%" stop-color="#0f3460"/></linearGradient>
+    <linearGradient id="glow" x1="0.5" y1="1" x2="0.5" y2="0"><stop offset="0%" stop-color="#e8a87c" stop-opacity=".6"/><stop offset="100%" stop-color="#e8a87c" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="200" height="140" fill="url(#sky)"/>
+  <rect y="95" width="200" height="45" fill="#0a0a12"/>
+  <rect x="30" y="35" width="22" height="60" rx="1" fill="#1c2540" stroke="#2a3a5c" stroke-width=".5"/>
+  <rect x="33" y="38" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".8"/><rect x="39" y="38" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".5"/><rect x="45" y="38" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".7"/>
+  <rect x="33" y="45" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".6"/><rect x="39" y="45" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".9"/><rect x="45" y="45" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".4"/>
+  <rect x="33" y="52" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".7"/><rect x="39" y="52" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".3"/><rect x="45" y="52" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".8"/>
+  <rect x="33" y="59" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".5"/><rect x="39" y="59" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".7"/><rect x="45" y="59" width="4" height="4" rx=".5" fill="#f4d98c" opacity=".6"/>
+  <rect x="60" y="20" width="35" height="75" rx="1" fill="#1e2845" stroke="#2a3a5c" stroke-width=".5"/>
+  <rect x="63" y="24" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".9"/><rect x="70" y="24" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".5"/><rect x="77" y="24" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".7"/><rect x="84" y="24" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".4"/>
+  <rect x="63" y="32" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".6"/><rect x="70" y="32" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".8"/><rect x="77" y="32" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".3"/><rect x="84" y="32" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".9"/>
+  <rect x="63" y="40" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".4"/><rect x="70" y="40" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".7"/><rect x="77" y="40" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".8"/><rect x="84" y="40" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".5"/>
+  <rect x="63" y="48" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".7"/><rect x="70" y="48" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".4"/><rect x="77" y="48" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".6"/><rect x="84" y="48" width="5" height="5" rx=".5" fill="#f4d98c" opacity=".8"/>
+  <rect x="110" y="45" width="50" height="50" rx="2" fill="#1b2540" stroke="#2a3a5c" stroke-width=".5"/>
+  <rect x="113" y="50" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".6"/><rect x="124" y="50" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".8"/><rect x="135" y="50" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".4"/>
+  <rect x="113" y="60" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".9"/><rect x="124" y="60" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".3"/><rect x="135" y="60" width="8" height="7" rx=".5" fill="#f4d98c" opacity=".7"/>
+  <rect y="95" width="200" height="3" fill="url(#glow)"/>
+  <circle cx="155" cy="30" r="8" fill="#f4d98c" opacity=".15"/>
+  <circle cx="155" cy="30" r="4" fill="#f4d98c" opacity=".25"/>
+  <rect x="10" y="100" width="40" height="1" rx=".5" fill="#e8a87c" opacity=".3"/>
+  <rect x="55" y="100" width="25" height="1" rx=".5" fill="#e8a87c" opacity=".2"/>
+  <rect x="85" y="100" width="15" height="1" rx=".5" fill="#e8a87c" opacity=".15"/>
+</svg>
