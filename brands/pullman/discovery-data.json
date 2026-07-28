@@ -14,25 +14,25 @@
           "value": "couple",
           "label": "En couple",
           "icon": "hearts",
-          "image": "../../assets/images/discovery/couple.avif"
+          "image": "../../assets/images/discovery/couple.jpg"
         },
         {
           "value": "family",
           "label": "En famille",
           "icon": "family",
-          "image": "../../assets/images/discovery/family.avif"
+          "image": "../../assets/images/discovery/family.jpg"
         },
         {
           "value": "friends",
           "label": "Entre amis",
           "icon": "group",
-          "image": "../../assets/images/discovery/friends.avif"
+          "image": "../../assets/images/discovery/friends.jpg"
         },
         {
           "value": "business",
           "label": "Business",
           "icon": "briefcase",
-          "image": "../../assets/images/discovery/business.avif"
+          "image": "../../assets/images/discovery/business.jpg"
         }
       ]
     },
@@ -44,31 +44,31 @@
           "value": "wellness",
           "label": "Détente & Wellness",
           "icon": "bed",
-          "image": "../../assets/images/discovery/wellness.avif"
+          "image": "../../assets/images/discovery/wellness.jpg"
         },
         {
           "value": "culture",
           "label": "Découverte culturelle",
           "icon": "pin",
-          "image": "../../assets/images/discovery/culture.avif"
+          "image": "../../assets/images/discovery/culture.jpg"
         },
         {
           "value": "city",
           "label": "City break",
           "icon": "pin",
-          "image": "../../assets/images/discovery/city.avif"
+          "image": "../../assets/images/discovery/city.jpg"
         },
         {
           "value": "gastro",
           "label": "Gastronomie",
           "icon": "utensils",
-          "image": "../../assets/images/discovery/gastro.avif"
+          "image": "../../assets/images/discovery/gastro.jpg"
         },
         {
           "value": "events",
           "label": "Business & Events",
           "icon": "presentation",
-          "image": "../../assets/images/discovery/events.avif"
+          "image": "../../assets/images/discovery/events.jpg"
         }
       ]
     }

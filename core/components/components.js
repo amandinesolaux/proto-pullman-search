@@ -2273,15 +2273,10 @@
     }
 
     async loadData() {
-      try {
-        const response = await fetch('../../brands/pullman/discovery-data.json');
-        const data = await response.json();
-        this.questions = data.questions;
-        this.destinations = data.destinations;
-      } catch (error) {
-        console.error('Failed to load discovery data:', error);
-        this.innerHTML = '<div style="padding: 40px; text-align: center;">Erreur de chargement des données</div>';
-      }
+      // Données inline pour éviter fetch en file://
+      const data = {"questions":{"q1":{"title":"Avec qui voyagez-vous ?","subtitle":"Répondez à 2 questions rapides pour découvrir votre prochaine destination","options":[{"value":"solo","label":"Solo","icon":"person","image":"../../assets/images/discovery/solo.jpg"},{"value":"couple","label":"En couple","icon":"hearts","image":"../../assets/images/discovery/couple.jpg"},{"value":"family","label":"En famille","icon":"family","image":"../../assets/images/discovery/family.jpg"},{"value":"friends","label":"Entre amis","icon":"group","image":"../../assets/images/discovery/friends.jpg"},{"value":"business","label":"Business","icon":"briefcase","image":"../../assets/images/discovery/business.jpg"}]},"q2":{"title":"Quel type de voyage ?","subtitle":"Sélectionnez l'expérience qui vous inspire","options":[{"value":"wellness","label":"Détente & Wellness","icon":"bed","image":"../../assets/images/discovery/wellness.jpg"},{"value":"culture","label":"Découverte culturelle","icon":"pin","image":"../../assets/images/discovery/culture.jpg"},{"value":"city","label":"City break","icon":"pin","image":"../../assets/images/discovery/city.jpg"},{"value":"gastro","label":"Gastronomie","icon":"utensils","image":"../../assets/images/discovery/gastro.jpg"},{"value":"events","label":"Business & Events","icon":"presentation","image":"../../assets/images/discovery/events.jpg"}]}},"destinations":[{"id":"paris","name":"Paris","image":"https://m.ahstatic.com/is/image/accorhotels/GettyImages-1187421561:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["culture","gastro","city"],"descriptions":{"couple-city":"Parfait pour un city break en couple","couple-culture":"Idéal pour une découverte culturelle à deux","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-city":"Idéal pour un city break en solo","solo-culture":"Parfait pour une découverte culturelle en solo","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-city":"Parfait pour un city break entre amis","friends-culture":"Idéal pour une découverte culturelle entre amis","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"singapore","name":"Singapour","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends","business"],"type":["city","gastro","culture","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Idéal pour un voyage business","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"bali","name":"Bali","image":"https://m.ahstatic.com/is/image/accorhotels/6556-1:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["wellness","culture"],"descriptions":{"couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"dubai","name":"Dubaï","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","business"],"type":["city","wellness","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","business-events":"Parfait pour un voyage business","couple-wellness":"Idéal pour un séjour détente en couple","family-wellness":"Parfait pour des vacances détente en famille"}},{"id":"shanghai","name":"Shanghai","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_2810-66:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","culture","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-culture":"Idéal pour une découverte culturelle en solo","friends-culture":"Parfait pour une découverte culturelle entre amis"}},{"id":"sao-paulo","name":"São Paulo","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0626-10:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","gastro","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"sydney","name":"Sydney","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["city","culture","wellness"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis"}},{"id":"toulouse","name":"Toulouse","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_7014-44:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["city","culture","gastro"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}}]};
+      this.questions = data.questions;
+      this.destinations = data.destinations;
     }
 
     render() {
@@ -2501,11 +2496,11 @@
 
     renderQuestion1() {
       const options = [
-        { value: 'solo', label: 'Solo', image: '../../../assets/images/discovery/solo.avif' },
-        { value: 'couple', label: 'En couple', image: '../../../assets/images/discovery/couple.avif' },
-        { value: 'family', label: 'En famille', image: '../../../assets/images/discovery/family.avif' },
-        { value: 'friends', label: 'Entre amis', image: '../../../assets/images/discovery/friends.avif' },
-        { value: 'business', label: 'Business', image: '../../../assets/images/discovery/business.avif' }
+        { value: 'solo', label: 'Solo', image: '../../assets/images/discovery/solo.jpg' },
+        { value: 'couple', label: 'En couple', image: '../../assets/images/discovery/couple.jpg' },
+        { value: 'family', label: 'En famille', image: '../../assets/images/discovery/family.jpg' },
+        { value: 'friends', label: 'Entre amis', image: '../../assets/images/discovery/friends.jpg' },
+        { value: 'business', label: 'Business', image: '../../assets/images/discovery/business.jpg' }
       ];
 
       return `
@@ -2629,11 +2624,11 @@
 
     renderQuestion2() {
       const options = [
-        { value: 'adventure', label: 'Aventure & Nature', image: '../../../assets/images/discovery/events.avif' },
-        { value: 'beach', label: 'Plage & Détente', image: '../../../assets/images/discovery/wellness.avif' },
-        { value: 'urban', label: 'Exploration urbaine', image: '../../../assets/images/discovery/city.avif' },
-        { value: 'cultural', label: 'Immersion culturelle', image: '../../../assets/images/discovery/culture.avif' },
-        { value: 'luxury', label: 'Luxe & Raffinement', image: '../../../assets/images/discovery/gastro.avif' }
+        { value: 'adventure', label: 'Aventure & Nature', image: '../../assets/images/discovery/events.jpg' },
+        { value: 'beach', label: 'Plage & Détente', image: '../../assets/images/discovery/wellness.jpg' },
+        { value: 'urban', label: 'Exploration urbaine', image: '../../assets/images/discovery/city.jpg' },
+        { value: 'cultural', label: 'Immersion culturelle', image: '../../assets/images/discovery/culture.jpg' },
+        { value: 'luxury', label: 'Luxe & Raffinement', image: '../../assets/images/discovery/gastro.jpg' }
       ];
 
       return `
@@ -2705,11 +2700,11 @@
 
     renderQuestion2() {
       const options = [
-        { value: 'wellness', label: 'Détente & Wellness', image: '../../../assets/images/discovery/wellness.avif' },
-        { value: 'culture', label: 'Découverte culturelle', image: '../../../assets/images/discovery/culture.avif' },
-        { value: 'city', label: 'City break', image: '../../../assets/images/discovery/city.avif' },
-        { value: 'gastro', label: 'Gastronomie', image: '../../../assets/images/discovery/gastro.avif' },
-        { value: 'events', label: 'Business & Events', image: '../../../assets/images/discovery/events.avif' }
+        { value: 'wellness', label: 'Détente & Wellness', image: '../../assets/images/discovery/wellness.jpg' },
+        { value: 'culture', label: 'Découverte culturelle', image: '../../assets/images/discovery/culture.jpg' },
+        { value: 'city', label: 'City break', image: '../../assets/images/discovery/city.jpg' },
+        { value: 'gastro', label: 'Gastronomie', image: '../../assets/images/discovery/gastro.jpg' },
+        { value: 'events', label: 'Business & Events', image: '../../assets/images/discovery/events.jpg' }
       ];
 
       return `
@@ -2904,14 +2899,14 @@
 
     renderQuestion3_Regions() {
       const options = [
-        { value: 'europe', label: 'Europe', image: '../../../assets/images/discovery/region-europe.avif' },
-        { value: 'asia', label: 'Asie', image: '../../../assets/images/discovery/region-asia.avif' },
-        { value: 'africa', label: 'Afrique', image: '../../../assets/images/discovery/region-africa.avif' },
-        { value: 'north-america', label: 'Amérique du Nord', image: '../../../assets/images/discovery/region-north-america.avif' },
-        { value: 'latin-america', label: 'Amérique Latine', image: '../../../assets/images/discovery/region-latin-america.avif' },
-        { value: 'middle-east', label: 'Moyen-Orient et Asie centrale', image: '../../../assets/images/discovery/region-middle-east.avif' },
-        { value: 'oceania', label: 'Océanie', image: '../../../assets/images/discovery/region-oceania.avif' },
-        { value: 'surprise', label: 'Je veux être surpris', image: '../../../assets/images/discovery/region-surprise.avif' }
+        { value: 'europe', label: 'Europe', image: '../../assets/images/discovery/region-europe.jpg' },
+        { value: 'asia', label: 'Asie', image: '../../assets/images/discovery/region-asia.jpg' },
+        { value: 'africa', label: 'Afrique', image: '../../assets/images/discovery/region-africa.jpg' },
+        { value: 'north-america', label: 'Amérique du Nord', image: '../../assets/images/discovery/region-north-america.jpg' },
+        { value: 'latin-america', label: 'Amérique Latine', image: '../../assets/images/discovery/region-latin-america.jpg' },
+        { value: 'middle-east', label: 'Moyen-Orient et Asie centrale', image: '../../assets/images/discovery/region-middle-east.jpg' },
+        { value: 'oceania', label: 'Océanie', image: '../../assets/images/discovery/region-oceania.jpg' },
+        { value: 'surprise', label: 'Je veux être surpris', image: '../../assets/images/discovery/region-surprise.jpg' }
       ];
 
       return `
