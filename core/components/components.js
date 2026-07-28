@@ -2259,8 +2259,12 @@
       super();
       this.state = {
         currentStep: 1,
+        carouselIndex: 2,
         selectedWho: null,
         selectedType: null,
+        selectedMonth: null,
+        selectedDuration: null,
+        selectedServices: [],
         results: []
       };
       this.questions = null;
@@ -2430,11 +2434,30 @@
     restart() {
       this.state = {
         currentStep: 1,
+        carouselIndex: 2,
         selectedWho: null,
-        selectedType: null,
+        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
+        friendsDetails: { adultsCount: null },
+        selectedTypes: [],
+        destinationIdea: null,
+        destinationInput: '',
+        selectedRegions: [],
+        selectedRegion: null,
+        selectedMonth: null,
+        selectedDuration: null,
+        selectedServices: [],
         results: []
       };
-      this.render();
+      const modalContent = this.querySelector('.wd-discovery-modal__content');
+      if (modalContent) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = this.render();
+        const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+        if (newContent) {
+          modalContent.innerHTML = newContent.innerHTML;
+          this.afterRender();
+        }
+      }
       this.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -2470,7 +2493,7 @@
         destinationInput: '', // Q3.1/3.2: texte libre
         selectedRegions: [], // Q3.3: régions du monde
         selectedRegion: null,
-        carouselIndex: 0
+        carouselIndex: 2
       };
       this.keydownHandler = null;
     }
@@ -2490,6 +2513,10 @@
         return this.renderQuestion3_MultipleDestinations();
       } else if (this.state.currentStep === 3.3) {
         return this.renderQuestion3_Regions();
+      } else if (this.state.currentStep === 4) {
+        return this.renderQuestion4_Period();
+      } else if (this.state.currentStep === 5) {
+        return this.renderQuestion5_Services();
       }
       return '';
     }
@@ -2582,7 +2609,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">${title}</label>
+              <label class="wd-discovery-modal__question-label">1. ${title}</label>
 
               ${isFamilyMode ? `
                 <div class="wd-discovery-modal__form-group">
@@ -2606,7 +2633,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 2/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 1/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2624,11 +2651,11 @@
 
     renderQuestion2() {
       const options = [
-        { value: 'adventure', label: 'Aventure & Nature', image: '../../assets/images/discovery/events.jpg' },
-        { value: 'beach', label: 'Plage & Détente', image: '../../assets/images/discovery/wellness.jpg' },
-        { value: 'urban', label: 'Exploration urbaine', image: '../../assets/images/discovery/city.jpg' },
-        { value: 'cultural', label: 'Immersion culturelle', image: '../../assets/images/discovery/culture.jpg' },
-        { value: 'luxury', label: 'Luxe & Raffinement', image: '../../assets/images/discovery/gastro.jpg' }
+        { value: 'spa', label: 'Avoir un spa dans l\'hôtel', image: '../../assets/images/discovery/wellness.jpg' },
+        { value: 'restaurant', label: 'Avoir un restaurant dans l\'hôtel', image: '../../assets/images/discovery/gastro.jpg' },
+        { value: 'workspace', label: 'Avoir un espace de travail dans l\'hôtel', image: '../../assets/images/discovery/business.jpg' },
+        { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/discovery/kids.jpg' },
+        { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
       ];
 
       return `
@@ -2638,10 +2665,10 @@
               ${ICON.close}
             </button>
             <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
-            <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
+            <p class="wd-discovery-modal__subtitle">Choisissez une ou plusieurs destinations qui vous inspirent</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">2. Quel style de voyage ?</label>
+              <label class="wd-discovery-modal__question-label">2. Qu'est-ce qui est important pour vous pour ce séjour ?</label>
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
                   const isSelected = this.state.selectedTravelStyles.includes(opt.value);
@@ -2682,7 +2709,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 3/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 2/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2700,11 +2727,11 @@
 
     renderQuestion2() {
       const options = [
-        { value: 'wellness', label: 'Détente & Wellness', image: '../../assets/images/discovery/wellness.jpg' },
-        { value: 'culture', label: 'Découverte culturelle', image: '../../assets/images/discovery/culture.jpg' },
-        { value: 'city', label: 'City break', image: '../../assets/images/discovery/city.jpg' },
-        { value: 'gastro', label: 'Gastronomie', image: '../../assets/images/discovery/gastro.jpg' },
-        { value: 'events', label: 'Business & Events', image: '../../assets/images/discovery/events.jpg' }
+        { value: 'spa', label: 'Avoir un spa dans l\'hôtel', image: '../../assets/images/discovery/wellness.jpg' },
+        { value: 'restaurant', label: 'Avoir un restaurant dans l\'hôtel', image: '../../assets/images/discovery/gastro.jpg' },
+        { value: 'workspace', label: 'Avoir un espace de travail dans l\'hôtel', image: '../../assets/images/discovery/business.jpg' },
+        { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/discovery/kids.jpg' },
+        { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
       ];
 
       return `
@@ -2717,9 +2744,7 @@
             <p class="wd-discovery-modal__subtitle">Choisissez une ou plusieurs destinations qui vous inspirent</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">2. Quel style de voyage ?</label>
-
-              <p class="wd-discovery-modal__region-label">Style de voyage (sélection multiple)</p>
+              <label class="wd-discovery-modal__question-label">2. Qu'est-ce qui est important pour vous pour ce séjour ? (sélection multiple possible)</label>
 
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
@@ -2760,7 +2785,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 3/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 2/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2778,9 +2803,8 @@
 
     renderQuestion3() {
       const options = [
-        { value: 'one', label: 'Oui, j\'ai une idée de destination en tête' },
-        { value: 'multiple', label: 'Oui, j\'ai plusieurs idées de destinations' },
-        { value: 'none', label: 'Je n\'ai pas encore d\'idées' }
+        { value: 'yes', label: 'Oui, j\'ai des idées de destination en tête' },
+        { value: 'no', label: 'Non, je n\'ai pas encore d\'idées' }
       ];
 
       return `
@@ -2811,7 +2835,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 3/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2846,7 +2870,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 5/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2881,7 +2905,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 6/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2899,14 +2923,12 @@
 
     renderQuestion3_Regions() {
       const options = [
-        { value: 'europe', label: 'Europe', image: '../../assets/images/discovery/region-europe.jpg' },
-        { value: 'asia', label: 'Asie', image: '../../assets/images/discovery/region-asia.jpg' },
-        { value: 'africa', label: 'Afrique', image: '../../assets/images/discovery/region-africa.jpg' },
-        { value: 'north-america', label: 'Amérique du Nord', image: '../../assets/images/discovery/region-north-america.jpg' },
-        { value: 'latin-america', label: 'Amérique Latine', image: '../../assets/images/discovery/region-latin-america.jpg' },
-        { value: 'middle-east', label: 'Moyen-Orient et Asie centrale', image: '../../assets/images/discovery/region-middle-east.jpg' },
-        { value: 'oceania', label: 'Océanie', image: '../../assets/images/discovery/region-oceania.jpg' },
-        { value: 'surprise', label: 'Je veux être surpris', image: '../../assets/images/discovery/region-surprise.jpg' }
+        { value: 'europe', label: 'Europe', image: '../../assets/images/destination/Europe.avif' },
+        { value: 'asia', label: 'Asie', image: '../../assets/images/destination/asie.avif' },
+        { value: 'africa', label: 'Afrique', image: '../../assets/images/destination/africa.avif' },
+        { value: 'north-america', label: 'Amérique du Nord', image: '../../assets/images/destination/america.avif' },
+        { value: 'latin-america', label: 'Amérique Latine', image: '../../assets/images/destination/ameriquelatine.avif' },
+        { value: 'oceania', label: 'Océanie', image: '../../assets/images/destination/oceanie.avif' }
       ];
 
       return `
@@ -2919,7 +2941,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Quelles régions du monde vous attirent le plus ?</label>
+              <label class="wd-discovery-modal__question-label">4. Quelles régions du monde vous attirent le plus ?</label>
 
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
@@ -2962,7 +2984,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 7/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -2971,6 +2993,144 @@
               </button>
               <button class="wd-discovery-modal__continue${this.state.selectedRegions.length > 0 ? ' is-active' : ''}" aria-label="Continuer">
                 Continuer${this.state.selectedRegions.length > 0 ? ` (${this.state.selectedRegions.length})` : ''}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+
+    renderQuestion4_Period() {
+      const months = [
+        { value: 'janvier', label: 'Janvier' },
+        { value: 'fevrier', label: 'Février' },
+        { value: 'mars', label: 'Mars' },
+        { value: 'avril', label: 'Avril' },
+        { value: 'mai', label: 'Mai' },
+        { value: 'juin', label: 'Juin' },
+        { value: 'juillet', label: 'Juillet' },
+        { value: 'aout', label: 'Août' },
+        { value: 'septembre', label: 'Septembre' },
+        { value: 'octobre', label: 'Octobre' },
+        { value: 'novembre', label: 'Novembre' },
+        { value: 'decembre', label: 'Décembre' }
+      ];
+
+      const durations = [
+        { value: '1week', label: 'Une semaine' },
+        { value: '2weeks', label: 'Deux semaines' },
+        { value: '3weeks', label: 'Trois semaines' },
+        { value: 'more', label: 'Plus de trois semaines' },
+        { value: 'advice', label: 'Conseillez-moi' }
+      ];
+
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
+
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">5. À quelle période et pour quelle durée souhaitez-vous partir ?</label>
+
+              <!-- Période -->
+              <div class="wd-discovery-modal__form-section">
+                <label class="wd-discovery-modal__form-label">Période</label>
+                <div class="wd-discovery-modal__select-grid">
+                  ${months.map(month => `
+                    <button 
+                      class="wd-discovery-modal__select-option${this.state.selectedMonth === month.value ? ' is-selected' : ''}" 
+                      data-value="${month.value}"
+                      data-type="month"
+                    >
+                      ${month.label}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Durée -->
+              <div class="wd-discovery-modal__form-section">
+                <label class="wd-discovery-modal__form-label">Durée</label>
+                <div class="wd-discovery-modal__select-grid">
+                  ${durations.map(duration => `
+                    <button 
+                      class="wd-discovery-modal__select-option${this.state.selectedDuration === duration.value ? ' is-selected' : ''}" 
+                      data-value="${duration.value}"
+                      data-type="duration"
+                    >
+                      ${duration.label}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape 5/7</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
+              </button>
+              <button class="wd-discovery-modal__continue${this.state.selectedMonth && this.state.selectedDuration ? ' is-active' : ''}" aria-label="Continuer">
+                Continuer
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+
+    renderQuestion5_Services() {
+      const services = [
+        { value: 'pets', label: 'Animaux' },
+        { value: 'accessibility', label: 'Accès handicapés' },
+        { value: 'parking', label: 'Parking' },
+        { value: 'kids-club', label: 'Club enfants' }
+      ];
+
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
+
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">6. Quels services sont importants pour vous ? <span style="font-weight: 400; color: #888;">(optionnel)</span></label>
+
+              <div class="wd-discovery-modal__select-grid">
+                ${services.map(service => `
+                  <button 
+                    class="wd-discovery-modal__select-option${this.state.selectedServices.includes(service.value) ? ' is-selected' : ''}" 
+                    data-value="${service.value}"
+                    data-type="service"
+                  >
+                    ${service.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape 6/7</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
+              </button>
+              <button class="wd-discovery-modal__continue is-active" aria-label="Continuer">
+                Continuer${this.state.selectedServices.length > 0 ? ` (${this.state.selectedServices.length})` : ''}
               </button>
             </div>
           </div>
@@ -3185,7 +3345,7 @@
           else if (this.state.currentStep === 3) {
             this.state.currentStep = 2;
             this.state.destinationIdea = null;
-            this.state.carouselIndex = 0;
+            this.state.carouselIndex = 2;
 
             const modalContent = this.querySelector('.wd-discovery-modal__content');
             if (modalContent) {
@@ -3273,6 +3433,9 @@
           console.log('Selected who:', this.state.selectedWho);
           console.log('Selected travel styles:', this.state.selectedTravelStyles);
           console.log('Selected types:', this.state.selectedTypes);
+          console.log('Selected month:', this.state.selectedMonth);
+          console.log('Selected duration:', this.state.selectedDuration);
+          console.log('Selected services:', this.state.selectedServices);
 
           // Q1 → Q1.5 (si famille ou amis) ou Q2 (style de voyage)
           if (this.state.currentStep === 1 && this.state.selectedWho) {
@@ -3301,7 +3464,7 @@
           else if (this.state.currentStep === 1.5) {
             console.log('Advancing from Q1.5 to Q2 (travel style)');
             this.state.currentStep = 2;
-            this.state.carouselIndex = 0;
+            this.state.carouselIndex = 2;
 
             const modalContent = this.querySelector('.wd-discovery-modal__content');
             if (modalContent) {
@@ -3332,16 +3495,14 @@
               }
             }
           }
-          // Q3 → Q3.1 (une destination), Q3.2 (plusieurs), ou Q3.3 (régions)
+          // Q3 → Q3.1 (champ libre) ou Q3.3 (régions)
           else if (this.state.currentStep === 3 && this.state.destinationIdea) {
             console.log('Advancing from Q3 based on choice:', this.state.destinationIdea);
-            if (this.state.destinationIdea === 'one') {
+            if (this.state.destinationIdea === 'yes') {
               this.state.currentStep = 3.1;
-            } else if (this.state.destinationIdea === 'multiple') {
-              this.state.currentStep = 3.2;
-            } else if (this.state.destinationIdea === 'none') {
+            } else if (this.state.destinationIdea === 'no') {
               this.state.currentStep = 3.3;
-              this.state.carouselIndex = 0;
+              this.state.carouselIndex = 2;
             }
 
             const modalContent = this.querySelector('.wd-discovery-modal__content');
@@ -3356,14 +3517,66 @@
               }
             }
           }
-          // Q3.1, Q3.2, Q3.3 → Fin
+          // Q3.1, Q3.2 → Q4 (période)
           else if ((this.state.currentStep === 3.1 || this.state.currentStep === 3.2) && this.state.destinationInput.length > 0) {
-            console.log('Closing modal with destination input');
-            this.close();
-            console.log('Sélection complète:', this.state);
+            console.log('Advancing from Q3.1/3.2 to Q4 (period)');
+            this.state.currentStep = 4;
+
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
+            }
           }
+          // Q3.3 → Q4 (période)
           else if (this.state.currentStep === 3.3 && this.state.selectedRegions.length > 0) {
-            console.log('Closing modal with region selection');
+            console.log('Advancing from Q3.3 to Q4 (period)');
+            this.state.currentStep = 4;
+
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
+            }
+          }
+          // Q4 → Q5 (services)
+          else if (this.state.currentStep === 4 && this.state.selectedMonth && this.state.selectedDuration) {
+            console.log('Advancing from Q4 to Q5 (services)');
+            console.log('Q4 state:', { month: this.state.selectedMonth, duration: this.state.selectedDuration });
+            this.state.currentStep = 5;
+
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
+            }
+          }
+          // Debug: Q4 not advancing?
+          else if (this.state.currentStep === 4) {
+            console.log('❌ Q4 Continue clicked but conditions not met');
+            console.log('State:', { step: this.state.currentStep, month: this.state.selectedMonth, duration: this.state.selectedDuration });
+          }
+          // Q5 → Fin (optionnel, toujours actif)
+          else if (this.state.currentStep === 5) {
+            console.log('Closing modal with services selection');
             this.close();
             console.log('Sélection complète:', this.state);
           }
@@ -3378,6 +3591,27 @@
           const clickedIndex = parseInt(option.dataset.index);
           const value = option.dataset.value;
           console.log('Card clicked! Index:', clickedIndex, 'Value:', value, 'Step:', this.state.currentStep);
+          console.log('DEBUG: About to check if step === 3, step is:', this.state.currentStep, 'type:', typeof this.state.currentStep);
+
+          // Q3: Options à choix unique (yes/no) sans carousel
+          if (this.state.currentStep === 3) {
+            console.log('Q3 option clicked:', value);
+            // Retirer la sélection de toutes les options
+            this.querySelectorAll('.wd-discovery-modal__option').forEach(opt => {
+              opt.classList.remove('is-selected');
+            });
+
+            // Sélectionner l'option cliquée
+            this.state.destinationIdea = value;
+            option.classList.add('is-selected');
+
+            // Activer le bouton Continue
+            const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+            if (continueBtn) {
+              continueBtn.classList.add('is-active');
+            }
+            return;
+          }
 
           // Q2 et Q3.3: Multi-sélection carousel (clic sur carte active = toggle, autre = navigation)
           if (this.state.currentStep === 2 || this.state.currentStep === 3.3) {
@@ -3526,6 +3760,71 @@
           }
         }, { passive: false });
       }
+
+      // Handler global pour Q4 et Q5 (délégation au niveau du composant)
+      if (!this._q4q5ListenerAttached) {
+        console.log('🔧 Q4/Q5 event listener attached');
+        this.addEventListener('click', (e) => {
+          console.log('🖱️ Click in modal, target:', e.target.tagName, e.target.textContent?.substring(0, 20));
+          
+          // Q4: sélection mois/durée
+          const q4Btn = e.target.closest('[data-type="month"], [data-type="duration"]');
+          if (q4Btn && this.state.currentStep === 4) {
+            const value = q4Btn.dataset.value;
+            const type = q4Btn.dataset.type;
+
+            console.log('Q4 button clicked:', { type, value });
+
+            if (type === 'month') {
+              this.querySelectorAll('[data-type="month"]').forEach(b => b.classList.remove('is-selected'));
+              q4Btn.classList.add('is-selected');
+              this.state.selectedMonth = value;
+              console.log('✅ Month selected:', value);
+            } else if (type === 'duration') {
+              this.querySelectorAll('[data-type="duration"]').forEach(b => b.classList.remove('is-selected'));
+              q4Btn.classList.add('is-selected');
+              this.state.selectedDuration = value;
+              console.log('✅ Duration selected:', value);
+            }
+
+            // Activer Continue
+            const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+            console.log('State après clic:', { month: this.state.selectedMonth, duration: this.state.selectedDuration });
+            
+            if (continueBtn && this.state.selectedMonth && this.state.selectedDuration) {
+              continueBtn.classList.add('is-active');
+              console.log('✅ Continue activé');
+            } else if (continueBtn) {
+              continueBtn.classList.remove('is-active');
+            }
+          }
+
+          // Q5: sélection services
+          const q5Btn = e.target.closest('[data-type="service"]');
+          if (q5Btn && this.state.currentStep === 5) {
+            const value = q5Btn.dataset.value;
+
+            if (this.state.selectedServices.includes(value)) {
+              this.state.selectedServices = this.state.selectedServices.filter(s => s !== value);
+              q5Btn.classList.remove('is-selected');
+            } else {
+              this.state.selectedServices.push(value);
+              q5Btn.classList.add('is-selected');
+            }
+
+            const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+            if (continueBtn) {
+              continueBtn.textContent = this.state.selectedServices.length > 0 
+                ? `Continuer (${this.state.selectedServices.length})` 
+                : 'Continuer';
+            }
+          }
+        });
+        
+        this._q4q5ListenerAttached = true;
+      }
+
+
     }
 
     // Mise à jour de la position du carousel sans recréer le HTML (pour animation fluide)
@@ -3539,22 +3838,28 @@
         // Retirer toutes les classes de position
         option.classList.remove('is-active', 'is-prev', 'is-next', 'is-hidden-left', 'is-hidden-right', 'is-hidden-left-1', 'is-hidden-right-1');
 
-        // Calculer la différence directe (pas de modulo circulaire)
-        const diff = i - idx;
+        // Calcul circulaire de la distance avec modulo
+        let diff = i - idx;
+        // Normaliser la distance dans [-totalOptions/2, totalOptions/2]
+        if (diff > totalOptions / 2) {
+          diff -= totalOptions;
+        } else if (diff < -totalOptions / 2) {
+          diff += totalOptions;
+        }
 
         if (diff === 0) {
           // Carte active au centre
           option.classList.add('is-active');
-        } else if (diff === 1 || (idx === totalOptions - 1 && i === 0)) {
-          // Carte immédiatement à droite (index suivant)
+        } else if (diff === 1) {
+          // Carte immédiatement à droite
           option.classList.add('is-next');
-        } else if (diff === -1 || (idx === 0 && i === totalOptions - 1)) {
-          // Carte immédiatement à gauche (index précédent)
+        } else if (diff === -1) {
+          // Carte immédiatement à gauche
           option.classList.add('is-prev');
-        } else if (diff === 2 || (idx >= totalOptions - 2 && i < 2)) {
+        } else if (diff === 2) {
           // Carte distance 2 à droite
           option.classList.add('is-hidden-right-1');
-        } else if (diff === -2 || (idx <= 1 && i >= totalOptions - 2)) {
+        } else if (diff === -2) {
           // Carte distance 2 à gauche
           option.classList.add('is-hidden-left-1');
         } else if (diff > 0) {
