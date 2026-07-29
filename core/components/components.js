@@ -2674,6 +2674,10 @@
         currentStep: 1,
         stepHistory: [],
         carouselIndex: 2,
+        // Dimension "connexion" (indépendante de selectedWho). Défaut : déconnecté,
+        // parcours identique à l'existant. userProfile mocké quand isConnected=true.
+        isConnected: false,
+        userProfile: null,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -2691,6 +2695,31 @@
         checkInDate: null,
         checkOutDate: null,
         results: []
+      };
+    }
+
+    // Bascule l'état de connexion. À true, mocke userProfile (aucun appel API à
+    // ce stade). À utiliser pour tester / brancher un vrai flux d'auth plus tard.
+    setConnected(connected) {
+      this.state.isConnected = !!connected;
+      this.state.userProfile = connected ? this._mockUserProfile() : null;
+    }
+
+    // Profil factice (itérations futures : wishlist, prefill Q1.5, points…).
+    _mockUserProfile() {
+      return {
+        firstName: 'Amandine',
+        loyaltyStatus: 'Gold',
+        loyaltyPoints: 2450,
+        wishlist: ['Bali, Indonésie', 'Tokyo, Japon', 'Marrakech, Maroc'],
+        familyMembers: [
+          { firstName: 'Léo', age: 6 },
+          { firstName: 'Emma', age: 3 }
+        ],
+        pastStays: [
+          { hotel: 'Pullman Paris Montparnasse', location: 'Paris, France', date: '2025-03' },
+          { hotel: 'Pullman Bali Legian Beach', location: 'Bali, Indonésie', date: '2024-08' }
+        ]
       };
     }
 
@@ -4360,7 +4389,29 @@
       }
     }
 
+    // Point d'entrée : orchestre deux dimensions de branchement INDÉPENDANTES.
+    //   1. le profil (selectedWho) — choix fait dans le wizard (Q1)
+    //   2. la connexion (isConnected) — connue avant le wizard
+    // Chaque dimension a sa propre méthode de résolution ; elles ne sont pas
+    // fusionnées en une seule condition, pour rester lisibles et extensibles.
     getNextStep(currentStep, state) {
+      // Dimension 1 — profil
+      const next = this._getNextStepByProfile(currentStep, state);
+      // Dimension 2 — connexion (sans effet pour l'instant : renvoie `next` tel quel)
+      return this._resolveConnectionRouting(currentStep, next, state);
+    }
+
+    // Dimension "connexion" : couche dédiée où vivra le branchement selon
+    // state.isConnected (wishlist, points fidélité, prefill…). Aujourd'hui
+    // volontairement transparente — aucun changement de comportement.
+    _resolveConnectionRouting(currentStep, next, state) {
+      if (!state.isConnected) return next; // parcours identique à l'existant
+      // TODO (itérations futures) : ajuster `next` selon state.userProfile.
+      return next;
+    }
+
+    // Dimension "profil" : logique existante, inchangée.
+    _getNextStepByProfile(currentStep, state) {
       // Flux business divergent
       if (state.selectedWho === 'business') {
         switch (currentStep) {
