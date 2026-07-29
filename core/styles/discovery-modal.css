@@ -177,7 +177,7 @@
   background-position: center;
   background-repeat: no-repeat;
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -249,11 +249,12 @@
 /* État sélectionné pour carousel 3D (multi-select Q3) */
 .wd-discovery-modal__option.is-selected {
   border: 2px solid #445047;
-  box-shadow: 0 16px 48px rgba(68, 80, 71, 0.28);
+  /* Petit halo kaki tout autour de la carte sélectionnée */
+  box-shadow: 0 0 0 4px rgba(68, 80, 71, 0.14), 0 16px 44px rgba(68, 80, 71, 0.28);
 }
 
 .wd-discovery-modal__option.is-selected.is-active {
-  box-shadow: 0 20px 56px rgba(68, 80, 71, 0.35);
+  box-shadow: 0 0 0 5px rgba(68, 80, 71, 0.18), 0 20px 56px rgba(68, 80, 71, 0.35);
 }
 
 .wd-discovery-modal__option-content {
