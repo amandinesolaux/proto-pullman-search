@@ -662,6 +662,186 @@
   font-weight: 700;
 }
 
+/* Sélecteur de dates arrivée → départ (parcours business) */
+.wd-discovery-modal__daterange {
+  position: relative;
+}
+
+.wd-discovery-modal__daterange-field {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: #445047;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.wd-discovery-modal__daterange-field:hover {
+  border-color: #5fef91;
+}
+
+.wd-discovery-modal__daterange-field[aria-expanded="true"] {
+  border-color: #5fef91;
+  background: #ffffff;
+}
+
+.wd-discovery-modal__daterange-value.is-placeholder {
+  color: #9aa39c;
+}
+
+.wd-discovery-modal__daterange-icon {
+  display: inline-flex;
+  flex: none;
+  color: #445047;
+}
+
+.wd-discovery-modal__calendar {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  width: 320px;
+  max-width: 100%;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+}
+
+.wd-discovery-modal__calendar[hidden] {
+  display: none;
+}
+
+.wd-discovery-modal__calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.wd-discovery-modal__calendar-title {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 15px;
+  color: #445047;
+  text-transform: capitalize;
+}
+
+.wd-discovery-modal__calendar-arrow {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #445047;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wd-discovery-modal__calendar-arrow:hover:not(:disabled) {
+  border-color: #5fef91;
+  background: rgba(95, 239, 145, 0.12);
+}
+
+.wd-discovery-modal__calendar-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.wd-discovery-modal__calendar-weekdays,
+.wd-discovery-modal__calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.wd-discovery-modal__calendar-weekdays {
+  margin-bottom: 6px;
+}
+
+.wd-discovery-modal__calendar-weekdays span {
+  padding: 4px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9aa39c;
+}
+
+.wd-discovery-modal__day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: #445047;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.wd-discovery-modal__day.is-empty {
+  visibility: hidden;
+  cursor: default;
+}
+
+.wd-discovery-modal__day:hover:not(:disabled):not(.is-start):not(.is-end):not(.is-single) {
+  background: rgba(95, 239, 145, 0.18);
+}
+
+.wd-discovery-modal__day.is-disabled {
+  color: #cbd0cb;
+  cursor: not-allowed;
+}
+
+.wd-discovery-modal__day.is-today {
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px #5fef91;
+}
+
+.wd-discovery-modal__day.is-in-range {
+  background: rgba(95, 239, 145, 0.20);
+  border-radius: 0;
+}
+
+.wd-discovery-modal__day.is-start,
+.wd-discovery-modal__day.is-end,
+.wd-discovery-modal__day.is-single {
+  background: #5fef91;
+  color: #17321f;
+  font-weight: 700;
+}
+
+.wd-discovery-modal__day.is-start {
+  border-radius: 8px 0 0 8px;
+}
+
+.wd-discovery-modal__day.is-end {
+  border-radius: 0 8px 8px 0;
+}
+
+.wd-discovery-modal__calendar-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #717171;
+  text-align: center;
+}
+
 /* Textarea pour question 4.2 */
 .wd-discovery-modal__form-textarea {
   resize: vertical;

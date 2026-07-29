@@ -3294,7 +3294,6 @@
         { value: 'decembre', label: 'Déc', fullLabel: 'Décembre', monthIndex: 11 }
       ];
 
-      const currentYear = new Date().getFullYear();
       const hasValidDates = this.state.checkInDate && this.state.checkOutDate && new Date(this.state.checkOutDate) > new Date(this.state.checkInDate);
 
       return `
@@ -3309,14 +3308,26 @@
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">Quelles sont vos dates d'arrivée et de départ ?</label>
 
-              <div class="wd-discovery-modal__form-group">
-                <label for="checkInDate">Date d'arrivée</label>
-                <input type="date" class="wd-discovery-modal__form-input" id="checkInDate" value="${this.state.checkInDate || ''}" min="${currentYear}-01-01" />
-              </div>
+              <div class="wd-discovery-modal__daterange">
+                <button type="button" class="wd-discovery-modal__daterange-field" id="dateRangeField" aria-haspopup="dialog" aria-expanded="false">
+                  <span class="wd-discovery-modal__daterange-value" id="dateRangeValue">Arrivée — Départ</span>
+                  <span class="wd-discovery-modal__daterange-icon" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  </span>
+                </button>
 
-              <div class="wd-discovery-modal__form-group">
-                <label for="checkOutDate">Date de départ</label>
-                <input type="date" class="wd-discovery-modal__form-input" id="checkOutDate" value="${this.state.checkOutDate || ''}" min="${this.state.checkInDate || `${currentYear}-01-01`}" />
+                <div class="wd-discovery-modal__calendar wd-discovery-modal__calendar--range" id="dateRangeCalendar" role="dialog" aria-label="Choisir vos dates" hidden>
+                  <div class="wd-discovery-modal__calendar-nav">
+                    <button type="button" class="wd-discovery-modal__calendar-arrow" data-nav="-1" aria-label="Mois précédent">${ICON.chevL}</button>
+                    <span class="wd-discovery-modal__calendar-title" id="calendarTitle"></span>
+                    <button type="button" class="wd-discovery-modal__calendar-arrow" data-nav="1" aria-label="Mois suivant">${ICON.chevR}</button>
+                  </div>
+                  <div class="wd-discovery-modal__calendar-weekdays">
+                    <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                  </div>
+                  <div class="wd-discovery-modal__calendar-days" id="calendarDays"></div>
+                  <div class="wd-discovery-modal__calendar-hint" id="calendarHint">Sélectionnez votre date d'arrivée</div>
+                </div>
               </div>
             </div>
 
@@ -3584,6 +3595,134 @@
             if (v.length >= 3) renderList(v);
           });
           input.addEventListener('blur', () => { setTimeout(closeList, 120); });
+        }
+      }
+
+      // Business : sélecteur de dates (arrivée → départ) en un seul champ, UI Pullman
+      if (this.state.currentStep === 'business-dates') {
+        const field = this.querySelector('#dateRangeField');
+        const valueEl = this.querySelector('#dateRangeValue');
+        const calendar = this.querySelector('#dateRangeCalendar');
+        const title = this.querySelector('#calendarTitle');
+        const daysEl = this.querySelector('#calendarDays');
+        const hint = this.querySelector('#calendarHint');
+        const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+
+        if (field && calendar && daysEl) {
+          const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+          const MONTHS_SHORT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+          const pad = n => String(n).padStart(2, '0');
+          const toISO = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const todayISO = toISO(today.getFullYear(), today.getMonth(), today.getDate());
+          const fmt = iso => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONTHS_SHORT[m - 1]} ${y}`; };
+
+          // Vue courante : mois de l'arrivée si déjà choisie, sinon mois en cours
+          const start = this.state.checkInDate ? this.state.checkInDate.split('-').map(Number) : null;
+          let viewY = start ? start[0] : today.getFullYear();
+          let viewM = start ? start[1] - 1 : today.getMonth();
+
+          const updateField = () => {
+            const { checkInDate, checkOutDate } = this.state;
+            if (checkInDate && checkOutDate) {
+              valueEl.textContent = `${fmt(checkInDate)} → ${fmt(checkOutDate)}`;
+              valueEl.classList.remove('is-placeholder');
+            } else if (checkInDate) {
+              valueEl.textContent = `${fmt(checkInDate)} → …`;
+              valueEl.classList.remove('is-placeholder');
+            } else {
+              valueEl.textContent = 'Arrivée — Départ';
+              valueEl.classList.add('is-placeholder');
+            }
+            const valid = checkInDate && checkOutDate && checkOutDate > checkInDate;
+            if (continueBtn) continueBtn.classList.toggle('is-active', !!valid);
+          };
+
+          const updateHint = () => {
+            if (!this.state.checkInDate || this.state.checkOutDate) hint.textContent = "Sélectionnez votre date d'arrivée";
+            else hint.textContent = 'Sélectionnez votre date de départ';
+          };
+
+          const renderDays = () => {
+            title.textContent = `${MONTHS[viewM]} ${viewY}`;
+            const firstDay = new Date(viewY, viewM, 1).getDay();      // 0 = dimanche
+            const offset = (firstDay + 6) % 7;                        // grille lundi → dimanche
+            const daysInMonth = new Date(viewY, viewM + 1, 0).getDate();
+            const { checkInDate, checkOutDate } = this.state;
+
+            let html = '';
+            for (let i = 0; i < offset; i++) html += '<span class="wd-discovery-modal__day is-empty"></span>';
+            for (let d = 1; d <= daysInMonth; d++) {
+              const iso = toISO(viewY, viewM, d);
+              const cls = ['wd-discovery-modal__day'];
+              if (iso < todayISO) cls.push('is-disabled');
+              if (iso === todayISO) cls.push('is-today');
+              if (iso === checkInDate) cls.push(checkOutDate ? 'is-start' : 'is-single');
+              if (iso === checkOutDate) cls.push('is-end');
+              if (checkInDate && checkOutDate && iso > checkInDate && iso < checkOutDate) cls.push('is-in-range');
+              html += `<button type="button" class="${cls.join(' ')}" data-date="${iso}"${iso < todayISO ? ' disabled' : ''}>${d}</button>`;
+            }
+            daysEl.innerHTML = html;
+
+            // Bornes de navigation : pas de mois entièrement passé
+            const prevBtn = calendar.querySelector('[data-nav="-1"]');
+            const atCurrentMonth = viewY === today.getFullYear() && viewM === today.getMonth();
+            prevBtn.disabled = atCurrentMonth;
+          };
+
+          const openCal = () => { calendar.hidden = false; field.setAttribute('aria-expanded', 'true'); renderDays(); updateHint(); };
+          const closeCal = () => { calendar.hidden = true; field.setAttribute('aria-expanded', 'false'); };
+
+          field.addEventListener('click', (e) => {
+            e.stopPropagation();
+            calendar.hidden ? openCal() : closeCal();
+          });
+
+          calendar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const nav = e.target.closest('[data-nav]');
+            if (nav && !nav.disabled) {
+              viewM += parseInt(nav.dataset.nav);
+              if (viewM < 0) { viewM = 11; viewY--; }
+              else if (viewM > 11) { viewM = 0; viewY++; }
+              renderDays();
+              return;
+            }
+            const dayBtn = e.target.closest('.wd-discovery-modal__day');
+            if (!dayBtn || dayBtn.disabled || dayBtn.classList.contains('is-empty')) return;
+            const iso = dayBtn.dataset.date;
+
+            if (!this.state.checkInDate || this.state.checkOutDate) {
+              // Nouveau départ
+              this.state.checkInDate = iso;
+              this.state.checkOutDate = null;
+            } else if (iso <= this.state.checkInDate) {
+              // Clic avant/sur l'arrivée → redéfinit l'arrivée
+              this.state.checkInDate = iso;
+            } else {
+              this.state.checkOutDate = iso;
+            }
+
+            renderDays();
+            updateField();
+            updateHint();
+
+            // Fermeture auto quand la plage est complète
+            if (this.state.checkInDate && this.state.checkOutDate) {
+              setTimeout(closeCal, 250);
+            }
+          });
+
+          // Fermeture au clic extérieur
+          this._dateRangeOutside && document.removeEventListener('click', this._dateRangeOutside);
+          this._dateRangeOutside = (e) => {
+            if (!this.contains(e.target)) return;
+            if (calendar.hidden) return;
+            if (!e.target.closest('.wd-discovery-modal__daterange')) closeCal();
+          };
+          document.addEventListener('click', this._dateRangeOutside);
+
+          updateField();
         }
       }
 
