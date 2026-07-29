@@ -97,17 +97,34 @@ RÉSULTATS (3 destinations + CTA)
 
 ---
 
-### Q2 : Quel type de voyage recherchez-vous ?
+### Q2 : Qu'est-ce qui est important pour vous pour ce séjour ?
 
 **Type:** Carousel 3D - multi-sélection  
 **Étape affichée:** 2/7  
-**Options:**
+**Options : dépendent du parcours choisi en Q1**
+
+#### Parcours non-business (`solo`, `couple`, `family`, `friends`)
 
 | Valeur | Label | Image |
 |--------|-------|-------|
 | `spa` | Avoir un spa dans l'hôtel | `wellness.jpg` |
 | `restaurant` | Avoir un restaurant dans l'hôtel | `gastro.jpg` |
 | `workspace` | Avoir un espace de travail dans l'hôtel | `business.jpg` |
+| `kids` | Avoir un espace pour enfants | `kids.jpg` |
+| `local` | Profiter de la vie locale | `culture.jpg` |
+
+> Les cartes `meeting-room` (salle de réunion) et `coworking` (espace de coworking) **ne sont pas affichées** pour ces parcours.
+
+#### Parcours business (`business`)
+
+Les cartes pro sont placées **en premier**. La carte `workspace` (espace de travail) **n'est pas affichée**.
+
+| Valeur | Label | Image |
+|--------|-------|-------|
+| `meeting-room` | Avoir une salle de réunion | `business.jpg` |
+| `coworking` | Avoir un espace de coworking | `business.jpg` |
+| `spa` | Avoir un spa dans l'hôtel | `wellness.jpg` |
+| `restaurant` | Avoir un restaurant dans l'hôtel | `gastro.jpg` |
 | `kids` | Avoir un espace pour enfants | `kids.jpg` |
 | `local` | Profiter de la vie locale | `culture.jpg` |
 

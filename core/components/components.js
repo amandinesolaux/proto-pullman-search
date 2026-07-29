@@ -2754,11 +2754,16 @@
         { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
       ];
 
-      // Pour business, réordonner avec options pro en premier
       if (this.state.selectedWho === 'business') {
-        const businessOptions = options.filter(o => ['workspace', 'meeting-room', 'coworking'].includes(o.value));
-        const otherOptions = options.filter(o => !['workspace', 'meeting-room', 'coworking'].includes(o.value));
+        // Business : retirer "espace de travail" (workspace), garder salle de réunion
+        // et coworking, et les placer en premier.
+        options = options.filter(o => o.value !== 'workspace');
+        const businessOptions = options.filter(o => ['meeting-room', 'coworking'].includes(o.value));
+        const otherOptions = options.filter(o => !['meeting-room', 'coworking'].includes(o.value));
         options = [...businessOptions, ...otherOptions];
+      } else {
+        // Autres parcours : retirer "salle de réunion" et "espace de coworking".
+        options = options.filter(o => !['meeting-room', 'coworking'].includes(o.value));
       }
 
       return `
