@@ -2497,11 +2497,13 @@
           return 5;
 
         case 5:
-          // Q5 → Q6
-          return 6;
+          // Q6 services (flux standard) → Résultats
+          // (l'étape 6 n'est utilisée que par le flux business, qui affiche
+          //  les services à l'étape 6)
+          return 'results';
 
         case 6:
-          // Q6 → Résultats
+          // Q6 services (flux business) → Résultats
           return 'results';
 
         default:
@@ -2567,9 +2569,17 @@
     constructor() {
       super();
       this.isOpen = false;
-      this.state = {
+      this.state = this.getInitialState();
+      this.keydownHandler = null;
+    }
+
+    // Source unique de l'état initial — utilisée par le constructeur, restart()
+    // et close(). Évite tout state incomplet (champs undefined) après réouverture.
+    getInitialState() {
+      return {
         currentStep: 1,
         stepHistory: [],
+        carouselIndex: 2,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -2580,12 +2590,14 @@
         destinationInput: '',
         selectedRegions: [],
         selectedRegion: null,
+        selectedMonth: null,
+        selectedDuration: null,
+        selectedServices: [],
         businessLocation: null,
         checkInDate: null,
         checkOutDate: null,
-        carouselIndex: 2
+        results: []
       };
-      this.keydownHandler = null;
     }
 
     render() {
@@ -4320,11 +4332,13 @@
           return 5;
 
         case 5:
-          // Q5 → Q6
-          return 6;
+          // Q6 services (flux standard) → Résultats
+          // (l'étape 6 n'est utilisée que par le flux business, qui affiche
+          //  les services à l'étape 6)
+          return 'results';
 
         case 6:
-          // Q6 → Résultats
+          // Q6 services (flux business) → Résultats
           return 'results';
 
         default:
@@ -4333,28 +4347,7 @@
     }
 
     restart() {
-      this.state = {
-        currentStep: 1,
-        stepHistory: [],
-        carouselIndex: 2,
-        selectedWho: null,
-        selectedYear: new Date().getFullYear(),
-        showYearPicker: false,
-        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
-        friendsDetails: { adultsCount: null },
-        selectedTypes: [],
-        destinationIdea: null,
-        destinationInput: '',
-        selectedRegions: [],
-        selectedRegion: null,
-        selectedMonth: null,
-        selectedDuration: null,
-        selectedServices: [],
-        businessLocation: null,
-        checkInDate: null,
-        checkOutDate: null,
-        results: []
-      };
+      this.state = this.getInitialState();
       const modalContent = this.querySelector('.wd-discovery-modal__content');
       if (modalContent) {
         const tempDiv = document.createElement('div');
@@ -4386,18 +4379,9 @@
         this.keydownHandler = null;
       }
 
-      this.state = {
-        currentStep: 1,
-        selectedWho: null,
-        selectedTravelStyles: [],
-        selectedTypes: [],
-        familyDetails: { childrenCount: null, childrenAges: [] },
-        friendsDetails: { adultsCount: null },
-        destinationIdea: null,
-        destinationInput: '',
-        selectedRegions: [],
-        carouselIndex: 0
-      };
+      // Réinitialisation complète (même forme que le constructeur / restart)
+      // pour éviter tout champ undefined à la réouverture.
+      this.state = this.getInitialState();
     }
   });
 
