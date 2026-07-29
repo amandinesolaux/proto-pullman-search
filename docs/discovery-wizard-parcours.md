@@ -139,7 +139,7 @@ Les cartes pro sont placées **en premier**. La carte `workspace` (espace de tra
 
 ---
 
-### Q3 : Avez-vous une idée de destination ?
+### Q3 : Avez-vous des idées de destination ?
 
 **Type:** Liste verticale - sélection unique  
 **Étape affichée:** 3/7  
@@ -147,62 +147,39 @@ Les cartes pro sont placées **en premier**. La carte `workspace` (espace de tra
 
 | Valeur | Label |
 |--------|-------|
-| `yes` | Oui, j'ai une destination en tête |
-| `no` | Non, je cherche l'inspiration |
-| `multiple` | J'ai plusieurs destinations en tête |
+| `yes` | Oui, j'ai des idées de destination en tête |
+| `no` | Non, je n'ai pas encore d'idées |
 
 **Navigation:**
-- **Si `yes`** → Q3.1 (input texte)
-- **Si `no`** → Q3.2 (choix région simple)
-- **Si `multiple`** → Q3.3 (sélection régions multi-sélection)
+- **Si `yes`** → Q3.2 (saisie des destinations envisagées)
+- **Si `no`** → Q3.3 (inspiration par régions)
+
+> ⚠️ Règle métier : un utilisateur qui répond **`no` (pas encore d'idées)** ne doit **jamais** voir la question « Entre quelles destinations hésitez-vous ? » (Q3.2). Il est envoyé directement vers l'inspiration par régions (Q3.3).
 
 ---
 
-### Q3.1 : Quelle est votre destination ? (conditionnelle)
+### Q3.2 : Entre quelles destinations hésitez-vous ? (conditionnelle)
 
-**Type:** Formulaire texte  
-**Étape affichée:** 3/7  
+**Type:** Formulaire texte (textarea)  
+**Étape affichée:** 4/7  
 **Condition:** Q3 = `yes`
 
 **Champ:**
-- Input texte libre (placeholder: "Ex: Paris, Tokyo, New York...")
+- Textarea libre (placeholder: "Ex: Paris, Tokyo et New York")
 
 **State modifié:** `destinationInput: string`
 
 **Navigation:** → Q4
 
----
-
-### Q3.2 : Quelle région du monde vous attire le plus ? (conditionnelle)
-
-**Type:** Liste verticale - sélection unique  
-**Étape affichée:** 3/7  
-**Condition:** Q3 = `no`
-
-**Options:**
-
-| Valeur | Label | Image |
-|--------|-------|-------|
-| `europe` | Europe | `Europe.avif` |
-| `asia` | Asie | `asie.avif` |
-| `africa` | Afrique | `africa.avif` |
-| `north-america` | Amérique du Nord | `america.avif` |
-| `latin-america` | Amérique Latine | `ameriquelatine.avif` |
-| `oceania` | Océanie | `oceanie.avif` |
-
-**State modifié:** `selectedRegion: string`
-
-**Navigation:** → Q3.3 (multi-sélection régions)
+> La question Q3.1 « Quelle destination vous fait envie ? » (input simple) existe encore dans le code mais n'est plus atteinte par le parcours actuel.
 
 ---
 
-### Q3.3 : Quelles régions du monde vous intéressent ? (conditionnelle)
+### Q3.3 : Quelles régions du monde vous attirent le plus ? (conditionnelle)
 
 **Type:** Carousel 3D - multi-sélection  
-**Étape affichée:** 3/7  
-**Conditions:**
-- Si Q3 = `no` → arrive depuis Q3.2 avec une région pré-sélectionnée
-- Si Q3 = `multiple` → arrive directement sans pré-sélection
+**Étape affichée:** 4/7  
+**Condition:** Q3 = `no`
 
 **Options:**
 

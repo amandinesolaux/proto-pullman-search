@@ -2468,11 +2468,13 @@
           return 3;
 
         case 3:
-          // Q3 → Q3.1 si "yes", Q3.2 si "no", Q3.3 si "multiple"
+          // Q3 : "oui, j'ai des idées" → on demande les destinations (3.2).
+          //      "non, pas encore d'idées" → inspiration par régions (3.3),
+          //      surtout PAS la question "entre quelles destinations hésitez-vous".
           if (state.destinationIdea === 'yes') {
-            return 3.1;
-          } else if (state.destinationIdea === 'no') {
             return 3.2;
+          } else if (state.destinationIdea === 'no') {
+            return 3.3;
           } else if (state.destinationIdea === 'multiple') {
             return 3.3;
           }
@@ -2483,8 +2485,8 @@
           return 4;
 
         case 3.2:
-          // Q3.2 → Q3.3
-          return 3.3;
+          // Q3.2 (destinations saisies) → Q4 (période)
+          return 4;
 
         case 3.3:
           // Q3.3 → Q4
@@ -4124,11 +4126,13 @@
           return 3;
 
         case 3:
-          // Q3 → Q3.1 si "yes", Q3.2 si "no", Q3.3 si "multiple"
+          // Q3 : "oui, j'ai des idées" → on demande les destinations (3.2).
+          //      "non, pas encore d'idées" → inspiration par régions (3.3),
+          //      surtout PAS la question "entre quelles destinations hésitez-vous".
           if (state.destinationIdea === 'yes') {
-            return 3.1;
-          } else if (state.destinationIdea === 'no') {
             return 3.2;
+          } else if (state.destinationIdea === 'no') {
+            return 3.3;
           } else if (state.destinationIdea === 'multiple') {
             return 3.3;
           }
@@ -4139,8 +4143,8 @@
           return 4;
 
         case 3.2:
-          // Q3.2 → Q3.3
-          return 3.3;
+          // Q3.2 (destinations saisies) → Q4 (période)
+          return 4;
 
         case 3.3:
           // Q3.3 → Q4
