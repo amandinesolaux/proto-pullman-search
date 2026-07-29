@@ -122,6 +122,8 @@
   color: #445047;
   margin-bottom: 24px;
   line-height: 28px;
+  /* Évite le "?" (ou un mot) orphelin seul sur la dernière ligne */
+  text-wrap: pretty;
 }
 
 .wd-discovery-modal__region-label {

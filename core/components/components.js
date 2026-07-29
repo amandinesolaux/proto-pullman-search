@@ -2975,7 +2975,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">4. Quelles régions du monde vous attirent le plus ?</label>
+              <label class="wd-discovery-modal__question-label">4. Quelles régions du monde vous attirent le plus&nbsp;?</label>
 
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
