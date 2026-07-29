@@ -617,6 +617,51 @@
   min-width: 120px;
 }
 
+/* Autocomplete ville/région (parcours business) */
+.wd-discovery-modal__autocomplete {
+  position: relative;
+}
+
+.wd-discovery-modal__autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.wd-discovery-modal__autocomplete-list[hidden] {
+  display: none;
+}
+
+.wd-discovery-modal__autocomplete-item {
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: #445047;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.wd-discovery-modal__autocomplete-item:hover,
+.wd-discovery-modal__autocomplete-item.is-active {
+  background: rgba(95, 239, 145, 0.15);
+}
+
+.wd-discovery-modal__autocomplete-item strong {
+  font-weight: 700;
+}
+
 /* Textarea pour question 4.2 */
 .wd-discovery-modal__form-textarea {
   resize: vertical;

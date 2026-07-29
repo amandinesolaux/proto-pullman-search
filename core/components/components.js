@@ -2620,7 +2620,7 @@
         { value: 'solo', label: 'Solo', image: '../../assets/images/discovery/solo.jpg' },
         { value: 'couple', label: 'En couple', image: '../../assets/images/discovery/couple.jpg' },
         { value: 'family', label: 'En famille', image: '../../assets/images/discovery/family.jpg' },
-        { value: 'friends', label: 'Entre amis', image: '../../assets/images/discovery/friends.jpg' },
+        { value: 'friends', label: 'Entre amis', image: '../../assets/images/discovery/friendtravel.avif' },
         { value: 'business', label: 'Business', image: '../../assets/images/discovery/business.jpg' }
       ];
 
@@ -3253,8 +3253,9 @@
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">Dans quelle ville ou région souhaitez-vous séjourner ?</label>
 
-              <div class="wd-discovery-modal__form-group">
-                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Tokyo, Singapour..." value="${this.state.businessLocation || ''}" />
+              <div class="wd-discovery-modal__form-group wd-discovery-modal__autocomplete">
+                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Tokyo, Singapour..." value="${this.state.businessLocation || ''}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
+                <ul class="wd-discovery-modal__autocomplete-list" id="businessLocationList" role="listbox" hidden></ul>
               </div>
             </div>
 
@@ -3486,6 +3487,101 @@
               }
             }
           });
+        }
+      }
+
+      // Business : champ ville/région avec autocomplete (villes Pullman + texte libre)
+      if (this.state.currentStep === 'business-location') {
+        const input = this.querySelector('#businessLocationInput');
+        const list = this.querySelector('#businessLocationList');
+        const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+
+        if (input && list) {
+          // Villes desservies par Pullman (dédupliquées), issues des jeux de données existants
+          const cities = [...new Set([...MOCK_HOTELS, ...PREVIEW_HOTELS].map(h => h.loc))].sort((a, b) => a.localeCompare(b, 'fr'));
+          const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+          let activeIndex = -1;
+
+          const setContinue = (on) => {
+            if (!continueBtn) return;
+            continueBtn.classList.toggle('is-active', on);
+          };
+
+          const closeList = () => {
+            list.hidden = true;
+            list.innerHTML = '';
+            activeIndex = -1;
+            input.setAttribute('aria-expanded', 'false');
+          };
+
+          const selectCity = (city) => {
+            input.value = city;
+            this.state.businessLocation = city;
+            setContinue(true);
+            closeList();
+          };
+
+          const renderList = (query) => {
+            const q = norm(query);
+            const matches = cities.filter(c => norm(c).includes(q));
+            if (matches.length === 0) { closeList(); return; }
+            list.innerHTML = matches.map((c, i) => {
+              // Surligne la portion correspondante
+              const idx = norm(c).indexOf(q);
+              const label = idx >= 0
+                ? `${c.slice(0, idx)}<strong>${c.slice(idx, idx + query.length)}</strong>${c.slice(idx + query.length)}`
+                : c;
+              return `<li class="wd-discovery-modal__autocomplete-item" role="option" data-city="${c}" data-index="${i}">${label}</li>`;
+            }).join('');
+            list.hidden = false;
+            activeIndex = -1;
+            input.setAttribute('aria-expanded', 'true');
+          };
+
+          const setActive = (delta) => {
+            const items = [...list.querySelectorAll('.wd-discovery-modal__autocomplete-item')];
+            if (items.length === 0) return;
+            items.forEach(el => el.classList.remove('is-active'));
+            activeIndex = (activeIndex + delta + items.length) % items.length;
+            items[activeIndex].classList.add('is-active');
+            items[activeIndex].scrollIntoView({ block: 'nearest' });
+          };
+
+          input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            this.state.businessLocation = value.trim() ? value : null;
+            setContinue(value.trim().length > 0);
+            if (value.trim().length >= 3) renderList(value.trim());
+            else closeList();
+          });
+
+          input.addEventListener('keydown', (e) => {
+            if (list.hidden) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); setActive(1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(-1); }
+            else if (e.key === 'Enter' && activeIndex >= 0) {
+              e.preventDefault();
+              const item = list.querySelectorAll('.wd-discovery-modal__autocomplete-item')[activeIndex];
+              if (item) selectCity(item.dataset.city);
+            } else if (e.key === 'Escape') {
+              closeList();
+            }
+          });
+
+          // mousedown (avant blur) pour que le clic sélectionne bien l'item
+          list.addEventListener('mousedown', (e) => {
+            const item = e.target.closest('.wd-discovery-modal__autocomplete-item');
+            if (!item) return;
+            e.preventDefault();
+            selectCity(item.dataset.city);
+          });
+
+          input.addEventListener('focus', () => {
+            const v = input.value.trim();
+            if (v.length >= 3) renderList(v);
+          });
+          input.addEventListener('blur', () => { setTimeout(closeList, 120); });
         }
       }
 
