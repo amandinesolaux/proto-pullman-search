@@ -4628,6 +4628,15 @@
 
     open() {
       this.isOpen = true;
+      // Synchronise la dimension "connexion" avec l'état de connexion du header
+      // (la connexion est connue avant le wizard). Dans ce prototype, un
+      // utilisateur connecté (ex. Amandine) dispose d'une wishlist mockée.
+      const header = document.querySelector('wd-header');
+      const connected = !!(header && header.isLoggedIn);
+      if (connected !== this.state.isConnected) {
+        this.setConnected(connected);
+        this._rerenderContent();
+      }
       this.modal.classList.add('wd-discovery-modal--active');
       document.body.style.overflow = 'hidden';
     }
