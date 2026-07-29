@@ -4126,9 +4126,9 @@
             }
           }
 
-          // Q5: sélection services
+          // Q6 (services) : rendu à l'étape 5 (flux standard) ou 6 (flux business)
           const q5Btn = e.target.closest('[data-type="service"]');
-          if (q5Btn && this.state.currentStep === 5) {
+          if (q5Btn && (this.state.currentStep === 5 || this.state.currentStep === 6)) {
             const value = q5Btn.dataset.value;
 
             if (this.state.selectedServices.includes(value)) {
