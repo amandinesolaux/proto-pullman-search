@@ -996,13 +996,13 @@
 /* Bouton Recommencer */
 .wd-discovery-modal__reset {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #717171;
   background: transparent;
   border: 1px solid #e0e0e0;
   cursor: pointer;
-  padding: 12px 20px;
+  padding: 9px 16px;
   border-radius: 50px;
   transition: all 0.3s ease;
 }
@@ -1020,16 +1020,16 @@
 /* Bouton Continuer - Tokens Pullman */
 .wd-discovery-modal__continue {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #ffffff;
   background: #d0d0d0;
   border: none;
   cursor: not-allowed;
-  padding: 12px 24px;
+  padding: 9px 20px;
   border-radius: 50px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-width: 150px;
+  min-width: 120px;
 }
 
 .wd-discovery-modal__continue.is-active {
