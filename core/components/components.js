@@ -2748,9 +2748,9 @@
         { value: 'spa', label: 'Avoir un spa dans l\'hôtel', image: '../../assets/images/discovery/wellness.jpg' },
         { value: 'restaurant', label: 'Avoir un restaurant dans l\'hôtel', image: '../../assets/images/discovery/gastro.jpg' },
         { value: 'workspace', label: 'Avoir un espace de travail dans l\'hôtel', image: '../../assets/images/discovery/business.jpg' },
-        { value: 'meeting-room', label: 'Avoir une salle de réunion', image: '../../assets/images/discovery/business.jpg' },
-        { value: 'coworking', label: 'Avoir un espace de coworking', image: '../../assets/images/discovery/business.jpg' },
-        { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/discovery/kids.jpg' },
+        { value: 'meeting-room', label: 'Avoir une salle de réunion', image: '../../assets/images/Serviceshôtels/meetingroom.avif' },
+        { value: 'coworking', label: 'Avoir un espace de coworking', image: '../../assets/images/Serviceshôtels/corwoking.avif' },
+        { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/Serviceshôtels/kidsplayground.webp' },
         { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
       ];
 
