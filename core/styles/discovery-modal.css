@@ -1231,11 +1231,11 @@
   color: #445047;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: center;
+  text-align: left;
   min-height: 48px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .wd-discovery-modal__select-option:hover {
