@@ -248,12 +248,12 @@
 
 /* État sélectionné pour carousel 3D (multi-select Q3) */
 .wd-discovery-modal__option.is-selected {
-  border: 3px solid #5fef91;
-  box-shadow: 0 20px 60px rgba(95, 239, 145, 0.4);
+  border: 2px solid #445047;
+  box-shadow: 0 16px 48px rgba(68, 80, 71, 0.28);
 }
 
 .wd-discovery-modal__option.is-selected.is-active {
-  box-shadow: 0 24px 70px rgba(95, 239, 145, 0.5);
+  box-shadow: 0 20px 56px rgba(68, 80, 71, 0.35);
 }
 
 .wd-discovery-modal__option-content {
@@ -393,8 +393,8 @@
 .wd-discovery-modal__option--card.is-selected .wd-discovery-modal__option-checkbox {
   opacity: 1;
   transform: scale(1);
-  background: #5fef91;
-  color: #445047;
+  background: #445047;
+  color: #ffffff;
 }
 
 .wd-discovery-modal__option-checkbox svg {
@@ -409,8 +409,8 @@
 .wd-discovery-modal__option.is-selected .wd-discovery-modal__option-checkbox {
   opacity: 1;
   transform: scale(1);
-  background: #5fef91;
-  color: #445047;
+  background: #445047;
+  color: #ffffff;
 }
 
 .wd-discovery-modal__carousel-nav {
