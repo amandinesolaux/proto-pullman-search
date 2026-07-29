@@ -903,6 +903,26 @@
     width: 100%;
     max-width: none;
   }
+
+  /* Calendrier annuel mobile */
+  .wd-discovery-modal__calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .wd-discovery-modal__mini-calendar {
+    padding: 8px;
+  }
+
+  .wd-discovery-modal__mini-calendar-header {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .wd-discovery-modal__mini-calendar-day {
+    font-size: 8px;
+    padding: 1px;
+  }
 }
 
 /* ===== Q4: Period & Duration Selection ===== */
@@ -947,6 +967,160 @@
 }
 
 .wd-discovery-modal__select-option.is-selected {
+  background: #5fef91;
+  border-color: #5fef91;
+  color: #1a1f1c;
+  font-weight: 600;
+}
+
+/* Calendrier annuel */
+.wd-discovery-modal__calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.wd-discovery-modal__mini-calendar {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wd-discovery-modal__mini-calendar:hover {
+  border-color: #5fef91;
+  box-shadow: 0 2px 8px rgba(95, 239, 145, 0.2);
+}
+
+.wd-discovery-modal__mini-calendar.is-selected {
+  border-color: #5fef91;
+  background: #f0fdf4;
+}
+
+.wd-discovery-modal__mini-calendar-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #445047;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.wd-discovery-modal__mini-calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.wd-discovery-modal__mini-calendar-day {
+  font-size: 10px;
+  text-align: center;
+  padding: 2px;
+  color: #445047;
+  line-height: 1.4;
+}
+
+.wd-discovery-modal__mini-calendar-day.is-other-month {
+  color: #d1d5db;
+}
+
+.wd-discovery-modal__mini-calendar-day.is-weekend {
+  color: #888;
+}
+
+/* Calendrier - Header avec toggle */
+.wd-discovery-modal__calendar-header {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.wd-discovery-modal__calendar-toggle {
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #445047;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.wd-discovery-modal__calendar-toggle:hover {
+  border-color: #5fef91;
+  background: #f8fff9;
+}
+
+.wd-discovery-modal__calendar-toggle svg {
+  transition: transform 0.2s ease;
+}
+
+/* Grille des mois */
+.wd-discovery-modal__month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.wd-discovery-modal__month-option {
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 24px;
+  padding: 16px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #445047;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.wd-discovery-modal__month-option:hover {
+  border-color: #5fef91;
+  background: #f8fff9;
+}
+
+.wd-discovery-modal__month-option.is-selected {
+  background: #5fef91;
+  border-color: #5fef91;
+  color: #1a1f1c;
+  font-weight: 600;
+}
+
+/* Grille des années */
+.wd-discovery-modal__year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.wd-discovery-modal__year-option {
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #445047;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.wd-discovery-modal__year-option:hover {
+  border-color: #5fef91;
+  background: #f8fff9;
+}
+
+.wd-discovery-modal__year-option.is-selected {
   background: #5fef91;
   border-color: #5fef91;
   color: #1a1f1c;
