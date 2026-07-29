@@ -95,6 +95,12 @@
 
   /* ---------- wd-header ---------- */
   def("wd-header", class extends WdEl {
+    constructor() {
+      super();
+      this.isLoggedIn = false;
+      this._accountOutside = null;
+    }
+
     render() {
       const items = this.list("nav");
       const lang = this.attr("lang", "EN");
@@ -144,7 +150,14 @@
                 <a href="#" class="wd-header__param">${esc(lang)}</a>
                 <a href="#" class="wd-header__param">${esc(currency)}</a>
               </div>
-              <a href="#" class="wd-header__account" aria-label="Account">${ICON.person} <span class="wd-header__account-label">Me connecter / m'inscrire</span></a>
+              <div class="wd-header__account-wrap">
+                <button type="button" class="wd-header__account${this.isLoggedIn ? ' wd-header__account--logged' : ''}" aria-haspopup="true" aria-expanded="false" aria-label="Compte">
+                  ${this.isLoggedIn
+                    ? `<span class="wd-header__avatar">${ICON.person}<span class="wd-header__avatar-dot"></span></span><span class="wd-header__account-label">Solaux amandine</span>`
+                    : `${ICON.person} <span class="wd-header__account-label">Me connecter / m'inscrire</span>`}
+                </button>
+                ${this._renderAccountMenu()}
+              </div>
             </div>
           </div>
         </div>
@@ -157,6 +170,87 @@
           </nav>
         </div>
       </header>`;
+    }
+
+    _renderAccountMenu() {
+      const links = `
+        <nav class="wd-account__links">
+          <a href="#" class="wd-account__link">Vos réservations</a>
+          <hr class="wd-account__sep"/>
+          <a href="#" class="wd-account__link">Avantages et statut</a>
+          <a href="#" class="wd-account__link">Gagner et utiliser des points</a>
+          <hr class="wd-account__sep"/>
+          <a href="#" class="wd-account__link">Aide et support</a>
+        </nav>`;
+
+      const body = this.isLoggedIn
+        ? `
+          <p class="wd-account__greeting">Bonjour Amandine 👋</p>
+          <p class="wd-account__greeting-sub">Ravi de vous revoir.</p>
+          ${links}`
+        : `
+          <div class="wd-account-card">
+            <div class="wd-account-card__head">
+              <span class="wd-account-card__logo">All</span>
+              <span class="wd-account-card__title">Le programme de fidélité</span>
+            </div>
+            <p class="wd-account-card__desc">Économisez dès votre première réservation grâce au tarif membre.</p>
+            <button type="button" class="wd-account-card__cta" data-account-action="register">M'inscrire gratuitement ${ICON.arrowR}</button>
+          </div>
+          <button type="button" class="wd-account__login" data-account-action="login">Me connecter ${ICON.arrowR}</button>
+          ${links}`;
+
+      return `
+        <div class="wd-header__account-menu" role="dialog" aria-label="Mon compte" hidden>
+          <button type="button" class="wd-header__account-menu-close" data-account-action="close" aria-label="Fermer">${ICON.close}</button>
+          ${body}
+        </div>`;
+    }
+
+    afterRender() {
+      const wrap = this.querySelector('.wd-header__account-wrap');
+      if (!wrap) return;
+      const btn = wrap.querySelector('.wd-header__account');
+      const menu = wrap.querySelector('.wd-header__account-menu');
+
+      const openMenu = () => { menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); };
+      const closeMenu = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.hidden ? openMenu() : closeMenu();
+      });
+
+      menu.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const action = e.target.closest('[data-account-action]');
+        if (!action) return;
+        const type = action.dataset.accountAction;
+        if (type === 'close') { closeMenu(); }
+        else if (type === 'login') {
+          this.isLoggedIn = true;
+          this._rerenderHeader(); // reflète l'état connecté (pill + menu)
+        }
+        // 'register' : placeholder (aucune action dans le prototype)
+      });
+
+      // Fermeture au clic extérieur / Échap
+      this._accountOutside && document.removeEventListener('click', this._accountOutside);
+      this._accountOutside = (e) => {
+        if (menu.hidden) return;
+        if (!this.contains(e.target)) closeMenu();
+        else if (!e.target.closest('.wd-header__account-wrap')) closeMenu();
+      };
+      document.addEventListener('click', this._accountOutside);
+
+      this._accountKeydown && document.removeEventListener('keydown', this._accountKeydown);
+      this._accountKeydown = (e) => { if (e.key === 'Escape' && !menu.hidden) closeMenu(); };
+      document.addEventListener('keydown', this._accountKeydown);
+    }
+
+    _rerenderHeader() {
+      this.innerHTML = this.render();
+      this.afterRender();
     }
   });
 
