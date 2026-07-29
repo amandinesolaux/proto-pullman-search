@@ -2431,11 +2431,90 @@
       this.state.results = matches.slice(0, 3);
     }
 
+    getNextStep(currentStep, state) {
+      // Flux business divergent
+      if (state.selectedWho === 'business') {
+        switch (currentStep) {
+          case 1:
+            return 2;
+          case 2:
+            return 'business-location';
+          case 'business-location':
+            return 'business-dates';
+          case 'business-dates':
+            return 6;
+          case 6:
+            return 'results';
+          default:
+            return currentStep;
+        }
+      }
+
+      // Flux standard pour solo/couple/family/friends
+      switch (currentStep) {
+        case 1:
+          // Q1 → Q1.5 si family/friends, sinon Q2
+          if (state.selectedWho === 'family' || state.selectedWho === 'friends') {
+            return 1.5;
+          }
+          return 2;
+
+        case 1.5:
+          // Q1.5 → Q2
+          return 2;
+
+        case 2:
+          // Q2 → Q3
+          return 3;
+
+        case 3:
+          // Q3 → Q3.1 si "yes", Q3.2 si "no", Q3.3 si "multiple"
+          if (state.destinationIdea === 'yes') {
+            return 3.1;
+          } else if (state.destinationIdea === 'no') {
+            return 3.2;
+          } else if (state.destinationIdea === 'multiple') {
+            return 3.3;
+          }
+          return 3;
+
+        case 3.1:
+          // Q3.1 → Q4
+          return 4;
+
+        case 3.2:
+          // Q3.2 → Q3.3
+          return 3.3;
+
+        case 3.3:
+          // Q3.3 → Q4
+          return 4;
+
+        case 4:
+          // Q4 → Q5
+          return 5;
+
+        case 5:
+          // Q5 → Q6
+          return 6;
+
+        case 6:
+          // Q6 → Résultats
+          return 'results';
+
+        default:
+          return currentStep;
+      }
+    }
+
     restart() {
       this.state = {
         currentStep: 1,
+        stepHistory: [],
         carouselIndex: 2,
         selectedWho: null,
+        selectedYear: new Date().getFullYear(),
+        showYearPicker: false,
         familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
         friendsDetails: { adultsCount: null },
         selectedTypes: [],
@@ -2446,6 +2525,9 @@
         selectedMonth: null,
         selectedDuration: null,
         selectedServices: [],
+        businessLocation: null,
+        checkInDate: null,
+        checkOutDate: null,
         results: []
       };
       const modalContent = this.querySelector('.wd-discovery-modal__content');
@@ -2485,14 +2567,20 @@
       this.isOpen = false;
       this.state = {
         currentStep: 1,
+        stepHistory: [],
         selectedWho: null,
-        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] }, // Q1.5 pour famille
-        friendsDetails: { adultsCount: null }, // Q1.5 pour amis
-        selectedTypes: [], // Q2: Quel style de voyage (multi-select)
-        destinationIdea: null, // Q3: 'one', 'multiple', 'none'
-        destinationInput: '', // Q3.1/3.2: texte libre
-        selectedRegions: [], // Q3.3: régions du monde
+        selectedYear: new Date().getFullYear(),
+        showYearPicker: false,
+        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
+        friendsDetails: { adultsCount: null },
+        selectedTypes: [],
+        destinationIdea: null,
+        destinationInput: '',
+        selectedRegions: [],
         selectedRegion: null,
+        businessLocation: null,
+        checkInDate: null,
+        checkOutDate: null,
         carouselIndex: 2
       };
       this.keydownHandler = null;
@@ -2505,6 +2593,10 @@
         return this.renderQuestion1_5();
       } else if (this.state.currentStep === 2) {
         return this.renderQuestion2();
+      } else if (this.state.currentStep === 'business-location') {
+        return this.renderQuestion_BusinessLocation();
+      } else if (this.state.currentStep === 'business-dates') {
+        return this.renderQuestion_BusinessDates();
       } else if (this.state.currentStep === 3) {
         return this.renderQuestion3();
       } else if (this.state.currentStep === 3.1) {
@@ -2516,6 +2608,8 @@
       } else if (this.state.currentStep === 4) {
         return this.renderQuestion4_Period();
       } else if (this.state.currentStep === 5) {
+        return this.renderQuestion5_Services();
+      } else if (this.state.currentStep === 6) {
         return this.renderQuestion5_Services();
       }
       return '';
@@ -2650,89 +2744,22 @@
     }
 
     renderQuestion2() {
-      const options = [
+      let options = [
         { value: 'spa', label: 'Avoir un spa dans l\'hôtel', image: '../../assets/images/discovery/wellness.jpg' },
         { value: 'restaurant', label: 'Avoir un restaurant dans l\'hôtel', image: '../../assets/images/discovery/gastro.jpg' },
         { value: 'workspace', label: 'Avoir un espace de travail dans l\'hôtel', image: '../../assets/images/discovery/business.jpg' },
+        { value: 'meeting-room', label: 'Avoir une salle de réunion', image: '../../assets/images/discovery/business.jpg' },
+        { value: 'coworking', label: 'Avoir un espace de coworking', image: '../../assets/images/discovery/business.jpg' },
         { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/discovery/kids.jpg' },
         { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
       ];
 
-      return `
-        <div class="wd-discovery-modal">
-          <div class="wd-discovery-modal__content">
-            <button class="wd-discovery-modal__close" aria-label="Fermer">
-              ${ICON.close}
-            </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
-            <p class="wd-discovery-modal__subtitle">Choisissez une ou plusieurs destinations qui vous inspirent</p>
-
-            <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">2. Qu'est-ce qui est important pour vous pour ce séjour ?</label>
-              <div class="wd-discovery-modal__options">
-                ${options.map((opt, i) => {
-                  const isSelected = this.state.selectedTravelStyles.includes(opt.value);
-                  let className = 'wd-discovery-modal__option wd-discovery-modal__option--card';
-                  const idx = this.state.carouselIndex;
-                  const distance = Math.abs(i - idx);
-                  const isLeft = i < idx;
-
-                  if (i === idx) {
-                    className += ' is-active';
-                  } else if (i === (idx - 1 + options.length) % options.length) {
-                    className += ' is-prev';
-                  } else if (i === (idx + 1) % options.length) {
-                    className += ' is-next';
-                  } else if (distance === 2 || (distance === options.length - 2)) {
-                    className += isLeft ? ' is-hidden-left-1' : ' is-hidden-right-1';
-                  } else {
-                    className += isLeft ? ' is-hidden-left' : ' is-hidden-right';
-                  }
-
-                  if (isSelected) {
-                    className += ' is-selected';
-                  }
-
-                  return `<button class="${className}" data-value="${opt.value}" data-index="${i}" style="background-image: url('${opt.image}'); background-size: cover; background-position: center;">
-                    <div class="wd-discovery-modal__option-checkbox">
-                      ${ICON.check}
-                    </div>
-                    <div class="wd-discovery-modal__option-content">
-                      <span>${opt.label}</span>
-                    </div>
-                  </button>`;
-                }).join('')}
-              </div>
-              <div class="wd-discovery-modal__carousel-nav">
-                ${options.map((_, i) => `<button class="wd-discovery-modal__carousel-dot${i === this.state.carouselIndex ? ' is-active' : ''}" data-dot="${i}"></button>`).join('')}
-              </div>
-            </div>
-
-            <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 2/7</div>
-              <button class="wd-discovery-modal__back" aria-label="Retour">
-                Retour
-              </button>
-              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
-                Recommencer
-              </button>
-              <button class="wd-discovery-modal__continue${this.state.selectedTravelStyles.length > 0 ? ' is-active' : ''}" aria-label="Continuer">
-                Continuer${this.state.selectedTravelStyles.length > 0 ? ` (${this.state.selectedTravelStyles.length})` : ''}
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    renderQuestion2() {
-      const options = [
-        { value: 'spa', label: 'Avoir un spa dans l\'hôtel', image: '../../assets/images/discovery/wellness.jpg' },
-        { value: 'restaurant', label: 'Avoir un restaurant dans l\'hôtel', image: '../../assets/images/discovery/gastro.jpg' },
-        { value: 'workspace', label: 'Avoir un espace de travail dans l\'hôtel', image: '../../assets/images/discovery/business.jpg' },
-        { value: 'kids', label: 'Avoir un espace pour enfants', image: '../../assets/images/discovery/kids.jpg' },
-        { value: 'local', label: 'Profiter de la vie locale', image: '../../assets/images/discovery/culture.jpg' }
-      ];
+      // Pour business, réordonner avec options pro en premier
+      if (this.state.selectedWho === 'business') {
+        const businessOptions = options.filter(o => ['workspace', 'meeting-room', 'coworking'].includes(o.value));
+        const otherOptions = options.filter(o => !['workspace', 'meeting-room', 'coworking'].includes(o.value));
+        options = [...businessOptions, ...otherOptions];
+      }
 
       return `
         <div class="wd-discovery-modal">
@@ -3001,20 +3028,60 @@
     }
 
 
+    generateMonthDays(monthIndex, year) {
+      const firstDay = new Date(year, monthIndex, 1).getDay();
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, monthIndex, 0).getDate();
+
+      const days = [];
+
+      // Jours du mois précédent
+      for (let i = firstDay - 1; i >= 0; i--) {
+        days.push({
+          day: daysInPrevMonth - i,
+          isOtherMonth: true,
+          isWeekend: false
+        });
+      }
+
+      // Jours du mois actuel
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, monthIndex, day);
+        const dayOfWeek = date.getDay();
+        days.push({
+          day,
+          isOtherMonth: false,
+          isWeekend: dayOfWeek === 0 || dayOfWeek === 6
+        });
+      }
+
+      // Jours du mois suivant
+      const remainingDays = 42 - days.length;
+      for (let day = 1; day <= remainingDays; day++) {
+        days.push({
+          day,
+          isOtherMonth: true,
+          isWeekend: false
+        });
+      }
+
+      return days;
+    }
+
     renderQuestion4_Period() {
-      const months = [
-        { value: 'janvier', label: 'Janvier' },
-        { value: 'fevrier', label: 'Février' },
-        { value: 'mars', label: 'Mars' },
-        { value: 'avril', label: 'Avril' },
-        { value: 'mai', label: 'Mai' },
-        { value: 'juin', label: 'Juin' },
-        { value: 'juillet', label: 'Juillet' },
-        { value: 'aout', label: 'Août' },
-        { value: 'septembre', label: 'Septembre' },
-        { value: 'octobre', label: 'Octobre' },
-        { value: 'novembre', label: 'Novembre' },
-        { value: 'decembre', label: 'Décembre' }
+      const monthsData = [
+        { value: 'janvier', label: 'Jan', fullLabel: 'Janvier', monthIndex: 0 },
+        { value: 'fevrier', label: 'Fév', fullLabel: 'Février', monthIndex: 1 },
+        { value: 'mars', label: 'Mar', fullLabel: 'Mars', monthIndex: 2 },
+        { value: 'avril', label: 'Avr', fullLabel: 'Avril', monthIndex: 3 },
+        { value: 'mai', label: 'Mai', fullLabel: 'Mai', monthIndex: 4 },
+        { value: 'juin', label: 'Jun', fullLabel: 'Juin', monthIndex: 5 },
+        { value: 'juillet', label: 'Jul', fullLabel: 'Juillet', monthIndex: 6 },
+        { value: 'aout', label: 'Aoû', fullLabel: 'Août', monthIndex: 7 },
+        { value: 'septembre', label: 'Sep', fullLabel: 'Septembre', monthIndex: 8 },
+        { value: 'octobre', label: 'Oct', fullLabel: 'Octobre', monthIndex: 9 },
+        { value: 'novembre', label: 'Nov', fullLabel: 'Novembre', monthIndex: 10 },
+        { value: 'decembre', label: 'Déc', fullLabel: 'Décembre', monthIndex: 11 }
       ];
 
       const durations = [
@@ -3024,6 +3091,16 @@
         { value: 'more', label: 'Plus de trois semaines' },
         { value: 'advice', label: 'Conseillez-moi' }
       ];
+
+      const currentYear = new Date().getFullYear();
+      const selectedYear = this.state.selectedYear || currentYear;
+      const showYearPicker = this.state.showYearPicker || false;
+
+      // Générer années: current -2 à current +10
+      const years = [];
+      for (let y = currentYear - 2; y <= currentYear + 10; y++) {
+        years.push(y);
+      }
 
       return `
         <div class="wd-discovery-modal">
@@ -3039,18 +3116,38 @@
 
               <!-- Période -->
               <div class="wd-discovery-modal__form-section">
-                <label class="wd-discovery-modal__form-label">Période</label>
-                <div class="wd-discovery-modal__select-grid">
-                  ${months.map(month => `
-                    <button 
-                      class="wd-discovery-modal__select-option${this.state.selectedMonth === month.value ? ' is-selected' : ''}" 
-                      data-value="${month.value}"
-                      data-type="month"
-                    >
-                      ${month.label}
-                    </button>
-                  `).join('')}
+                <div class="wd-discovery-modal__calendar-header">
+                  <button class="wd-discovery-modal__calendar-toggle" data-action="toggle-picker">
+                    ${showYearPicker ? `${selectedYear}` : `${monthsData.find(m => m.value === this.state.selectedMonth)?.fullLabel || ''} ${selectedYear}`}
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
                 </div>
+
+                ${showYearPicker ? `
+                  <div class="wd-discovery-modal__year-grid">
+                    ${years.map(year => `
+                      <button
+                        class="wd-discovery-modal__year-option${selectedYear === year ? ' is-selected' : ''}"
+                        data-year="${year}"
+                      >
+                        ${year}
+                      </button>
+                    `).join('')}
+                  </div>
+                ` : `
+                  <div class="wd-discovery-modal__month-grid">
+                    ${monthsData.map(month => `
+                      <button
+                        class="wd-discovery-modal__month-option${this.state.selectedMonth === month.value ? ' is-selected' : ''}"
+                        data-month="${month.value}"
+                      >
+                        ${month.label}
+                      </button>
+                    `).join('')}
+                  </div>
+                `}
               </div>
 
               <!-- Durée -->
@@ -3058,8 +3155,8 @@
                 <label class="wd-discovery-modal__form-label">Durée</label>
                 <div class="wd-discovery-modal__select-grid">
                   ${durations.map(duration => `
-                    <button 
-                      class="wd-discovery-modal__select-option${this.state.selectedDuration === duration.value ? ' is-selected' : ''}" 
+                    <button
+                      class="wd-discovery-modal__select-option${this.state.selectedDuration === duration.value ? ' is-selected' : ''}"
                       data-value="${duration.value}"
                       data-type="duration"
                     >
@@ -3138,7 +3235,102 @@
       `;
     }
 
+    renderQuestion_BusinessLocation() {
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <p class="wd-discovery-modal__subtitle">Précisez votre destination pour un voyage d'affaires</p>
+
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">Dans quelle ville ou région souhaitez-vous séjourner ?</label>
+
+              <div class="wd-discovery-modal__form-group">
+                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Tokyo, Singapour..." value="${this.state.businessLocation || ''}" />
+              </div>
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape 3/6</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
+              </button>
+              <button class="wd-discovery-modal__continue${this.state.businessLocation && this.state.businessLocation.length > 0 ? ' is-active' : ''}" aria-label="Continuer">
+                Continuer
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    renderQuestion_BusinessDates() {
+      const monthsData = [
+        { value: 'janvier', label: 'Jan', fullLabel: 'Janvier', monthIndex: 0 },
+        { value: 'fevrier', label: 'Fév', fullLabel: 'Février', monthIndex: 1 },
+        { value: 'mars', label: 'Mar', fullLabel: 'Mars', monthIndex: 2 },
+        { value: 'avril', label: 'Avr', fullLabel: 'Avril', monthIndex: 3 },
+        { value: 'mai', label: 'Mai', fullLabel: 'Mai', monthIndex: 4 },
+        { value: 'juin', label: 'Jun', fullLabel: 'Juin', monthIndex: 5 },
+        { value: 'juillet', label: 'Jul', fullLabel: 'Juillet', monthIndex: 6 },
+        { value: 'aout', label: 'Aoû', fullLabel: 'Août', monthIndex: 7 },
+        { value: 'septembre', label: 'Sep', fullLabel: 'Septembre', monthIndex: 8 },
+        { value: 'octobre', label: 'Oct', fullLabel: 'Octobre', monthIndex: 9 },
+        { value: 'novembre', label: 'Nov', fullLabel: 'Novembre', monthIndex: 10 },
+        { value: 'decembre', label: 'Déc', fullLabel: 'Décembre', monthIndex: 11 }
+      ];
+
+      const currentYear = new Date().getFullYear();
+      const hasValidDates = this.state.checkInDate && this.state.checkOutDate && new Date(this.state.checkOutDate) > new Date(this.state.checkInDate);
+
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <p class="wd-discovery-modal__subtitle">Précisez vos dates de séjour</p>
+
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">Quelles sont vos dates d'arrivée et de départ ?</label>
+
+              <div class="wd-discovery-modal__form-group">
+                <label for="checkInDate">Date d'arrivée</label>
+                <input type="date" class="wd-discovery-modal__form-input" id="checkInDate" value="${this.state.checkInDate || ''}" min="${currentYear}-01-01" />
+              </div>
+
+              <div class="wd-discovery-modal__form-group">
+                <label for="checkOutDate">Date de départ</label>
+                <input type="date" class="wd-discovery-modal__form-input" id="checkOutDate" value="${this.state.checkOutDate || ''}" min="${this.state.checkInDate || `${currentYear}-01-01`}" />
+              </div>
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape 4/6</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
+              </button>
+              <button class="wd-discovery-modal__continue${hasValidDates ? ' is-active' : ''}" aria-label="Continuer">
+                Continuer
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     afterRender() {
+      console.log('🔄 afterRender called, currentStep:', this.state.currentStep, 'selectedWho:', this.state.selectedWho);
       this.modal = this.querySelector('.wd-discovery-modal');
       this.modalContent = this.querySelector('.wd-discovery-modal__content');
 
@@ -3299,73 +3491,20 @@
           e.stopPropagation();
           console.log('=== BACK BUTTON CLICKED ===');
           console.log('Current step:', this.state.currentStep);
+          console.log('Step history:', this.state.stepHistory);
 
-          // Retour à Q1.5 depuis Q2 (quel style de voyage - si famille/amis)
-          if (this.state.currentStep === 2) {
-            if (this.state.selectedWho === 'family' || this.state.selectedWho === 'friends') {
-              this.state.currentStep = 1.5;
-            } else {
-              this.state.currentStep = 1;
+          // Dépiler l'historique
+          if (this.state.stepHistory.length > 0) {
+            const previousStep = this.state.stepHistory.pop();
+            console.log('Going back to step:', previousStep);
+            this.state.currentStep = previousStep;
+
+            // Centrer carousel pour Q1, Q2, Q3.3
+            if (previousStep === 1 || previousStep === 2 || previousStep === 3.3) {
+              this.state.carouselIndex = 2;
             }
-            this.state.selectedTypes = [];
-            this.state.carouselIndex = 0;
 
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Retour à Q1 depuis Q1.5
-          else if (this.state.currentStep === 1.5) {
-            this.state.currentStep = 1;
-            this.state.familyDetails = { childrenCount: null, childrenAges: [] };
-            this.state.friendsDetails = { adultsCount: null };
-            this.state.carouselIndex = 0;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Retour à Q2 depuis Q3 (idées de destination)
-          else if (this.state.currentStep === 3) {
-            this.state.currentStep = 2;
-            this.state.destinationIdea = null;
-            this.state.carouselIndex = 2;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Retour à Q3 depuis Q3.1, Q3.2, Q3.3
-          else if (this.state.currentStep === 3.1 || this.state.currentStep === 3.2 || this.state.currentStep === 3.3) {
-            this.state.currentStep = 3;
-            this.state.destinationInput = '';
-            this.state.selectedRegions = [];
-            this.state.carouselIndex = 0;
-
+            // Re-render
             const modalContent = this.querySelector('.wd-discovery-modal__content');
             if (modalContent) {
               const tempDiv = document.createElement('div');
@@ -3386,32 +3525,7 @@
       if (resetBtn) {
         resetBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('=== RESET BUTTON CLICKED ===');
-          this.state.currentStep = 1;
-          this.state.selectedWho = null;
-          this.state.selectedTypes = [];
-          this.state.familyDetails = { childrenCount: null, childrenAges: [] };
-          this.state.friendsDetails = { adultsCount: null };
-          this.state.destinationIdea = null;
-          this.state.destinationInput = '';
-          this.state.selectedRegions = [];
-          this.state.carouselIndex = 0;
-
-          // Update only the modal content, not the entire component
-          const modalContent = this.querySelector('.wd-discovery-modal__content');
-          if (modalContent) {
-            // Get the new Q1 HTML from render()
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = this.render();
-            const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-            if (newContent) {
-              // Replace only the inner content
-              modalContent.innerHTML = newContent.innerHTML;
-              // Re-attach event listeners for Q1
-              this.afterRender();
-            }
-          }
+          this.restart();
         });
       }
 
@@ -3430,155 +3544,41 @@
           e.stopPropagation();
           console.log('=== CONTINUE BUTTON CLICKED ===');
           console.log('Current step:', this.state.currentStep);
-          console.log('Selected who:', this.state.selectedWho);
-          console.log('Selected travel styles:', this.state.selectedTravelStyles);
-          console.log('Selected types:', this.state.selectedTypes);
-          console.log('Selected month:', this.state.selectedMonth);
-          console.log('Selected duration:', this.state.selectedDuration);
-          console.log('Selected services:', this.state.selectedServices);
+          console.log('Button has is-active class?', continueBtn.classList.contains('is-active'));
+          console.log('State selectedWho:', this.state.selectedWho);
 
-          // Q1 → Q1.5 (si famille ou amis) ou Q2 (style de voyage)
-          if (this.state.currentStep === 1 && this.state.selectedWho) {
-            if (this.state.selectedWho === 'family' || this.state.selectedWho === 'friends') {
-              console.log('Advancing to Q1.5 (details)');
-              this.state.currentStep = 1.5;
-            } else {
-              console.log('Advancing to Q2 (travel style)');
-              this.state.currentStep = 2;
-            }
-            this.state.carouselIndex = 0;
+          // Pousser l'étape actuelle dans l'historique avant de naviguer
+          this.state.stepHistory.push(this.state.currentStep);
 
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+          // Obtenir la prochaine étape via la fonction centralisée
+          const nextStep = this.getNextStep(this.state.currentStep, this.state);
 
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q1.5 → Q2 (style de voyage)
-          else if (this.state.currentStep === 1.5) {
-            console.log('Advancing from Q1.5 to Q2 (travel style)');
-            this.state.currentStep = 2;
-            this.state.carouselIndex = 2;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q2 → Q3 (idées de destination)
-          else if (this.state.currentStep === 2 && this.state.selectedTypes.length > 0) {
-            console.log('Advancing to Q3 (destination ideas)');
-            this.state.currentStep = 3;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q3 → Q3.1 (champ libre) ou Q3.3 (régions)
-          else if (this.state.currentStep === 3 && this.state.destinationIdea) {
-            console.log('Advancing from Q3 based on choice:', this.state.destinationIdea);
-            if (this.state.destinationIdea === 'yes') {
-              this.state.currentStep = 3.1;
-            } else if (this.state.destinationIdea === 'no') {
-              this.state.currentStep = 3.3;
-              this.state.carouselIndex = 2;
-            }
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q3.1, Q3.2 → Q4 (période)
-          else if ((this.state.currentStep === 3.1 || this.state.currentStep === 3.2) && this.state.destinationInput.length > 0) {
-            console.log('Advancing from Q3.1/3.2 to Q4 (period)');
-            this.state.currentStep = 4;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q3.3 → Q4 (période)
-          else if (this.state.currentStep === 3.3 && this.state.selectedRegions.length > 0) {
-            console.log('Advancing from Q3.3 to Q4 (period)');
-            this.state.currentStep = 4;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Q4 → Q5 (services)
-          else if (this.state.currentStep === 4 && this.state.selectedMonth && this.state.selectedDuration) {
-            console.log('Advancing from Q4 to Q5 (services)');
-            console.log('Q4 state:', { month: this.state.selectedMonth, duration: this.state.selectedDuration });
-            this.state.currentStep = 5;
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-          }
-          // Debug: Q4 not advancing?
-          else if (this.state.currentStep === 4) {
-            console.log('❌ Q4 Continue clicked but conditions not met');
-            console.log('State:', { step: this.state.currentStep, month: this.state.selectedMonth, duration: this.state.selectedDuration });
-          }
-          // Q5 → Fin (optionnel, toujours actif)
-          else if (this.state.currentStep === 5) {
-            console.log('Closing modal with services selection');
+          if (nextStep === 'results') {
+            console.log('Closing modal with final selection');
             this.close();
             console.log('Sélection complète:', this.state);
+            return;
+          }
+
+          console.log('Advancing from', this.state.currentStep, 'to', nextStep);
+          this.state.currentStep = nextStep;
+
+          // Centrer carousel pour Q2, Q3.2, Q3.3
+          if (nextStep === 2 || nextStep === 3.2 || nextStep === 3.3) {
+            this.state.carouselIndex = 2;
+          }
+
+          // Re-render
+          const modalContent = this.querySelector('.wd-discovery-modal__content');
+          if (modalContent) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = this.render();
+            const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+
+            if (newContent) {
+              modalContent.innerHTML = newContent.innerHTML;
+              this.afterRender();
+            }
           }
         });
       }
@@ -3676,9 +3676,9 @@
             }
           }
           // Q1: Carousel avec sélection sur carte active (SINGLE SELECT)
-          else if (clickedIndex === this.state.carouselIndex) {
-            console.log('Active card clicked, value:', value);
-            if (this.state.currentStep === 1) {
+          else if (this.state.currentStep === 1) {
+            if (clickedIndex === this.state.carouselIndex) {
+              console.log('Q1: Active card clicked, value:', value);
               // Retirer la sélection de toutes les cartes
               this.querySelectorAll('.wd-discovery-modal__option').forEach(opt => {
                 opt.classList.remove('is-selected');
@@ -3692,6 +3692,11 @@
               if (continueBtn) {
                 continueBtn.classList.add('is-active');
               }
+            } else {
+              // Clic sur carte non-active → navigation
+              console.log('Q1: Not active card, navigating to:', clickedIndex);
+              this.state.carouselIndex = clickedIndex;
+              this.updateCarouselPosition();
             }
           } else {
             // Navigation vers la carte cliquée (Q1)
@@ -3766,31 +3771,83 @@
         console.log('🔧 Q4/Q5 event listener attached');
         this.addEventListener('click', (e) => {
           console.log('🖱️ Click in modal, target:', e.target.tagName, e.target.textContent?.substring(0, 20));
-          
-          // Q4: sélection mois/durée
-          const q4Btn = e.target.closest('[data-type="month"], [data-type="duration"]');
-          if (q4Btn && this.state.currentStep === 4) {
-            const value = q4Btn.dataset.value;
-            const type = q4Btn.dataset.type;
 
-            console.log('Q4 button clicked:', { type, value });
-
-            if (type === 'month') {
-              this.querySelectorAll('[data-type="month"]').forEach(b => b.classList.remove('is-selected'));
-              q4Btn.classList.add('is-selected');
-              this.state.selectedMonth = value;
-              console.log('✅ Month selected:', value);
-            } else if (type === 'duration') {
-              this.querySelectorAll('[data-type="duration"]').forEach(b => b.classList.remove('is-selected'));
-              q4Btn.classList.add('is-selected');
-              this.state.selectedDuration = value;
-              console.log('✅ Duration selected:', value);
+          // Q4: Toggle entre vue mois et vue années
+          const toggleBtn = e.target.closest('[data-action="toggle-picker"]');
+          if (toggleBtn && this.state.currentStep === 4) {
+            this.state.showYearPicker = !this.state.showYearPicker;
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
             }
+            return;
+          }
+
+          // Q4: Sélection année
+          const yearBtn = e.target.closest('[data-year]');
+          if (yearBtn && this.state.currentStep === 4) {
+            const year = parseInt(yearBtn.dataset.year);
+            this.state.selectedYear = year;
+            this.state.showYearPicker = false;
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
+            }
+            return;
+          }
+
+          // Q4: Sélection mois
+          const monthBtn = e.target.closest('[data-month]');
+          if (monthBtn && this.state.currentStep === 4) {
+            const monthValue = monthBtn.dataset.month;
+            this.state.selectedMonth = monthValue;
+
+            // Activer Continue si durée aussi sélectionnée
+            const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+            if (continueBtn && this.state.selectedMonth && this.state.selectedDuration) {
+              continueBtn.classList.add('is-active');
+            }
+
+            const modalContent = this.querySelector('.wd-discovery-modal__content');
+            if (modalContent) {
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = this.render();
+              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+              if (newContent) {
+                modalContent.innerHTML = newContent.innerHTML;
+                this.afterRender();
+              }
+            }
+            return;
+          }
+
+          // Q4: sélection durée
+          const durationBtn = e.target.closest('[data-type="duration"]');
+          if (durationBtn && this.state.currentStep === 4) {
+            const value = durationBtn.dataset.value;
+            console.log('Duration button clicked:', value);
+
+            this.querySelectorAll('[data-type="duration"]').forEach(b => b.classList.remove('is-selected'));
+            durationBtn.classList.add('is-selected');
+            this.state.selectedDuration = value;
+            console.log('✅ Duration selected:', value);
 
             // Activer Continue
             const continueBtn = this.querySelector('.wd-discovery-modal__continue');
             console.log('State après clic:', { month: this.state.selectedMonth, duration: this.state.selectedDuration });
-            
+
             if (continueBtn && this.state.selectedMonth && this.state.selectedDuration) {
               continueBtn.classList.add('is-active');
               console.log('✅ Continue activé');
@@ -3924,6 +3981,117 @@
         continueBtn.classList.add('is-active');
       } else {
         continueBtn.classList.remove('is-active');
+      }
+    }
+
+    getNextStep(currentStep, state) {
+      // Flux business divergent
+      if (state.selectedWho === 'business') {
+        switch (currentStep) {
+          case 1:
+            return 2;
+          case 2:
+            return 'business-location';
+          case 'business-location':
+            return 'business-dates';
+          case 'business-dates':
+            return 6;
+          case 6:
+            return 'results';
+          default:
+            return currentStep;
+        }
+      }
+
+      // Flux standard pour solo/couple/family/friends
+      switch (currentStep) {
+        case 1:
+          // Q1 → Q1.5 si family/friends, sinon Q2
+          if (state.selectedWho === 'family' || state.selectedWho === 'friends') {
+            return 1.5;
+          }
+          return 2;
+
+        case 1.5:
+          // Q1.5 → Q2
+          return 2;
+
+        case 2:
+          // Q2 → Q3
+          return 3;
+
+        case 3:
+          // Q3 → Q3.1 si "yes", Q3.2 si "no", Q3.3 si "multiple"
+          if (state.destinationIdea === 'yes') {
+            return 3.1;
+          } else if (state.destinationIdea === 'no') {
+            return 3.2;
+          } else if (state.destinationIdea === 'multiple') {
+            return 3.3;
+          }
+          return 3;
+
+        case 3.1:
+          // Q3.1 → Q4
+          return 4;
+
+        case 3.2:
+          // Q3.2 → Q3.3
+          return 3.3;
+
+        case 3.3:
+          // Q3.3 → Q4
+          return 4;
+
+        case 4:
+          // Q4 → Q5
+          return 5;
+
+        case 5:
+          // Q5 → Q6
+          return 6;
+
+        case 6:
+          // Q6 → Résultats
+          return 'results';
+
+        default:
+          return currentStep;
+      }
+    }
+
+    restart() {
+      this.state = {
+        currentStep: 1,
+        stepHistory: [],
+        carouselIndex: 2,
+        selectedWho: null,
+        selectedYear: new Date().getFullYear(),
+        showYearPicker: false,
+        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
+        friendsDetails: { adultsCount: null },
+        selectedTypes: [],
+        destinationIdea: null,
+        destinationInput: '',
+        selectedRegions: [],
+        selectedRegion: null,
+        selectedMonth: null,
+        selectedDuration: null,
+        selectedServices: [],
+        businessLocation: null,
+        checkInDate: null,
+        checkOutDate: null,
+        results: []
+      };
+      const modalContent = this.querySelector('.wd-discovery-modal__content');
+      if (modalContent) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = this.render();
+        const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+        if (newContent) {
+          modalContent.innerHTML = newContent.innerHTML;
+          this.afterRender();
+        }
       }
     }
 
