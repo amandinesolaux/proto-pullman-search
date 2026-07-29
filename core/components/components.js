@@ -2623,7 +2623,7 @@
         { value: 'couple', label: 'En couple', image: '../../assets/images/discovery/couple.jpg' },
         { value: 'family', label: 'En famille', image: '../../assets/images/discovery/family.jpg' },
         { value: 'friends', label: 'Entre amis', image: '../../assets/images/discovery/friendtravel.avif' },
-        { value: 'business', label: 'Business', image: '../../assets/images/discovery/business.jpg' }
+        { value: 'business', label: 'Business', image: '../../assets/images/discovery/businesstravel.avif' }
       ];
 
       return `
