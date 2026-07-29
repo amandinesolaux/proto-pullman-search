@@ -3174,12 +3174,37 @@
 
 
     renderQuestion5_Services() {
-      const services = [
+      // Options non liées à l'âge : toujours affichées, inchangées.
+      const baseServices = [
         { value: 'pets', label: 'Animaux' },
         { value: 'accessibility', label: 'Accès handicapés' },
-        { value: 'parking', label: 'Parking' },
-        { value: 'kids-club', label: 'Club enfants' }
+        { value: 'parking', label: 'Parking' }
       ];
+
+      let services;
+      if (this.state.selectedWho === 'family') {
+        // Filtrage strict selon les âges collectés en Q1.5 (childrenAges).
+        const ages = Array.isArray(this.state.familyDetails && this.state.familyDetails.childrenAges)
+          ? this.state.familyDetails.childrenAges
+          : [];
+        const hasAgeIn = (min, max) => ages.some(a => typeof a === 'number' && a >= min && a <= max);
+
+        const ageServices = [];
+        if (hasAgeIn(0, 2)) ageServices.push({ value: 'baby-bed', label: 'Lit bébé' });
+        if (hasAgeIn(0, 2)) ageServices.push({ value: 'high-chair', label: 'Chaise haute' });
+        if (hasAgeIn(2, 11)) ageServices.push({ value: 'kids-pool', label: 'Pataugeoire / piscine sécurisée' });
+        if (hasAgeIn(3, 11)) ageServices.push({ value: 'kids-club', label: 'Club enfants' });
+
+        services = [...baseServices, ...ageServices];
+      } else {
+        // Profils solo/couple/business/friends : Q6 inchangé (comportement d'origine).
+        services = [...baseServices, { value: 'kids-club', label: 'Club enfants' }];
+      }
+
+      // Anti "service fantôme" : purge du state toute option sélectionnée mais
+      // plus visible (ex. retour arrière + changement d'âge en Q1.5).
+      const visibleValues = services.map(s => s.value);
+      this.state.selectedServices = this.state.selectedServices.filter(v => visibleValues.includes(v));
 
       return `
         <div class="wd-discovery-modal">
