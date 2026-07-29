@@ -3506,7 +3506,8 @@
 
             // Centrer carousel pour Q1, Q2, Q3.3
             if (previousStep === 1 || previousStep === 2 || previousStep === 3.3) {
-              this.state.carouselIndex = 2;
+              // En business, Q2 démarre sur la 1re carte pro (salle de réunion)
+              this.state.carouselIndex = (previousStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
             }
 
             // Re-render
@@ -3570,7 +3571,8 @@
 
           // Centrer carousel pour Q2, Q3.2, Q3.3
           if (nextStep === 2 || nextStep === 3.2 || nextStep === 3.3) {
-            this.state.carouselIndex = 2;
+            // En business, Q2 démarre sur la 1re carte pro (salle de réunion)
+            this.state.carouselIndex = (nextStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
           }
 
           // Re-render
