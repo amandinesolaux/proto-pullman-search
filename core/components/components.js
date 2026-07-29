@@ -2590,8 +2590,8 @@
           return 4;
 
         case 'wishlist':
-          // Écran wishlist → Q5 (période)
-          return 4;
+          // Écran wishlist → Q5 (période), seulement si une destination est retenue
+          return state.destinationInput ? 4 : 'wishlist';
 
         case 4:
           // Q4 → Q5
@@ -2703,6 +2703,13 @@
         checkOutDate: null,
         results: []
       };
+    }
+
+    // Vrai si la destination retenue correspond à une entrée de la wishlist
+    // (utilisé pour l'état sélectionné des cartes et l'activation de "Continuer").
+    _isWishlistSelected() {
+      const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
+      return wishlist.some(d => (d.country ? `${d.name}, ${d.country}` : d.name) === this.state.destinationInput);
     }
 
     // Vrai seulement si connecté ET wishlist non vide (gate des features perso).
@@ -3046,9 +3053,10 @@
     }
 
     // Écran wishlist (destinationIdea === 'wishlist') : cartes cliquables des
-    // destinations sauvegardées. Un clic enregistre la destination et saute à Q5.
+    // destinations sauvegardées. Un clic sélectionne, "Continuer" mène à Q5.
     renderQuestion3_Wishlist() {
       const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
+      const hasSelection = this._isWishlistSelected();
 
       return `
         <div class="wd-discovery-modal">
@@ -3088,6 +3096,9 @@
               </button>
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">
                 Recommencer
+              </button>
+              <button class="wd-discovery-modal__continue${hasSelection ? ' is-active' : ''}" aria-label="Continuer">
+                Continuer
               </button>
             </div>
           </div>
@@ -3728,12 +3739,10 @@
             e.stopPropagation();
             const dest = wishlist[parseInt(card.dataset.wishlistIndex)];
             if (!dest) return;
+            // Sélection simple (pattern habituel du wizard) : "Continuer" mène à Q5.
             // Réutilise destinationInput (comme l'écran "hésitation") : pas de cas
             // spécial côté Résultats.
             this.state.destinationInput = dest.country ? `${dest.name}, ${dest.country}` : dest.name;
-            // Navigation cohérente avec la pile : empile l'écran wishlist avant de sauter à Q5.
-            this.state.stepHistory.push(this.state.currentStep);
-            this.state.currentStep = this.getNextStep('wishlist', this.state);
             this._rerenderContent();
           });
         });
@@ -4585,8 +4594,8 @@
           return 4;
 
         case 'wishlist':
-          // Écran wishlist → Q5 (période)
-          return 4;
+          // Écran wishlist → Q5 (période), seulement si une destination est retenue
+          return state.destinationInput ? 4 : 'wishlist';
 
         case 4:
           // Q4 → Q5
