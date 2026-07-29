@@ -2565,12 +2565,15 @@
           // Q3 : "oui, j'ai des idées" → on demande les destinations (3.2).
           //      "non, pas encore d'idées" → inspiration par régions (3.3),
           //      surtout PAS la question "entre quelles destinations hésitez-vous".
+          //      "repartir de ma wishlist" (connecté) → écran wishlist.
           if (state.destinationIdea === 'yes') {
             return 3.2;
           } else if (state.destinationIdea === 'no') {
             return 3.3;
           } else if (state.destinationIdea === 'multiple') {
             return 3.3;
+          } else if (state.destinationIdea === 'wishlist') {
+            return 'wishlist';
           }
           return 3;
 
@@ -2584,6 +2587,10 @@
 
         case 3.3:
           // Q3.3 → Q4
+          return 4;
+
+        case 'wishlist':
+          // Écran wishlist → Q5 (période)
           return 4;
 
         case 4:
@@ -2698,6 +2705,13 @@
       };
     }
 
+    // Vrai seulement si connecté ET wishlist non vide (gate des features perso).
+    _hasWishlist() {
+      return !!(this.state.isConnected && this.state.userProfile
+        && Array.isArray(this.state.userProfile.wishlist)
+        && this.state.userProfile.wishlist.length > 0);
+    }
+
     // Bascule l'état de connexion. À true, mocke userProfile (aucun appel API à
     // ce stade). À utiliser pour tester / brancher un vrai flux d'auth plus tard.
     setConnected(connected) {
@@ -2711,7 +2725,11 @@
         firstName: 'Amandine',
         loyaltyStatus: 'Gold',
         loyaltyPoints: 2450,
-        wishlist: ['Bali, Indonésie', 'Tokyo, Japon', 'Marrakech, Maroc'],
+        wishlist: [
+          { name: 'Bangkok', country: 'Thaïlande', image: 'https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' },
+          { name: 'Bali', country: 'Indonésie', image: 'https://m.ahstatic.com/is/image/accorhotels/6556-1:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' },
+          { name: 'Tokyo', country: 'Japon', image: 'https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' }
+        ],
         familyMembers: [
           { firstName: 'Léo', age: 6 },
           { firstName: 'Emma', age: 3 }
@@ -2742,6 +2760,8 @@
         return this.renderQuestion3_MultipleDestinations();
       } else if (this.state.currentStep === 3.3) {
         return this.renderQuestion3_Regions();
+      } else if (this.state.currentStep === 'wishlist') {
+        return this.renderQuestion3_Wishlist();
       } else if (this.state.currentStep === 4) {
         return this.renderQuestion4_Period();
       } else if (this.state.currentStep === 5) {
@@ -2976,6 +2996,11 @@
         { value: 'no', label: 'Non, je n\'ai pas encore d\'idées' }
       ];
 
+      // Option hyperpersonnalisée : visible seulement si connecté avec wishlist non vide.
+      if (this._hasWishlist()) {
+        options.push({ value: 'wishlist', label: 'Repartir de ma wishlist' });
+      }
+
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content">
@@ -3013,6 +3038,56 @@
               </button>
               <button class="wd-discovery-modal__continue${this.state.destinationIdea ? ' is-active' : ''}" aria-label="Continuer">
                 Continuer
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Écran wishlist (destinationIdea === 'wishlist') : cartes cliquables des
+    // destinations sauvegardées. Un clic enregistre la destination et saute à Q5.
+    renderQuestion3_Wishlist() {
+      const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
+
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <p class="wd-discovery-modal__subtitle">Repartez d'une destination que vous avez sauvegardée.</p>
+
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">Votre wishlist</label>
+
+              <div class="wd-discovery-modal__wishlist-grid">
+                ${wishlist.map((dest, i) => {
+                  const label = dest.country ? `${dest.name}, ${dest.country}` : dest.name;
+                  const isSelected = this.state.destinationInput === label;
+                  return `<button class="wd-discovery-modal__wishlist-card${isSelected ? ' is-selected' : ''}" data-wishlist-index="${i}" style="background-image: url('${dest.image || ''}')">
+                    <span class="wd-discovery-modal__wishlist-card-overlay"></span>
+                    <span class="wd-discovery-modal__wishlist-card-text">
+                      <span class="wd-discovery-modal__wishlist-card-name">${dest.name}</span>
+                      ${dest.country ? `<span class="wd-discovery-modal__wishlist-card-country">${dest.country}</span>` : ''}
+                    </span>
+                  </button>`;
+                }).join('')}
+              </div>
+
+              <button type="button" class="wd-discovery-modal__wishlist-alt" data-wishlist-action="back-to-q3">
+                Choisir une autre façon de rechercher
+              </button>
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
               </button>
             </div>
           </div>
@@ -3640,6 +3715,40 @@
                 continueBtn.classList.remove('is-active');
               }
             }
+          });
+        }
+      }
+
+      // Écran wishlist : sélection d'une destination sauvegardée → saut à Q5
+      if (this.state.currentStep === 'wishlist') {
+        const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
+
+        this.querySelectorAll('.wd-discovery-modal__wishlist-card').forEach(card => {
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dest = wishlist[parseInt(card.dataset.wishlistIndex)];
+            if (!dest) return;
+            // Réutilise destinationInput (comme l'écran "hésitation") : pas de cas
+            // spécial côté Résultats.
+            this.state.destinationInput = dest.country ? `${dest.name}, ${dest.country}` : dest.name;
+            // Navigation cohérente avec la pile : empile l'écran wishlist avant de sauter à Q5.
+            this.state.stepHistory.push(this.state.currentStep);
+            this.state.currentStep = this.getNextStep('wishlist', this.state);
+            this._rerenderContent();
+          });
+        });
+
+        // Lien discret : revenir à Q3 (conserve Q1/Q1.5/Q2 déjà répondus)
+        const altLink = this.querySelector('[data-wishlist-action="back-to-q3"]');
+        if (altLink) {
+          altLink.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.state.currentStep = 3;
+            // Dépile l'entrée Q3 poussée à l'aller pour ne pas la dupliquer.
+            if (this.state.stepHistory[this.state.stepHistory.length - 1] === 3) {
+              this.state.stepHistory.pop();
+            }
+            this._rerenderContent();
           });
         }
       }
@@ -4451,12 +4560,15 @@
           // Q3 : "oui, j'ai des idées" → on demande les destinations (3.2).
           //      "non, pas encore d'idées" → inspiration par régions (3.3),
           //      surtout PAS la question "entre quelles destinations hésitez-vous".
+          //      "repartir de ma wishlist" (connecté) → écran wishlist.
           if (state.destinationIdea === 'yes') {
             return 3.2;
           } else if (state.destinationIdea === 'no') {
             return 3.3;
           } else if (state.destinationIdea === 'multiple') {
             return 3.3;
+          } else if (state.destinationIdea === 'wishlist') {
+            return 'wishlist';
           }
           return 3;
 
@@ -4470,6 +4582,10 @@
 
         case 3.3:
           // Q3.3 → Q4
+          return 4;
+
+        case 'wishlist':
+          // Écran wishlist → Q5 (période)
           return 4;
 
         case 4:
@@ -4493,15 +4609,20 @@
 
     restart() {
       this.state = this.getInitialState();
+      this._rerenderContent();
+    }
+
+    // Re-rend le contenu de la modale à partir de l'état courant (remplace le
+    // pattern tempDiv → innerHTML → afterRender répété dans les handlers).
+    _rerenderContent() {
       const modalContent = this.querySelector('.wd-discovery-modal__content');
-      if (modalContent) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = this.render();
-        const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-        if (newContent) {
-          modalContent.innerHTML = newContent.innerHTML;
-          this.afterRender();
-        }
+      if (!modalContent) return;
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = this.render();
+      const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
+      if (newContent) {
+        modalContent.innerHTML = newContent.innerHTML;
+        this.afterRender();
       }
     }
 

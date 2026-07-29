@@ -898,6 +898,59 @@
   cursor: not-allowed;
 }
 
+/* Écran wishlist (utilisateur connecté) : cartes des destinations sauvegardées */
+.wd-discovery-modal__wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.wd-discovery-modal__wishlist-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0;
+  background-size: cover;
+  background-position: center;
+  background-color: #445047;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.wd-discovery-modal__wishlist-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.65) 100%);
+}
+.wd-discovery-modal__wishlist-card-text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  color: #ffffff;
+}
+.wd-discovery-modal__wishlist-card-name { display: block; font-family: var(--font-sans); font-size: 17px; font-weight: 700; }
+.wd-discovery-modal__wishlist-card-country { display: block; font-family: var(--font-sans); font-size: 13px; opacity: 0.85; }
+.wd-discovery-modal__wishlist-card:hover { border-color: #5fef91; }
+.wd-discovery-modal__wishlist-card.is-selected { border-color: #5fef91; box-shadow: inset 0 0 0 1px #5fef91; }
+
+/* Lien discret pour choisir une autre option */
+.wd-discovery-modal__wishlist-alt {
+  margin-top: 20px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: #717171;
+  text-decoration: underline;
+}
+.wd-discovery-modal__wishlist-alt:hover { color: #445047; }
+
 /* Textarea pour question 4.2 */
 .wd-discovery-modal__form-textarea {
   resize: vertical;
