@@ -3101,13 +3101,6 @@
 
       const currentYear = new Date().getFullYear();
       const selectedYear = this.state.selectedYear || currentYear;
-      const showYearPicker = this.state.showYearPicker || false;
-
-      // Générer années: current -2 à current +10
-      const years = [];
-      for (let y = currentYear - 2; y <= currentYear + 10; y++) {
-        years.push(y);
-      }
 
       return `
         <div class="wd-discovery-modal">
@@ -3121,40 +3114,28 @@
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">5. À quelle période et pour quelle durée souhaitez-vous partir ?</label>
 
-              <!-- Période -->
+              <!-- Période (même composant que le date picker business, en sélection de mois) -->
               <div class="wd-discovery-modal__form-section">
-                <div class="wd-discovery-modal__calendar-header">
-                  <button class="wd-discovery-modal__calendar-toggle" data-action="toggle-picker">
-                    ${showYearPicker ? `${selectedYear}` : `${monthsData.find(m => m.value === this.state.selectedMonth)?.fullLabel || ''} ${selectedYear}`}
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
+                <label class="wd-discovery-modal__form-label">Période</label>
+                <div class="wd-discovery-modal__daterange">
+                  <button type="button" class="wd-discovery-modal__daterange-field" id="periodField" aria-haspopup="dialog" aria-expanded="false">
+                    <span class="wd-discovery-modal__daterange-value${this.state.selectedMonth ? '' : ' is-placeholder'}" id="periodValue">
+                      ${this.state.selectedMonth ? `${monthsData.find(m => m.value === this.state.selectedMonth)?.fullLabel || ''} ${selectedYear}` : 'Choisissez une période'}
+                    </span>
+                    <span class="wd-discovery-modal__daterange-icon" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </span>
                   </button>
-                </div>
 
-                ${showYearPicker ? `
-                  <div class="wd-discovery-modal__year-grid">
-                    ${years.map(year => `
-                      <button
-                        class="wd-discovery-modal__year-option${selectedYear === year ? ' is-selected' : ''}"
-                        data-year="${year}"
-                      >
-                        ${year}
-                      </button>
-                    `).join('')}
+                  <div class="wd-discovery-modal__calendar wd-discovery-modal__calendar--months" id="periodCalendar" role="dialog" aria-label="Choisir une période" hidden>
+                    <div class="wd-discovery-modal__calendar-nav">
+                      <button type="button" class="wd-discovery-modal__calendar-arrow" data-pnav="-1" aria-label="Année précédente">${ICON.chevL}</button>
+                      <span class="wd-discovery-modal__calendar-title" id="periodYearTitle"></span>
+                      <button type="button" class="wd-discovery-modal__calendar-arrow" data-pnav="1" aria-label="Année suivante">${ICON.chevR}</button>
+                    </div>
+                    <div class="wd-discovery-modal__month-picker" id="periodMonths"></div>
                   </div>
-                ` : `
-                  <div class="wd-discovery-modal__month-grid">
-                    ${monthsData.map(month => `
-                      <button
-                        class="wd-discovery-modal__month-option${this.state.selectedMonth === month.value ? ' is-selected' : ''}"
-                        data-month="${month.value}"
-                      >
-                        ${month.label}
-                      </button>
-                    `).join('')}
-                  </div>
-                `}
+                </div>
               </div>
 
               <!-- Durée -->
@@ -3726,6 +3707,87 @@
         }
       }
 
+      // Q5 (période) : sélection du MOIS avec le même composant calendrier (nav par année)
+      if (this.state.currentStep === 4) {
+        const pField = this.querySelector('#periodField');
+        const pCal = this.querySelector('#periodCalendar');
+        const pTitle = this.querySelector('#periodYearTitle');
+        const pMonths = this.querySelector('#periodMonths');
+        const pValue = this.querySelector('#periodValue');
+        const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+
+        if (pField && pCal && pMonths) {
+          const SHORT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+          const FULL = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+          const VALUES = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
+          const now = new Date();
+          const curY = now.getFullYear();
+          const curM = now.getMonth();
+          let viewY = this.state.selectedYear || curY;
+
+          const updateContinue = () => {
+            if (continueBtn) continueBtn.classList.toggle('is-active', !!(this.state.selectedMonth && this.state.selectedDuration));
+          };
+          const updateValue = () => {
+            if (this.state.selectedMonth) {
+              const i = VALUES.indexOf(this.state.selectedMonth);
+              pValue.textContent = `${FULL[i]} ${this.state.selectedYear || curY}`;
+              pValue.classList.remove('is-placeholder');
+            } else {
+              pValue.textContent = 'Choisissez une période';
+              pValue.classList.add('is-placeholder');
+            }
+          };
+          const renderMonths = () => {
+            pTitle.textContent = viewY;
+            let html = '';
+            for (let i = 0; i < 12; i++) {
+              const disabled = viewY === curY && i < curM;
+              const selected = this.state.selectedMonth === VALUES[i] && (this.state.selectedYear || curY) === viewY;
+              const cls = ['wd-discovery-modal__month-cell'];
+              if (disabled) cls.push('is-disabled');
+              if (selected) cls.push('is-selected');
+              html += `<button type="button" class="${cls.join(' ')}" data-pmonth="${i}"${disabled ? ' disabled' : ''}>${SHORT[i]}</button>`;
+            }
+            pMonths.innerHTML = html;
+            const prev = pCal.querySelector('[data-pnav="-1"]');
+            const next = pCal.querySelector('[data-pnav="1"]');
+            prev.disabled = viewY <= curY;
+            next.disabled = viewY >= curY + 10;
+          };
+          const openCal = () => { pCal.hidden = false; pField.setAttribute('aria-expanded', 'true'); renderMonths(); };
+          const closeCal = () => { pCal.hidden = true; pField.setAttribute('aria-expanded', 'false'); };
+
+          pField.addEventListener('click', (e) => { e.stopPropagation(); pCal.hidden ? openCal() : closeCal(); });
+
+          pCal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const nav = e.target.closest('[data-pnav]');
+            if (nav && !nav.disabled) { viewY += parseInt(nav.dataset.pnav); renderMonths(); return; }
+            const cell = e.target.closest('.wd-discovery-modal__month-cell');
+            if (!cell || cell.disabled) return;
+            const i = parseInt(cell.dataset.pmonth);
+            this.state.selectedMonth = VALUES[i];
+            this.state.selectedYear = viewY;
+            renderMonths();
+            updateValue();
+            updateContinue();
+            setTimeout(closeCal, 200);
+          });
+
+          this._periodOutside && document.removeEventListener('click', this._periodOutside);
+          this._periodOutside = (e) => {
+            if (!this.contains(e.target)) return;
+            if (pCal.hidden) return;
+            if (!e.target.closest('.wd-discovery-modal__daterange')) closeCal();
+          };
+          document.addEventListener('click', this._periodOutside);
+
+          updateValue();
+          updateContinue();
+        }
+      }
+
       // Bouton "Retour"
       const backBtn = this.querySelector('.wd-discovery-modal__back');
       if (backBtn) {
@@ -4015,67 +4077,6 @@
         console.log('🔧 Q4/Q5 event listener attached');
         this.addEventListener('click', (e) => {
           console.log('🖱️ Click in modal, target:', e.target.tagName, e.target.textContent?.substring(0, 20));
-
-          // Q4: Toggle entre vue mois et vue années
-          const toggleBtn = e.target.closest('[data-action="toggle-picker"]');
-          if (toggleBtn && this.state.currentStep === 4) {
-            this.state.showYearPicker = !this.state.showYearPicker;
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-            return;
-          }
-
-          // Q4: Sélection année
-          const yearBtn = e.target.closest('[data-year]');
-          if (yearBtn && this.state.currentStep === 4) {
-            const year = parseInt(yearBtn.dataset.year);
-            this.state.selectedYear = year;
-            this.state.showYearPicker = false;
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-            return;
-          }
-
-          // Q4: Sélection mois
-          const monthBtn = e.target.closest('[data-month]');
-          if (monthBtn && this.state.currentStep === 4) {
-            const monthValue = monthBtn.dataset.month;
-            this.state.selectedMonth = monthValue;
-
-            // Activer Continue si durée aussi sélectionnée
-            const continueBtn = this.querySelector('.wd-discovery-modal__continue');
-            if (continueBtn && this.state.selectedMonth && this.state.selectedDuration) {
-              continueBtn.classList.add('is-active');
-            }
-
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
-            return;
-          }
 
           // Q4: sélection durée
           const durationBtn = e.target.closest('[data-type="duration"]');

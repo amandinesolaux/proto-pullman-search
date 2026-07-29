@@ -45,7 +45,7 @@
   background: #ffffff;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 48px 32px 32px 32px;
+  padding: 48px 32px 0 32px;
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
   transform: translateX(100%);
   transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -448,22 +448,25 @@
 
 /* Footer */
 .wd-discovery-modal__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-top: auto;
+  margin-left: -32px;
+  margin-right: -32px;
+  padding: 16px 32px calc(16px + env(safe-area-inset-bottom, 0px));
   background: #ffffff;
   border-top: 1px solid #e5e5e5;
-  padding: 20px 0;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: auto;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.wd-discovery-modal__footer > * {
-  flex-shrink: 0;
-}
-
-.wd-discovery-modal__footer .wd-discovery-modal__reset {
-  margin-left: auto;
+/* Le stepper pousse le groupe d'actions vers la droite */
+.wd-discovery-modal__footer .wd-discovery-modal__stepper {
+  margin-right: auto;
 }
 
 /* Stepper - texte simple */
@@ -849,6 +852,51 @@
   text-align: center;
 }
 
+/* Variante sélection de mois (question Période) */
+.wd-discovery-modal__calendar--months {
+  width: 300px;
+}
+
+.wd-discovery-modal__calendar--months .wd-discovery-modal__calendar-title {
+  text-transform: none;
+}
+
+.wd-discovery-modal__month-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.wd-discovery-modal__month-cell {
+  padding: 12px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: #445047;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wd-discovery-modal__month-cell:hover:not(:disabled):not(.is-selected) {
+  border-color: #5fef91;
+  background: rgba(95, 239, 145, 0.12);
+}
+
+.wd-discovery-modal__month-cell.is-selected {
+  border-color: #5fef91;
+  background: #5fef91;
+  color: #445047;
+  font-weight: 700;
+}
+
+.wd-discovery-modal__month-cell.is-disabled {
+  color: #cbd0cb;
+  background: #fafafa;
+  cursor: not-allowed;
+}
+
 /* Textarea pour question 4.2 */
 .wd-discovery-modal__form-textarea {
   resize: vertical;
@@ -952,12 +1000,11 @@
   font-weight: 500;
   color: #717171;
   background: transparent;
-  border: 1px solid #d0d0d0;
+  border: 1px solid #e0e0e0;
   cursor: pointer;
-  padding: 12px 24px;
+  padding: 12px 20px;
   border-radius: 50px;
   transition: all 0.3s ease;
-  min-width: 150px;
 }
 
 .wd-discovery-modal__reset:hover {
@@ -1035,7 +1082,7 @@
 /* Responsive - Mobile */
 @media (max-width: 768px) {
   .wd-discovery-modal__content {
-    padding: 40px 24px;
+    padding: 40px 24px 0;
     max-height: 92vh;
     border-radius: 16px 16px 0 0;
     width: 100%;
@@ -1097,24 +1144,21 @@
   }
 
   .wd-discovery-modal__footer {
-    padding: 16px 24px;
-    flex-direction: column;
-    gap: 12px;
+    margin-left: -24px;
+    margin-right: -24px;
+    padding: 12px 24px calc(12px + env(safe-area-inset-bottom, 0px));
+    gap: 8px 10px;
   }
 
-  .wd-discovery-modal__footer .wd-discovery-modal__reset,
-  .wd-discovery-modal__footer .wd-discovery-modal__continue {
-    margin-left: 0;
+  /* Stepper sur sa propre ligne, actions compactes en dessous */
+  .wd-discovery-modal__footer .wd-discovery-modal__stepper {
+    order: -1;
+    flex-basis: 100%;
+    margin: 0;
   }
 
-  .wd-discovery-modal__stepper-step {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-  }
-
-  .wd-discovery-modal__stepper-line {
-    width: 32px;
+  .wd-discovery-modal__footer .wd-discovery-modal__back {
+    margin-right: auto;
   }
 
   /* Form groups pour Question 1.5 */
@@ -1124,16 +1168,14 @@
 
   .wd-discovery-modal__reset {
     font-size: 13px;
-    padding: 10px 20px;
-    width: 100%;
-    max-width: none;
+    padding: 10px 16px;
   }
 
   .wd-discovery-modal__continue {
     font-size: 14px;
-    padding: 12px 28px;
-    width: 100%;
-    max-width: none;
+    padding: 12px 22px;
+    flex: 1 1 auto;
+    min-width: 130px;
   }
 
   /* Calendrier annuel mobile */
