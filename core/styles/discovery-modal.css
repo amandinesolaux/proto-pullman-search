@@ -1271,6 +1271,12 @@
   margin-bottom: 12px;
 }
 
+.wd-discovery-modal__form-label--subtle {
+  font-size: 13px;
+  font-weight: 400;
+  color: #717171;
+}
+
 .wd-discovery-modal__select-grid {
   display: grid;
   grid-template-columns: 1fr; /* chaque option sur la ligne entière */

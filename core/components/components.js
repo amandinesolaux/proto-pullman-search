@@ -2620,7 +2620,7 @@
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
-        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
+        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [], childrenNames: [] },
         friendsDetails: { adultsCount: null },
         selectedTypes: [],
         destinationIdea: null,
@@ -2688,7 +2688,7 @@
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
-        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [] },
+        familyDetails: { adultsCount: null, childrenCount: null, childrenAges: [], childrenNames: [] },
         friendsDetails: { adultsCount: null },
         selectedTypes: [],
         destinationIdea: null,
@@ -2710,6 +2710,18 @@
     _isWishlistSelected() {
       const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
       return wishlist.some(d => (d.country ? `${d.name}, ${d.country}` : d.name) === this.state.destinationInput);
+    }
+
+    // Pré-remplit familyDetails depuis le profil connecté (enfants connus).
+    _prefillFamilyFromProfile() {
+      if (!this.state.isConnected || !this.state.userProfile) return;
+      const members = this.state.userProfile.familyMembers;
+      if (!Array.isArray(members) || members.length === 0) return;
+      if (this.state.familyDetails.childrenCount) return;
+      this.state.familyDetails.adultsCount = 2;
+      this.state.familyDetails.childrenCount = members.length;
+      this.state.familyDetails.childrenNames = members.map(m => m.firstName);
+      this.state.familyDetails.childrenAges = members.map(m => m.age);
     }
 
     // Vrai seulement si connecté ET wishlist non vide (gate des features perso).
@@ -2855,7 +2867,15 @@
 
     renderQuestion1_5() {
       const isFamilyMode = this.state.selectedWho === 'family';
+
+      if (isFamilyMode) this._prefillFamilyFromProfile();
+
       const title = isFamilyMode ? 'Parlez-nous de votre famille' : 'Combien serez-vous ?';
+      const hasPrefill = isFamilyMode && this.state.familyDetails.childrenNames.length > 0;
+      const prefillValid = hasPrefill
+        && this.state.familyDetails.adultsCount >= 1
+        && this.state.familyDetails.childrenCount > 0
+        && this.state.familyDetails.childrenAges.length === this.state.familyDetails.childrenCount;
 
       return `
         <div class="wd-discovery-modal">
@@ -2878,9 +2898,16 @@
                   <label class="wd-discovery-modal__form-label">Nombre d'enfants</label>
                   <input type="number" min="0" max="10" class="wd-discovery-modal__form-input" id="childrenCount" value="${this.state.familyDetails.childrenCount || ''}" />
                 </div>
-                <div class="wd-discovery-modal__form-group" id="childrenAgesContainer" style="display: none;">
+                <div class="wd-discovery-modal__form-group" id="childrenAgesContainer" style="display: ${hasPrefill ? 'block' : 'none'};">
                   <label class="wd-discovery-modal__form-label">Âge des enfants</label>
-                  <div id="childrenAgesInputs"></div>
+                  <div id="childrenAgesInputs">
+                    ${hasPrefill ? this.state.familyDetails.childrenNames.map((name, i) => `
+                      <div class="wd-discovery-modal__form-group">
+                        <label class="wd-discovery-modal__form-label wd-discovery-modal__form-label--subtle">Âge de ${name}</label>
+                        <input type="number" min="0" max="17" class="wd-discovery-modal__form-input child-age-input" data-index="${i}" value="${this.state.familyDetails.childrenAges[i] != null ? this.state.familyDetails.childrenAges[i] : ''}" />
+                      </div>
+                    `).join('') : ''}
+                  </div>
                 </div>
               ` : `
                 <div class="wd-discovery-modal__form-group">
@@ -2898,7 +2925,7 @@
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">
                 Recommencer
               </button>
-              <button class="wd-discovery-modal__continue" aria-label="Continuer">
+              <button class="wd-discovery-modal__continue${prefillValid ? ' is-active' : ''}" aria-label="Continuer">
                 Continuer
               </button>
             </div>
@@ -3633,12 +3660,14 @@
                 childrenAgesInputs.innerHTML = '';
 
                 // Créer un input pour chaque enfant
+                const names = this.state.familyDetails.childrenNames || [];
                 for (let i = 0; i < count; i++) {
+                  const childLabel = names[i] ? `Âge de ${names[i]}` : `Âge de l'enfant ${i + 1}`;
                   const ageInput = document.createElement('div');
                   ageInput.className = 'wd-discovery-modal__form-group';
                   ageInput.innerHTML = `
-                    <label class="wd-discovery-modal__form-label">Âge de l'enfant ${i + 1}</label>
-                    <input type="number" min="0" max="17" class="wd-discovery-modal__form-input child-age-input" data-index="${i}" value="${this.state.familyDetails.childrenAges[i] || ''}" />
+                    <label class="wd-discovery-modal__form-label wd-discovery-modal__form-label--subtle">${childLabel}</label>
+                    <input type="number" min="0" max="17" class="wd-discovery-modal__form-input child-age-input" data-index="${i}" value="${this.state.familyDetails.childrenAges[i] != null ? this.state.familyDetails.childrenAges[i] : ''}" />
                   `;
                   childrenAgesInputs.appendChild(ageInput);
                 }
