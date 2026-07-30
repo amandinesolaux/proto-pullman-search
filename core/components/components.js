@@ -4087,18 +4087,11 @@
               this.state.carouselIndex = (previousStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
             }
 
-            // Re-render
-            const modalContent = this.querySelector('.wd-discovery-modal__content');
-            if (modalContent) {
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = this.render();
-              const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-              if (newContent) {
-                modalContent.innerHTML = newContent.innerHTML;
-                this.afterRender();
-              }
-            }
+            // Re-render + scroll en haut (évite un décalage visuel hérité
+            // de l'étape précédente, par ex. wishlist après Q5 scrollée).
+            this._rerenderContent();
+            const mc = this.querySelector('.wd-discovery-modal__content');
+            if (mc) mc.scrollTop = 0;
           }
         });
       }
@@ -4152,18 +4145,10 @@
             this.state.carouselIndex = (nextStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
           }
 
-          // Re-render
-          const modalContent = this.querySelector('.wd-discovery-modal__content');
-          if (modalContent) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = this.render();
-            const newContent = tempDiv.querySelector('.wd-discovery-modal__content');
-
-            if (newContent) {
-              modalContent.innerHTML = newContent.innerHTML;
-              this.afterRender();
-            }
-          }
+          // Re-render + scroll en haut pour la nouvelle étape
+          this._rerenderContent();
+          const mc = this.querySelector('.wd-discovery-modal__content');
+          if (mc) mc.scrollTop = 0;
         });
       }
 
