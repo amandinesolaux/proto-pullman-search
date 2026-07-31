@@ -516,22 +516,136 @@
   };
 
   const PREVIEW_HOTELS = [
-    { name:"Pullman Paris Montparnasse", loc:"Paris, France", lat:48.8422, lng:2.3219, stars:4, price:189, features:"Rooftop bar · Spa · Restaurant gastronomique", tags:["business","culture","gastro"], services:["pool","gym","restaurant","bar","meeting-room","parking","wifi","room-service","concierge","laundry","ev-charging"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Paris Tour Eiffel", loc:"Paris, France", lat:48.8559, lng:2.2930, stars:5, price:259, features:"Vue Tour Eiffel · Spa · Restaurant", tags:["romance","luxury","culture"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","room-service","concierge","valet","wifi","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Paris Bercy", loc:"Paris, France", lat:48.8396, lng:2.3826, stars:4, price:175, features:"AccorArena · Piscine · Business center", tags:["business","meeting"], services:["meeting-room","business-center","gym","restaurant","bar","parking","wifi","room-service","laundry","ev-charging","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Lyon Part-Dieu", loc:"Lyon, France", lat:45.7602, lng:4.8590, stars:4, price:159, features:"Gare Part-Dieu · Restaurant · Fitness", tags:["business","gastro"], services:["restaurant","bar","meeting-room","business-center","gym","parking","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Lyon Centre", loc:"Lyon, France", lat:45.7640, lng:4.8357, stars:4, price:169, features:"Presqu'île · Bar lounge · Spa", tags:["gastro","culture","wellness"], services:["spa","pool","gym","restaurant","bar","terrace","wifi","room-service","concierge","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Marseille Provence", loc:"Marseille, France", lat:43.4370, lng:5.2148, stars:4, price:145, features:"Aéroport · Piscine extérieure · Restaurant", tags:["beach","gastro","family"], services:["pool","spa","restaurant","bar","terrace","kids-club","parking","wifi","room-service","shuttle","bike-rental","gym"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Marrakech Palmeraie", loc:"Marrakech, Maroc", lat:31.6690, lng:-7.9811, stars:5, price:179, features:"Golf · Piscine · Spa · Jardins", tags:["wellness","romance","luxury","meeting"], services:["spa","pool","gym","restaurant","fine_dining","bar","golf","meeting-room","concierge","valet","wifi","room-service","kids-club","terrace","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman London St Pancras", loc:"Londres, Royaume-Uni", lat:51.5305, lng:-0.1240, stars:5, price:289, features:"King's Cross · Restaurant · Bar cocktails", tags:["business","culture","luxury"], services:["gym","restaurant","bar","meeting-room","business-center","concierge","valet","wifi","room-service","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Barcelona Skipper", loc:"Barcelone, Espagne", lat:41.3851, lng:2.1994, stars:5, price:219, features:"Front de mer · Piscine · Rooftop", tags:["beach","gastro","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","terrace","wifi","room-service","concierge","bike-rental","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Dubai Creek", loc:"Dubaï, EAU", lat:25.2532, lng:55.3320, stars:5, price:199, features:"Creek views · Piscine · Spa · Restaurant", tags:["luxury","business","family"], services:["pool","spa","gym","restaurant","bar","rooftop","meeting-room","business-center","kids-club","concierge","valet","wifi","room-service","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Singapore Orchard", loc:"Singapour", lat:1.3048, lng:103.8318, stars:5, price:229, features:"Orchard Road · Piscine · Fitness 24h", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","bar","rooftop","meeting-room","business-center","concierge","valet","wifi","room-service","laundry","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Nice Côte d'Azur", loc:"Nice, France", lat:43.6653, lng:7.2150, stars:4, price:185, features:"Promenade des Anglais · Piscine · Spa", tags:["beach","wellness","romance"], services:["pool","spa","gym","restaurant","bar","terrace","parking","wifi","room-service","concierge","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Bordeaux Lac", loc:"Bordeaux, France", lat:44.8799, lng:-0.5640, stars:4, price:155, features:"Parc des expositions · Restaurant · Bar", tags:["gastro","culture","eco"], services:["restaurant","bar","terrace","meeting-room","parking","wifi","room-service","bike-rental","ev-charging","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Bangkok Hotel G", loc:"Bangkok, Thaïlande", lat:13.7248, lng:100.5170, stars:5, price:139, features:"Silom · Rooftop pool · Sky bar", tags:["culture","gastro","family"], services:["pool","spa","gym","restaurant","bar","rooftop","kids-club","concierge","wifi","room-service","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Bali Legian Beach", loc:"Bali, Indonésie", lat:-8.7055, lng:115.1700, stars:5, price:159, features:"Plage privée · Piscine · Spa balinais", tags:["beach","wellness","romance","family"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
-    { name:"Pullman Tokyo Tamachi", loc:"Tokyo, Japon", lat:35.6453, lng:139.7479, stars:5, price:249, features:"Shinagawa · Restaurant japonais · Fitness", tags:["business","culture","luxury"], services:["gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ AFRICA ═══════════════════
+    { name:"Pullman Dakar Teranga", loc:"Dakar, Sénégal", stars:5, price:155, features:"Front de mer · Piscine · Terrasse panoramique", tags:["beach","culture","business"], services:["pool","spa","gym","restaurant","bar","terrace","meeting-room","concierge","wifi","room-service","parking","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/dakar/0921.html" },
+    { name:"Pullman Abidjan", loc:"Abidjan, Côte d'Ivoire", stars:5, price:165, features:"Lagune Ébrié · Piscine · Restaurant africain", tags:["business","culture","gastro"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/abidjan/1146.html" },
+    { name:"Pullman Mazagan Royal Golf & Spa", loc:"El Jadida, Maroc", stars:5, price:195, features:"Golf · Plage · Spa · Casino", tags:["beach","wellness","romance","family","luxury"], services:["pool","spa","gym","restaurant","fine_dining","bar","golf","kids-club","garden","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Marrakech Palmeraie", loc:"Marrakech, Maroc", stars:5, price:179, features:"Golf · Piscine · Spa · Jardins", tags:["wellness","romance","luxury","meeting"], services:["spa","pool","gym","restaurant","fine_dining","bar","golf","meeting-room","concierge","valet","wifi","room-service","kids-club","terrace","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Kinshasa Grand Hôtel", loc:"Kinshasa, RD Congo", stars:5, price:185, features:"Centre-ville · Piscine · Business center", tags:["business","meeting","culture"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Lubumbashi Grand Karavia", loc:"Lubumbashi, RD Congo", stars:5, price:175, features:"Lac Kipopo · Piscine · Restaurant", tags:["business","meeting"], services:["pool","gym","restaurant","bar","meeting-room","business-center","parking","wifi","room-service","laundry","shuttle","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Nairobi Upper Hill", loc:"Nairobi, Kenya", stars:5, price:159, features:"Upper Hill · Piscine · Spa · Restaurant", tags:["business","culture","wellness"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","shuttle","laundry","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Cape Town", loc:"Le Cap, Afrique du Sud", stars:5, price:189, features:"Waterfront · Piscine · Restaurant · Vue mer", tags:["luxury","culture","gastro","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","concierge","wifi","room-service","parking","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/cape-town/6556.html" },
+    // ═══════════════════ AMERICAS ═══════════════════
+    { name:"Pullman Miami Airport", loc:"Miami, États-Unis", stars:4, price:199, features:"Aéroport · Piscine · Bar lounge", tags:["business","beach","family"], services:["pool","gym","restaurant","bar","meeting-room","business-center","parking","wifi","room-service","shuttle","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman São Paulo Vila Olímpia", loc:"São Paulo, Brésil", stars:5, price:149, features:"Vila Olímpia · Rooftop · Restaurant", tags:["business","gastro","culture"], services:["pool","gym","restaurant","bar","rooftop","meeting-room","business-center","concierge","wifi","room-service","laundry","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman São Paulo Ibirapuera", loc:"São Paulo, Brésil", stars:5, price:139, features:"Parc Ibirapuera · Piscine · Spa", tags:["wellness","culture","family"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","concierge","wifi","room-service","parking","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman São Paulo Guarulhos Airport", loc:"Guarulhos, Brésil", stars:4, price:119, features:"Aéroport · Business center · Restaurant", tags:["business","meeting"], services:["gym","restaurant","bar","meeting-room","business-center","wifi","room-service","shuttle","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman RJ São Conrado", loc:"Rio de Janeiro, Brésil", stars:5, price:169, features:"São Conrado · Plage · Piscine · Vue mer", tags:["beach","romance","culture"], services:["pool","spa","gym","restaurant","bar","terrace","concierge","wifi","room-service","parking","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Rosario City Center", loc:"Rosario, Argentine", stars:5, price:129, features:"Centre-ville · Piscine · Restaurant", tags:["business","culture","gastro"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Santiago El Bosque", loc:"Santiago, Chili", stars:5, price:159, features:"El Bosque · Piscine · Restaurant · Spa", tags:["business","luxury","gastro"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Santiago Vitacura", loc:"Santiago, Chili", stars:5, price:149, features:"Vitacura · Piscine · Fitness · Restaurant", tags:["business","culture"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Viña del Mar San Martín", loc:"Viña del Mar, Chili", stars:5, price:169, features:"Front de mer · Casino · Piscine · Restaurant", tags:["beach","romance","gastro","luxury"], services:["pool","spa","gym","restaurant","bar","terrace","concierge","wifi","room-service","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Lima San Isidro", loc:"Lima, Pérou", stars:5, price:159, features:"San Isidro · Restaurant · Piscine · Spa", tags:["business","gastro","luxury"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Lima Miraflores", loc:"Lima, Pérou", stars:5, price:149, features:"Miraflores · Vue océan · Restaurant", tags:["culture","romance","gastro"], services:["pool","gym","restaurant","bar","terrace","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ EUROPE — FRANCE ═══════════════════
+    { name:"Pullman Paris Montparnasse", loc:"Paris, France", stars:4, price:189, features:"Rooftop bar · Spa · Restaurant gastronomique", tags:["business","culture","gastro"], services:["pool","gym","restaurant","bar","meeting-room","parking","wifi","room-service","concierge","laundry","ev-charging"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/paris/8189.html" },
+    { name:"Pullman Paris Tour Eiffel", loc:"Paris, France", stars:5, price:259, features:"Vue Tour Eiffel · Spa · Restaurant", tags:["romance","luxury","culture"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","room-service","concierge","valet","wifi","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/paris/7229.html" },
+    { name:"Pullman Paris Centre - Bercy", loc:"Paris, France", stars:4, price:175, features:"AccorArena · Piscine · Business center", tags:["business","meeting"], services:["meeting-room","business-center","gym","restaurant","bar","parking","wifi","room-service","laundry","ev-charging","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/paris/2192.html" },
+    { name:"Pullman Paris La Défense", loc:"Paris La Défense, France", stars:5, price:219, features:"La Défense · Restaurant · Bar panoramique", tags:["business","luxury","meeting"], services:["gym","restaurant","fine_dining","bar","rooftop","meeting-room","business-center","concierge","wifi","room-service","laundry","valet","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/paris-la-defense/0576.html" },
+    { name:"Pullman Lyon Part-Dieu", loc:"Lyon, France", stars:4, price:159, features:"Gare Part-Dieu · Restaurant · Fitness", tags:["business","gastro"], services:["restaurant","bar","meeting-room","business-center","gym","parking","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280", url:"https://pullman.accor.com/fr/hotels/lyon/C177.html" },
+    { name:"Pullman Marseille Provence", loc:"Marseille, France", stars:4, price:145, features:"Aéroport · Piscine extérieure · Restaurant", tags:["beach","gastro","family"], services:["pool","spa","restaurant","bar","terrace","kids-club","parking","wifi","room-service","shuttle","bike-rental","gym"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Nice Côte d'Azur", loc:"Nice, France", stars:4, price:185, features:"Promenade des Anglais · Piscine · Spa", tags:["beach","wellness","romance"], services:["pool","spa","gym","restaurant","bar","terrace","parking","wifi","room-service","concierge","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Bordeaux Lac", loc:"Bordeaux, France", stars:4, price:155, features:"Parc des expositions · Restaurant · Bar", tags:["gastro","culture","eco"], services:["restaurant","bar","terrace","meeting-room","parking","wifi","room-service","bike-rental","ev-charging","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Toulouse Airport", loc:"Toulouse, France", stars:4, price:139, features:"Aéroport · Piscine · Restaurant · Terrasse", tags:["business","meeting"], services:["pool","gym","restaurant","bar","terrace","meeting-room","business-center","parking","wifi","room-service","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Cannes Mandelieu", loc:"Cannes, France", stars:4, price:175, features:"Royal Casino · Golf · Piscine · Spa", tags:["luxury","romance","wellness","gastro"], services:["pool","spa","gym","restaurant","bar","golf","terrace","meeting-room","parking","wifi","room-service","concierge","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Montpellier Centre", loc:"Montpellier, France", stars:4, price:149, features:"Centre historique · Restaurant · Bar", tags:["culture","gastro","business"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ EUROPE — OTHER ═══════════════════
+    { name:"Pullman London St Pancras", loc:"Londres, Royaume-Uni", stars:5, price:289, features:"King's Cross · Restaurant · Bar cocktails", tags:["business","culture","luxury"], services:["gym","restaurant","bar","meeting-room","business-center","concierge","valet","wifi","room-service","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Liverpool", loc:"Liverpool, Royaume-Uni", stars:4, price:179, features:"Kings Dock · Restaurant · Bar · Vue port", tags:["culture","business","gastro"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Berlin Schweizerhof", loc:"Berlin, Allemagne", stars:5, price:199, features:"Ku'damm · Spa · Restaurant · Bar", tags:["culture","luxury","business"], services:["spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","pet-friendly","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Cologne", loc:"Cologne, Allemagne", stars:4, price:169, features:"Cathédrale · Restaurant · Bar · Fitness", tags:["culture","business","gastro"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Munich", loc:"Munich, Allemagne", stars:4, price:189, features:"Centre-ville · Restaurant · Spa · Fitness", tags:["business","culture","luxury"], services:["spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","parking","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Stuttgart Fontana", loc:"Stuttgart, Allemagne", stars:4, price:169, features:"Centre-ville · Restaurant · Bar · Fitness", tags:["business","meeting"], services:["gym","restaurant","bar","meeting-room","business-center","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Barcelona Skipper", loc:"Barcelone, Espagne", stars:5, price:219, features:"Front de mer · Piscine · Rooftop", tags:["beach","gastro","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","terrace","wifi","room-service","concierge","bike-rental","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Brussels Centre Midi", loc:"Bruxelles, Belgique", stars:4, price:159, features:"Gare du Midi · Restaurant · Bar", tags:["business","culture"], services:["gym","restaurant","bar","meeting-room","business-center","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Eindhoven Cocagne", loc:"Eindhoven, Pays-Bas", stars:4, price:159, features:"Centre-ville · Design · Restaurant · Bar", tags:["business","culture"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Budapest", loc:"Budapest, Hongrie", stars:5, price:169, features:"Opéra · Restaurant · Spa · Fitness", tags:["culture","luxury","romance"], services:["spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Bucharest World Trade Center", loc:"Bucarest, Roumanie", stars:5, price:139, features:"WTC · Piscine · Restaurant · Spa", tags:["business","meeting","culture"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Riga Old Town", loc:"Riga, Lettonie", stars:5, price:149, features:"Vieille ville · Restaurant · Bar · Spa", tags:["culture","luxury","romance"], services:["spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Zagreb", loc:"Zagreb, Croatie", stars:5, price:149, features:"Centre-ville · Spa · Restaurant · Fitness", tags:["culture","business","wellness"], services:["spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Tbilisi", loc:"Tbilissi, Géorgie", stars:5, price:129, features:"Centre-ville · Piscine · Spa · Restaurant", tags:["culture","luxury","wellness"], services:["pool","spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Istanbul", loc:"Istanbul, Turquie", stars:5, price:159, features:"Bosphore · Piscine · Spa · Restaurant", tags:["culture","luxury","gastro","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","meeting-room","concierge","wifi","room-service","parking","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Basel Europe", loc:"Bâle, Suisse", stars:5, price:229, features:"Centre-ville · Restaurant · Bar · Fitness", tags:["business","luxury","culture"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Gorni Okol", loc:"Gorni Okol, Bulgarie", stars:5, price:119, features:"Montagne · Spa · Piscine · Nature", tags:["wellness","eco","family"], services:["pool","spa","gym","restaurant","bar","garden","kids-club","wifi","room-service","parking","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ MIDDLE EAST ═══════════════════
+    { name:"Pullman Dubai Creek City Centre", loc:"Dubaï, EAU", stars:5, price:199, features:"Creek views · Piscine · Spa · Restaurant", tags:["luxury","business","family"], services:["pool","spa","gym","restaurant","bar","rooftop","meeting-room","business-center","kids-club","concierge","valet","wifi","room-service","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Dubai Downtown", loc:"Dubaï, EAU", stars:5, price:219, features:"Burj Khalifa · Piscine · Spa", tags:["luxury","romance","family"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","kids-club","concierge","valet","wifi","room-service","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Dubai JLT", loc:"Dubaï, EAU", stars:5, price:179, features:"JLT · Piscine · Restaurant · Fitness", tags:["business","meeting"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Sharjah", loc:"Sharjah, EAU", stars:4, price:139, features:"Centre-ville · Piscine · Restaurant", tags:["business","family"], services:["pool","gym","restaurant","bar","meeting-room","kids-club","wifi","room-service","parking","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Resort Al Marjan Island", loc:"Ras Al Khaimah, EAU", stars:5, price:249, features:"Plage privée · Piscine · Spa · Golf", tags:["beach","luxury","wellness","family","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","golf","kids-club","garden","concierge","wifi","room-service","parking","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman ZamZam Makkah", loc:"La Mecque, Arabie Saoudite", stars:5, price:299, features:"Mosquée Al-Haram · Restaurant · Vue", tags:["luxury","culture"], services:["restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","valet","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman ZamZam Madinah", loc:"Médine, Arabie Saoudite", stars:5, price:249, features:"Mosquée du Prophète · Restaurant · Vue", tags:["luxury","culture"], services:["restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","valet","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Doha West Bay", loc:"Doha, Qatar", stars:5, price:209, features:"West Bay · Piscine · Spa · Restaurant", tags:["luxury","business","meeting"], services:["pool","spa","gym","restaurant","fine_dining","bar","rooftop","meeting-room","business-center","concierge","valet","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ ASIA — THAILAND ═══════════════════
+    { name:"Pullman Bangkok Hotel G", loc:"Bangkok, Thaïlande", stars:5, price:139, features:"Silom · Rooftop pool · Sky bar", tags:["culture","gastro","family"], services:["pool","spa","gym","restaurant","bar","rooftop","kids-club","concierge","wifi","room-service","shuttle","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Bangkok King Power", loc:"Bangkok, Thaïlande", stars:5, price:149, features:"King Power · Piscine · Spa · Restaurant", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","fine_dining","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Pattaya Hotel G", loc:"Pattaya, Thaïlande", stars:5, price:119, features:"Plage · Piscine · Restaurant · Bar", tags:["beach","family","gastro"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","concierge","wifi","room-service","shuttle","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Khao Lak Resort", loc:"Phang Nga, Thaïlande", stars:5, price:159, features:"Plage privée · Piscine · Spa · Nature", tags:["beach","wellness","romance","family","eco"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","garden","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Phuket Arcadia Naithon Beach", loc:"Phuket, Thaïlande", stars:5, price:179, features:"Naithon Beach · Piscine · Spa · Villas", tags:["beach","luxury","wellness","romance"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","garden","concierge","wifi","room-service","shuttle","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Phuket Panwa Beach Resort", loc:"Phuket, Thaïlande", stars:5, price:189, features:"Cape Panwa · Piscine à débordement · Spa", tags:["beach","luxury","romance","wellness"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","garden","kids-club","concierge","wifi","room-service","shuttle","yoga","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Phuket Karon Beach Resort", loc:"Phuket, Thaïlande", stars:5, price:169, features:"Karon Beach · Piscine · Restaurant · Spa", tags:["beach","family","wellness"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Khon Kaen Raja Orchid", loc:"Khon Kaen, Thaïlande", stars:5, price:99, features:"Centre-ville · Piscine · Restaurant", tags:["business","culture"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ ASIA — INDONESIA ═══════════════════
+    { name:"Pullman Bali Legian Beach", loc:"Bali, Indonésie", stars:5, price:159, features:"Plage privée · Piscine · Spa balinais", tags:["beach","wellness","romance","family"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Lombok Merujani Mandalika", loc:"Lombok, Indonésie", stars:5, price:149, features:"Mandalika · Plage · Piscine · Resort", tags:["beach","wellness","romance","eco"], services:["pool","spa","gym","restaurant","bar","terrace","garden","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Jakarta Indonesia Thamrin", loc:"Jakarta, Indonésie", stars:5, price:119, features:"Thamrin · Piscine · Spa · Restaurant", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","fine_dining","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Jakarta Central Park", loc:"Jakarta, Indonésie", stars:5, price:109, features:"Central Park · Piscine · Restaurant", tags:["business","meeting","culture"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Bandung Grand Central", loc:"Bandung, Indonésie", stars:5, price:99, features:"Centre-ville · Restaurant · Piscine", tags:["business","culture","gastro"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Ciawi Vimala Hills", loc:"Bogor, Indonésie", stars:5, price:129, features:"Collines · Piscine · Spa · Nature", tags:["wellness","eco","family"], services:["pool","spa","gym","restaurant","bar","garden","kids-club","meeting-room","wifi","room-service","parking","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ ASIA — VIETNAM ═══════════════════
+    { name:"Pullman Hanoi", loc:"Hanoï, Vietnam", stars:5, price:119, features:"West Lake · Piscine · Spa · Restaurant", tags:["culture","luxury","gastro"], services:["pool","spa","gym","restaurant","fine_dining","bar","meeting-room","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Saigon Centre", loc:"Hô Chi Minh-Ville, Vietnam", stars:5, price:109, features:"District 1 · Piscine · Rooftop · Restaurant", tags:["business","culture","gastro"], services:["pool","gym","restaurant","bar","rooftop","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Danang Beach Resort", loc:"Danang, Vietnam", stars:5, price:139, features:"Plage · Piscine · Spa · Resort", tags:["beach","wellness","family","romance"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Hai Phong", loc:"Hai Phong, Vietnam", stars:5, price:99, features:"Centre-ville · Restaurant · Piscine", tags:["business","culture"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Phu Quoc Beach Resort", loc:"Phu Quoc, Vietnam", stars:5, price:159, features:"Plage privée · Piscine · Spa · Villas", tags:["beach","luxury","wellness","romance","family"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle","yoga","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Vung Tau", loc:"Vung Tau, Vietnam", stars:5, price:119, features:"Plage · Piscine · Restaurant · Bar", tags:["beach","family","gastro"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","concierge","wifi","room-service","parking","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ ASIA — OTHER ═══════════════════
+    { name:"Pullman Singapore Orchard", loc:"Singapour", stars:5, price:229, features:"Orchard Road · Piscine · Fitness 24h", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","bar","rooftop","meeting-room","business-center","concierge","valet","wifi","room-service","laundry","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Singapore Hill Street", loc:"Singapour", stars:5, price:219, features:"Hill Street · Restaurant · Bar · Spa", tags:["culture","luxury","business"], services:["spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Tokyo Tamachi", loc:"Tokyo, Japon", stars:5, price:249, features:"Shinagawa · Restaurant japonais · Fitness", tags:["business","culture","luxury"], services:["gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","coworking"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"The Ambassador Seoul - A Pullman Hotel", loc:"Séoul, Corée du Sud", stars:5, price:189, features:"Insadong · Restaurant · Spa · Résidences", tags:["culture","luxury","business"], services:["spa","gym","restaurant","fine_dining","bar","meeting-room","concierge","wifi","room-service","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Kuala Lumpur City Centre", loc:"Kuala Lumpur, Malaisie", stars:5, price:129, features:"KLCC · Piscine · Spa · Restaurant", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Kuching", loc:"Kuching, Malaisie", stars:5, price:99, features:"Waterfront · Piscine · Restaurant", tags:["culture","business","eco"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Miri Waterfront", loc:"Miri, Malaisie", stars:5, price:89, features:"Waterfront · Piscine · Restaurant", tags:["business","culture"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman New Delhi Aerocity", loc:"New Delhi, Inde", stars:5, price:129, features:"Aéroport · Piscine · Spa ayurvédique", tags:["business","wellness","culture"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","shuttle","laundry","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Chennai Anna Salai", loc:"Chennai, Inde", stars:5, price:109, features:"Anna Salai · Piscine · Spa · Restaurant", tags:["business","culture","wellness"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Maldives Maamutaa", loc:"Maldives", stars:5, price:599, features:"Villas sur pilotis · Spa · All inclusive", tags:["beach","luxury","romance","wellness"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","garden","concierge","wifi","room-service","yoga","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Luang Prabang", loc:"Luang Prabang, Laos", stars:5, price:179, features:"UNESCO · Piscine · Spa · Nature", tags:["culture","wellness","romance","eco"], services:["pool","spa","gym","restaurant","bar","garden","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Yangon", loc:"Yangon, Myanmar", stars:5, price:109, features:"Centre-ville · Piscine · Spa · Restaurant", tags:["culture","business","luxury"], services:["pool","spa","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ ASIA — CHINA ═══════════════════
+    { name:"Pullman Shanghai South", loc:"Shanghai, Chine", stars:5, price:139, features:"Xujiahui · Piscine · Restaurant · Spa", tags:["business","luxury","culture"], services:["pool","spa","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Shanghai Jing'an", loc:"Shanghai, Chine", stars:5, price:149, features:"Jing'an · Restaurant · Bar · Piscine", tags:["business","luxury","gastro"], services:["pool","spa","gym","restaurant","fine_dining","bar","meeting-room","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Beijing South", loc:"Pékin, Chine", stars:5, price:129, features:"Sud de Pékin · Piscine · Restaurant", tags:["business","culture","meeting"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry","shuttle","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Guangzhou Baiyun Airport", loc:"Guangzhou, Chine", stars:5, price:119, features:"Aéroport · Piscine · Restaurant", tags:["business","meeting"], services:["pool","gym","restaurant","bar","meeting-room","business-center","wifi","room-service","shuttle","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Sanya Yalong Bay", loc:"Sanya, Chine", stars:5, price:199, features:"Yalong Bay · Plage · Piscine · Spa", tags:["beach","luxury","romance","family","wellness"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","kids-club","garden","concierge","wifi","room-service","shuttle","yoga","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Oceanview Sanya Bay", loc:"Sanya, Chine", stars:5, price:179, features:"Sanya Bay · Vue océan · Piscine · Spa", tags:["beach","family","wellness","romance"], services:["pool","spa","gym","restaurant","bar","terrace","kids-club","concierge","wifi","room-service","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Lijiang Resort & Spa", loc:"Lijiang, Chine", stars:5, price:169, features:"Vieille ville · Spa · Piscine · Montagne", tags:["culture","wellness","romance","eco"], services:["pool","spa","gym","restaurant","bar","garden","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Zhangjiajie", loc:"Zhangjiajie, Chine", stars:5, price:139, features:"Avatar Mountains · Piscine · Spa · Nature", tags:["eco","culture","wellness"], services:["pool","spa","gym","restaurant","bar","garden","concierge","wifi","room-service","parking","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"The Park Lane Hong Kong", loc:"Hong Kong, Chine", stars:5, price:259, features:"Causeway Bay · Victoria Park · Restaurant", tags:["luxury","culture","business","gastro"], services:["gym","restaurant","fine_dining","bar","meeting-room","concierge","wifi","room-service","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Resort Xishuangbanna", loc:"Xishuangbanna, Chine", stars:5, price:149, features:"Forêt tropicale · Piscine · Spa · Nature", tags:["eco","wellness","family","culture"], services:["pool","spa","gym","restaurant","bar","garden","kids-club","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Haikou", loc:"Haikou, Chine", stars:5, price:129, features:"Centre-ville · Piscine · Restaurant", tags:["business","culture","beach"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Nanjing Lukou Airport", loc:"Nanjing, Chine", stars:5, price:109, features:"Aéroport · Piscine · Restaurant", tags:["business","meeting"], services:["pool","gym","restaurant","bar","meeting-room","business-center","wifi","room-service","shuttle","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Dali Resort", loc:"Dali, Chine", stars:5, price:159, features:"Lac Erhai · Montagne · Spa · Piscine", tags:["eco","wellness","romance","culture"], services:["pool","spa","gym","restaurant","bar","garden","concierge","wifi","room-service","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    // ═══════════════════ OCEANIA ═══════════════════
+    { name:"Pullman Melbourne Albert Park", loc:"Melbourne, Australie", stars:5, price:209, features:"Albert Park · Piscine · Restaurant", tags:["culture","gastro","wellness"], services:["pool","spa","gym","restaurant","bar","terrace","meeting-room","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Melbourne City Centre", loc:"Melbourne, Australie", stars:5, price:199, features:"Centre-ville · Restaurant · Bar · Fitness", tags:["business","culture","gastro"], services:["gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Sydney Hyde Park", loc:"Sydney, Australie", stars:5, price:229, features:"Hyde Park · Restaurant · Bar rooftop", tags:["culture","luxury","business"], services:["gym","restaurant","bar","rooftop","meeting-room","business-center","concierge","wifi","room-service","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman at Sydney Olympic Park", loc:"Sydney, Australie", stars:5, price:189, features:"Olympic Park · Piscine · Restaurant", tags:["business","meeting","family"], services:["pool","gym","restaurant","bar","meeting-room","business-center","concierge","wifi","room-service","parking","laundry"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Quay Grand Sydney Harbour", loc:"Sydney, Australie", stars:5, price:349, features:"Circular Quay · Vue Opéra · Suites", tags:["luxury","romance","culture"], services:["gym","restaurant","bar","concierge","wifi","room-service","laundry","valet"], img:"https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Sydney Airport", loc:"Sydney, Australie", stars:4, price:179, features:"Aéroport · Restaurant · Bar · Fitness", tags:["business","meeting"], services:["gym","restaurant","bar","meeting-room","business-center","wifi","room-service","shuttle","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Reef Hotel Casino", loc:"Cairns, Australie", stars:5, price:199, features:"Grande Barrière · Casino · Piscine · Spa", tags:["beach","luxury","culture","family"], services:["pool","spa","gym","restaurant","fine_dining","bar","kids-club","concierge","wifi","room-service","parking","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Cairns International", loc:"Cairns, Australie", stars:5, price:189, features:"Grande Barrière · Piscine · Restaurant", tags:["beach","culture","family"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","parking","laundry","shuttle"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Palm Cove Sea Temple", loc:"Palm Cove, Australie", stars:5, price:239, features:"Plage tropicale · Piscine · Spa · Golf", tags:["beach","luxury","wellness","romance"], services:["pool","spa","gym","restaurant","bar","terrace","golf","garden","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Port Douglas Sea Temple", loc:"Port Douglas, Australie", stars:5, price:249, features:"Daintree · Plage · Piscine · Spa", tags:["beach","luxury","wellness","eco","romance"], services:["pool","spa","gym","restaurant","bar","terrace","garden","concierge","wifi","room-service","parking","bike-rental","yoga"], img:"https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Bunker Bay Resort", loc:"Margaret River, Australie", stars:5, price:269, features:"Bunker Bay · Plage · Spa · Vignobles", tags:["beach","luxury","wellness","romance","gastro"], services:["pool","spa","gym","restaurant","fine_dining","bar","terrace","garden","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Magenta Shores Resort", loc:"Central Coast, Australie", stars:5, price:219, features:"Plage · Golf · Piscine · Spa", tags:["beach","wellness","family"], services:["pool","spa","gym","restaurant","bar","golf","terrace","kids-club","garden","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Adelaide", loc:"Adélaïde, Australie", stars:5, price:189, features:"Centre-ville · Restaurant · Bar · Fitness", tags:["business","culture","gastro"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Brisbane King George Square", loc:"Brisbane, Australie", stars:5, price:199, features:"Centre-ville · Restaurant · Piscine", tags:["business","culture"], services:["pool","gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Brisbane Airport", loc:"Brisbane, Australie", stars:4, price:169, features:"Aéroport · Restaurant · Fitness", tags:["business","meeting"], services:["gym","restaurant","bar","meeting-room","wifi","room-service","shuttle","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Sails in the Desert - Pullman", loc:"Ayers Rock, Australie", stars:5, price:299, features:"Uluru · Piscine · Restaurant · Désert", tags:["culture","luxury","eco"], services:["pool","gym","restaurant","bar","terrace","concierge","wifi","room-service","shuttle","garden"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Auckland Hotel & Apartments", loc:"Auckland, Nouvelle-Zélande", stars:5, price:209, features:"Waterfront · Restaurant · Bar · Fitness", tags:["business","culture","luxury"], services:["gym","restaurant","bar","meeting-room","concierge","wifi","room-service","laundry","pet-friendly"], img:"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Auckland Airport", loc:"Auckland, Nouvelle-Zélande", stars:4, price:179, features:"Aéroport · Restaurant · Fitness", tags:["business","meeting"], services:["gym","restaurant","bar","meeting-room","wifi","room-service","shuttle","laundry","parking"], img:"https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
+    { name:"Pullman Rotorua", loc:"Rotorua, Nouvelle-Zélande", stars:5, price:189, features:"Sources thermales · Spa · Piscine · Nature", tags:["wellness","eco","culture","family"], services:["pool","spa","gym","restaurant","bar","garden","kids-club","concierge","wifi","room-service","parking","bike-rental"], img:"https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" },
   ];
 
   def("wd-booking", class extends WdEl {
@@ -555,44 +669,768 @@
         <div class="wd-booking__dropdown" data-state="closed">
           <div class="wd-booking__dd-body">
             <div class="wd-booking__dd-empty">
-              <div class="wd-booking__dd-assistant">
-                <p class="wd-booking__dd-assistant-msg">Pas encore de destination en tête ? Dites-nous ce qui vous inspire</p>
-                <div class="wd-booking__dd-chips">
-                  <button class="wd-booking__dd-chip" data-chip="spa" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.wellness}</span>Détente & spa</button>
-                  <button class="wd-booking__dd-chip" data-chip="gastronomie" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.gastro}</span>Gastronomie</button>
-                  <button class="wd-booking__dd-chip" data-chip="famille" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.family}</span>En famille</button>
-                  <button class="wd-booking__dd-chip" data-chip="business" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.business}</span>Business</button>
-                  <button class="wd-booking__dd-chip" data-chip="romantique" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.romance}</span>Romantique</button>
-                  <button class="wd-booking__dd-chip" data-chip="culture" type="button"><span class="wd-booking__dd-chip-icon">${SEARCH_ICON.culture}</span>Culture</button>
-                </div>
-              </div>
               <div class="wd-booking__dd-cols">
                 <div class="wd-booking__dd-left">
-                  <h3 class="wd-booking__dd-section-title">Vos explorations récentes</h3>
-                  <ul class="wd-booking__dd-recent-list">
-                    ${getRecents().map(r => `<li class="wd-booking__dd-recent-item">
-                      <span class="wd-booking__dd-recent-icon">${SEARCH_ICON.clock}</span>
-                      <div class="wd-booking__dd-recent-text">
-                        <span class="wd-booking__dd-recent-dest">${esc(r.dest)}</span>
-                        <span class="wd-booking__dd-recent-meta">${esc(r.meta)}</span>
+                  <!-- Recherches récentes (conditionnelle) -->
+                  <div class="wd-booking__dd-recent-searches" style="display:none">
+                    <h3 class="wd-booking__dd-section-title">Recherches récentes</h3>
+                    <div class="wd-booking__dd-recent-list"></div>
+                  </div>
+
+                  <!-- Liste des hôtels par continent -->
+                  <h3 class="wd-booking__dd-section-title">Nos hôtels dans le monde</h3>
+
+                  <!-- Tabs continents -->
+                  <div class="wd-booking__dd-continent-tabs">
+                    <button class="wd-booking__dd-continent-tab wd-booking__dd-continent-tab--active" data-continent="france">France</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="europe">Europe</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="tha-lande">Thaïlande</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="indon-sie">Indonésie</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="vietnam">Vietnam</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="chine">Chine</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="asie-pacifique">Asie-Pacifique</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="moyen-orient">Moyen-Orient</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="oc-anie">Océanie</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="am-riques">Amériques</button>
+                    <button class="wd-booking__dd-continent-tab" data-continent="afrique">Afrique</button>
+                  </div>
+
+                  <!-- Conteneur des hôtels (hauteur fixe pour correspondre à la map) -->
+                  <div class="wd-booking__dd-continent-content">
+                    <div class="wd-booking__dd-continent-panel wd-booking__dd-continent-panel--active" data-continent="france">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bordeaux Lac" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bordeaux Lac</span>
+                            <span class="wd-booking__dd-hotel-loc">Bordeaux, France</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cannes Mandelieu" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Cannes Mandelieu</span>
+                            <span class="wd-booking__dd-hotel-loc">Cannes, France</span>
+                          </div>
+                        </a>
+                        <a href="https://pullman.accor.com/fr/hotels/lyon/C177.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lyon Part-Dieu" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lyon Part-Dieu</span>
+                            <span class="wd-booking__dd-hotel-loc">Lyon, France</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Marseille Provence" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Marseille Provence</span>
+                            <span class="wd-booking__dd-hotel-loc">Marseille, France</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Montpellier Centre" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Montpellier Centre</span>
+                            <span class="wd-booking__dd-hotel-loc">Montpellier, France</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nice Côte d'Azur" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Nice Côte d'Azur</span>
+                            <span class="wd-booking__dd-hotel-loc">Nice, France</span>
+                          </div>
+                        </a>
+                        <a href="https://pullman.accor.com/fr/hotels/paris/2192.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Paris Centre - Bercy" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Paris Centre - Bercy</span>
+                            <span class="wd-booking__dd-hotel-loc">Paris, France</span>
+                          </div>
+                        </a>
+                        <a href="https://pullman.accor.com/fr/hotels/paris-la-defense/0576.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Paris La Défense" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Paris La Défense</span>
+                            <span class="wd-booking__dd-hotel-loc">Paris La Défense, France</span>
+                          </div>
+                        </a>
                       </div>
-                      <button class="wd-booking__dd-recent-close" type="button" aria-label="Supprimer">${ICON.close}</button>
-                    </li>`).join("")}
-                  </ul>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="europe">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Barcelona Skipper" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Barcelona Skipper</span>
+                            <span class="wd-booking__dd-hotel-loc">Barcelone, Espagne</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Basel Europe" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Basel Europe</span>
+                            <span class="wd-booking__dd-hotel-loc">Bâle, Suisse</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Berlin Schweizerhof" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Berlin Schweizerhof</span>
+                            <span class="wd-booking__dd-hotel-loc">Berlin, Allemagne</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brussels Centre Midi" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Brussels Centre Midi</span>
+                            <span class="wd-booking__dd-hotel-loc">Bruxelles, Belgique</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bucharest World Trade Center" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bucharest World Trade Center</span>
+                            <span class="wd-booking__dd-hotel-loc">Bucarest, Roumanie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Budapest" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Budapest</span>
+                            <span class="wd-booking__dd-hotel-loc">Budapest, Hongrie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cologne" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Cologne</span>
+                            <span class="wd-booking__dd-hotel-loc">Cologne, Allemagne</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Eindhoven Cocagne" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Eindhoven Cocagne</span>
+                            <span class="wd-booking__dd-hotel-loc">Eindhoven, Pays-Bas</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="tha-lande">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bangkok Hotel G" />
+                          <div class="wd-booking__dd-hotel-info">
+                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--renovated">RÉNOVÉ</span>
+                            <span class="wd-booking__dd-hotel-name">Pullman Bangkok Hotel G</span>
+                            <span class="wd-booking__dd-hotel-loc">Bangkok, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bangkok King Power" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bangkok King Power</span>
+                            <span class="wd-booking__dd-hotel-loc">Bangkok, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Khao Lak Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Khao Lak Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Phang Nga, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Khon Kaen Raja Orchid" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Khon Kaen Raja Orchid</span>
+                            <span class="wd-booking__dd-hotel-loc">Khon Kaen, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Pattaya Hotel G" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Pattaya Hotel G</span>
+                            <span class="wd-booking__dd-hotel-loc">Pattaya, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Arcadia Naithon Beach" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Arcadia Naithon Beach</span>
+                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Karon Beach Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Karon Beach Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Panwa Beach Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Panwa Beach Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="indon-sie">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bali Legian Beach" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bali Legian Beach</span>
+                            <span class="wd-booking__dd-hotel-loc">Bali, Indonésie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bandung Grand Central" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bandung Grand Central</span>
+                            <span class="wd-booking__dd-hotel-loc">Bandung, Indonésie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Ciawi Vimala Hills" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Ciawi Vimala Hills</span>
+                            <span class="wd-booking__dd-hotel-loc">Bogor, Indonésie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Jakarta Central Park" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Jakarta Central Park</span>
+                            <span class="wd-booking__dd-hotel-loc">Jakarta, Indonésie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Jakarta Indonesia Thamrin" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Jakarta Indonesia Thamrin</span>
+                            <span class="wd-booking__dd-hotel-loc">Jakarta, Indonésie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lombok Merujani Mandalika" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lombok Merujani Mandalika</span>
+                            <span class="wd-booking__dd-hotel-loc">Lombok, Indonésie</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="vietnam">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Danang Beach Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Danang Beach Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Danang, Vietnam</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Hai Phong" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Hai Phong</span>
+                            <span class="wd-booking__dd-hotel-loc">Hai Phong, Vietnam</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Hanoi" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Hanoi</span>
+                            <span class="wd-booking__dd-hotel-loc">Hanoï, Vietnam</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phu Quoc Beach Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Phu Quoc Beach Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Phu Quoc, Vietnam</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Saigon Centre" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Saigon Centre</span>
+                            <span class="wd-booking__dd-hotel-loc">Hô Chi Minh-Ville, Vietnam</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Vung Tau" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Vung Tau</span>
+                            <span class="wd-booking__dd-hotel-loc">Vung Tau, Vietnam</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="chine">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Beijing South" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Beijing South</span>
+                            <span class="wd-booking__dd-hotel-loc">Pékin, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dali Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Dali Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Dali, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Guangzhou Baiyun Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Guangzhou Baiyun Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Guangzhou, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Haikou" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Haikou</span>
+                            <span class="wd-booking__dd-hotel-loc">Haikou, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lijiang Resort & Spa" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lijiang Resort & Spa</span>
+                            <span class="wd-booking__dd-hotel-loc">Lijiang, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nanjing Lukou Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Nanjing Lukou Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Nanjing, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Oceanview Sanya Bay" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Oceanview Sanya Bay</span>
+                            <span class="wd-booking__dd-hotel-loc">Sanya, Chine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Resort Xishuangbanna" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Resort Xishuangbanna</span>
+                            <span class="wd-booking__dd-hotel-loc">Xishuangbanna, Chine</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="asie-pacifique">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Chennai Anna Salai" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Chennai Anna Salai</span>
+                            <span class="wd-booking__dd-hotel-loc">Chennai, Inde</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kuala Lumpur City Centre" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Kuala Lumpur City Centre</span>
+                            <span class="wd-booking__dd-hotel-loc">Kuala Lumpur, Malaisie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kuching" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Kuching</span>
+                            <span class="wd-booking__dd-hotel-loc">Kuching, Malaisie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Luang Prabang" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Luang Prabang</span>
+                            <span class="wd-booking__dd-hotel-loc">Luang Prabang, Laos</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Maldives Maamutaa" />
+                          <div class="wd-booking__dd-hotel-info">
+                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
+                            <span class="wd-booking__dd-hotel-name">Pullman Maldives Maamutaa</span>
+                            <span class="wd-booking__dd-hotel-loc">Maldives</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Miri Waterfront" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Miri Waterfront</span>
+                            <span class="wd-booking__dd-hotel-loc">Miri, Malaisie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman New Delhi Aerocity" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman New Delhi Aerocity</span>
+                            <span class="wd-booking__dd-hotel-loc">New Delhi, Inde</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Singapore Hill Street" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Singapore Hill Street</span>
+                            <span class="wd-booking__dd-hotel-loc">Singapour</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="moyen-orient">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Doha West Bay" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Doha West Bay</span>
+                            <span class="wd-booking__dd-hotel-loc">Doha, Qatar</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai Creek City Centre" />
+                          <div class="wd-booking__dd-hotel-info">
+                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
+                            <span class="wd-booking__dd-hotel-name">Pullman Dubai Creek City Centre</span>
+                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai Downtown" />
+                          <div class="wd-booking__dd-hotel-info">
+                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
+                            <span class="wd-booking__dd-hotel-name">Pullman Dubai Downtown</span>
+                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai JLT" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Dubai JLT</span>
+                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Istanbul" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Istanbul</span>
+                            <span class="wd-booking__dd-hotel-loc">Istanbul, Turquie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Resort Al Marjan Island" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Resort Al Marjan Island</span>
+                            <span class="wd-booking__dd-hotel-loc">Ras Al Khaimah, EAU</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Sharjah" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Sharjah</span>
+                            <span class="wd-booking__dd-hotel-loc">Sharjah, EAU</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman ZamZam Madinah" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman ZamZam Madinah</span>
+                            <span class="wd-booking__dd-hotel-loc">Médine, Arabie Saoudite</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="oc-anie">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Adelaide" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Adelaide</span>
+                            <span class="wd-booking__dd-hotel-loc">Adélaïde, Australie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman at Sydney Olympic Park" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman at Sydney Olympic Park</span>
+                            <span class="wd-booking__dd-hotel-loc">Sydney, Australie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Auckland Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Auckland Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Auckland, Nouvelle-Zélande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Auckland Hotel & Apartments" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Auckland Hotel & Apartments</span>
+                            <span class="wd-booking__dd-hotel-loc">Auckland, Nouvelle-Zélande</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brisbane Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Brisbane Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Brisbane, Australie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brisbane King George Square" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Brisbane King George Square</span>
+                            <span class="wd-booking__dd-hotel-loc">Brisbane, Australie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bunker Bay Resort" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Bunker Bay Resort</span>
+                            <span class="wd-booking__dd-hotel-loc">Margaret River, Australie</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cairns International" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Cairns International</span>
+                            <span class="wd-booking__dd-hotel-loc">Cairns, Australie</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="am-riques">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lima Miraflores" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lima Miraflores</span>
+                            <span class="wd-booking__dd-hotel-loc">Lima, Pérou</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lima San Isidro" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lima San Isidro</span>
+                            <span class="wd-booking__dd-hotel-loc">Lima, Pérou</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Miami Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Miami Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Miami, États-Unis</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman RJ São Conrado" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman RJ São Conrado</span>
+                            <span class="wd-booking__dd-hotel-loc">Rio de Janeiro, Brésil</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Rosario City Center" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Rosario City Center</span>
+                            <span class="wd-booking__dd-hotel-loc">Rosario, Argentine</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Santiago El Bosque" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Santiago El Bosque</span>
+                            <span class="wd-booking__dd-hotel-loc">Santiago, Chili</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Santiago Vitacura" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Santiago Vitacura</span>
+                            <span class="wd-booking__dd-hotel-loc">Santiago, Chili</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman São Paulo Guarulhos Airport" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman São Paulo Guarulhos Airport</span>
+                            <span class="wd-booking__dd-hotel-loc">Guarulhos, Brésil</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+
+                    <div class="wd-booking__dd-continent-panel" data-continent="afrique">
+                      <div class="wd-booking__dd-hotels">
+                        <a href="https://pullman.accor.com/fr/hotels/abidjan/1146.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Abidjan" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Abidjan</span>
+                            <span class="wd-booking__dd-hotel-loc">Abidjan, Côte d'Ivoire</span>
+                          </div>
+                        </a>
+                        <a href="https://pullman.accor.com/fr/hotels/cape-town/6556.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cape Town" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Cape Town</span>
+                            <span class="wd-booking__dd-hotel-loc">Le Cap, Afrique du Sud</span>
+                          </div>
+                        </a>
+                        <a href="https://pullman.accor.com/fr/hotels/dakar/0921.html" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dakar Teranga" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Dakar Teranga</span>
+                            <span class="wd-booking__dd-hotel-loc">Dakar, Sénégal</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kinshasa Grand Hôtel" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Kinshasa Grand Hôtel</span>
+                            <span class="wd-booking__dd-hotel-loc">Kinshasa, RD Congo</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lubumbashi Grand Karavia" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Lubumbashi Grand Karavia</span>
+                            <span class="wd-booking__dd-hotel-loc">Lubumbashi, RD Congo</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Marrakech Palmeraie" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Marrakech Palmeraie</span>
+                            <span class="wd-booking__dd-hotel-loc">Marrakech, Maroc</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Mazagan Royal Golf & Spa" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Mazagan Royal Golf & Spa</span>
+                            <span class="wd-booking__dd-hotel-loc">El Jadida, Maroc</span>
+                          </div>
+                        </a>
+                        <a href="#" class="wd-booking__dd-hotel-row">
+                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nairobi Upper Hill" />
+                          <div class="wd-booking__dd-hotel-info">
+                            
+                            <span class="wd-booking__dd-hotel-name">Pullman Nairobi Upper Hill</span>
+                            <span class="wd-booking__dd-hotel-loc">Nairobi, Kenya</span>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="wd-booking__dd-right">
-                  <h3 class="wd-booking__dd-section-title">Nos hôtels récents ou rénovés</h3>
-                  <div class="wd-booking__dd-hotels">
-                    ${MOCK_HOTELS.map(h => `<a href="#" class="wd-booking__dd-hotel-row">
-                      <img class="wd-booking__dd-hotel-thumb" src="${h.img}" alt="${esc(h.name)}" />
-                      <div class="wd-booking__dd-hotel-info">
-                        ${h.badge ? `<span class="wd-booking__dd-hotel-badge">${esc(h.badge)}</span>` : ""}
-                        <span class="wd-booking__dd-hotel-name">${esc(h.name)}</span>
-                        <span class="wd-booking__dd-hotel-loc">${esc(h.loc)}</span>
-                      </div>
-                    </a>`).join("")}
+                  <h3 class="wd-booking__dd-section-title">Tous nos hôtels dans le monde</h3>
+                  <div class="wd-booking__dd-map-container">
+                    <div id="wd-booking-map" class="wd-booking__dd-map" style="height: 280px; border-radius: 8px;"></div>
                   </div>
-                  <a href="#" class="wd-booking__dd-see-all-hotels">Voir tous les hôtels</a>
+                  <a href="/pages/pullman/search-results.html" class="wd-booking__dd-see-all-hotels">Voir tous les hôtels sur la carte</a>
                 </div>
               </div>
             </div>
@@ -785,10 +1623,144 @@
         if (label) label.textContent = name;
         typingEl.textContent = '';
         if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+
+        // Sauvegarder la recherche dans localStorage
+        saveRecentSearch(name);
+
         showEmpty();
         destInput.dispatchEvent(new Event('input', {bubbles: true}));
         setTimeout(() => { const fields = destField.parentElement; const dateField = fields ? fields.querySelectorAll('.wd-booking__field')[1] : null; if (dateField) dateField.click(); }, 300);
       };
+
+      // Gestion des recherches récentes
+      const RECENT_SEARCHES_KEY = 'pullman_recent_searches';
+      const MAX_RECENT_SEARCHES = 3;
+
+      const getRecentSearches = () => {
+        try {
+          const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+          return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+          return [];
+        }
+      };
+
+      const saveRecentSearch = (destination) => {
+        try {
+          let recent = getRecentSearches();
+          // Retirer la destination si elle existe déjà
+          recent = recent.filter(s => s.destination !== destination);
+          // Ajouter en tête
+          recent.unshift({
+            destination,
+            timestamp: Date.now()
+          });
+          // Limiter à MAX_RECENT_SEARCHES
+          recent = recent.slice(0, MAX_RECENT_SEARCHES);
+          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recent));
+          renderRecentSearches();
+        } catch (e) {
+          console.error('Failed to save recent search', e);
+        }
+      };
+
+      const removeRecentSearch = (destination) => {
+        try {
+          let recent = getRecentSearches();
+          recent = recent.filter(s => s.destination !== destination);
+          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recent));
+          renderRecentSearches();
+        } catch (e) {
+          console.error('Failed to remove recent search', e);
+        }
+      };
+
+      const formatRecentDate = (timestamp) => {
+        const now = Date.now();
+        const diff = now - timestamp;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return "À l'instant";
+        if (minutes < 60) return `Il y a ${minutes} min`;
+        if (hours < 24) return `Il y a ${hours}h`;
+        if (days < 7) return `Il y a ${days}j`;
+        return new Date(timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+      };
+
+      const renderRecentSearches = () => {
+        const recentContainer = this.querySelector('.wd-booking__dd-recent-searches');
+        const recentList = this.querySelector('.wd-booking__dd-recent-list');
+        const recent = getRecentSearches();
+
+        if (recent.length === 0) {
+          recentContainer.style.display = 'none';
+          return;
+        }
+
+        recentContainer.style.display = 'block';
+        recentList.innerHTML = recent.map(search => `
+          <div class="wd-booking__dd-recent-item" data-dest="${esc(search.destination)}">
+            <div class="wd-booking__dd-recent-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="wd-booking__dd-recent-text">
+              <span class="wd-booking__dd-recent-dest">${esc(search.destination)}</span>
+              <span class="wd-booking__dd-recent-meta">${formatRecentDate(search.timestamp)}</span>
+            </div>
+            <button class="wd-booking__dd-recent-close" data-dest="${esc(search.destination)}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        `).join('');
+
+        // Events pour les items récents
+        recentList.querySelectorAll('.wd-booking__dd-recent-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            if (e.target.closest('.wd-booking__dd-recent-close')) return;
+            const dest = item.dataset.dest;
+            if (dest) selectDest(dest);
+          });
+        });
+
+        // Events pour les boutons supprimer
+        recentList.querySelectorAll('.wd-booking__dd-recent-close').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dest = btn.dataset.dest;
+            if (dest) removeRecentSearch(dest);
+          });
+        });
+      };
+
+      // Afficher les recherches récentes au chargement
+      renderRecentSearches();
+
+      // Gestion des tabs continents
+      const continentTabs = this.querySelectorAll('.wd-booking__dd-continent-tab');
+      const continentPanels = this.querySelectorAll('.wd-booking__dd-continent-panel');
+
+      continentTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const continent = tab.dataset.continent;
+
+          // Désactiver tous les tabs et panels
+          continentTabs.forEach(t => t.classList.remove('wd-booking__dd-continent-tab--active'));
+          continentPanels.forEach(p => p.classList.remove('wd-booking__dd-continent-panel--active'));
+
+          // Activer le tab et panel sélectionnés
+          tab.classList.add('wd-booking__dd-continent-tab--active');
+          const panel = this.querySelector(`.wd-booking__dd-continent-panel[data-continent="${continent}"]`);
+          if (panel) panel.classList.add('wd-booking__dd-continent-panel--active');
+        });
+      });
 
       // ===== DATE PICKER LOGIC =====
       const datepicker = this.querySelector('.wd-booking__datepicker');
@@ -2787,6 +3759,10 @@
         return this.renderQuestion5_Services();
       } else if (this.state.currentStep === 6) {
         return this.renderQuestion5_Services();
+      } else if (this.state.currentStep === 'results-loading') {
+        return this.renderResultsLoading();
+      } else if (this.state.currentStep === 'results') {
+        return this.renderResults();
       }
       return '';
     }
@@ -2806,7 +3782,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -2883,7 +3859,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -2963,7 +3939,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Choisissez une ou plusieurs destinations qui vous inspirent</p>
 
             <div class="wd-discovery-modal__question">
@@ -3041,7 +4017,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3091,7 +4067,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Repartez d'une destination que vous avez sauvegardée.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3140,7 +4116,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3175,7 +4151,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3219,7 +4195,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3356,7 +4332,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3424,7 +4400,7 @@
     renderQuestion5_Services() {
       // Options non liées à l'âge : toujours affichées, inchangées.
       const baseServices = [
-        { value: 'pets', label: 'Animaux' },
+        { value: 'pets', label: 'Animaux acceptés' },
         { value: 'accessibility', label: 'Accès handicapés' },
         { value: 'parking', label: 'Parking' }
       ];
@@ -3460,7 +4436,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
@@ -3496,6 +4472,301 @@
       `;
     }
 
+    _buildRecapItems() {
+      const items = [];
+      const whoLabels = { solo:'Solo', couple:'En couple', family:'En famille', friends:'Entre amis', business:'Business' };
+      items.push({ label:'Voyageur', value: whoLabels[this.state.selectedWho] || this.state.selectedWho });
+
+      if (this.state.selectedWho === 'family' && this.state.familyDetails.childrenCount) {
+        const adults = this.state.familyDetails.adultsCount || 2;
+        const kids = this.state.familyDetails.childrenCount;
+        const names = this.state.familyDetails.childrenNames || [];
+        const kidsStr = names.length > 0 ? names.join(', ') : `${kids} enfant${kids > 1 ? 's' : ''}`;
+        items.push({ label:'Composition', value:`${adults} adulte${adults > 1 ? 's' : ''}, ${kidsStr}` });
+      } else if (this.state.selectedWho === 'friends' && this.state.friendsDetails.adultsCount) {
+        items.push({ label:'Groupe', value:`${this.state.friendsDetails.adultsCount} personnes` });
+      }
+
+      if (this.state.selectedTypes.length > 0) {
+        const typeLabels = { detente:'Détente & bien-être', aventure:'Aventure & découverte', culture:'Culture & patrimoine', gastronomie:'Gastronomie', romantique:'Romantique', nature:'Nature & évasion', nightlife:'Nightlife', sport:'Sport & activités', business:'Business & networking', 'meeting-room':'Salle de réunion', 'team-building':'Team building', coworking:'Co-working', 'business-dining':'Restaurant d\'affaires', spa:'Spa', restaurant:'Restaurant', workspace:'Espace de travail', kids:'Espace enfants', local:'Vie locale' };
+        items.push({ label:'Type de séjour', value: this.state.selectedTypes.map(t => typeLabels[t] || t).join(', ') });
+      }
+
+      const regionLabels = { europe:'Europe', asia:'Asie', africa:'Afrique', 'north-america':'Amérique du Nord', 'latin-america':'Amérique Latine', oceania:'Océanie' };
+      if (this.state.destinationInput) {
+        items.push({ label:'Destination', value: this.state.destinationInput });
+      } else if (this.state.selectedRegions && this.state.selectedRegions.length > 0) {
+        items.push({ label:'Régions', value: this.state.selectedRegions.map(r => regionLabels[r] || r).join(', ') });
+      } else if (this.state.businessLocation) {
+        items.push({ label:'Destination', value: this.state.businessLocation });
+      }
+
+      const monthLabels = { janvier:'Janvier', fevrier:'Février', mars:'Mars', avril:'Avril', mai:'Mai', juin:'Juin', juillet:'Juillet', aout:'Août', septembre:'Septembre', octobre:'Octobre', novembre:'Novembre', decembre:'Décembre' };
+      if (this.state.selectedMonth) {
+        items.push({ label:'Période', value:`${monthLabels[this.state.selectedMonth] || this.state.selectedMonth} ${this.state.selectedYear || new Date().getFullYear()}` });
+      } else if (this.state.checkInDate && this.state.checkOutDate) {
+        const fmt = d => new Date(d).toLocaleDateString('fr-FR', { day:'numeric', month:'long' });
+        items.push({ label:'Dates', value:`${fmt(this.state.checkInDate)} — ${fmt(this.state.checkOutDate)}` });
+      }
+
+      const durationLabels = { '1week':'Une semaine', '2weeks':'Deux semaines', '3weeks':'Trois semaines', more:'Plus de trois semaines', advice:'Conseillez-moi' };
+      if (this.state.selectedDuration) {
+        items.push({ label:'Durée', value: durationLabels[this.state.selectedDuration] || this.state.selectedDuration });
+      }
+
+      if (this.state.selectedServices.length > 0) {
+        const svcLabels = { pets:'Animaux acceptés', accessibility:'Accès handicapés', parking:'Parking', 'baby-bed':'Lit bébé', 'high-chair':'Chaise haute', 'kids-pool':'Pataugeoire', 'kids-club':'Club enfants' };
+        items.push({ label:'Services', value: this.state.selectedServices.map(s => svcLabels[s] || s).join(', ') });
+      }
+      return items;
+    }
+
+    _matchHotels() {
+      const whoToTags = { solo:['culture','wellness'], couple:['romance','luxury'], family:['family','beach','wellness'], friends:['culture','gastro','beach'], business:['business','meeting'] };
+      const profileTags = whoToTags[this.state.selectedWho] || [];
+      const typeTags = this.state.selectedTypes || [];
+      const typeToTag = { detente:'wellness', aventure:'culture', culture:'culture', gastronomie:'gastro', romantique:'romance', nature:'eco', spa:'wellness', restaurant:'gastro', nightlife:'culture', sport:'wellness', 'meeting-room':'meeting', 'team-building':'meeting', coworking:'business', 'business-dining':'gastro', kids:'family', local:'culture' };
+
+      const dest = (this.state.destinationInput || this.state.businessLocation || '').toLowerCase().trim();
+      const regions = (this.state.selectedRegions || []);
+
+      const regionCountries = {
+        europe: ['france','espagne','royaume-uni','italie','allemagne','portugal','grèce','suisse','belgique','pays-bas','autriche','hongrie','roumanie','lettonie','croatie','géorgie','turquie','bulgarie','lyon','paris','bordeaux','marseille','nice','barcelone','londres','berlin','munich','cologne','stuttgart','bruxelles','eindhoven','budapest','bucarest','riga','zagreb','tbilissi','istanbul','bâle','toulouse','cannes','montpellier','liverpool','la défense','gorni okol'],
+        asia: ['thaïlande','japon','chine','inde','indonésie','singapour','vietnam','cambodge','malaisie','maldives','laos','myanmar','corée du sud','bali','lombok','bangkok','pattaya','phuket','phang nga','khon kaen','tokyo','séoul','shanghai','pékin','guangzhou','sanya','lijiang','zhangjiajie','hong kong','xishuangbanna','haikou','nanjing','dali','jakarta','bandung','bogor','hanoï','hô chi minh','danang','hai phong','phu quoc','vung tau','kuala lumpur','kuching','miri','new delhi','chennai','luang prabang','yangon'],
+        africa: ['maroc','afrique du sud','sénégal','kenya','côte d\'ivoire','rd congo','abidjan','dakar','kinshasa','lubumbashi','nairobi','le cap','marrakech','el jadida'],
+        'north-america': ['états-unis','canada','mexique','new york','los angeles','miami','montréal'],
+        'latin-america': ['brésil','argentine','colombie','pérou','chili','são paulo','rio de janeiro','guarulhos','rosario','santiago','viña del mar','lima'],
+        oceania: ['australie','nouvelle-zélande','fidji','sydney','melbourne','cairns','palm cove','port douglas','margaret river','central coast','adélaïde','brisbane','ayers rock','auckland','rotorua'],
+        'middle-east': ['émirats','eau','dubaï','qatar','arabie saoudite','oman','abu dhabi','sharjah','ras al khaimah','la mecque','médine','doha']
+      };
+
+      const isInRegions = (loc, regs) => regs.some(r => (regionCountries[r] || []).some(c => loc.includes(c)));
+      const findRegion = (loc) => Object.keys(regionCountries).find(r => regionCountries[r].some(c => loc.includes(c)));
+
+      const destRegion = dest ? findRegion(dest) : null;
+
+      const scored = PREVIEW_HOTELS.map(hotel => {
+        let score = 0;
+        const htags = hotel.tags || [];
+        const hsvc = hotel.services || [];
+        const loc = hotel.loc.toLowerCase();
+        let matchesDest = false;
+        let sameRegionAsDest = false;
+
+        if (dest) {
+          const destCity = dest.split(',')[0].trim();
+          const locCity = loc.split(',')[0].trim();
+          if (locCity === destCity || loc.includes(destCity) || destCity.includes(locCity)) {
+            score += 25;
+            matchesDest = true;
+          } else if (loc.includes(dest.split(',').pop().trim())) {
+            score += 15;
+            sameRegionAsDest = true;
+          }
+          if (destRegion) {
+            const hotelRegion = findRegion(loc);
+            if (hotelRegion === destRegion) {
+              score += 10;
+              sameRegionAsDest = true;
+            }
+          }
+        }
+
+        const inRegion = regions.length > 0 && isInRegions(loc, regions);
+        if (inRegion) score += 15;
+
+        profileTags.forEach(t => { if (htags.includes(t)) score += 2; });
+        typeTags.forEach(t => {
+          if (htags.includes(typeToTag[t] || t)) score += 3;
+        });
+
+        (this.state.selectedServices || []).forEach(s => {
+          const mapped = { pets:'pet-friendly', parking:'parking', 'kids-club':'kids-club', 'kids-pool':'pool', 'baby-bed':'room-service', 'high-chair':'restaurant', accessibility:'concierge' };
+          if (hsvc.includes(mapped[s] || s)) score += 2;
+        });
+
+        return { ...hotel, score, inRegion, matchesDest, sameRegionAsDest };
+      });
+
+      if (dest) {
+        const exact = scored.filter(h => h.matchesDest).sort((a, b) => b.score - a.score);
+        const sameRegion = scored.filter(h => !h.matchesDest && h.sameRegionAsDest).sort((a, b) => b.score - a.score);
+        return [...exact, ...sameRegion].slice(0, 3);
+      }
+
+      if (regions.length > 0) {
+        const inRegion = scored.filter(h => h.inRegion).sort((a, b) => b.score - a.score);
+        return inRegion.slice(0, 3);
+      }
+
+      return scored.sort((a, b) => b.score - a.score).slice(0, 3);
+    }
+
+    _generateRecommendation(hotels) {
+      const who = { solo:'un voyageur solo', couple:'un couple', family:'une famille', friends:'un groupe d\'amis', business:'un voyage d\'affaires' };
+      const whoStr = who[this.state.selectedWho] || 'vous';
+
+      const regionLabels = { europe:'Europe', asia:'Asie', africa:'Afrique', 'north-america':'Amérique du Nord', 'latin-america':'Amérique Latine', oceania:'Océanie' };
+      const regions = (this.state.selectedRegions || []).map(r => regionLabels[r] || r);
+      const dest = this.state.destinationInput || this.state.businessLocation || (regions.length > 0 ? regions[0] : '');
+
+      const types = this.state.selectedTypes || [];
+      const typeLabels = { detente:'détente', aventure:'aventure', culture:'culture', gastronomie:'gastronomie', romantique:'romantique', nature:'nature', spa:'spa & bien-être', restaurant:'gastronomie', workspace:'espace de travail', 'meeting-room':'réunions', coworking:'co-working', kids:'activités enfants', local:'vie locale', nightlife:'sorties', sport:'sport', business:'business', 'team-building':'team building', 'business-dining':'gastronomie d\'affaires' };
+      const typeStr = types.length > 0 ? types.map(t => typeLabels[t] || t).slice(0, 2).join(' et ') : '';
+
+      let text = `Pour ${whoStr}`;
+      if (dest) text += ` à destination ${dest.includes(',') ? 'de ' : 'd\''}${dest}`;
+      if (typeStr) text += ` en quête de ${typeStr}`;
+      text += `, nous avons sélectionné ${hotels.length} établissement${hotels.length > 1 ? 's' : ''} qui correspond${hotels.length > 1 ? 'ent' : ''} parfaitement à vos envies. `;
+
+      if (hotels.length > 0) {
+        const top = hotels[0];
+        text += `Notre coup de cœur : le ${top.name}, ${top.features.split(' · ')[0].toLowerCase()} — un choix idéal pour votre séjour.`;
+      }
+      return text;
+    }
+
+    _buildOrbitCards() {
+      const cards = [];
+
+      const whoImages = { solo:'../../assets/images/discovery/solo.jpg', couple:'../../assets/images/discovery/couple.jpg', family:'../../assets/images/discovery/family.jpg', friends:'../../assets/images/discovery/friendtravel.avif', business:'../../assets/images/discovery/businesstravel.avif' };
+      const whoLabels = { solo:'Solo', couple:'En couple', family:'En famille', friends:'Entre amis', business:'Business' };
+      if (this.state.selectedWho) {
+        cards.push({ image: whoImages[this.state.selectedWho], label: whoLabels[this.state.selectedWho] });
+      }
+
+      const typeImages = { detente:'../../assets/images/discovery/wellness.jpg', aventure:'../../assets/images/discovery/culture.jpg', culture:'../../assets/images/discovery/culture.jpg', gastronomie:'../../assets/images/discovery/gastro.jpg', romantique:'../../assets/images/discovery/couple.jpg', nature:'../../assets/images/discovery/wellness.jpg', spa:'../../assets/images/discovery/wellness.jpg', restaurant:'../../assets/images/discovery/gastro.jpg', workspace:'../../assets/images/discovery/business.jpg', 'meeting-room':'../../assets/images/Serviceshôtels/meetingroom.avif', coworking:'../../assets/images/Serviceshôtels/corwoking.avif', kids:'../../assets/images/Serviceshôtels/kidsplayground.webp', local:'../../assets/images/discovery/culture.jpg' };
+      const typeLabelsShort = { detente:'Détente', aventure:'Aventure', culture:'Culture', gastronomie:'Gastronomie', romantique:'Romantique', nature:'Nature', spa:'Spa', restaurant:'Restaurant', workspace:'Workspace', 'meeting-room':'Réunion', coworking:'Coworking', kids:'Enfants', local:'Vie locale' };
+      (this.state.selectedTypes || []).forEach(t => {
+        cards.push({ image: typeImages[t] || '../../assets/images/discovery/wellness.jpg', label: typeLabelsShort[t] || t });
+      });
+
+      if (this.state.destinationInput) {
+        const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
+        const match = wishlist.find(w => (w.country ? `${w.name}, ${w.country}` : w.name) === this.state.destinationInput);
+        cards.push({ image: match ? match.image : '../../assets/images/discovery/culture.jpg', label: this.state.destinationInput.split(',')[0] });
+      } else if (this.state.selectedRegions && this.state.selectedRegions.length > 0) {
+        const regionImages = { europe:'../../assets/images/destination/Europe.avif', asia:'../../assets/images/destination/asie.avif', africa:'../../assets/images/destination/africa.avif', 'north-america':'../../assets/images/destination/america.avif', 'latin-america':'../../assets/images/destination/ameriquelatine.avif', oceania:'../../assets/images/destination/oceanie.avif' };
+        const regionLabels = { europe:'Europe', asia:'Asie', africa:'Afrique', 'north-america':'Am. du Nord', 'latin-america':'Am. Latine', oceania:'Océanie' };
+        this.state.selectedRegions.forEach(r => {
+          cards.push({ image: regionImages[r] || '../../assets/images/discovery/culture.jpg', label: regionLabels[r] || r });
+        });
+      }
+
+      return cards;
+    }
+
+    renderResultsLoading() {
+      const cards = this._buildOrbitCards();
+      const n = cards.length;
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
+            <div class="wd-discovery-modal__results-loading">
+              <div class="wd-discovery-modal__orbit-scene">
+                ${cards.map((card, i) => `
+                  <div class="wd-discovery-modal__orbit-card" style="--i: ${i}; --n: ${n}; ${card.image ? `background-image: url('${card.image}');` : `background: ${card.color || '#3F5E5A'};`}">
+                    ${card.image ? '<div class="wd-discovery-modal__orbit-card-overlay"></div>' : ''}
+                    <span class="wd-discovery-modal__orbit-card-label">${card.label}</span>
+                  </div>
+                `).join('')}
+              </div>
+
+              <h2 class="wd-discovery-modal__results-loading-title">Recherche en cours...</h2>
+              <p class="wd-discovery-modal__results-loading-subtitle">Nous analysons vos préférences pour trouver les hôtels Pullman qui vous correspondent.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    _startResultsLoading() {
+      setTimeout(() => {
+        this.state.stepHistory.push('results-loading');
+        this.state.currentStep = 'results';
+        this.state.matchedHotels = this._matchHotels();
+        this._rerenderContent();
+        const mc = this.querySelector('.wd-discovery-modal__content');
+        if (mc) mc.scrollTop = 0;
+      }, 7000);
+    }
+
+    renderResults() {
+      const items = this._buildRecapItems();
+      const hotels = this.state.matchedHotels || this._matchHotels();
+      const recommendation = this._generateRecommendation(hotels);
+      const firstName = (this.state.isConnected && this.state.userProfile) ? this.state.userProfile.firstName : '';
+
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">
+              ${ICON.close}
+            </button>
+
+            <div class="wd-discovery-modal__results">
+              <h2 class="wd-discovery-modal__results-title">${firstName ? `${firstName}, voici` : 'Voici'} nos recommandations</h2>
+
+              <div class="wd-discovery-modal__results-ai-msg">
+                <div class="wd-discovery-modal__results-ai-avatar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#ffffff"/></svg>
+                </div>
+                <div class="wd-discovery-modal__results-ai-bubble">
+                  <span class="wd-discovery-modal__results-ai-name">Concierge Pullman</span>
+                  <p class="wd-discovery-modal__results-ai-text">${recommendation}</p>
+                  <div class="wd-discovery-modal__results-ai-recap">
+                    ${items.map(item => `
+                      <div class="wd-discovery-modal__results-recap-row">
+                        <span class="wd-discovery-modal__results-recap-row-label">${item.label}</span>
+                        <span class="wd-discovery-modal__results-recap-row-value">${item.value}</span>
+                      </div>
+                    `).join('')}
+                  </div>
+                  <button class="wd-discovery-modal__results-edit" aria-label="Modifier mes critères">Modifier mes critères</button>
+                </div>
+              </div>
+
+              <div class="wd-discovery-modal__results-hotels">
+                ${hotels.map((hotel, i) => `
+                  <div class="wd-discovery-modal__results-hotel-card">
+                    ${i === 0 ? '<span class="wd-discovery-modal__results-hotel-badge">Coup de cœur</span>' : ''}
+                    <img class="wd-discovery-modal__results-hotel-img" src="${hotel.img}" alt="${hotel.name}" loading="lazy" />
+                    <div class="wd-discovery-modal__results-hotel-info">
+                      <h4 class="wd-discovery-modal__results-hotel-name">${hotel.name}</h4>
+                      <p class="wd-discovery-modal__results-hotel-loc">${hotel.loc}</p>
+                      <p class="wd-discovery-modal__results-hotel-features">${hotel.features}</p>
+                      <div class="wd-discovery-modal__results-hotel-bottom">
+                        <span class="wd-discovery-modal__results-hotel-price">À partir de <strong>${hotel.price} €</strong> / nuit</span>
+                        <div class="wd-discovery-modal__results-hotel-actions">
+                          <a href="${hotel.url || '#'}" class="wd-discovery-modal__results-hotel-cta" ${hotel.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>Découvrir l'hôtel →</a>
+                          <a href="${hotel.url || '#'}" class="wd-discovery-modal__results-hotel-book" ${hotel.url ? 'target="_blank" rel="noopener noreferrer"' : ''}>Réserver</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+
+            </div>
+
+            <div class="wd-discovery-modal__footer">
+              <button class="wd-discovery-modal__back" aria-label="Retour">
+                Retour
+              </button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">
+                Recommencer
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     renderQuestion_BusinessLocation() {
       return `
         <div class="wd-discovery-modal">
@@ -3503,7 +4774,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Précisez votre destination pour un voyage d'affaires</p>
 
             <div class="wd-discovery-modal__question">
@@ -3556,7 +4827,7 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">Trouvez votre prochaine inspiration</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Précisez vos dates de séjour</p>
 
             <div class="wd-discovery-modal__question">
@@ -4159,9 +5430,12 @@
           const nextStep = this.getNextStep(this.state.currentStep, this.state);
 
           if (nextStep === 'results') {
-            console.log('Closing modal with final selection');
-            this.close();
-            console.log('Sélection complète:', this.state);
+            console.log('Navigating to results loading...');
+            this.state.currentStep = 'results-loading';
+            this._rerenderContent();
+            const mc2 = this.querySelector('.wd-discovery-modal__content');
+            if (mc2) mc2.scrollTop = 0;
+            this._startResultsLoading();
             return;
           }
 
@@ -4418,6 +5692,23 @@
         this._q4q5ListenerAttached = true;
       }
 
+      if (this.state.currentStep === 'results') {
+        const editBtn = this.querySelector('.wd-discovery-modal__results-edit');
+        if (editBtn) {
+          editBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (this.state.stepHistory.length > 0) {
+              const prevStep = this.state.stepHistory.pop();
+              this.state.currentStep = prevStep === 'results-loading' && this.state.stepHistory.length > 0
+                ? this.state.stepHistory.pop() : prevStep;
+              this._rerenderContent();
+              const mc = this.querySelector('.wd-discovery-modal__content');
+              if (mc) mc.scrollTop = 0;
+            }
+          });
+        }
+
+      }
 
     }
 
