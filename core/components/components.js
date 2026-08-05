@@ -2941,7 +2941,7 @@
       const options = [
         { value: 'escapade', label: 'Une escapade', desc: 'Séjour loisir, détente, découverte', image: '../../assets/images/discovery/couple.avif' },
         { value: 'pro', label: 'Un déplacement pro', desc: 'Voyage d\'affaires, coworking', image: '../../assets/images/discovery/business.avif' },
-        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/discovery/events.avif' },
+        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/Q1/event.webp' },
         { value: 'guide', label: 'Je me laisse guider', desc: 'Pas encore sûr ? On vous oriente', image: '../../assets/images/discovery/city.avif' }
       ];
 
@@ -3663,8 +3663,16 @@
 
     _buildRecapItems() {
       const items = [];
-      const whoLabels = { solo:'Solo', couple:'En couple', family:'En famille', friends:'Entre amis', business:'Business' };
-      items.push({ label:'Voyageur', value: whoLabels[this.state.selectedWho] || this.state.selectedWho });
+      const stayLabels = { escapade:'Escapade', pro:'Déplacement pro', event:'Événement', guide:'Guide' };
+      if (this.state.selectedStayType) {
+        items.push({ label:'Séjour', value: stayLabels[this.state.selectedStayType] || this.state.selectedStayType });
+      }
+      if (this.state.selectedStayType === 'escapade') {
+        const whoLabels = { solo:'Solo', couple:'En couple', family:'En famille', friends:'Entre amis' };
+        if (this.state.selectedWho) {
+          items.push({ label:'Voyageur', value: whoLabels[this.state.selectedWho] || this.state.selectedWho });
+        }
+      }
 
       if (this.state.selectedWho === 'family' && this.state.familyDetails.childrenCount) {
         const adults = this.state.familyDetails.adultsCount || 2;
@@ -3707,6 +3715,42 @@
         const svcLabels = { pets:'Animaux acceptés', accessibility:'Accès handicapés', parking:'Parking', 'baby-bed':'Lit bébé', 'high-chair':'Chaise haute', 'kids-pool':'Pataugeoire', 'kids-club':'Club enfants' };
         items.push({ label:'Services', value: this.state.selectedServices.map(s => svcLabels[s] || s).join(', ') });
       }
+
+      // Pro-specific recap
+      if (this.state.selectedStayType === 'pro') {
+        const ctxLabels = { solo:'Solo', team:'En équipe', client:'Rencontre client' };
+        if (this.state.proContext) {
+          items.push({ label:'Contexte', value: ctxLabels[this.state.proContext] || this.state.proContext });
+        }
+        if (this.state.proNeeds && this.state.proNeeds.length > 0) {
+          const needLabels = { 'work-room':'Chambre équipée', coworking:'Coworking', 'meeting-small':'Salle de réunion', spa:'Spa', restaurant:'Restaurant', local:'Vie locale' };
+          items.push({ label:'Besoins pro', value: this.state.proNeeds.map(n => needLabels[n] || n).join(', ') });
+        }
+        if (this.state.bleisureChoice) {
+          items.push({ label:'Bleisure', value: this.state.bleisureChoice === 'yes' ? 'Séjour prolongé' : 'Non' });
+        }
+      }
+
+      // Event-specific recap
+      if (this.state.selectedStayType === 'event') {
+        const famLabels = { pro:'Événement professionnel', celebration:'Célébration privée' };
+        if (this.state.eventFamily) {
+          items.push({ label:'Type', value: famLabels[this.state.eventFamily] || this.state.eventFamily });
+        }
+        const subLabels = { seminar:'Séminaire / réunion', conference:'Conférence / congrès', teambuilding:'Team building', corporate:'Événement d\'entreprise', wedding:'Mariage', 'evg-evjf':'EVG / EVJF', birthday:'Anniversaire', other:'Autre célébration' };
+        if (this.state.eventSubType) {
+          items.push({ label:'Format', value: subLabels[this.state.eventSubType] || this.state.eventSubType });
+        }
+        const volLabels = { small:'Moins de 20', medium:'20 – 50', large:'50 – 150', xlarge:'150+' };
+        if (this.state.eventVolume) {
+          items.push({ label:'Participants', value: volLabels[this.state.eventVolume] || this.state.eventVolume });
+        }
+        if (this.state.eventNeeds && this.state.eventNeeds.length > 0) {
+          const enLabels = { 'meeting-room':'Salle de réunion', plenary:'Plénière', coworking:'Coworking', catering:'Restauration', rooms:'Nuitées', av:'Matériel AV', reception:'Espace réception', traiteur:'Traiteur', rooftop:'Soirée / rooftop' };
+          items.push({ label:'Prestations', value: this.state.eventNeeds.map(n => enLabels[n] || n).join(', ') });
+        }
+      }
+
       return items;
     }
 
@@ -3769,6 +3813,15 @@
           if (htags.includes(typeToTag[t] || t)) score += 3;
         });
 
+        if (this.state.selectedStayType === 'event') {
+          if (htags.includes('meeting')) score += 5;
+          if (hsvc.includes('meeting-room') || hsvc.includes('banquet')) score += 4;
+        }
+        if (this.state.selectedStayType === 'pro') {
+          if (htags.includes('business')) score += 4;
+          if (hsvc.includes('meeting-room') || hsvc.includes('coworking')) score += 3;
+        }
+
         (this.state.selectedServices || []).forEach(s => {
           const mapped = { pets:'pet-friendly', parking:'parking', 'kids-club':'kids-club', 'kids-pool':'pool', 'baby-bed':'room-service', 'high-chair':'restaurant', accessibility:'concierge' };
           if (hsvc.includes(mapped[s] || s)) score += 2;
@@ -3803,6 +3856,30 @@
       const typeLabels = { detente:'détente', aventure:'aventure', culture:'culture', gastronomie:'gastronomie', romantique:'romantique', nature:'nature', spa:'spa & bien-être', restaurant:'gastronomie', workspace:'espace de travail', 'meeting-room':'réunions', coworking:'co-working', kids:'activités enfants', local:'vie locale', nightlife:'sorties', sport:'sport', business:'business', 'team-building':'team building', 'business-dining':'gastronomie d\'affaires' };
       const typeStr = types.length > 0 ? types.map(t => typeLabels[t] || t).slice(0, 2).join(' et ') : '';
 
+      if (this.state.selectedStayType === 'pro') {
+        const ctxLabels = { solo:'un déplacement solo', team:'un séjour en équipe', client:'une rencontre client' };
+        const ctxStr = ctxLabels[this.state.proContext] || 'un voyage d\'affaires';
+        let text = `Pour ${ctxStr}`;
+        if (dest) text += ` à ${dest}`;
+        text += `, nous avons sélectionné ${hotels.length} établissement${hotels.length > 1 ? 's' : ''} alliant confort et productivité. `;
+        if (this.state.bleisureChoice === 'yes') text += 'Bonus : chaque hôtel offre de belles options pour prolonger votre séjour côté loisirs. ';
+        if (hotels.length > 0) text += `Notre recommandation : le ${hotels[0].name} — ${hotels[0].features.split(' · ')[0].toLowerCase()}.`;
+        return text;
+      }
+
+      if (this.state.selectedStayType === 'event') {
+        const famLabels = { pro:'votre événement professionnel', celebration:'votre célébration' };
+        const famStr = famLabels[this.state.eventFamily] || 'votre événement';
+        const volLabels = { small:'un petit groupe', medium:'une trentaine de personnes', large:'un grand groupe', xlarge:'un très grand événement' };
+        const volStr = volLabels[this.state.eventVolume] || '';
+        let text = `Pour ${famStr}`;
+        if (dest) text += ` à ${dest}`;
+        if (volStr) text += ` avec ${volStr}`;
+        text += `, nous avons identifié ${hotels.length} établissement${hotels.length > 1 ? 's' : ''} avec les espaces et services adaptés. `;
+        if (hotels.length > 0) text += `Notre coup de cœur : le ${hotels[0].name} — ${hotels[0].features.split(' · ')[0].toLowerCase()}.`;
+        return text;
+      }
+
       let text = `Pour ${whoStr}`;
       if (dest) text += ` à destination ${dest.includes(',') ? 'de ' : 'd\''}${dest}`;
       if (typeStr) text += ` en quête de ${typeStr}`;
@@ -3830,7 +3907,30 @@
         cards.push({ image: typeImages[t] || '../../assets/images/discovery/wellness.jpg', label: typeLabelsShort[t] || t });
       });
 
-      if (this.state.destinationInput) {
+      // Pro-specific orbit cards
+      if (this.state.selectedStayType === 'pro') {
+        const ctxImages = { solo:'../../assets/images/discovery/business.avif', team:'../../assets/images/Serviceshôtels/meetingroom.avif', client:'../../assets/images/discovery/business.avif' };
+        const ctxLabels = { solo:'Solo', team:'Équipe', client:'Client' };
+        if (this.state.proContext) {
+          cards.push({ image: ctxImages[this.state.proContext] || '../../assets/images/discovery/business.avif', label: ctxLabels[this.state.proContext] || 'Pro' });
+        }
+        if (this.state.bleisureChoice === 'yes') {
+          cards.push({ image: '../../assets/images/discovery/couple.avif', label: 'Bleisure' });
+        }
+      }
+
+      // Event-specific orbit cards
+      if (this.state.selectedStayType === 'event') {
+        const famImages = { pro:'../../assets/images/Serviceshôtels/meetingroom.avif', celebration:'../../assets/images/Q1/event.webp' };
+        const famLabels = { pro:'Pro', celebration:'Célébration' };
+        if (this.state.eventFamily) {
+          cards.push({ image: famImages[this.state.eventFamily] || '../../assets/images/Q1/event.webp', label: famLabels[this.state.eventFamily] || 'Événement' });
+        }
+      }
+
+      if (this.state.businessLocation) {
+        cards.push({ image: '../../assets/images/discovery/culture.jpg', label: this.state.businessLocation.split(',')[0] });
+      } else if (this.state.destinationInput) {
         const wishlist = (this.state.userProfile && this.state.userProfile.wishlist) || [];
         const match = wishlist.find(w => (w.country ? `${w.name}, ${w.country}` : w.name) === this.state.destinationInput);
         cards.push({ image: match ? match.image : '../../assets/images/discovery/culture.jpg', label: this.state.destinationInput.split(',')[0] });
@@ -3846,8 +3946,8 @@
     }
 
     renderResultsLoading() {
-      const cards = this._buildOrbitCards();
-      const n = cards.length;
+      const items = this._buildRecapItems();
+      const firstName = this.state.isConnected && this.state.userProfile ? this.state.userProfile.firstName : '';
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content">
@@ -3855,19 +3955,29 @@
               ${ICON.close}
             </button>
 
-            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <div class="wd-discovery-modal__results-loading">
-              <div class="wd-discovery-modal__orbit-scene">
-                ${cards.map((card, i) => `
-                  <div class="wd-discovery-modal__orbit-card" style="--i: ${i}; --n: ${n}; ${card.image ? `background-image: url('${card.image}');` : `background: ${card.color || '#3F5E5A'};`}">
-                    ${card.image ? '<div class="wd-discovery-modal__orbit-card-overlay"></div>' : ''}
-                    <span class="wd-discovery-modal__orbit-card-label">${card.label}</span>
+              <div class="wd-discovery-modal__loading-icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2"/>
+                  <circle cx="24" cy="24" r="20" stroke="#3F5E5A" stroke-width="2" stroke-linecap="round" stroke-dasharray="126" stroke-dashoffset="90" class="wd-discovery-modal__loading-spinner"/>
+                </svg>
+              </div>
+              <h2 class="wd-discovery-modal__results-loading-title">${firstName ? `${firstName}, nous cherchons` : 'Nous cherchons'} votre hôtel idéal</h2>
+              <p class="wd-discovery-modal__results-loading-subtitle">Analyse de vos préférences en cours...</p>
+
+              <div class="wd-discovery-modal__loading-recap">
+                ${items.map((item, i) => `
+                  <div class="wd-discovery-modal__loading-chip" style="animation-delay: ${i * 0.4}s;">
+                    <span class="wd-discovery-modal__loading-chip-label">${item.label}</span>
+                    <span class="wd-discovery-modal__loading-chip-value">${item.value}</span>
                   </div>
                 `).join('')}
               </div>
 
-              <h2 class="wd-discovery-modal__results-loading-title">Recherche en cours...</h2>
-              <p class="wd-discovery-modal__results-loading-subtitle">Nous analysons vos préférences pour trouver les hôtels Pullman qui vous correspondent.</p>
+              <div class="wd-discovery-modal__loading-bar">
+                <div class="wd-discovery-modal__loading-bar-fill"></div>
+              </div>
+              <p class="wd-discovery-modal__loading-step">Comparaison de 120+ hôtels Pullman...</p>
             </div>
           </div>
         </div>
@@ -4026,6 +4136,17 @@
       ];
 
       const hasValidDates = this.state.checkInDate && this.state.checkOutDate && new Date(this.state.checkOutDate) > new Date(this.state.checkInDate);
+      const isEvent = this.state.selectedStayType === 'event';
+      const firstName = this.state.isConnected && this.state.userProfile ? this.state.userProfile.firstName : '';
+      const dateTitle = isEvent
+        ? (firstName ? `${firstName}, quand a lieu votre événement ?` : 'Quand a lieu votre événement ?')
+        : (firstName ? `${firstName}, quelles sont vos dates ?` : 'Quelles sont vos dates ?');
+      const dateSubtitle = isEvent
+        ? 'Indiquez les dates de votre événement pour vérifier la disponibilité des espaces.'
+        : 'Précisez vos dates de séjour.';
+      const dateLabel = isEvent
+        ? 'Dates de l\'événement'
+        : 'Quelles sont vos dates d\'arrivée et de départ ?';
 
       return `
         <div class="wd-discovery-modal">
@@ -4033,11 +4154,11 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
-            <p class="wd-discovery-modal__subtitle">Précisez vos dates de séjour</p>
+            <h2 class="wd-discovery-modal__title">${dateTitle}</h2>
+            <p class="wd-discovery-modal__subtitle">${dateSubtitle}</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Quelles sont vos dates d'arrivée et de départ ?</label>
+              <label class="wd-discovery-modal__question-label">${dateLabel}</label>
 
               <div class="wd-discovery-modal__daterange">
                 <button type="button" class="wd-discovery-modal__daterange-field" id="dateRangeField" aria-haspopup="dialog" aria-expanded="false">
@@ -4063,7 +4184,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/6</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -4143,11 +4264,13 @@
       ];
       const needsOptions = [
         { value: 'work-room', label: 'Chambre équipée pour travailler' },
-        { value: 'coworking', label: 'Accès coworking' },
-        { value: 'meeting-small', label: 'Petite salle de réunion (2-8 pers.)' },
-        { value: 'spa', label: 'Spa' },
-        { value: 'restaurant', label: 'Restaurant' },
-        { value: 'local', label: 'Vie locale' }
+        { value: 'coworking', label: 'Café hybride / co-working' },
+        { value: 'pullman-nook', label: 'Petit recoin Pullman (pod)' },
+        { value: 'meeting-small', label: 'Salle de réunion / studio' },
+        { value: 'hybrid', label: 'Réunion hybride (visio)' },
+        { value: 'restaurant', label: 'Restauration toute la journée' },
+        { value: 'spa', label: 'Spa & fitness (pass journée)' },
+        { value: 'local', label: 'Découverte locale' }
       ];
       const ctx = this.state.proContext;
       const needs = this.state.proNeeds || [];
@@ -4183,40 +4306,60 @@
     }
 
     renderProBleisure() {
-      const choice = this.state.bleisureChoice;
+      return this._renderSelectCards(
+        'Et si vous restiez un peu plus ?',
+        `Découvrez ce que Pullman ${this.state.businessLocation || ''} vous réserve au-delà du travail.`,
+        [
+          { value: 'yes', label: 'Prolonger mon séjour', desc: 'Détente, découverte, escapade après le travail', image: '../../assets/images/discovery/wellness.avif' },
+          { value: 'no', label: 'Pas cette fois', desc: 'Retour direct après la mission', image: '../../assets/images/discovery/businesstravel.avif' }
+        ],
+        'bleisureChoice'
+      );
+    }
+
+    _renderSelectCards(title, subtitle, options, stateField) {
+      const selected = this.state[stateField];
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content">
             <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
-            <h2 class="wd-discovery-modal__title">Et si vous restiez un peu plus ?</h2>
-            <p class="wd-discovery-modal__subtitle">Découvrez ce que Pullman ${this.state.businessLocation || ''} vous réserve au-delà du travail.</p>
+            <h2 class="wd-discovery-modal__title">${title}</h2>
+            <p class="wd-discovery-modal__subtitle">${subtitle}</p>
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Prolonger votre séjour ?</label>
-              <div class="wd-discovery-modal__chips" style="margin-top: 12px; gap: 12px;">
-                <button class="wd-discovery-modal__chip wd-discovery-modal__chip--large${choice === 'yes' ? ' is-selected' : ''}" data-stub-value="yes" data-stub-field="bleisureChoice">Prolonger mon séjour</button>
-                <button class="wd-discovery-modal__chip wd-discovery-modal__chip--large${choice === 'no' ? ' is-selected' : ''}" data-stub-value="no" data-stub-field="bleisureChoice">Pas cette fois</button>
+              <div class="wd-discovery-modal__select-cards">
+                ${options.map(opt => `
+                  <button class="wd-discovery-modal__select-card${selected === opt.value ? ' is-selected' : ''}" data-stub-value="${opt.value}" data-stub-field="${stateField}">
+                    <div class="wd-discovery-modal__select-card-img" style="background-image: url('${opt.image}');"></div>
+                    <div class="wd-discovery-modal__select-card-body">
+                      <span class="wd-discovery-modal__select-card-label">${opt.label}</span>
+                      <small class="wd-discovery-modal__select-card-desc">${opt.desc}</small>
+                    </div>
+                    <div class="wd-discovery-modal__select-card-check">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M6 10l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                  </button>
+                `).join('')}
               </div>
             </div>
             <div class="wd-discovery-modal__footer">
               <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
-              <button class="wd-discovery-modal__continue${choice ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+              <button class="wd-discovery-modal__continue${selected ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
             </div>
           </div>
         </div>`;
     }
 
     renderEventFamily() {
-      return this._renderStubScreen(
+      return this._renderSelectCards(
         'Quel type d\'événement ?',
         'Deux univers, deux ambiances — choisissez celui qui vous correspond.',
-        'Famille d\'événement',
         [
-          { value: 'pro', label: 'Événement professionnel', desc: 'Séminaire, conférence, team building, lancement...' },
-          { value: 'celebration', label: 'Célébration privée', desc: 'Mariage, anniversaire, EVG/EVJF...' }
+          { value: 'pro', label: 'Événement professionnel', desc: 'Séminaire, conférence, team building, lancement...', image: '../../assets/images/Serviceshôtels/meetingroom.avif' },
+          { value: 'celebration', label: 'Célébration privée', desc: 'Mariage, anniversaire, EVG/EVJF...', image: '../../assets/images/Q1/event.webp' }
         ],
-        'eventFamily', 'eventFamily'
+        'eventFamily'
       );
     }
 
@@ -4224,24 +4367,55 @@
       const isPro = this.state.eventFamily === 'pro';
       const options = isPro
         ? [
-            { value: 'seminar', label: 'Séminaire / réunion' },
-            { value: 'conference', label: 'Conférence / congrès' },
-            { value: 'teambuilding', label: 'Team building' },
-            { value: 'corporate', label: 'Événement d\'entreprise' }
+            { value: 'seminar', label: 'Séminaire', desc: 'Réunion, formation', image: '../../assets/images/Serviceshôtels/meetingroom.avif' },
+            { value: 'conference', label: 'Conférence', desc: 'Congrès, salon', image: '../../assets/images/discovery/events.avif' },
+            { value: 'teambuilding', label: 'Team building', desc: 'Cohésion, activités', image: '../../assets/images/discovery/friendtravel.avif' },
+            { value: 'corporate', label: 'Événement corporate', desc: 'Lancement, gala', image: '../../assets/images/discovery/business.avif' }
           ]
         : [
-            { value: 'wedding', label: 'Mariage' },
-            { value: 'evg-evjf', label: 'EVG / EVJF' },
-            { value: 'birthday', label: 'Anniversaire' },
-            { value: 'other', label: 'Autre célébration' }
+            { value: 'wedding', label: 'Mariage', desc: 'Cérémonie & réception', image: '../../assets/images/Q1/event.webp' },
+            { value: 'evg-evjf', label: 'EVG / EVJF', desc: 'Enterrement de vie', image: '../../assets/images/discovery/friends.avif' },
+            { value: 'birthday', label: 'Anniversaire', desc: 'Fête & célébration', image: '../../assets/images/discovery/gastro.avif' },
+            { value: 'other', label: 'Autre célébration', desc: 'Baptême, fiançailles...', image: '../../assets/images/discovery/couple.avif' }
           ];
-      return this._renderStubScreen(
-        'Précisez votre événement',
-        isPro ? 'Quel format professionnel envisagez-vous ?' : 'Quelle célébration préparez-vous ?',
-        'Type d\'événement',
-        options,
-        'eventSubType', 'eventSubType'
-      );
+      const selected = this.state.eventSubType;
+      const idx = this.state.carouselIndex ?? 0;
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <h2 class="wd-discovery-modal__title">Précisez votre événement</h2>
+            <p class="wd-discovery-modal__subtitle">${isPro ? 'Quel format professionnel envisagez-vous ?' : 'Quelle célébration préparez-vous ?'}</p>
+            <div class="wd-discovery-modal__question">
+              <div class="wd-discovery-modal__options">
+                ${options.map((opt, i) => {
+                  let className = 'wd-discovery-modal__option wd-discovery-modal__option--card';
+                  if (i === idx) className += ' is-active';
+                  else if (i === (idx - 1 + options.length) % options.length) className += ' is-prev';
+                  else if (i === (idx + 1) % options.length) className += ' is-next';
+                  else className += i < idx ? ' is-hidden-left-1' : ' is-hidden-right-1';
+                  if (selected === opt.value) className += ' is-selected';
+                  return `<button class="${className}" data-value="${opt.value}" data-index="${i}" style="background-image: url('${opt.image}'); background-size: cover; background-position: center;">
+                    <div class="wd-discovery-modal__option-checkbox">${ICON.check}</div>
+                    <div class="wd-discovery-modal__option-content">
+                      <span>${opt.label}</span>
+                      <small class="wd-discovery-modal__option-desc">${opt.desc}</small>
+                    </div>
+                  </button>`;
+                }).join('')}
+              </div>
+              <div class="wd-discovery-modal__carousel-nav">
+                ${options.map((_, i) => `<button class="wd-discovery-modal__carousel-dot${i === idx ? ' is-active' : ''}" data-dot="${i}"></button>`).join('')}
+              </div>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+              <button class="wd-discovery-modal__continue${selected ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+            </div>
+          </div>
+        </div>`;
     }
 
     renderEventVolume() {
@@ -4263,18 +4437,22 @@
       const isPro = this.state.eventFamily === 'pro';
       const options = isPro
         ? [
-            { value: 'meeting-room', label: 'Salle de réunion' },
-            { value: 'plenary', label: 'Plénière' },
-            { value: 'coworking', label: 'Coworking' },
-            { value: 'catering', label: 'Restauration / pauses' },
+            { value: 'meeting-room', label: 'Salle de réunion / studio' },
+            { value: 'plenary', label: 'Espace modulable grande envergure' },
+            { value: 'hybrid', label: 'Réunion hybride (tech immersive)' },
+            { value: 'catering', label: 'Banquets & traiteur' },
+            { value: 'outdoor', label: 'Espaces verts / terrasse' },
             { value: 'rooms', label: 'Nuitées invités' },
-            { value: 'av', label: 'Matériel AV' }
+            { value: 'av', label: 'Matériel AV & scénographie' },
+            { value: 'connect', label: 'Pullman Connect (plateforme)' }
           ]
         : [
-            { value: 'reception', label: 'Espace réception' },
-            { value: 'catering', label: 'Traiteur' },
+            { value: 'reception', label: 'Espace réception / salle de bal' },
+            { value: 'catering', label: 'Banquets & traiteur' },
+            { value: 'outdoor', label: 'Espaces verts / terrasse / rooftop' },
             { value: 'rooms', label: 'Hébergement invités' },
-            { value: 'rooftop', label: 'Soirée / rooftop' }
+            { value: 'spa', label: 'Spa & bien-être' },
+            { value: 'av', label: 'Décoration & scénographie' }
           ];
       return this._renderMultiSelectScreen(
         'De quoi avez-vous besoin ?',
@@ -4286,28 +4464,26 @@
     }
 
     renderGuide1() {
-      return this._renderStubScreen(
+      return this._renderSelectCards(
         'On vous guide !',
         'Quelques questions rapides pour vous orienter vers la bonne expérience.',
-        'C\'est pour le travail ?',
         [
-          { value: 'yes', label: 'Oui, c\'est professionnel' },
-          { value: 'no', label: 'Non, c\'est personnel' }
+          { value: 'yes', label: 'Professionnel', desc: 'Voyage d\'affaires, séminaire, réunion', image: '../../assets/images/discovery/business.avif' },
+          { value: 'no', label: 'Personnel', desc: 'Escapade, vacances, découverte', image: '../../assets/images/discovery/couple.avif' }
         ],
-        'guideWork', 'guideWork'
+        'guideWork'
       );
     }
 
     renderGuide2() {
-      return this._renderStubScreen(
+      return this._renderSelectCards(
         'Précisons ensemble',
         'Une dernière question pour vous orienter.',
-        'Vous organisez quelque chose pour un groupe ?',
         [
-          { value: 'yes', label: 'Oui, un événement à organiser' },
-          { value: 'no', label: 'Non, un déplacement individuel' }
+          { value: 'yes', label: 'Un événement', desc: 'Groupe, séminaire, célébration', image: '../../assets/images/discovery/events.avif' },
+          { value: 'no', label: 'Un séjour individuel', desc: 'Déplacement solo ou en duo', image: '../../assets/images/discovery/solo.avif' }
         ],
-        'guideGroup', 'guideGroup'
+        'guideGroup'
       );
     }
 
@@ -4512,28 +4688,97 @@
       }
 
       // Business : champ ville/région avec autocomplete (villes Pullman + texte libre)
-      if (this.state.currentStep === 'business-location') {
+      if (this.state.currentStep === 'business-location' || this.state.currentStep === 'pro-location' || this.state.currentStep === 'event-location') {
         const input = this.querySelector('#businessLocationInput');
         const list = this.querySelector('#businessLocationList');
         const continueBtn = this.querySelector('.wd-discovery-modal__continue');
 
         if (input && list) {
-          // Villes desservies par Pullman (dédupliquées), issues des jeux de données existants
-          const cities = [...new Set([...MOCK_HOTELS, ...PREVIEW_HOTELS].map(h => h.loc))].sort((a, b) => a.localeCompare(b, 'fr'));
           const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+          const esc = s => (s || '').replace(/"/g, '&quot;');
+          const cap = s => (s || '').replace(/\b\p{L}/gu, m => m.toUpperCase());
+
+          // Catalogue des villes Pullman, agrégé depuis les hôtels (ville → pays + nb d'hôtels)
+          const cityMap = new Map();
+          [...MOCK_HOTELS, ...PREVIEW_HOTELS].forEach(h => {
+            const [rawCity, rawCountry] = (h.loc || '').split(',');
+            const city = (rawCity || '').trim();
+            if (!city) return;
+            const country = (rawCountry || '').trim();
+            if (!cityMap.has(city)) cityMap.set(city, { city, country, count: 0 });
+            cityMap.get(city).count++;
+          });
+          const pullmanCities = [...cityMap.values()];
+          const findCity = name => pullmanCities.find(c => norm(c.city) === norm(name));
+
+          // Quartiers & lieux emblématiques (rattachés à une ville Pullman)
+          const lieux = (MOCK_AUTOCOMPLETE.lieux || []);
+
+          // Régions → villes Pullman réellement présentes
+          const regions = [
+            { name: 'Île-de-France', cities: ['Paris', 'Paris La Défense'] },
+            { name: 'Côte d\'Azur', cities: ['Nice', 'Cannes'] },
+            { name: 'Provence', cities: ['Marseille', 'Cannes', 'Nice'] },
+            { name: 'Occitanie', cities: ['Toulouse', 'Montpellier'] },
+            { name: 'Nouvelle-Aquitaine', cities: ['Bordeaux'] },
+            { name: 'Auvergne-Rhône-Alpes', cities: ['Lyon'] },
+            { name: 'Asie du Sud-Est', cities: ['Bangkok', 'Singapour', 'Bali', 'Hô Chi Minh-Ville', 'Kuala Lumpur'] },
+            { name: 'Moyen-Orient', cities: ['Dubaï', 'Doha', 'Ras Al Khaimah', 'Sharjah'] },
+            { name: 'Maghreb', cities: ['Marrakech', 'El Jadida'] },
+            { name: 'Océan Indien', cities: ['Maldives'] }
+          ].filter(r => r.cities.some(findCity));
+
+          // Villes SANS Pullman → alternatives Pullman les plus proches
+          const nearby = {
+            'nantes': ['Bordeaux', 'Paris'],
+            'lille': ['Paris', 'Bruxelles'],
+            'strasbourg': ['Paris', 'Munich'],
+            'rennes': ['Paris', 'Bordeaux'],
+            'grenoble': ['Lyon'],
+            'nancy': ['Paris'],
+            'rouen': ['Paris'],
+            'clermont-ferrand': ['Lyon'],
+            'dijon': ['Lyon', 'Paris'],
+            'genève': ['Lyon', 'Bâle'],
+            'amsterdam': ['Eindhoven', 'Bruxelles'],
+            'madrid': ['Barcelone'],
+            'new york': ['Miami']
+          };
+
+          // Destinations populaires (affichées au focus / si aucune saisie)
+          const popular = ['Paris', 'Nice', 'Lyon', 'Marseille', 'Bordeaux', 'Londres', 'Barcelone', 'Dubaï', 'Marrakech', 'Singapour', 'Bangkok', 'Tokyo']
+            .map(findCity).filter(Boolean);
+
+          const ICONS = {
+            city: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-6-5.3-6-10a6 6 0 1112 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>',
+            region: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z"/><path d="M9 3v15M15 6v15"/></svg>',
+            lieu: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h.01M15 8h.01M9 12h.01M15 12h.01M9 16h6"/></svg>'
+          };
 
           let activeIndex = -1;
 
-          const setContinue = (on) => {
-            if (!continueBtn) return;
-            continueBtn.classList.toggle('is-active', on);
-          };
+          const setContinue = (on) => { if (continueBtn) continueBtn.classList.toggle('is-active', on); };
 
           const closeList = () => {
             list.hidden = true;
             list.innerHTML = '';
             activeIndex = -1;
             input.setAttribute('aria-expanded', 'false');
+          };
+
+          const openList = () => {
+            list.hidden = false;
+            activeIndex = -1;
+            input.setAttribute('aria-expanded', 'true');
+            // Ouvre vers le haut si la place manque sous le champ (modale scrollable)
+            const content = input.closest('.wd-discovery-modal__content');
+            const inputRect = input.getBoundingClientRect();
+            const boundBottom = content ? content.getBoundingClientRect().bottom : window.innerHeight;
+            const boundTop = content ? content.getBoundingClientRect().top : 0;
+            const needed = Math.min(list.scrollHeight, 260) + 12;
+            const spaceBelow = boundBottom - inputRect.bottom;
+            const spaceAbove = inputRect.top - boundTop;
+            list.classList.toggle('is-up', spaceBelow < needed && spaceAbove > spaceBelow);
           };
 
           const selectCity = (city) => {
@@ -4543,21 +4788,68 @@
             closeList();
           };
 
-          const renderList = (query) => {
+          const groupLi = (label) => `<li class="wd-discovery-modal__autocomplete-group" role="presentation">${label}</li>`;
+
+          const itemLi = (value, labelHtml, meta, kind) => `<li class="wd-discovery-modal__autocomplete-item" role="option" data-city="${esc(value)}"><span class="wd-discovery-modal__ac-icon">${ICONS[kind] || ICONS.city}</span><span class="wd-discovery-modal__ac-text"><span class="wd-discovery-modal__ac-name">${labelHtml}</span>${meta ? `<span class="wd-discovery-modal__ac-meta">${meta}</span>` : ''}</span></li>`;
+
+          const cityMeta = (c) => {
+            const hotels = c.count > 1 ? `${c.count} hôtels` : '1 hôtel';
+            return c.country ? `${c.country} · ${hotels}` : hotels;
+          };
+
+          const renderList = (rawQuery) => {
+            const query = (rawQuery || '').trim();
             const q = norm(query);
-            const matches = cities.filter(c => norm(c).includes(q));
-            if (matches.length === 0) { closeList(); return; }
-            list.innerHTML = matches.map((c, i) => {
-              // Surligne la portion correspondante
-              const idx = norm(c).indexOf(q);
-              const label = idx >= 0
-                ? `${c.slice(0, idx)}<strong>${c.slice(idx, idx + query.length)}</strong>${c.slice(idx + query.length)}`
-                : c;
-              return `<li class="wd-discovery-modal__autocomplete-item" role="option" data-city="${c}" data-index="${i}">${label}</li>`;
-            }).join('');
-            list.hidden = false;
-            activeIndex = -1;
-            input.setAttribute('aria-expanded', 'true');
+            const hi = (name) => {
+              if (!q) return name;
+              const i = norm(name).indexOf(q);
+              return i < 0 ? name : `${name.slice(0, i)}<strong>${name.slice(i, i + query.length)}</strong>${name.slice(i + query.length)}`;
+            };
+
+            let html = '';
+
+            if (!q) {
+              html += groupLi('Destinations populaires');
+              html += popular.map(c => itemLi(c.city, c.city, cityMeta(c), 'city')).join('');
+              list.innerHTML = html;
+              openList();
+              return;
+            }
+
+            const cityMatches = pullmanCities.filter(c => norm(c.city).includes(q))
+              .sort((a, b) => norm(a.city).indexOf(q) - norm(b.city).indexOf(q) || b.count - a.count);
+            const regionMatches = regions.filter(r => norm(r.name).includes(q));
+            const lieuMatches = lieux.filter(l => norm(l.name).includes(q));
+
+            if (cityMatches.length) {
+              html += groupLi('Villes Pullman');
+              html += cityMatches.slice(0, 6).map(c => itemLi(c.city, hi(c.city), cityMeta(c), 'city')).join('');
+            }
+            if (regionMatches.length) {
+              html += groupLi('Régions');
+              html += regionMatches.slice(0, 3).map(r => itemLi(r.name, hi(r.name), `${r.cities.filter(findCity).length} villes Pullman`, 'region')).join('');
+            }
+            if (lieuMatches.length) {
+              html += groupLi('Quartiers & lieux');
+              html += lieuMatches.slice(0, 4).map(l => itemLi(l.name, hi(l.name), `${l.type} · ${l.loc}`, 'lieu')).join('');
+            }
+
+            if (!html) {
+              const nearKey = Object.keys(nearby).find(k => norm(k).includes(q) || q.includes(norm(k)));
+              if (nearKey) {
+                html += `<li class="wd-discovery-modal__autocomplete-empty" role="presentation">Pas d'hôtel Pullman à <strong>${cap(nearKey)}</strong>. Voici les Pullman les plus proches :</li>`;
+                html += nearby[nearKey].map(name => {
+                  const c = findCity(name);
+                  return itemLi(name, name, c ? cityMeta(c) : '', 'city');
+                }).join('');
+              } else {
+                html += `<li class="wd-discovery-modal__autocomplete-empty" role="presentation">Aucun Pullman ne correspond à «&nbsp;${query}&nbsp;». Découvrez nos destinations :</li>`;
+                html += popular.slice(0, 6).map(c => itemLi(c.city, c.city, cityMeta(c), 'city')).join('');
+              }
+            }
+
+            list.innerHTML = html;
+            openList();
           };
 
           const setActive = (delta) => {
@@ -4573,8 +4865,7 @@
             const value = e.target.value;
             this.state.businessLocation = value.trim() ? value : null;
             setContinue(value.trim().length > 0);
-            if (value.trim().length >= 3) renderList(value.trim());
-            else closeList();
+            renderList(value);
           });
 
           input.addEventListener('keydown', (e) => {
@@ -4598,16 +4889,13 @@
             selectCity(item.dataset.city);
           });
 
-          input.addEventListener('focus', () => {
-            const v = input.value.trim();
-            if (v.length >= 3) renderList(v);
-          });
+          input.addEventListener('focus', () => { renderList(input.value); });
           input.addEventListener('blur', () => { setTimeout(closeList, 120); });
         }
       }
 
       // Business : sélecteur de dates (arrivée → départ) en un seul champ, UI Pullman
-      if (this.state.currentStep === 'business-dates') {
+      if (['business-dates', 'pro-dates', 'event-dates'].includes(this.state.currentStep)) {
         const field = this.querySelector('#dateRangeField');
         const valueEl = this.querySelector('#dateRangeValue');
         const calendar = this.querySelector('#dateRangeCalendar');
@@ -4919,6 +5207,9 @@
           if (nextStep === 2 || nextStep === 3.2 || nextStep === 3.3) {
             this.state.carouselIndex = 2;
           }
+          if (nextStep === 'event-subtype') {
+            this.state.carouselIndex = 0;
+          }
 
           // Re-render + scroll en haut pour la nouvelle étape
           this._rerenderContent();
@@ -5029,7 +5320,6 @@
 
               this.state.selectedStayType = value;
               this.state.selectedWho = value === 'pro' ? 'business' : null;
-              // Nettoyer l'état des autres branches
               this.state.eventFamily = null;
               this.state.eventSubType = null;
               this.state.proContext = null;
@@ -5052,9 +5342,22 @@
               this.state.carouselIndex = clickedIndex;
               this.updateCarouselPosition();
             }
+          }
+          // Event Subtype: Carousel single-select
+          else if (this.state.currentStep === 'event-subtype') {
+            if (clickedIndex === this.state.carouselIndex) {
+              this.querySelectorAll('.wd-discovery-modal__option').forEach(opt => {
+                opt.classList.remove('is-selected');
+              });
+              this.state.eventSubType = value;
+              option.classList.add('is-selected');
+              const continueBtn = this.querySelector('.wd-discovery-modal__continue');
+              if (continueBtn) continueBtn.classList.add('is-active');
+            } else {
+              this.state.carouselIndex = clickedIndex;
+              this.updateCarouselPosition();
+            }
           } else {
-            // Navigation vers la carte cliquée (Q1)
-            console.log('Not active card, navigating to:', clickedIndex);
             this.state.carouselIndex = clickedIndex;
             this.updateCarouselPosition();
           }
@@ -5319,8 +5622,12 @@
       if (currentStep === 1) {
         switch (state.selectedStayType) {
           case 'escapade': return 1.5;
-          case 'pro': return 'pro-location';
-          case 'event': return 'event-family';
+          case 'pro':
+            state.selectedWho = 'business';
+            return 'pro-location';
+          case 'event':
+            state.selectedWho = 'business';
+            return 'event-family';
           case 'guide': return 'guide-1';
           default: return 1;
         }
