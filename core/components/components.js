@@ -116,8 +116,9 @@
             <div class="wd-header__booking">
               <div class="wd-header__booking-tabs">
                 <button class="wd-header__booking-tab wd-header__booking-tab--active" data-tab="hotels">Hôtels</button>
-                <button class="wd-header__booking-tab" data-tab="meetings">Meetings</button>
-                <button class="wd-header__booking-tab" data-tab="experiences">Expériences</button>
+                <button class="wd-header__booking-tab" data-tab="restaurants">Restaurants</button>
+                <button class="wd-header__booking-tab" data-tab="reunions">Réunions</button>
+                <button class="wd-header__booking-tab" data-tab="celebrations">Célébrations</button>
               </div>
               <div class="wd-header__booking-search">
                 <button class="wd-header__booking-field">
@@ -652,846 +653,65 @@
     render() {
       const btn = this.attr("cta", "Rechercher");
       return `<div class="wd-booking">
+        <div class="wd-booking__tabs">
+          <button class="wd-booking__tab wd-booking__tab--active" data-tab="hotels">Hôtels<span class="wd-booking__tab-line"></span></button>
+          <button class="wd-booking__tab" data-tab="restaurants">Restaurants<span class="wd-booking__tab-line"></span></button>
+          <button class="wd-booking__tab" data-tab="reunions">Réunions<span class="wd-booking__tab-line"></span></button>
+          <button class="wd-booking__tab" data-tab="celebrations">Célébrations<span class="wd-booking__tab-line"></span></button>
+        </div>
         <div class="wd-booking__fields">
           <div class="wd-booking__field wd-booking__field--dest">
-            <span class="wd-booking__search-icon-pulse">${SEARCH_ICON.search}</span>
-            <div class="wd-booking__dest-static"><span class="wd-booking__label">${new Date().getHours() < 18 ? 'Bonjour' : 'Bonsoir'}, quelle sera votre prochaine escapade ?</span><span class="wd-booking__value wd-booking__value--typing"></span></div>
-            <input type="text" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" />
-            <span class="wd-booking__kbd">${navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}K</span>
+            <svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+            <div class="wd-booking__dest-wrap">
+              <span class="wd-booking__label">Que recherchez-vous ?</span>
+              <div class="wd-booking__dest-input-row">
+                <div class="wd-booking__dest-chips" id="wd-dest-chips"></div>
+                <input type="text" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" />
+              </div>
+            </div>
+            <button class="wd-booking__map-toggle" title="Voir la carte" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg></button>
           </div>
           <div class="wd-booking__sep"></div>
-          <div class="wd-booking__field">${ICON.cal}<div><span class="wd-booking__label">À quelles dates ? <span style="font-weight:300;opacity:.6">(facultatif)</span></span><span class="wd-booking__value">JJ/MM/AAAA → JJ/MM/AAAA</span></div></div>
+          <div class="wd-booking__field wd-booking__field--dates"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="1.5"/><path d="M3 9h18M8 3v3M16 3v3" stroke-linecap="round"/></svg><div><span class="wd-booking__label">À quelles dates ?</span><span class="wd-booking__value">01/04/2025 &nbsp;<svg width="12" height="9" viewBox="0 0 14 9" fill="none" style="vertical-align:-1px"><path d="M1 4.5h12M9 1l4 3.5L9 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>&nbsp; 02/04/2025</span></div></div>
           <div class="wd-booking__sep"></div>
-          <div class="wd-booking__field">${ICON.person}<div><span class="wd-booking__label">Combien serez-vous ? <span style="font-weight:300;opacity:.6">(facultatif)</span></span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
+          <div class="wd-booking__field wd-booking__field--guests"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 18v-2h18v2M3 16V14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M7 12V9.5A1.5 1.5 0 0 1 8.5 8h7a1.5 1.5 0 0 1 1.5 1.5V12" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">Combien serez-vous ?</span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
           <a href="#" class="wd-btn wd-btn--primary wd-booking__cta">${esc(btn)}</a>
         </div>
-        <a href="#" class="wd-booking__special">Special rates and accessibility ${ICON.chevD}</a>
+        <div class="wd-booking__special-rates"><span class="wd-booking__special-rates-line"></span><a href="#" class="wd-booking__special-rates-link">Special rates and accessibility <svg width="14" height="8" viewBox="0 0 14 8" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="wd-booking__special-rates-line"></span></div>
         <div class="wd-booking__dropdown" data-state="closed">
           <div class="wd-booking__dd-body">
-            <div class="wd-booking__dd-empty">
-              <div class="wd-booking__dd-cols">
-                <div class="wd-booking__dd-left">
-                  <!-- Recherches récentes (conditionnelle) -->
-                  <div class="wd-booking__dd-recent-searches" style="display:none">
-                    <h3 class="wd-booking__dd-section-title">Recherches récentes</h3>
-                    <div class="wd-booking__dd-recent-list"></div>
-                  </div>
-
-                  <!-- Liste des hôtels par continent -->
-                  <h3 class="wd-booking__dd-section-title">Nos hôtels dans le monde</h3>
-
-                  <!-- Tabs continents -->
-                  <div class="wd-booking__dd-continent-tabs">
-                    <button class="wd-booking__dd-continent-tab wd-booking__dd-continent-tab--active" data-continent="france">France</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="europe">Europe</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="tha-lande">Thaïlande</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="indon-sie">Indonésie</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="vietnam">Vietnam</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="chine">Chine</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="asie-pacifique">Asie-Pacifique</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="moyen-orient">Moyen-Orient</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="oc-anie">Océanie</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="am-riques">Amériques</button>
-                    <button class="wd-booking__dd-continent-tab" data-continent="afrique">Afrique</button>
-                  </div>
-
-                  <!-- Conteneur des hôtels (hauteur fixe pour correspondre à la map) -->
-                  <div class="wd-booking__dd-continent-content">
-                    <div class="wd-booking__dd-continent-panel wd-booking__dd-continent-panel--active" data-continent="france">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bordeaux Lac" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bordeaux Lac</span>
-                            <span class="wd-booking__dd-hotel-loc">Bordeaux, France</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cannes Mandelieu" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Cannes Mandelieu</span>
-                            <span class="wd-booking__dd-hotel-loc">Cannes, France</span>
-                          </div>
-                        </a>
-                        <a href="https://pullman.accor.com/fr/hotels/lyon/C177.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lyon Part-Dieu" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lyon Part-Dieu</span>
-                            <span class="wd-booking__dd-hotel-loc">Lyon, France</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Marseille Provence" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Marseille Provence</span>
-                            <span class="wd-booking__dd-hotel-loc">Marseille, France</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Montpellier Centre" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Montpellier Centre</span>
-                            <span class="wd-booking__dd-hotel-loc">Montpellier, France</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nice Côte d'Azur" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Nice Côte d'Azur</span>
-                            <span class="wd-booking__dd-hotel-loc">Nice, France</span>
-                          </div>
-                        </a>
-                        <a href="https://pullman.accor.com/fr/hotels/paris/2192.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Paris Centre - Bercy" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Paris Centre - Bercy</span>
-                            <span class="wd-booking__dd-hotel-loc">Paris, France</span>
-                          </div>
-                        </a>
-                        <a href="https://pullman.accor.com/fr/hotels/paris-la-defense/0576.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Paris La Défense" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Paris La Défense</span>
-                            <span class="wd-booking__dd-hotel-loc">Paris La Défense, France</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="europe">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Barcelona Skipper" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Barcelona Skipper</span>
-                            <span class="wd-booking__dd-hotel-loc">Barcelone, Espagne</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Basel Europe" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Basel Europe</span>
-                            <span class="wd-booking__dd-hotel-loc">Bâle, Suisse</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Berlin Schweizerhof" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Berlin Schweizerhof</span>
-                            <span class="wd-booking__dd-hotel-loc">Berlin, Allemagne</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brussels Centre Midi" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Brussels Centre Midi</span>
-                            <span class="wd-booking__dd-hotel-loc">Bruxelles, Belgique</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bucharest World Trade Center" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bucharest World Trade Center</span>
-                            <span class="wd-booking__dd-hotel-loc">Bucarest, Roumanie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Budapest" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Budapest</span>
-                            <span class="wd-booking__dd-hotel-loc">Budapest, Hongrie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cologne" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Cologne</span>
-                            <span class="wd-booking__dd-hotel-loc">Cologne, Allemagne</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Eindhoven Cocagne" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Eindhoven Cocagne</span>
-                            <span class="wd-booking__dd-hotel-loc">Eindhoven, Pays-Bas</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="tha-lande">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bangkok Hotel G" />
-                          <div class="wd-booking__dd-hotel-info">
-                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--renovated">RÉNOVÉ</span>
-                            <span class="wd-booking__dd-hotel-name">Pullman Bangkok Hotel G</span>
-                            <span class="wd-booking__dd-hotel-loc">Bangkok, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bangkok King Power" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bangkok King Power</span>
-                            <span class="wd-booking__dd-hotel-loc">Bangkok, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Khao Lak Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Khao Lak Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Phang Nga, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Khon Kaen Raja Orchid" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Khon Kaen Raja Orchid</span>
-                            <span class="wd-booking__dd-hotel-loc">Khon Kaen, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Pattaya Hotel G" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Pattaya Hotel G</span>
-                            <span class="wd-booking__dd-hotel-loc">Pattaya, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Arcadia Naithon Beach" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Arcadia Naithon Beach</span>
-                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Karon Beach Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Karon Beach Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phuket Panwa Beach Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Phuket Panwa Beach Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Phuket, Thaïlande</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="indon-sie">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bali Legian Beach" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bali Legian Beach</span>
-                            <span class="wd-booking__dd-hotel-loc">Bali, Indonésie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bandung Grand Central" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bandung Grand Central</span>
-                            <span class="wd-booking__dd-hotel-loc">Bandung, Indonésie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Ciawi Vimala Hills" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Ciawi Vimala Hills</span>
-                            <span class="wd-booking__dd-hotel-loc">Bogor, Indonésie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Jakarta Central Park" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Jakarta Central Park</span>
-                            <span class="wd-booking__dd-hotel-loc">Jakarta, Indonésie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Jakarta Indonesia Thamrin" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Jakarta Indonesia Thamrin</span>
-                            <span class="wd-booking__dd-hotel-loc">Jakarta, Indonésie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lombok Merujani Mandalika" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lombok Merujani Mandalika</span>
-                            <span class="wd-booking__dd-hotel-loc">Lombok, Indonésie</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="vietnam">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Danang Beach Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Danang Beach Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Danang, Vietnam</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Hai Phong" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Hai Phong</span>
-                            <span class="wd-booking__dd-hotel-loc">Hai Phong, Vietnam</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Hanoi" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Hanoi</span>
-                            <span class="wd-booking__dd-hotel-loc">Hanoï, Vietnam</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Phu Quoc Beach Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Phu Quoc Beach Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Phu Quoc, Vietnam</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Saigon Centre" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Saigon Centre</span>
-                            <span class="wd-booking__dd-hotel-loc">Hô Chi Minh-Ville, Vietnam</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Vung Tau" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Vung Tau</span>
-                            <span class="wd-booking__dd-hotel-loc">Vung Tau, Vietnam</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="chine">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Beijing South" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Beijing South</span>
-                            <span class="wd-booking__dd-hotel-loc">Pékin, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dali Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Dali Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Dali, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Guangzhou Baiyun Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Guangzhou Baiyun Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Guangzhou, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Haikou" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Haikou</span>
-                            <span class="wd-booking__dd-hotel-loc">Haikou, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lijiang Resort & Spa" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lijiang Resort & Spa</span>
-                            <span class="wd-booking__dd-hotel-loc">Lijiang, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nanjing Lukou Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Nanjing Lukou Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Nanjing, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Oceanview Sanya Bay" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Oceanview Sanya Bay</span>
-                            <span class="wd-booking__dd-hotel-loc">Sanya, Chine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Resort Xishuangbanna" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Resort Xishuangbanna</span>
-                            <span class="wd-booking__dd-hotel-loc">Xishuangbanna, Chine</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="asie-pacifique">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Chennai Anna Salai" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Chennai Anna Salai</span>
-                            <span class="wd-booking__dd-hotel-loc">Chennai, Inde</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kuala Lumpur City Centre" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Kuala Lumpur City Centre</span>
-                            <span class="wd-booking__dd-hotel-loc">Kuala Lumpur, Malaisie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kuching" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Kuching</span>
-                            <span class="wd-booking__dd-hotel-loc">Kuching, Malaisie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Luang Prabang" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Luang Prabang</span>
-                            <span class="wd-booking__dd-hotel-loc">Luang Prabang, Laos</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Maldives Maamutaa" />
-                          <div class="wd-booking__dd-hotel-info">
-                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
-                            <span class="wd-booking__dd-hotel-name">Pullman Maldives Maamutaa</span>
-                            <span class="wd-booking__dd-hotel-loc">Maldives</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Miri Waterfront" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Miri Waterfront</span>
-                            <span class="wd-booking__dd-hotel-loc">Miri, Malaisie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman New Delhi Aerocity" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman New Delhi Aerocity</span>
-                            <span class="wd-booking__dd-hotel-loc">New Delhi, Inde</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Singapore Hill Street" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Singapore Hill Street</span>
-                            <span class="wd-booking__dd-hotel-loc">Singapour</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="moyen-orient">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Doha West Bay" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Doha West Bay</span>
-                            <span class="wd-booking__dd-hotel-loc">Doha, Qatar</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai Creek City Centre" />
-                          <div class="wd-booking__dd-hotel-info">
-                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
-                            <span class="wd-booking__dd-hotel-name">Pullman Dubai Creek City Centre</span>
-                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai Downtown" />
-                          <div class="wd-booking__dd-hotel-info">
-                            <span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--new">NOUVEAU</span>
-                            <span class="wd-booking__dd-hotel-name">Pullman Dubai Downtown</span>
-                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dubai JLT" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Dubai JLT</span>
-                            <span class="wd-booking__dd-hotel-loc">Dubaï, EAU</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Istanbul" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Istanbul</span>
-                            <span class="wd-booking__dd-hotel-loc">Istanbul, Turquie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Resort Al Marjan Island" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Resort Al Marjan Island</span>
-                            <span class="wd-booking__dd-hotel-loc">Ras Al Khaimah, EAU</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Sharjah" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Sharjah</span>
-                            <span class="wd-booking__dd-hotel-loc">Sharjah, EAU</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman ZamZam Madinah" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman ZamZam Madinah</span>
-                            <span class="wd-booking__dd-hotel-loc">Médine, Arabie Saoudite</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="oc-anie">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Adelaide" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Adelaide</span>
-                            <span class="wd-booking__dd-hotel-loc">Adélaïde, Australie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman at Sydney Olympic Park" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman at Sydney Olympic Park</span>
-                            <span class="wd-booking__dd-hotel-loc">Sydney, Australie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Auckland Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Auckland Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Auckland, Nouvelle-Zélande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Auckland Hotel & Apartments" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Auckland Hotel & Apartments</span>
-                            <span class="wd-booking__dd-hotel-loc">Auckland, Nouvelle-Zélande</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brisbane Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Brisbane Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Brisbane, Australie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Brisbane King George Square" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Brisbane King George Square</span>
-                            <span class="wd-booking__dd-hotel-loc">Brisbane, Australie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Bunker Bay Resort" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Bunker Bay Resort</span>
-                            <span class="wd-booking__dd-hotel-loc">Margaret River, Australie</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cairns International" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Cairns International</span>
-                            <span class="wd-booking__dd-hotel-loc">Cairns, Australie</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="am-riques">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lima Miraflores" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lima Miraflores</span>
-                            <span class="wd-booking__dd-hotel-loc">Lima, Pérou</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lima San Isidro" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lima San Isidro</span>
-                            <span class="wd-booking__dd-hotel-loc">Lima, Pérou</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Miami Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Miami Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Miami, États-Unis</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman RJ São Conrado" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman RJ São Conrado</span>
-                            <span class="wd-booking__dd-hotel-loc">Rio de Janeiro, Brésil</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Rosario City Center" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Rosario City Center</span>
-                            <span class="wd-booking__dd-hotel-loc">Rosario, Argentine</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Santiago El Bosque" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Santiago El Bosque</span>
-                            <span class="wd-booking__dd-hotel-loc">Santiago, Chili</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Santiago Vitacura" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Santiago Vitacura</span>
-                            <span class="wd-booking__dd-hotel-loc">Santiago, Chili</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman São Paulo Guarulhos Airport" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman São Paulo Guarulhos Airport</span>
-                            <span class="wd-booking__dd-hotel-loc">Guarulhos, Brésil</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="wd-booking__dd-continent-panel" data-continent="afrique">
-                      <div class="wd-booking__dd-hotels">
-                        <a href="https://pullman.accor.com/fr/hotels/abidjan/1146.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Abidjan" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Abidjan</span>
-                            <span class="wd-booking__dd-hotel-loc">Abidjan, Côte d'Ivoire</span>
-                          </div>
-                        </a>
-                        <a href="https://pullman.accor.com/fr/hotels/cape-town/6556.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Cape Town" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Cape Town</span>
-                            <span class="wd-booking__dd-hotel-loc">Le Cap, Afrique du Sud</span>
-                          </div>
-                        </a>
-                        <a href="https://pullman.accor.com/fr/hotels/dakar/0921.html" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Dakar Teranga" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Dakar Teranga</span>
-                            <span class="wd-booking__dd-hotel-loc">Dakar, Sénégal</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Kinshasa Grand Hôtel" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Kinshasa Grand Hôtel</span>
-                            <span class="wd-booking__dd-hotel-loc">Kinshasa, RD Congo</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Lubumbashi Grand Karavia" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Lubumbashi Grand Karavia</span>
-                            <span class="wd-booking__dd-hotel-loc">Lubumbashi, RD Congo</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Marrakech Palmeraie" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Marrakech Palmeraie</span>
-                            <span class="wd-booking__dd-hotel-loc">Marrakech, Maroc</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Mazagan Royal Golf & Spa" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Mazagan Royal Golf & Spa</span>
-                            <span class="wd-booking__dd-hotel-loc">El Jadida, Maroc</span>
-                          </div>
-                        </a>
-                        <a href="#" class="wd-booking__dd-hotel-row">
-                          <img class="wd-booking__dd-hotel-thumb" src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="Pullman Nairobi Upper Hill" />
-                          <div class="wd-booking__dd-hotel-info">
-                            
-                            <span class="wd-booking__dd-hotel-name">Pullman Nairobi Upper Hill</span>
-                            <span class="wd-booking__dd-hotel-loc">Nairobi, Kenya</span>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
+            <div class="wd-booking__dd-suggestions" id="wd-suggestions" style="display:none">
+              <div class="wd-booking__dd-suggestions-list" id="wd-suggestions-list"></div>
+            </div>
+            <div class="wd-booking__dd-search-panel" id="wd-search-panel">
+              <div class="wd-booking__dd-two-cols">
+                <div class="wd-booking__dd-dest-col">
+                  <h3 class="wd-booking__dd-col-title">Destination</h3>
+                  <div class="wd-booking__dd-continents" id="wd-continents"></div>
+                  <nav class="wd-booking__dd-breadcrumb" id="wd-breadcrumb" aria-label="Navigation destination"></nav>
+                  <div class="wd-booking__dd-dest-list" id="wd-dest-list"></div>
                 </div>
-                <div class="wd-booking__dd-right">
-                  <h3 class="wd-booking__dd-section-title">Tous nos hôtels dans le monde</h3>
-                  <div class="wd-booking__dd-map-container">
-                    <div id="wd-booking-map" class="wd-booking__dd-map" style="height: 280px; border-radius: 8px;"></div>
-                  </div>
-                  <a href="/pages/pullman/search-results.html" class="wd-booking__dd-see-all-hotels">Voir tous les hôtels sur la carte</a>
+                <div class="wd-booking__dd-criteria-col">
+                  <h3 class="wd-booking__dd-col-title">Critères</h3>
+                  <div class="wd-booking__dd-criteria-list" id="wd-criteria-list"></div>
                 </div>
               </div>
             </div>
-            <div class="wd-booking__dd-inspiration" style="display:none">
-              <div class="wd-booking__dd-inspi-header">
-                <span class="wd-booking__dd-inspi-icon"></span>
-                <span class="wd-booking__dd-inspi-title"></span>
-              </div>
-              <p class="wd-booking__dd-inspi-prompt">Où aimeriez-vous vivre cette expérience ?</p>
-              <div class="wd-booking__dd-inspi-grid"></div>
-            </div>
-            <div class="wd-booking__dd-preview" style="display:none">
-              <div class="wd-booking__dd-preview-header">
-                <div class="wd-booking__dd-preview-category">
-                  <span class="wd-booking__dd-preview-category-icon"></span>
-                  <span class="wd-booking__dd-preview-category-label"></span>
-                </div>
-                <div class="wd-booking__dd-preview-tags"></div>
-              </div>
-              <div class="wd-booking__dd-preview-layout">
-                <div class="wd-booking__dd-preview-list"></div>
-                <div class="wd-booking__dd-preview-map-col">
-                  <div class="wd-booking__dd-preview-geo"></div>
-                  <div class="wd-booking__dd-preview-map" id="wd-preview-map"></div>
-                </div>
-              </div>
-              <div class="wd-booking__dd-preview-footer">
-                <span class="wd-booking__dd-preview-count"></span>
-                <div class="wd-booking__dd-preview-footer-actions">
-                  <button class="wd-booking__dd-preview-back" type="button">Modifier ma recherche</button>
-                  <a class="wd-booking__dd-preview-cta" href="#">Voir tous les résultats</a>
-                </div>
-              </div>
-            </div>
-            <div class="wd-booking__dd-autocomplete" style="display:none">
-              <div class="wd-booking__dd-ac-group wd-booking__dd-ac-group--proximity" data-group="proximity" style="display:none">
-                <div class="wd-booking__dd-proximity-banner">
-                  <span class="wd-booking__dd-proximity-icon">${ICON.pin}</span>
-                  <div class="wd-booking__dd-proximity-text">
-                    <span class="wd-booking__dd-proximity-title">Hôtels à proximité</span>
-                    <span class="wd-booking__dd-proximity-sub">Basé sur votre position actuelle</span>
-                  </div>
-                  <span class="wd-booking__dd-proximity-arrow">→</span>
-                </div>
-              </div>
-              <div class="wd-booking__dd-cols">
-                <div class="wd-booking__dd-left">
-                  <div class="wd-booking__dd-ac-group" data-group="destinations">
-                    <h3 class="wd-booking__dd-section-title">${ICON.pin} Destinations</h3>
-                    <ul class="wd-booking__dd-ac-list"></ul>
-                  </div>
-                  <div class="wd-booking__dd-ac-group" data-group="lieux">
-                    <h3 class="wd-booking__dd-section-title">${SEARCH_ICON.landmark} Lieux d'intérêt</h3>
-                    <ul class="wd-booking__dd-ac-list"></ul>
+            <div class="wd-booking__dd-mapview" style="display:none">
+              <div class="wd-booking__dd-two-cols">
+                <div class="wd-booking__dd-map-col">
+                  <h3 class="wd-booking__dd-col-title">Carte</h3>
+                  <div class="wd-booking__dd-mapview-continents" id="wd-mapview-continents"></div>
+                  <div class="wd-booking__dd-mapview-wrap">
+                    <div id="wd-booking-map" class="wd-booking__dd-map"></div>
                   </div>
                 </div>
-                <div class="wd-booking__dd-right">
-                  <div class="wd-booking__dd-ac-group" data-group="hotels">
-                    <h3 class="wd-booking__dd-section-title">${SEARCH_ICON.building} Hôtels</h3>
-                    <ul class="wd-booking__dd-ac-hotels"></ul>
+                <div class="wd-booking__dd-criteria-col">
+                  <div class="wd-booking__dd-criteria-header">
+                    <h3 class="wd-booking__dd-col-title">Critères</h3>
+                    <button class="wd-booking__dd-clear-filters" id="wd-clear-map-filters" type="button">Retirer tout</button>
                   </div>
+                  <div class="wd-booking__dd-mapview-criteria" id="wd-mapview-criteria"></div>
                 </div>
               </div>
             </div>
@@ -1536,231 +756,954 @@
     }
 
     afterRender() {
+      const bookingTabs = this.querySelectorAll('.wd-booking__tab');
+      const bookingFields = this.querySelector('.wd-booking__fields');
+      const destStaticLabel = this.querySelector('.wd-booking__label');
+      const destStaticTyping = this.querySelector('.wd-booking__value--typing');
+      const TAB_CONFIG = {
+        hotels: { label: 'Où voyagez-vous ? (obligatoire)', placeholder: 'Destination, nom d\'hôtel', value: 'Destination, nom d\'hôtel', guests: 'Combien serez-vous ?' },
+        restaurants: { label: 'Où manger ?', placeholder: 'Restaurant, cuisine, ville...', value: 'Restaurant, cuisine, ville...', guests: 'Combien serez-vous ?' },
+        reunions: { label: 'Organisez votre réunion', placeholder: 'Ville, hôtel, type de réunion...', value: 'Ville, hôtel, type de réunion...', guests: 'Combien de participants ?' },
+        celebrations: { label: 'Célébrez un moment unique', placeholder: 'Ville, hôtel, type de célébration...', value: 'Ville, hôtel, type de célébration...', guests: 'Combien d\'invités ?' },
+      };
+      const guestsLabel = this.querySelector('.wd-booking__field--guests .wd-booking__label');
+      bookingTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          bookingTabs.forEach(t => t.classList.remove('wd-booking__tab--active'));
+          tab.classList.add('wd-booking__tab--active');
+          searchState.activeTab = tab.dataset.tab;
+          const cfg = TAB_CONFIG[tab.dataset.tab];
+          if (cfg && destStaticLabel) destStaticLabel.textContent = cfg.label;
+          if (cfg && destStaticTyping) destStaticTyping.textContent = cfg.value;
+          const inp = this.querySelector('.wd-booking__dest-input');
+          if (cfg && inp) inp.placeholder = cfg.placeholder;
+          if (cfg && guestsLabel) guestsLabel.textContent = cfg.guests;
+          const hasCriteria = tab.dataset.tab !== 'restaurants';
+          const chips = this.querySelector('#wd-dest-chips');
+          if (chips) chips.style.display = hasCriteria ? '' : 'none';
+          const dropdown = this.querySelector('.wd-booking__dropdown');
+          if (dropdown && dropdown.dataset.state === 'open') renderPanel();
+        });
+      });
+
       const dropdown = this.querySelector('.wd-booking__dropdown');
       const destField = this.querySelector('.wd-booking__field--dest');
-      const destStatic = this.querySelector('.wd-booking__dest-static');
       const destInput = this.querySelector('.wd-booking__dest-input');
-      const emptyPanel = this.querySelector('.wd-booking__dd-empty');
-      const inspiPanel = this.querySelector('.wd-booking__dd-inspiration');
-      const acPanel = this.querySelector('.wd-booking__dd-autocomplete');
-      const typingEl = this.querySelector('.wd-booking__value--typing');
-      const TYPING_SUGGESTIONS = [
-        "Un spa relaxant à Marrakech ?",
-        "Week-end gastro à Lyon ?",
-        "Escapade romantique à Paris ?",
-        "Séminaire d'équipe à Barcelone ?",
-        "Découverte culturelle à Tokyo ?",
-        "Vacances en famille à Bali ?",
-        "City break à Londres ?",
-        "Rooftop avec vue à Dubaï ?",
-      ];
-      let typingIdx = 0, typingCharIdx = 0, typingDir = 1, typingTimer = null;
-      const typingTick = () => {
-        const word = TYPING_SUGGESTIONS[typingIdx];
-        if (typingDir === 1) {
-          typingCharIdx++;
-          typingEl.textContent = word.substring(0, typingCharIdx);
-          if (typingCharIdx >= word.length) {
-            typingDir = 0;
-            typingTimer = setTimeout(typingTick, 3000);
-            return;
-          }
-          typingTimer = setTimeout(typingTick, 80 + Math.random() * 50);
-        } else if (typingDir === 0) {
-          typingDir = -1;
-          typingTick();
-        } else {
-          typingCharIdx--;
-          typingEl.textContent = word.substring(0, typingCharIdx);
-          if (typingCharIdx <= 0) {
-            typingDir = 1;
-            typingIdx = (typingIdx + 1) % TYPING_SUGGESTIONS.length;
-            typingTimer = setTimeout(typingTick, 600);
-            return;
-          }
-          typingTimer = setTimeout(typingTick, 35);
-        }
+
+      const searchState = {
+        continent: null,
+        country: null,
+        city: null,
+        criteria: new Set(),
+        freeText: '',
+        expandedCountry: null,
+        selectedHotel: null,
+        activeTab: 'hotels',
+        tabCriteria: {
+          hotels: new Set(),
+          reunions: new Set(),
+          celebrations: new Set(),
+        },
       };
-      typingTimer = setTimeout(typingTick, 800);
+
+      const CRITERIA_GROUPS = {
+        hotels: [
+          { group: 'Bien-être & Loisirs', items: [
+            { id: 'pool', label: 'Piscine' },
+            { id: 'spa', label: 'Spa' },
+            { id: 'gym', label: 'Fitness' },
+            { id: 'beach', label: 'Bord de mer' },
+          ]},
+          { group: 'Restauration', items: [
+            { id: 'breakfast', label: 'Petit-déjeuner inclus' },
+            { id: 'restaurant', label: 'Restaurant' },
+            { id: 'bar', label: 'Bar / Rooftop' },
+          ]},
+          { group: 'Pratique', items: [
+            { id: 'center', label: 'Centre-ville' },
+            { id: 'parking', label: 'Parking' },
+            { id: 'pets', label: 'Animaux acceptés' },
+          ]},
+          { group: 'Séjour', items: [
+            { id: 'family', label: 'Famille / Kids club' },
+            { id: 'meeting', label: 'Salles de réunion' },
+          ]},
+        ],
+        reunions: [
+          { group: 'Type d\'espace', items: [
+            { id: 'r-room', label: 'Salle de réunion' },
+            { id: 'r-large', label: 'Espace modulable grande envergure' },
+            { id: 'r-studio', label: 'Studio (petit recoin)' },
+            { id: 'r-cowork', label: 'Tiers & coworking' },
+          ]},
+          { group: 'Équipements', items: [
+            { id: 'r-screen', label: 'Écran & projection' },
+            { id: 'r-wifi', label: 'Wifi haut débit' },
+            { id: 'r-catering', label: 'Restauration traiteur' },
+            { id: 'r-terrace', label: 'Terrasse / extérieur' },
+          ]},
+          { group: 'Format', items: [
+            { id: 'r-day', label: 'Journée' },
+            { id: 'r-residential', label: 'Résidentiel avec hébergement' },
+          ]},
+        ],
+        celebrations: [
+          { group: 'Type de célébration', items: [
+            { id: 'c-wedding', label: 'Mariage' },
+            { id: 'c-birthday', label: 'Anniversaire' },
+            { id: 'c-evjf', label: 'EVJF / EVG' },
+            { id: 'c-babyshower', label: 'Baby shower' },
+          ]},
+          { group: 'Type d\'espace', items: [
+            { id: 'c-garden', label: 'Jardin & extérieur' },
+            { id: 'c-rooftop', label: 'Rooftop' },
+            { id: 'c-hall', label: 'Salle de réception' },
+            { id: 'c-beach', label: 'Bord de mer' },
+          ]},
+          { group: 'Services', items: [
+            { id: 'c-catering', label: 'Traiteur festif' },
+            { id: 'c-hosting', label: 'Hébergement pour les invités' },
+            { id: 'c-deco', label: 'Décoration' },
+            { id: 'c-music', label: 'Musique / DJ' },
+          ]},
+        ],
+      };
+      const getActiveCriteriaGroups = () => CRITERIA_GROUPS[searchState.activeTab] || [];
+      const getActiveCriteriaList = () => getActiveCriteriaGroups().flatMap(g => g.items);
+      const getActiveCriteria = () => searchState.tabCriteria[searchState.activeTab] || searchState.tabCriteria.hotels;
+      const CRITERIA_LIST = CRITERIA_GROUPS.hotels.flatMap(g => g.items);
+
+      const SUGGESTIONS_DB = [
+        'Paris avec piscine', 'Meilleurs hôtels Paris', 'Paris en famille',
+        'Bali spa & wellness', 'Bali lune de miel', 'Bali resort tout inclus',
+        'Dubai rooftop bar', 'Dubai avec piscine', 'Dubai en famille',
+        'Bangkok centre-ville', 'Bangkok avec spa', 'Bangkok gastronomie',
+        'Marrakech spa', 'Marrakech golf', 'Marrakech en couple',
+        'Lyon gastronomie', 'Lyon business', 'Lyon centre-ville',
+        'Nice bord de mer', 'Nice avec piscine', 'Nice en famille',
+        'Sydney centre-ville', 'Sydney avec vue', 'Sydney en famille',
+        'Phuket resort', 'Phuket plage', 'Phuket en famille',
+        'São Paulo business', 'Lima gastronomie', 'Santiago en famille',
+      ];
+
+      // Données structurées régions > pays > hôtels
+      const REGION_HOTELS = [
+        { id:'europe', label:'Europe', img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman Bordeaux Lac', loc:'Bordeaux, France', country:'France', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/bordeaux-le-lac/0669.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Cannes Mandelieu', loc:'Mandelieu, France', country:'France', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/mandelieu-la-napoule/1168.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','beach'] },
+          { name:'Pullman Lyon', loc:'Lyon, France', country:'France', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/lyon/C177.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Montpellier Centre', loc:'Montpellier, France', country:'France', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/montpellier/1294.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Paris Centre - Bercy', loc:'Paris, France', country:'France', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/paris/2192.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Paris La Défense', loc:'Paris La Défense, France', country:'France', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/paris/3013.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast'] },
+          { name:'Pullman Paris Tour Eiffel', loc:'Paris, France', country:'France', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/paris/7229.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Paris Montparnasse', loc:'Paris, France', country:'France', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/paris/8189.html', services:['restaurant','bar','rooftop','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
+          { name:'Pullman Toulouse Airport', loc:'Toulouse, France', country:'France', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/toulouse/0565.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Berlin Schweizerhof', loc:'Berlin, Allemagne', country:'Allemagne', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/berlin/5347.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Cologne', loc:'Cologne, Allemagne', country:'Allemagne', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/koeln/5366.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Munich', loc:'Munich, Allemagne', country:'Allemagne', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/munich/8657.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Stuttgart Fontana', loc:'Stuttgart, Allemagne', country:'Allemagne', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/stuttgart/5425.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Brussels Centre Midi', loc:'Bruxelles, Belgique', country:'Belgique', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/brussels/7431.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Bucharest WTC', loc:'Bucarest, Roumanie', country:'Roumanie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/bucharest/1714.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Budapest', loc:'Budapest, Hongrie', country:'Hongrie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/budapest/C319.html', services:['restaurant','bar','rooftop','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Eindhoven Cocagne', loc:'Eindhoven, Pays-Bas', country:'Pays-Bas', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/eindhoven/5374.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Basel Europe', loc:'Bâle, Suisse', country:'Suisse', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/basel/5921.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Liverpool', loc:'Liverpool, Royaume-Uni', country:'Royaume-Uni', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/liverpool/9227.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman London St Pancras', loc:'Londres, Royaume-Uni', country:'Royaume-Uni', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/london/5309.html', services:['restaurant','bar','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Istanbul', loc:'Istanbul, Turquie', country:'Turquie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/istanbul/9429.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Riga Old Town', loc:'Riga, Lettonie', country:'Lettonie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/riga/9619.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Tbilisi Axis Towers', loc:'Tbilissi, Géorgie', country:'Géorgie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/tbilisi/A1F1.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Zagreb', loc:'Zagreb, Croatie', country:'Croatie', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/zagreb/C030.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Gorni Okol', loc:'Gorni Okol, Bulgarie', country:'Bulgarie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/gorni-okol/B364.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+        ]},
+        { id:'asie', label:'Asie', img:'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman Bangkok Hotel G', loc:'Bangkok, Thaïlande', country:'Thaïlande', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/bangkok/3616.html', badge:'RÉNOVÉ', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Bangkok King Power', loc:'Bangkok, Thaïlande', country:'Thaïlande', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/bangkok/6323.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Khon Kaen Raja Orchid', loc:'Khon Kaen, Thaïlande', country:'Thaïlande', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/khon-kaen/1877.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Khao Lak Resort', loc:'Phang Nga, Thaïlande', country:'Thaïlande', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/phang-nga/B436.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Pattaya Hotel G', loc:'Pattaya, Thaïlande', country:'Thaïlande', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/pattaya/7540.html', services:['pool','restaurant','bar','spa','beach','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Phuket Arcadia', loc:'Phuket, Thaïlande', country:'Thaïlande', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/phuket/7488.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Phuket Panwa Beach', loc:'Phuket, Thaïlande', country:'Thaïlande', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/phuket/A2E5.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Bali Legian Beach', loc:'Bali, Indonésie', country:'Indonésie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/legian/6556.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Bandung Grand Central', loc:'Bandung, Indonésie', country:'Indonésie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/bandung/9109.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Ciawi Vimala Hills', loc:'Bogor, Indonésie', country:'Indonésie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/bogor/9061.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','garden','golf'] },
+          { name:'Pullman Jakarta Central Park', loc:'Jakarta, Indonésie', country:'Indonésie', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/jakarta/7536.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Jakarta Indonesia', loc:'Jakarta, Indonésie', country:'Indonésie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/jakarta/8491.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Lombok Merujani', loc:'Lombok, Indonésie', country:'Indonésie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/central-lombok/A1K2.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Danang Beach Resort', loc:'Danang, Vietnam', country:'Vietnam', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/danang/8838.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Hai Phong', loc:'Hai Phong, Vietnam', country:'Vietnam', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/hai-phong/B4S6.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Hanoi', loc:'Hanoï, Vietnam', country:'Vietnam', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/hanoi/7579.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Saigon Centre', loc:'Hô Chi Minh-Ville, Vietnam', country:'Vietnam', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/ho-chi-minh/7489.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','rooftop'] },
+          { name:'Pullman Phu Quoc Beach Resort', loc:'Phu Quoc, Vietnam', country:'Vietnam', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/phu-quoc/A248.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Vung Tau', loc:'Vung Tau, Vietnam', country:'Vietnam', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/ho-chi-minh/7133.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast'] },
+          { name:'Pullman Beijing South', loc:'Pékin, Chine', country:'Chine', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/beijing/7025.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Lijiang Resort & Spa', loc:'Lijiang, Chine', country:'Chine', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/lijiang/7231.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Oceanview Sanya Bay', loc:'Sanya, Chine', country:'Chine', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/sanya/7126.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','gym','wifi','breakfast'] },
+          { name:'Pullman Shanghai Jing\'an', loc:'Shanghai, Chine', country:'Chine', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/shanghai/7598.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Shanghai Central', loc:'Shanghai, Chine', country:'Chine', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/shanghai/7298.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Guangzhou Baiyun Airport', loc:'Guangzhou, Chine', country:'Chine', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/guangzhou/B2W3.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Zhangjiajie', loc:'Zhangjiajie, Chine', country:'Chine', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/zhangjiajie/7934.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Guiyang', loc:'Guiyang, Chine', country:'Chine', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/guiyang/8275.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Dali', loc:'Dali, Chine', country:'Chine', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/dali/8627.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman New Delhi Aerocity', loc:'New Delhi, Inde', country:'Inde', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/new-delhi/7559.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Chennai Anna Salai', loc:'Chennai, Inde', country:'Inde', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/chennai/C460.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Kuala Lumpur City Centre', loc:'Kuala Lumpur, Malaisie', country:'Malaisie', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/kuala-lumpur/A0C5.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Kuching', loc:'Kuching, Malaisie', country:'Malaisie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/kuching-sarawak/6332.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Miri Waterfront', loc:'Miri, Malaisie', country:'Malaisie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/miri/9731.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Singapore Hill Street', loc:'Singapour', country:'Singapour', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/singapore/B5L7.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop'] },
+          { name:'Pullman Maldives Maamutaa', loc:'Maldives', country:'Maldives', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/maamutaa-island/9924.html', badge:'NOUVEAU', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Luang Prabang', loc:'Luang Prabang, Laos', country:'Laos', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/luang-prabang/9112.html', services:['pool','restaurant','bar','spa','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Seoul', loc:'Séoul, Corée du Sud', country:'Corée du Sud', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/seoul/0966.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Tokyo Tamachi', loc:'Tokyo, Japon', country:'Japon', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/tokyo/B137.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
+        ]},
+        { id:'moyen-orient', label:'Moyen-Orient', img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman Dubai Creek City Centre', loc:'Dubaï, EAU', country:'EAU', img:'6556-1', href:'https://pullman.accor.com/fr/hotels/dubai/2022.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','kids-club'] },
+          { name:'Pullman Dubai Downtown', loc:'Dubaï, EAU', country:'EAU', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/dubai/B8D7.html', services:['pool','restaurant','bar','rooftop','spa','parking','meeting-rooms','coworking','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Dubai JLT', loc:'Dubaï, EAU', country:'EAU', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/dubai/6305.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Resort Al Marjan Island', loc:'Ras Al Khaimah, EAU', country:'EAU', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/ras-al-khaimah/A0D2.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Sharjah', loc:'Sharjah, EAU', country:'EAU', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sharjah/A0R4.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Doha West Bay', loc:'Doha, Qatar', country:'Qatar', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/doha/8112.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman ZamZam Makkah', loc:'La Mecque, Arabie Saoudite', country:'Arabie Saoudite', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/makkah/6036.html', services:['restaurant','bar','parking','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman ZamZam Madinah', loc:'Médine, Arabie Saoudite', country:'Arabie Saoudite', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/al-madinah-al-munawarah/9245.html', services:['restaurant','bar','parking','meeting-rooms','wifi','breakfast'] },
+        ]},
+        { id:'oceanie', label:'Océanie', img:'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman Adelaide', loc:'Adélaïde, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/adelaide/B217.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Sydney Hyde Park', loc:'Sydney, Australie', country:'Australie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sydney/8763.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Quay Grand Sydney Harbour', loc:'Sydney, Australie', country:'Australie', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/sydney/8779.html', services:['restaurant','bar','pool','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Sydney Airport', loc:'Sydney, Australie', country:'Australie', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/sydney/9522.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Sydney Olympic Park', loc:'Sydney, Australie', country:'Australie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/sydney/6411.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Sydney Penrith', loc:'Sydney, Australie', country:'Australie', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/sydney/C0F1.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','golf','garden'] },
+          { name:'Pullman Brisbane King George Sq.', loc:'Brisbane, Australie', country:'Australie', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/brisbane/8784.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Brisbane Airport', loc:'Brisbane, Australie', country:'Australie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/brisbane/9559.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Cairns International', loc:'Cairns, Australie', country:'Australie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/cairns/8772.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Reef Hotel Casino', loc:'Cairns, Australie', country:'Australie', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/cairns/2901.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','casino'] },
+          { name:'Pullman Bunker Bay Resort', loc:'Margaret River, Australie', country:'Australie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/naturaliste/8775.html', services:['pool','restaurant','bar','spa','beach','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Melbourne City Centre', loc:'Melbourne, Australie', country:'Australie', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/melbourne/3028.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Melbourne Albert Park', loc:'Melbourne, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/melbourne/8788.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Magenta Shores Resort', loc:'Magenta, Australie', country:'Australie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/magenta/8791.html', services:['pool','restaurant','bar','spa','beach','parking','gym','wifi','breakfast','golf','garden'] },
+          { name:'Pullman Palm Cove Sea Temple', loc:'Palm Cove, Australie', country:'Australie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/palm-cove/8761.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Port Douglas Sea Temple', loc:'Port Douglas, Australie', country:'Australie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/port-douglas/8762.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Sails in the Desert', loc:'Ayers Rock, Australie', country:'Australie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/yulara/8606.html', services:['pool','restaurant','bar','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Auckland Hotel & Apts', loc:'Auckland, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/auckland/8219.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Auckland Airport', loc:'Auckland, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/auckland/A8U9.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Rotorua', loc:'Rotorua, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/rotorua/A7W3.html', services:['restaurant','bar','pool','spa','parking','gym','wifi','breakfast','garden'] },
+        ]},
+        { id:'ameriques', label:'Amériques', img:'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman São Paulo Vila Olímpia', loc:'São Paulo, Brésil', country:'Brésil', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/sao-paulo/8938.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman São Paulo Ibirapuera', loc:'São Paulo, Brésil', country:'Brésil', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/sao-paulo/2125.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman São Paulo Guarulhos Airport', loc:'Guarulhos, Brésil', country:'Brésil', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sao-paulo/8923.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Lima Miraflores', loc:'Lima, Pérou', country:'Pérou', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/lima/B464.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Lima San Isidro', loc:'Lima, Pérou', country:'Pérou', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lima/B462.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Santiago El Bosque', loc:'Santiago, Chili', country:'Chili', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/santiago/B461.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Santiago Vitacura', loc:'Santiago, Chili', country:'Chili', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/santiago/B470.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Viña del Mar', loc:'Viña del Mar, Chili', country:'Chili', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/vina-del-mar/B463.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Miami Airport', loc:'Miami, États-Unis', country:'États-Unis', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/miami/0889.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Rosario City Center', loc:'Rosario, Argentine', country:'Argentine', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/rosario/6784.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+        ]},
+        { id:'afrique', label:'Afrique', img:'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=200&h=200&fit=crop', hotels: [
+          { name:'Pullman Marrakech Palmeraie', loc:'Marrakech, Maroc', country:'Maroc', img:'aja_p_0795-31', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','kids-club'] },
+          { name:'Pullman Mazagan Royal Golf & Spa', loc:'El Jadida, Maroc', country:'Maroc', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/el-jadida/2960.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','kids-club'] },
+          { name:'Pullman Abidjan', loc:'Abidjan, Côte d\'Ivoire', country:'Côte d\'Ivoire', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/abidjan/1146.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Cape Town', loc:'Le Cap, Afrique du Sud', country:'Afrique du Sud', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/cape-town/C0H1.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Dakar Teranga', loc:'Dakar, Sénégal', country:'Sénégal', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/dakar/0563.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Kinshasa Grand Hôtel', loc:'Kinshasa, RD Congo', country:'RD Congo', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/kinshasa/9635.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Lubumbashi Grand Karavia', loc:'Lubumbashi, RD Congo', country:'RD Congo', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lubumbashi/A0T4.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Nairobi Upper Hill', loc:'Nairobi, Kenya', country:'Kenya', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/nairobi/C0D4.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+        ]},
+      ];
+
+      const imgBase = 'https://m.ahstatic.com/is/image/accorhotels/';
+      const getMatchingHotels = (continentId, countryName, criteria) => {
+        const region = REGION_HOTELS.find(r => r.id === continentId);
+        if (!region) return [];
+        let hotels = region.hotels;
+        if (countryName) hotels = hotels.filter(h => h.country === countryName);
+        return hotels;
+      };
+
+      const getRegion = () => REGION_HOTELS.find(r => r.id === searchState.continent);
+      const getCountries = () => {
+        const region = getRegion();
+        if (!region) return [];
+        return [...new Set(region.hotels.map(h => h.country))].sort();
+      };
+      const getCities = () => {
+        const region = getRegion();
+        if (!region) return [];
+        let hotels = region.hotels;
+        if (searchState.country) hotels = hotels.filter(h => h.country === searchState.country);
+        return [...new Set(hotels.map(h => h.loc.split(',')[0].trim()))].sort();
+      };
+      const getFilteredHotels = () => {
+        const region = getRegion();
+        if (!region) return [];
+        let hotels = region.hotels;
+        if (searchState.country) hotels = hotels.filter(h => h.country === searchState.country);
+        if (searchState.city) hotels = hotels.filter(h => h.loc.split(',')[0].trim() === searchState.city);
+        return hotels;
+      };
+      const buildChips = () => {
+        const chips = [];
+        if (searchState.selectedHotel) {
+          chips.push({ type: 'hotel', id: searchState.selectedHotel, label: searchState.selectedHotel, icon: '<svg viewBox="0 0 14 14" class="wd-booking__chip-icon"><path d="M2 11V5.5L7 2l5 3.5V11H9V8H5v3H2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>' });
+        } else if (searchState.expandedCountry) {
+          chips.push({ type: 'country', id: searchState.expandedCountry, label: searchState.expandedCountry });
+        } else if (searchState.continent) {
+          const r = getRegion();
+          if (r) chips.push({ type: 'continent', id: searchState.continent, label: r.label });
+        }
+        const activeCriteria = getActiveCriteria();
+        const activeCriteriaList = getActiveCriteriaList();
+        activeCriteria.forEach(cId => {
+          const c = activeCriteriaList.find(x => x.id === cId);
+          if (c) chips.push({ type: 'criteria', id: cId, label: c.label });
+        });
+        return chips;
+      };
+      const removeChip = (type, id) => {
+        if (type === 'continent') { searchState.continent = null; searchState.expandedCountry = null; searchState.selectedHotel = null; }
+        else if (type === 'country') { searchState.expandedCountry = null; searchState.selectedHotel = null; }
+        else if (type === 'hotel') { searchState.selectedHotel = null; }
+        else if (type === 'criteria') { getActiveCriteria().delete(id); }
+        renderPanel();
+      };
+      const getSuggestions = (text) => {
+        if (!text || text.length < 2) return [];
+        const lower = text.toLowerCase();
+        let pool = SUGGESTIONS_DB;
+        if (searchState.city) {
+          pool = pool.filter(s => s.toLowerCase().startsWith(searchState.city.toLowerCase()));
+        } else if (searchState.country) {
+          const citiesInCountry = REGION_HOTELS.flatMap(r => r.hotels)
+            .filter(h => h.country === searchState.country)
+            .map(h => h.loc.split(',')[0].trim().toLowerCase());
+          pool = pool.filter(s => citiesInCountry.some(c => s.toLowerCase().startsWith(c)));
+        }
+        return pool.filter(s => s.toLowerCase().includes(lower)).slice(0, 5);
+      };
+
+      const continentsEl = this.querySelector('#wd-continents');
+      const breadcrumbEl = this.querySelector('#wd-breadcrumb');
+      const destListEl = this.querySelector('#wd-dest-list');
+      const criteriaListEl = this.querySelector('#wd-criteria-list');
+      const chipsEl = this.querySelector('#wd-dest-chips');
+      const suggestionsEl = this.querySelector('#wd-suggestions');
+      const suggestionsListEl = this.querySelector('#wd-suggestions-list');
+      const searchPanelEl = this.querySelector('#wd-search-panel');
+
+      const renderContinents = () => {
+        continentsEl.innerHTML = REGION_HOTELS.map(r => {
+          const active = r.id === searchState.continent;
+          return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button" role="tab" aria-selected="' + active + '">' +
+            '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
+            '<div class="wd-booking__dd-continent-overlay"></div>' +
+            '<span class="wd-booking__dd-continent-fallback" style="display:none">' + esc(r.label) + '</span>' +
+            '<span class="wd-booking__dd-continent-label">' + esc(r.label) + '</span>' +
+            '</button>';
+        }).join('');
+      };
+
+      const renderBreadcrumb = () => {
+        const parts = [];
+        const region = getRegion();
+        if (region) parts.push({ label: region.label, level: 'continent' });
+        if (searchState.country) parts.push({ label: searchState.country, level: 'country' });
+        if (searchState.city) parts.push({ label: searchState.city, level: 'city' });
+        if (parts.length <= 1) { breadcrumbEl.innerHTML = ''; return; }
+        breadcrumbEl.innerHTML = parts.map((p, i) => {
+          const isLast = i === parts.length - 1;
+          const sep = i > 0 ? '<span class="wd-booking__dd-breadcrumb-sep">/</span>' : '';
+          if (isLast) return sep + '<span class="wd-booking__dd-breadcrumb-item wd-booking__dd-breadcrumb-item--current">' + esc(p.label) + '</span>';
+          return sep + '<button class="wd-booking__dd-breadcrumb-item" data-level="' + p.level + '" type="button">' + esc(p.label) + '</button>';
+        }).join('');
+      };
+
+      const CRITERIA_KEYWORDS = {
+        'piscine': 'pool', 'pool': 'pool', 'swimming': 'pool',
+        'spa': 'spa', 'wellness': 'spa', 'bien-être': 'spa', 'bien être': 'spa',
+        'fitness': 'gym', 'gym': 'gym', 'sport': 'gym', 'salle de sport': 'gym',
+        'plage': 'beach', 'bord de mer': 'beach', 'beach': 'beach', 'mer': 'beach', 'ocean': 'beach',
+        'centre-ville': 'center', 'centre ville': 'center', 'downtown': 'center', 'centre': 'center',
+        'petit-déjeuner': 'breakfast', 'petit déjeuner': 'breakfast', 'breakfast': 'breakfast', 'petit dej': 'breakfast',
+        'restaurant': 'restaurant', 'gastronomie': 'restaurant', 'gastro': 'restaurant',
+        'bar': 'bar', 'rooftop': 'bar', 'cocktail': 'bar',
+        'parking': 'parking', 'voiture': 'parking',
+        'animaux': 'pets', 'chien': 'pets', 'chat': 'pets', 'pet': 'pets', 'pets': 'pets', 'dog': 'pets',
+        'famille': 'family', 'enfant': 'family', 'enfants': 'family', 'kids': 'family', 'family': 'family',
+        'réunion': 'meeting', 'reunion': 'meeting', 'meeting': 'meeting', 'business': 'meeting', 'séminaire': 'meeting', 'seminaire': 'meeting',
+      };
+      const CONTINENT_KEYWORDS = {};
+      REGION_HOTELS.forEach(r => { CONTINENT_KEYWORDS[r.label.toLowerCase()] = r.id; });
+      Object.assign(CONTINENT_KEYWORDS, {
+        'amérique': 'ameriques', 'amerique': 'ameriques', 'america': 'ameriques',
+        'amérique du nord': 'ameriques', 'amérique latine': 'ameriques', 'amérique du sud': 'ameriques',
+        'asie du sud': 'asie', 'asie du sud-est': 'asie', 'asia': 'asie',
+        'moyen orient': 'moyen-orient', 'middle east': 'moyen-orient',
+        'océanie': 'oceanie', 'pacifique': 'oceanie', 'pacific': 'oceanie',
+        'africa': 'afrique',
+      });
+      const ALL_COUNTRIES = [...new Set(REGION_HOTELS.flatMap(r => r.hotels.map(h => h.country)))];
+      const ALL_CITIES = [...new Set(REGION_HOTELS.flatMap(r => r.hotels.map(h => h.loc.split(',')[0].trim())))];
+
+      const parseQuery = (text) => {
+        const lower = text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        const lowerRaw = text.toLowerCase();
+        const result = { continent: null, country: null, city: null, criteria: [], remaining: '' };
+        let remaining = lowerRaw;
+        const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+        for (const city of ALL_CITIES.sort((a, b) => b.length - a.length)) {
+          if (lowerRaw.includes(city.toLowerCase())) {
+            result.city = city;
+            const region = REGION_HOTELS.find(r => r.hotels.some(h => h.loc.split(',')[0].trim() === city));
+            const hotel = region ? region.hotels.find(h => h.loc.split(',')[0].trim() === city) : null;
+            if (region) result.continent = region.id;
+            if (hotel) result.country = hotel.country;
+            remaining = remaining.replace(new RegExp(escRe(city), 'gi'), ' ');
+            break;
+          }
+        }
+        if (!result.city) {
+          for (const country of ALL_COUNTRIES.sort((a, b) => b.length - a.length)) {
+            if (lowerRaw.includes(country.toLowerCase())) {
+              result.country = country;
+              const region = REGION_HOTELS.find(r => r.hotels.some(h => h.country === country));
+              if (region) result.continent = region.id;
+              remaining = remaining.replace(new RegExp(escRe(country), 'gi'), ' ');
+              break;
+            }
+          }
+        }
+        if (!result.continent) {
+          const sortedContinents = Object.entries(CONTINENT_KEYWORDS).sort((a, b) => b[0].length - a[0].length);
+          for (const [label, id] of sortedContinents) {
+            const labelNorm = label.normalize('NFD').replace(/[̀-ͯ]/g, '');
+            if (lower.includes(labelNorm)) {
+              result.continent = id;
+              remaining = remaining.replace(new RegExp(escRe(label), 'gi'), ' ');
+              break;
+            }
+          }
+        }
+
+        const sortedKeys = Object.keys(CRITERIA_KEYWORDS).sort((a, b) => b.length - a.length);
+        for (const kw of sortedKeys) {
+          const kwNorm = kw.normalize('NFD').replace(/[̀-ͯ]/g, '');
+          const re = new RegExp('(?:^|[\\s,])' + escRe(kwNorm) + '(?:$|[\\s,])', 'i');
+          if (re.test(lower)) {
+            const cId = CRITERIA_KEYWORDS[kw];
+            if (!result.criteria.includes(cId)) result.criteria.push(cId);
+            remaining = remaining.replace(new RegExp(escRe(kw), 'gi'), ' ');
+          }
+        }
+        result.remaining = remaining.replace(/\b(avec|en|et|un|une|le|la|les|des|du|de|pour|à|a|au|hôtel|hotel)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+        return result;
+      };
+
+      const CRITERIA_TO_SERVICES = {
+        pool: ['pool'], spa: ['spa'], gym: ['gym'], beach: ['beach'],
+        breakfast: ['breakfast'], restaurant: ['restaurant'], bar: ['bar','rooftop'],
+        center: [], parking: ['parking'], pets: ['pets'],
+        family: ['kids-club'], meeting: ['meeting-rooms'],
+      };
+      const hotelMatchesCriteria = (h) => {
+        const active = getActiveCriteria();
+        if (!active.size) return true;
+        if (!h.services) return false;
+        for (const cId of active) {
+          const svcs = CRITERIA_TO_SERVICES[cId];
+          if (!svcs || !svcs.length) continue;
+          if (!svcs.some(s => h.services.includes(s))) return false;
+        }
+        return true;
+      };
+
+      const renderResultsCount = () => {
+        const allHotels = REGION_HOTELS.flatMap(r => r.hotels);
+        let pool = [];
+        let label = '';
+        if (searchState.selectedHotel) {
+          const country = searchState.expandedCountry || '';
+          const region = getRegion();
+          pool = region ? region.hotels.filter(h => h.country === country) : [];
+          label = country;
+        } else if (searchState.expandedCountry) {
+          const region = getRegion();
+          pool = region ? region.hotels.filter(h => h.country === searchState.expandedCountry) : [];
+          label = searchState.expandedCountry;
+        } else if (searchState.continent) {
+          const region = getRegion();
+          pool = region ? region.hotels : [];
+          label = region ? region.label : '';
+        } else {
+          pool = allHotels;
+          const countryCount = new Set(allHotels.map(h => h.country)).size;
+          label = countryCount + ' pays';
+        }
+        const count = pool.filter(hotelMatchesCriteria).length;
+        const activeCriteria = getActiveCriteria();
+        const criteriaLabels = [];
+        if (activeCriteria.size) {
+          const list = getActiveCriteriaList();
+          activeCriteria.forEach(cId => {
+            const c = list.find(x => x.id === cId);
+            if (c) criteriaLabels.push(c.label.toLowerCase());
+          });
+        }
+        let desc = '<span class="wd-booking__dd-results-count-number">' + count + '</span> hôtel' + (count > 1 ? 's' : '');
+        if (criteriaLabels.length) {
+          desc += ' ' + criteriaLabels.join(', ');
+        }
+        if (label) {
+          desc += '<span class="wd-booking__dd-results-count-sep">—</span>' +
+            '<span class="wd-booking__dd-results-count-label">' + esc(label) + '</span>';
+        }
+        return '<div class="wd-booking__dd-results-count">' + desc + '</div>';
+      };
+
+      const renderDestList = () => {
+        const query = searchState.freeText.toLowerCase();
+        if (!searchState.continent) {
+          const allHotels = REGION_HOTELS.flatMap(r => r.hotels);
+          const allCountries = [...new Set(allHotels.map(h => h.country))].sort();
+          const allCities = [...new Set(allHotels.map(h => h.loc.split(',')[0].trim()))].sort();
+          let html = '';
+          if (query.length >= 1) {
+            const parsed = parseQuery(searchState.freeText);
+            let filteredHotels = allHotels;
+            if (parsed.continent) filteredHotels = filteredHotels.filter(h => {
+              const r = REGION_HOTELS.find(rr => rr.hotels.includes(h));
+              return r && r.id === parsed.continent;
+            });
+            if (parsed.country) filteredHotels = filteredHotels.filter(h => h.country === parsed.country);
+            if (parsed.city) filteredHotels = filteredHotels.filter(h => h.loc.split(',')[0].trim() === parsed.city);
+            const hasParsedGeo = parsed.continent || parsed.country || parsed.city;
+            const hasParsedCriteria = parsed.criteria.length > 0;
+            if (hasParsedGeo || hasParsedCriteria) {
+              html += '<div class="wd-booking__dd-dest-subtitle">' + filteredHotels.length + ' hotel' + (filteredHotels.length > 1 ? 's' : '') + ' trouve' + (filteredHotels.length > 1 ? 's' : '') + '</div>';
+              html += filteredHotels.slice(0, 8).map(h => {
+                const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
+                return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row">' +
+                  '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
+                  '<div class="wd-booking__dd-hotel-info">' +
+                  '<span class="wd-booking__dd-hotel-name">' + esc(h.name) + '</span>' +
+                  '<span class="wd-booking__dd-hotel-loc">' + esc(h.loc.split(',')[0].trim()) + '<span class="wd-booking__dd-hotel-country">' + esc(h.loc.includes(',') ? h.loc.split(',').slice(1).join(',').trim() : '') + '</span></span>' +
+                  '</div></a>';
+              }).join('');
+            } else {
+              const matchedCountries = allCountries.filter(c => c.toLowerCase().includes(query));
+              const matchedCities = allCities.filter(c => c.toLowerCase().includes(query));
+              const matchedHotels = allHotels.filter(h => h.name.toLowerCase().includes(query));
+              if (matchedCountries.length) {
+                html += '<div class="wd-booking__dd-dest-subtitle">Pays</div>';
+                html += matchedCountries.map(c => {
+                  const count = allHotels.filter(h => h.country === c).length;
+                  const region = REGION_HOTELS.find(r => r.hotels.some(h => h.country === c));
+                  return '<button class="wd-booking__dd-dest-item" data-dest-type="country-global" data-dest-country="' + esc(c) + '" data-dest-continent="' + (region ? region.id : '') + '" type="button">' +
+                    esc(c) +
+                    '<span class="wd-booking__dd-dest-item-count">' + count + ' hôtel' + (count > 1 ? 's' : '') + '</span>' +
+                    '<span class="wd-booking__dd-dest-item-arrow"><svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg></span>' +
+                    '</button>';
+                }).join('');
+              }
+              if (matchedCities.length) {
+                html += '<div class="wd-booking__dd-dest-subtitle">Villes</div>';
+                html += matchedCities.map(c => {
+                  const hotel = allHotels.find(h => h.loc.split(',')[0].trim() === c);
+                  const region = REGION_HOTELS.find(r => r.hotels.some(h => h.loc.split(',')[0].trim() === c));
+                  const country = hotel ? hotel.country : '';
+                  return '<button class="wd-booking__dd-dest-item" data-dest-type="city-global" data-dest-city="' + esc(c) + '" data-dest-country="' + esc(country) + '" data-dest-continent="' + (region ? region.id : '') + '" type="button">' +
+                    esc(c) +
+                    '<span class="wd-booking__dd-dest-item-count">' + esc(country) + '</span>' +
+                    '</button>';
+                }).join('');
+              }
+              if (matchedHotels.length) {
+                html += '<div class="wd-booking__dd-dest-subtitle">Hotels</div>';
+                html += matchedHotels.slice(0, 5).map(h => {
+                  const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
+                  return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row">' +
+                    '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
+                    '<div class="wd-booking__dd-hotel-info">' +
+                    '<span class="wd-booking__dd-hotel-name">' + esc(h.name) + '</span>' +
+                    '<span class="wd-booking__dd-hotel-loc">' + esc(h.loc.split(',')[0].trim()) + '<span class="wd-booking__dd-hotel-country">' + esc(h.loc.includes(',') ? h.loc.split(',').slice(1).join(',').trim() : '') + '</span></span>' +
+                    '</div></a>';
+                }).join('');
+              }
+            }
+            if (!html) html = '<div class="wd-booking__dd-dest-subtitle">Aucun resultat</div>';
+          } else {
+            const hasC = getActiveCriteria().size > 0;
+            html = '<div class="wd-booking__dd-dest-subtitle">Pays</div>';
+            html += allCountries.map(c => {
+              const inCountry = allHotels.filter(h => h.country === c);
+              const count = hasC ? inCountry.filter(hotelMatchesCriteria).length : inCountry.length;
+              if (hasC && count === 0) return '';
+              const region = REGION_HOTELS.find(r => r.hotels.some(h => h.country === c));
+              return '<button class="wd-booking__dd-dest-item" data-dest-type="country-global" data-dest-country="' + esc(c) + '" data-dest-continent="' + (region ? region.id : '') + '" type="button">' +
+                esc(c) +
+                '<span class="wd-booking__dd-dest-item-count">' + count + ' hôtel' + (count > 1 ? 's' : '') + '</span>' +
+                '<span class="wd-booking__dd-dest-item-arrow"><svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg></span>' +
+                '</button>';
+            }).join('');
+          }
+          destListEl.innerHTML = html + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
+          return;
+        }
+        const countries = getCountries();
+        const region = getRegion();
+        const hasCriteria = getActiveCriteria().size > 0;
+        const countryListHtml = countries.map(c => {
+          const allInCountry = region.hotels.filter(h => h.country === c);
+          const hotelsInCountry = hasCriteria ? allInCountry.filter(hotelMatchesCriteria) : allInCountry;
+          const count = hotelsInCountry.length;
+          if (hasCriteria && count === 0 && searchState.expandedCountry !== c) return '';
+          const isExpanded = searchState.expandedCountry === c;
+          let html = '<button class="wd-booking__dd-dest-item' + (isExpanded ? ' wd-booking__dd-dest-item--expanded' : '') + (hasCriteria && count === 0 ? ' wd-booking__dd-dest-item--empty' : '') + '" data-dest-type="country" data-dest-value="' + esc(c) + '" type="button">' +
+            esc(c) +
+            '<span class="wd-booking__dd-dest-item-count">' + count + ' hôtel' + (count > 1 ? 's' : '') + '</span>' +
+            '<span class="wd-booking__dd-dest-item-arrow"><svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg></span>' +
+            '</button>';
+          if (isExpanded) {
+            const displayHotels = hasCriteria ? hotelsInCountry : allInCountry;
+            html += '<div class="wd-booking__dd-country-hotels">' +
+              (displayHotels.length ? displayHotels : allInCountry).map(h => {
+                const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
+                const isSelected = searchState.selectedHotel === h.name;
+                const dimmed = hasCriteria && !hotelMatchesCriteria(h);
+                return '<button type="button" class="wd-booking__dd-hotel-row' + (isSelected ? ' wd-booking__dd-hotel-row--selected' : '') + (dimmed ? ' wd-booking__dd-hotel-row--dimmed' : '') + '" data-dest-type="hotel" data-hotel-name="' + esc(h.name) + '" data-hotel-href="' + esc(h.href || '') + '">' +
+                  '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
+                  '<div class="wd-booking__dd-hotel-info">' +
+                  (h.badge ? '<span class="wd-booking__dd-hotel-badge wd-booking__dd-hotel-badge--' + (h.badge === 'RÉNOVÉ' ? 'renovated' : 'new') + '">' + h.badge + '</span>' : '') +
+                  '<span class="wd-booking__dd-hotel-name">' + esc(h.name) + '</span>' +
+                  '<span class="wd-booking__dd-hotel-loc">' + esc(h.loc.split(',')[0].trim()) + '<span class="wd-booking__dd-hotel-country">' + esc(h.loc.includes(',') ? h.loc.split(',').slice(1).join(',').trim() : '') + '</span></span>' +
+                  '</div></button>';
+              }).join('') +
+              '</div>';
+          }
+          return html;
+        }).join('');
+        destListEl.innerHTML = '<div class="wd-booking__dd-dest-subtitle">Pays</div>' + countryListHtml + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
+      };
+
+      const renderCriteria = () => {
+        const groups = getActiveCriteriaGroups();
+        const activeCriteria = getActiveCriteria();
+        if (!groups.length) { criteriaListEl.innerHTML = ''; return; }
+        criteriaListEl.innerHTML = groups.map(g => {
+          const groupItems = g.items.map(c => {
+            const checked = activeCriteria.has(c.id);
+            return '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
+              '<span class="wd-booking__dd-criteria-check"></span>' +
+              esc(c.label) +
+              '</button>';
+          }).join('');
+          return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
+        }).join('');
+      };
+
+      const MAX_VISIBLE_CHIPS = 3;
+      const renderChips = () => {
+        const chips = buildChips();
+        if (!chips.length) {
+          chipsEl.innerHTML = '';
+          return;
+        }
+        const closeIcon = '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg>';
+        const visible = chips.slice(0, MAX_VISIBLE_CHIPS);
+        const overflow = chips.length - MAX_VISIBLE_CHIPS;
+        let html = visible.map(c =>
+          '<span class="wd-booking__dest-chip">' +
+          (c.icon || '') + esc(c.label) +
+          '<button class="wd-booking__dest-chip-close" data-chip-type="' + c.type + '" data-chip-id="' + esc(c.id) + '" type="button" aria-label="Supprimer ' + esc(c.label) + '">' + closeIcon + '</button>' +
+          '</span>'
+        ).join('');
+        if (overflow > 0) {
+          html += '<span class="wd-booking__dest-chip wd-booking__dest-chip--more">+' + overflow + '</span>';
+        }
+        chipsEl.innerHTML = html;
+      };
+
+      const searchIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="5"/><line x1="10" y1="10" x2="14.5" y2="14.5" stroke-linecap="round"/></svg>';
+      const renderSuggestions = (text) => {
+        const results = getSuggestions(text);
+        if (!results.length) { suggestionsEl.style.display = 'none'; return; }
+        suggestionsEl.style.display = '';
+        const lower = text.toLowerCase();
+        suggestionsListEl.innerHTML = results.map(s => {
+          const idx = s.toLowerCase().indexOf(lower);
+          let highlighted = esc(s);
+          if (idx >= 0) {
+            highlighted = esc(s.substring(0, idx)) + '<mark>' + esc(s.substring(idx, idx + text.length)) + '</mark>' + esc(s.substring(idx + text.length));
+          }
+          return '<button class="wd-booking__dd-suggestion" data-suggestion="' + esc(s) + '" type="button">' +
+            '<span class="wd-booking__dd-suggestion-icon">' + searchIcon + '</span>' +
+            highlighted +
+            '</button>';
+        }).join('');
+      };
+
+      const renderPanel = () => {
+        renderContinents();
+        renderBreadcrumb();
+        renderDestList();
+        renderCriteria();
+        renderChips();
+      };
 
       const open = () => {
-        if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
         dropdown.dataset.state = 'open';
         destField.classList.add('wd-booking__field--editing');
-        destStatic.style.display = 'none';
-        destInput.style.display = 'block';
-        if (selectedDest) { destInput.value = selectedDest; }
-        setTimeout(() => { destInput.focus(); destInput.select(); }, 50);
+        suggestionsEl.style.display = 'none';
+        if (!(ddMapview && ddMapview.style.display !== 'none')) {
+          searchPanelEl.style.display = '';
+        }
+        renderPanel();
+        setTimeout(() => { destInput.focus(); }, 50);
       };
       const close = () => {
         dropdown.dataset.state = 'closed';
         destField.classList.remove('wd-booking__field--editing');
-        destInput.style.display = 'none';
-        destStatic.style.display = '';
-        if (selectedDest) {
-          destInput.value = selectedDest;
-        } else {
-          destInput.value = '';
-          destField.classList.remove('wd-booking__field--selected');
-          const label = destStatic.querySelector('.wd-booking__label');
-          if (label) label.textContent = new Date().getHours() < 18 ? 'Bonjour, quelle sera votre prochaine escapade ?' : 'Bonsoir, quelle sera votre prochaine escapade ?';
-          typingIdx = (typingIdx + 1) % TYPING_SUGGESTIONS.length;
-          typingCharIdx = 0; typingDir = 1;
-          typingTimer = setTimeout(typingTick, 600);
-        }
-        showEmpty();
-      };
-      let selectedDest = null;
-      const selectDest = (name) => {
-        selectedDest = name;
-        dropdown.dataset.state = 'closed';
-        destField.classList.remove('wd-booking__field--editing');
-        destField.classList.add('wd-booking__field--selected');
-        destInput.style.display = 'none';
-        destInput.value = name;
-        destStatic.style.display = '';
-        const label = destStatic.querySelector('.wd-booking__label');
-        if (label) label.textContent = name;
-        typingEl.textContent = '';
-        if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
-
-        // Sauvegarder la recherche dans localStorage
-        saveRecentSearch(name);
-
-        showEmpty();
-        destInput.dispatchEvent(new Event('input', {bubbles: true}));
-        setTimeout(() => { const fields = destField.parentElement; const dateField = fields ? fields.querySelectorAll('.wd-booking__field')[1] : null; if (dateField) dateField.click(); }, 300);
+        renderChips();
       };
 
-      // Gestion des recherches récentes
-      const RECENT_SEARCHES_KEY = 'pullman_recent_searches';
-      const MAX_RECENT_SEARCHES = 3;
-
-      const getRecentSearches = () => {
-        try {
-          const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
-          return stored ? JSON.parse(stored) : [];
-        } catch (e) {
-          return [];
-        }
-      };
-
-      const saveRecentSearch = (destination) => {
-        try {
-          let recent = getRecentSearches();
-          // Retirer la destination si elle existe déjà
-          recent = recent.filter(s => s.destination !== destination);
-          // Ajouter en tête
-          recent.unshift({
-            destination,
-            timestamp: Date.now()
-          });
-          // Limiter à MAX_RECENT_SEARCHES
-          recent = recent.slice(0, MAX_RECENT_SEARCHES);
-          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recent));
-          renderRecentSearches();
-        } catch (e) {
-          console.error('Failed to save recent search', e);
-        }
-      };
-
-      const removeRecentSearch = (destination) => {
-        try {
-          let recent = getRecentSearches();
-          recent = recent.filter(s => s.destination !== destination);
-          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(recent));
-          renderRecentSearches();
-        } catch (e) {
-          console.error('Failed to remove recent search', e);
-        }
-      };
-
-      const formatRecentDate = (timestamp) => {
-        const now = Date.now();
-        const diff = now - timestamp;
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-
-        if (minutes < 1) return "À l'instant";
-        if (minutes < 60) return `Il y a ${minutes} min`;
-        if (hours < 24) return `Il y a ${hours}h`;
-        if (days < 7) return `Il y a ${days}j`;
-        return new Date(timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-      };
-
-      const renderRecentSearches = () => {
-        const recentContainer = this.querySelector('.wd-booking__dd-recent-searches');
-        const recentList = this.querySelector('.wd-booking__dd-recent-list');
-        const recent = getRecentSearches();
-
-        if (recent.length === 0) {
-          recentContainer.style.display = 'none';
+      continentsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.wd-booking__dd-continent');
+        if (!btn) return;
+        searchState.continent = btn.dataset.continent;
+        searchState.expandedCountry = null;
+        renderPanel();
+      });
+      breadcrumbEl.addEventListener('click', (e) => {
+        const item = e.target.closest('.wd-booking__dd-breadcrumb-item');
+        if (!item || item.classList.contains('wd-booking__dd-breadcrumb-item--current')) return;
+        searchState.expandedCountry = null;
+        renderPanel();
+      });
+      destListEl.addEventListener('click', (e) => {
+        const hotelRow = e.target.closest('.wd-booking__dd-hotel-row');
+        if (hotelRow) {
+          e.preventDefault();
+          const name = hotelRow.dataset.hotelName;
+          searchState.selectedHotel = searchState.selectedHotel === name ? null : name;
+          renderDestList();
+          renderChips();
           return;
         }
-
-        recentContainer.style.display = 'block';
-        recentList.innerHTML = recent.map(search => `
-          <div class="wd-booking__dd-recent-item" data-dest="${esc(search.destination)}">
-            <div class="wd-booking__dd-recent-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </div>
-            <div class="wd-booking__dd-recent-text">
-              <span class="wd-booking__dd-recent-dest">${esc(search.destination)}</span>
-              <span class="wd-booking__dd-recent-meta">${formatRecentDate(search.timestamp)}</span>
-            </div>
-            <button class="wd-booking__dd-recent-close" data-dest="${esc(search.destination)}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        `).join('');
-
-        // Events pour les items récents
-        recentList.querySelectorAll('.wd-booking__dd-recent-item').forEach(item => {
-          item.addEventListener('click', (e) => {
-            if (e.target.closest('.wd-booking__dd-recent-close')) return;
-            const dest = item.dataset.dest;
-            if (dest) selectDest(dest);
-          });
-        });
-
-        // Events pour les boutons supprimer
-        recentList.querySelectorAll('.wd-booking__dd-recent-close').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const dest = btn.dataset.dest;
-            if (dest) removeRecentSearch(dest);
-          });
-        });
-      };
-
-      // Afficher les recherches récentes au chargement
-      renderRecentSearches();
-
-      // Gestion des tabs continents
-      const continentTabs = this.querySelectorAll('.wd-booking__dd-continent-tab');
-      const continentPanels = this.querySelectorAll('.wd-booking__dd-continent-panel');
-
-      continentTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const continent = tab.dataset.continent;
-
-          // Désactiver tous les tabs et panels
-          continentTabs.forEach(t => t.classList.remove('wd-booking__dd-continent-tab--active'));
-          continentPanels.forEach(p => p.classList.remove('wd-booking__dd-continent-panel--active'));
-
-          // Activer le tab et panel sélectionnés
-          tab.classList.add('wd-booking__dd-continent-tab--active');
-          const panel = this.querySelector(`.wd-booking__dd-continent-panel[data-continent="${continent}"]`);
-          if (panel) panel.classList.add('wd-booking__dd-continent-panel--active');
-        });
+        const item = e.target.closest('.wd-booking__dd-dest-item');
+        if (!item) return;
+        e.preventDefault();
+        const type = item.dataset.destType;
+        const value = item.dataset.destValue;
+        if (type === 'country') {
+          searchState.expandedCountry = searchState.expandedCountry === value ? null : value;
+          searchState.selectedHotel = null;
+          renderDestList();
+          renderChips();
+          return;
+        }
+        else if (type === 'country-global') {
+          searchState.continent = item.dataset.destContinent;
+          searchState.expandedCountry = item.dataset.destCountry;
+          searchState.selectedHotel = null;
+          destInput.value = '';
+          searchState.freeText = '';
+        }
+        else if (type === 'city-global') {
+          searchState.continent = item.dataset.destContinent;
+          searchState.expandedCountry = item.dataset.destCountry;
+          searchState.selectedHotel = null;
+          destInput.value = '';
+          searchState.freeText = '';
+        }
+        renderPanel();
       });
+      criteriaListEl.addEventListener('click', (e) => {
+        const item = e.target.closest('.wd-booking__dd-criteria-item');
+        if (!item) return;
+        const id = item.dataset.criteria;
+        const activeCriteria = getActiveCriteria();
+        if (activeCriteria.has(id)) activeCriteria.delete(id);
+        else activeCriteria.add(id);
+        renderPanel();
+      });
+      chipsEl.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('.wd-booking__dest-chip-close');
+        if (!closeBtn) return;
+        e.stopPropagation();
+        removeChip(closeBtn.dataset.chipType, closeBtn.dataset.chipId);
+      });
+      let parseTimeout = null;
+      let renderMapPanel = null;
+      const isMapViewActive = () => ddMapview && ddMapview.style.display !== 'none';
+      destInput.addEventListener('input', () => {
+        const val = destInput.value.trim();
+        searchState.freeText = val;
+        clearTimeout(parseTimeout);
+        if (isMapViewActive()) {
+          if (val.length >= 2) {
+            parseTimeout = setTimeout(() => {
+              const parsed = parseQuery(val);
+              let changed = false;
+              parsed.criteria.forEach(cId => {
+                if (!getActiveCriteria().has(cId)) { getActiveCriteria().add(cId); changed = true; }
+              });
+              if (parsed.continent && searchState.continent !== parsed.continent) {
+                searchState.continent = parsed.continent;
+                changed = true;
+              }
+              if (changed) {
+                destInput.value = '';
+                searchState.freeText = '';
+                renderMapPanel();
+                renderChips();
+                if (typeof updateBookingMapContinent === 'function') {
+                  updateBookingMapContinent(searchState.continent, getActiveCriteria());
+                } else if (typeof updateBookingMapCriteria === 'function') {
+                  updateBookingMapCriteria(getActiveCriteria());
+                }
+                destInput.focus();
+              }
+            }, 600);
+          }
+          return;
+        }
+        if (val.length >= 1 && !searchState.continent) {
+          suggestionsEl.style.display = 'none';
+          searchPanelEl.style.display = '';
+          parseTimeout = setTimeout(() => {
+            const parsed = parseQuery(val);
+            let changed = false;
+            parsed.criteria.forEach(cId => {
+              if (!getActiveCriteria().has(cId)) { getActiveCriteria().add(cId); changed = true; }
+            });
+            if (parsed.continent && !searchState.continent) { searchState.continent = parsed.continent; changed = true; }
+            if (parsed.country && !searchState.country) { searchState.country = parsed.country; changed = true; }
+            if (parsed.city && !searchState.city) { searchState.city = parsed.city; changed = true; }
+            if (changed) {
+              destInput.value = '';
+              searchState.freeText = '';
+              renderPanel();
+              destInput.focus();
+              return;
+            }
+          }, 600);
+          renderDestList();
+        } else if (val.length >= 2) {
+          renderSuggestions(val);
+          searchPanelEl.style.display = 'none';
+        } else {
+          suggestionsEl.style.display = 'none';
+          searchPanelEl.style.display = '';
+          if (!searchState.continent) renderDestList();
+        }
+      });
+      suggestionsListEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.wd-booking__dd-suggestion');
+        if (!btn) return;
+        destInput.value = btn.dataset.suggestion;
+        searchState.freeText = btn.dataset.suggestion;
+        suggestionsEl.style.display = 'none';
+        searchPanelEl.style.display = '';
+        renderChips();
+      });
+      this.querySelector('.wd-booking__dropdown').addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { close(); e.stopPropagation(); }
+      });
+      continentsEl.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+          const btns = [...continentsEl.querySelectorAll('.wd-booking__dd-continent')];
+          const idx = btns.indexOf(document.activeElement);
+          if (idx < 0) return;
+          const next = e.key === 'ArrowRight' ? idx + 1 : idx - 1;
+          if (btns[next]) { btns[next].focus(); e.preventDefault(); }
+        }
+      });
+
+      renderPanel();
+
+      const mapToggle = this.querySelector('.wd-booking__map-toggle');
+      const ddMapview = this.querySelector('.wd-booking__dd-mapview');
+      const mapViewContinents = this.querySelector('#wd-mapview-continents');
+      const mapViewCriteria = this.querySelector('#wd-mapview-criteria');
+      let mapInitDone = false;
+      if (mapToggle && ddMapview) {
+        renderMapPanel = () => {
+          mapViewContinents.innerHTML = REGION_HOTELS.map(r => {
+            const active = r.id === searchState.continent;
+            return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button">' +
+              '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
+              '<div class="wd-booking__dd-continent-overlay"></div>' +
+              '<span class="wd-booking__dd-continent-fallback" style="display:none">' + esc(r.label) + '</span>' +
+              '<span class="wd-booking__dd-continent-label">' + esc(r.label) + '</span>' +
+              '</button>';
+          }).join('');
+          mapViewCriteria.innerHTML = CRITERIA_GROUPS.hotels.map(g => {
+            const groupItems = g.items.map(c => {
+              const checked = getActiveCriteria().has(c.id);
+              return '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
+                '<span class="wd-booking__dd-criteria-check"></span>' + esc(c.label) + '</button>';
+            }).join('');
+            return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
+          }).join('');
+        };
+
+        mapViewContinents.addEventListener('click', (e) => {
+          const btn = e.target.closest('.wd-booking__dd-continent');
+          if (!btn) return;
+          const id = btn.dataset.continent;
+          searchState.continent = searchState.continent === id ? null : id;
+          searchState.country = null;
+          searchState.city = null;
+          renderMapPanel();
+          renderChips();
+          if (typeof updateBookingMapContinent === 'function') {
+            updateBookingMapContinent(searchState.continent);
+          }
+        });
+        mapViewCriteria.addEventListener('click', (e) => {
+          const item = e.target.closest('.wd-booking__dd-criteria-item');
+          if (!item) return;
+          const id = item.dataset.criteria;
+          const ac = getActiveCriteria();
+          if (ac.has(id)) ac.delete(id);
+          else ac.add(id);
+          renderMapPanel();
+          renderChips();
+          if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(ac);
+        });
+
+        const clearFiltersBtn = this.querySelector('#wd-clear-map-filters');
+        if (clearFiltersBtn) {
+          clearFiltersBtn.addEventListener('click', () => {
+            getActiveCriteria().clear();
+            renderMapPanel();
+            renderChips();
+            if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
+          });
+        }
+
+        mapToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const showing = ddMapview.style.display !== 'none';
+          if (showing) {
+            ddMapview.style.display = 'none';
+            searchPanelEl.style.display = '';
+          } else {
+            ddMapview.style.display = '';
+            searchPanelEl.style.display = 'none';
+            suggestionsEl.style.display = 'none';
+            renderMapPanel();
+          }
+          mapToggle.classList.toggle('wd-booking__map-toggle--active', !showing);
+          if (!showing && typeof initBookingMap === 'function') {
+            setTimeout(() => {
+              initBookingMap(searchState.continent);
+            }, 200);
+            mapInitDone = true;
+          }
+        });
+      }
 
       // ===== DATE PICKER LOGIC =====
       const datepicker = this.querySelector('.wd-booking__datepicker');
@@ -1842,8 +1785,6 @@
         if (dropdown.dataset.state === 'open') {
           dropdown.dataset.state = 'closed';
           destField.classList.remove('wd-booking__field--editing');
-          destInput.style.display = 'none';
-          destStatic.style.display = '';
         }
         datepicker.dataset.state = 'open';
         dateField.classList.add('wd-booking__field--editing');
@@ -1946,455 +1887,6 @@
       });
       // ===== END DATE PICKER =====
 
-      const previewPanel = dropdown.querySelector('.wd-booking__dd-preview');
-      const recentListEl = this.querySelector('.wd-booking__dd-recent-list');
-      const renderRecents = () => {
-        if (!recentListEl) return;
-        const items = getRecents();
-        if (!items.length) {
-          recentListEl.innerHTML = '<li class="wd-booking__dd-recent-empty">Aucune recherche récente pour le moment.</li>';
-          return;
-        }
-        recentListEl.innerHTML = items.map(r => `<li class="wd-booking__dd-recent-item" data-q="${esc(r.q || r.dest)}">
-          <span class="wd-booking__dd-recent-icon">${SEARCH_ICON.clock}</span>
-          <div class="wd-booking__dd-recent-text">
-            <span class="wd-booking__dd-recent-dest">${esc(r.dest)}</span>
-            <span class="wd-booking__dd-recent-meta">${esc(r.meta)}</span>
-          </div>
-          <button class="wd-booking__dd-recent-close" type="button" aria-label="Supprimer">${ICON.close}</button>
-        </li>`).join('');
-      };
-      const showEmpty = () => { renderRecents(); emptyPanel.style.display = ''; inspiPanel.style.display = 'none'; acPanel.style.display = 'none'; previewPanel.style.display = 'none'; };
-      const buildRecentMeta = () => {
-        const fmtD = (dt) => dt.getDate() + ' ' + MONTH_SHORT[dt.getMonth()];
-        if (dpCheckIn && dpCheckOut) return fmtD(dpCheckIn) + ' → ' + fmtD(dpCheckOut);
-        if (dpCheckIn) return 'À partir du ' + fmtD(dpCheckIn);
-        return 'Dates flexibles';
-      };
-      const recordSearch = (dest, q) => { if (dest) addRecent({ dest: dest, meta: buildRecentMeta(), q: q || dest }); };
-      const showAC = () => { emptyPanel.style.display = 'none'; inspiPanel.style.display = 'none'; acPanel.style.display = ''; previewPanel.style.display = 'none'; };
-      const showInspi = () => { emptyPanel.style.display = 'none'; inspiPanel.style.display = ''; acPanel.style.display = 'none'; previewPanel.style.display = 'none'; };
-
-      const THEME_META = {
-        wellness: { label:'Détente & spa', tags:['wellness','spa'], relatedTags:['Spa','Piscine','Yoga','Fitness','Terrasse','Jardin'] },
-        gastro:   { label:'Gastronomie', tags:['gastro'], relatedTags:['Restaurant','Restaurant étoilé','Bar','Rooftop','Terrasse'] },
-        family:   { label:'En famille', tags:['family'], relatedTags:['Piscine','Kids club','Jardin','Animaux acceptés','Navette','Parking'] },
-        business: { label:'Business', tags:['business','meeting'], relatedTags:['Salle de réunion','Business center','Coworking','Parking','Navette'] },
-        romance:  { label:'Romantique', tags:['romance'], relatedTags:['Spa','Rooftop','Restaurant étoilé','Terrasse','Animaux acceptés'] },
-        culture:  { label:'Culture', tags:['culture'], relatedTags:['Conciergerie','Restaurant','Vélos','Terrasse','Bar'] },
-      };
-
-      let previewMapMarkers = [];
-
-      const showPreview = (theme) => {
-        emptyPanel.style.display = 'none'; inspiPanel.style.display = 'none'; acPanel.style.display = 'none'; previewPanel.style.display = '';
-        const meta = THEME_META[theme] || { label: theme, tags:[theme], relatedTags:[] };
-        const filtered = PREVIEW_HOTELS.filter(h => h.tags.some(t => meta.tags.includes(t)));
-
-        const categoryIcon = previewPanel.querySelector('.wd-booking__dd-preview-category-icon');
-        const categoryLabel = previewPanel.querySelector('.wd-booking__dd-preview-category-label');
-        const tagsEl = previewPanel.querySelector('.wd-booking__dd-preview-tags');
-        const intention = MOCK_AUTOCOMPLETE.intentions.find(i => i.filter === theme);
-        if (categoryIcon && intention) categoryIcon.innerHTML = SEARCH_ICON[intention.icon] || '';
-        if (categoryLabel) categoryLabel.textContent = meta.label;
-        const listEl = previewPanel.querySelector('.wd-booking__dd-preview-list');
-        const countEl = previewPanel.querySelector('.wd-booking__dd-preview-count');
-        const ctaEl = previewPanel.querySelector('.wd-booking__dd-preview-cta');
-        let activeTags = [];
-        let activeGeo = null;
-
-        const geoEl = previewPanel.querySelector('.wd-booking__dd-preview-geo');
-        const getCountry = (loc) => { const parts = loc.split(','); return parts.length > 1 ? parts[parts.length - 1].trim() : loc; };
-        const geoGroups = {};
-        filtered.forEach(h => { const c = getCountry(h.loc); geoGroups[c] = (geoGroups[c] || 0) + 1; });
-        if (Object.keys(geoGroups).length > 1) {
-          geoEl.innerHTML = Object.entries(geoGroups).map(([c, n]) =>
-            `<button class="wd-booking__dd-preview-geo-chip" data-geo="${esc(c)}" type="button">${esc(c)} (${n})</button>`
-          ).join('') + '<button class="wd-booking__dd-preview-geo-clear" type="button">Toutes</button>';
-          geoEl.style.display = '';
-          geoEl.addEventListener('click', (e) => {
-            const chip = e.target.closest('.wd-booking__dd-preview-geo-chip');
-            const clear = e.target.closest('.wd-booking__dd-preview-geo-clear');
-            if (chip) {
-              const geo = chip.dataset.geo;
-              activeGeo = activeGeo === geo ? null : geo;
-            } else if (clear) {
-              activeGeo = null;
-            } else return;
-            geoEl.querySelectorAll('.wd-booking__dd-preview-geo-chip').forEach(c => c.classList.toggle('wd-booking__dd-preview-geo-chip--active', c.dataset.geo === activeGeo));
-            geoEl.querySelector('.wd-booking__dd-preview-geo-clear').classList.toggle('wd-booking__dd-preview-geo-clear--active', !activeGeo);
-            const result = getSubFiltered();
-            renderResults(result);
-            renderMap(result);
-          });
-        } else {
-          geoEl.style.display = 'none';
-        }
-
-        const TAG_TO_SERVICE = {
-          'piscine':'pool','spa':'spa','fitness':'gym','yoga':'yoga','hammam':'spa',
-          'restaurant':'restaurant','bar':'bar','rooftop':'rooftop','terrasse':'terrace','brunch':'restaurant',
-          'kids club':'kids-club','jardin':'garden','plage':'beach','navette':'shuttle',
-          'salle de réunion':'meeting-room','coworking':'coworking','business center':'business-center','wi-fi':'wifi','parking':'parking',
-          'conciergerie':'concierge','voiturier':'valet','vélos':'bike-rental','restaurant étoilé':'fine_dining',
-          'animaux acceptés':'pet-friendly','pet-friendly':'pet-friendly'
-        };
-        const getSubFiltered = () => {
-          let base = filtered;
-          if (activeGeo) base = base.filter(h => getCountry(h.loc) === activeGeo);
-          if (!activeTags.length) return base;
-          const result = base.filter(h => {
-            const svc = (h.services || []).join(' ').toLowerCase();
-            const feat = (h.features || '').toLowerCase();
-            return activeTags.every(t => {
-              const tl = t.toLowerCase();
-              const mapped = TAG_TO_SERVICE[tl];
-              if (mapped && svc.includes(mapped)) return true;
-              return feat.includes(tl) || svc.includes(tl);
-            });
-          });
-          return result;
-        };
-
-        const highlightMarker = (idx) => {
-          previewMapMarkers.forEach((m, j) => {
-            const el = m.getElement();
-            if (!el) return;
-            const pin = el.querySelector('.wd-preview-pin');
-            if (j === idx) { pin.classList.add('wd-preview-pin--active'); m.setZIndexOffset(1000); }
-            else { pin.classList.remove('wd-preview-pin--active'); m.setZIndexOffset(0); }
-          });
-        };
-
-        const renderCardList = (hotels) => hotels.map((h, i) => `<div class="wd-booking__dd-preview-card" data-idx="${i}">
-            <img class="wd-booking__dd-preview-card-img" src="${h.img}" alt="${esc(h.name)}" loading="lazy" />
-            <div class="wd-booking__dd-preview-card-info">
-              <span class="wd-booking__dd-preview-card-name">${esc(h.name)}${h.services && h.services.includes('pet-friendly') ? ' <span class="wd-booking__dd-preview-card-pet" title="Animaux acceptés">🐾</span>' : ''}</span>
-              <span class="wd-booking__dd-preview-card-loc">${esc(h.loc)}</span>
-              <div class="wd-booking__dd-preview-card-features">${h.features.split(' · ').map(f => `<span class="wd-booking__dd-preview-card-tag">${esc(f)}</span>`).join('')}</div>
-              <span class="wd-booking__dd-preview-card-price">à partir de <strong>${h.price} EUR</strong> / nuit</span>
-            </div>
-          </div>`).join('');
-
-        const renderResults = (hotels) => {
-          if (hotels.length) {
-            listEl.innerHTML = renderCardList(hotels);
-            countEl.textContent = hotels.length + ' hôtel' + (hotels.length > 1 ? 's' : '') + ' correspond' + (hotels.length > 1 ? 'ent' : '') + ' à votre recherche';
-            ctaEl.textContent = 'Explorer les ' + hotels.length + ' hôtels';
-          } else {
-            const suggestions = filtered.slice(0, 3);
-            listEl.innerHTML = "<div class=\"wd-booking__dd-preview-empty\">" +
-              "<div class=\"wd-booking__dd-preview-empty-icon\"><svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"rgba(255,255,255,.4)\" stroke-width=\"1.5\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.35-4.35\"/></svg></div>" +
-              "<span class=\"wd-booking__dd-preview-empty-title\">Aucun résultat pour cette combinaison</span>" +
-              "<span class=\"wd-booking__dd-preview-empty-sub\">Essayez avec un seul filtre, ou découvrez nos suggestions ci-dessous</span>" +
-              "<div class=\"wd-booking__dd-preview-empty-actions\">" +
-              "<button type=\"button\" class=\"wd-booking__dd-preview-empty-reset\">Réinitialiser les filtres</button>" +
-              "</div></div>" +
-              "<div class=\"wd-booking__dd-preview-suggest-label\">Suggestions " + esc(meta.label) + "</div>" +
-              renderCardList(suggestions);
-            listEl.querySelector(".wd-booking__dd-preview-empty-reset").addEventListener("click", function() {
-              activeTags = [];
-              tagsEl.querySelectorAll(".wd-booking__dd-preview-tag--active").forEach(function(t) { t.classList.remove("wd-booking__dd-preview-tag--active"); });
-              renderResults(filtered);
-              renderMap(filtered);
-            });
-            countEl.textContent = suggestions.length + " suggestion" + (suggestions.length > 1 ? "s" : "") + " " + meta.label;
-            ctaEl.textContent = "Explorer tous les hôtels " + meta.label;
-          }
-          ctaEl.href = searchBase + '?theme=' + encodeURIComponent(theme) + (activeTags.length ? '&tags=' + activeTags.map(encodeURIComponent).join(',') : '');
-        };
-
-        const renderMap = (hotels) => {
-          const mapEl = previewPanel.querySelector('#wd-preview-map');
-          if (!mapEl) return;
-          const doRender = () => {
-            if (mapEl._leaflet_id) { mapEl._map.remove(); delete mapEl._leaflet_id; }
-            const map = L.map(mapEl, { zoomControl: false, attributionControl: false }).setView([46.5, 2.5], 3);
-            mapEl._map = map;
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
-            previewMapMarkers = [];
-            hotels.forEach((h, i) => {
-              var shortName = h.name.replace('Pullman ', '');
-              var html = '<div class="wd-preview-pin"><span class="wd-preview-pin-dot"></span>' + esc(shortName) + '</div>';
-              const icon = L.divIcon({ className:'', html: html, iconSize: null, iconAnchor:[12,12] });
-              const m = L.marker([h.lat, h.lng], { icon: icon, interactive: true }).addTo(map);
-              previewMapMarkers.push(m);
-              m.on('mouseover', () => { highlightMarker(i); const card = listEl.querySelector('[data-idx="'+i+'"]'); if(card) { card.classList.add('wd-booking__dd-preview-card--active'); card.scrollIntoView({ block:'nearest', behavior:'smooth' }); } });
-              m.on('mouseout', () => { highlightMarker(-1); const card = listEl.querySelector('[data-idx="'+i+'"]'); if(card) card.classList.remove('wd-booking__dd-preview-card--active'); });
-              m.on('click', () => { window.location.href = searchBase + '?q=' + encodeURIComponent(h.name.split(' ').slice(1).join(' ')); });
-            });
-            if (hotels.length === 1) {
-              map.setView([hotels[0].lat, hotels[0].lng], 5, { animate: true });
-            } else if (hotels.length) {
-              var lats = hotels.map(function(h){ return h.lat; });
-              var lngs = hotels.map(function(h){ return h.lng; });
-              var medLat = lats.slice().sort(function(a,b){return a-b;})[Math.floor(lats.length/2)];
-              var medLng = lngs.slice().sort(function(a,b){return a-b;})[Math.floor(lngs.length/2)];
-              var nearby = hotels.filter(function(h){ return Math.abs(h.lat - medLat) < 25 && Math.abs(h.lng - medLng) < 40; });
-              var focus = nearby.length >= Math.ceil(hotels.length * 0.6) ? nearby : hotels;
-              var focusMarkers = focus.map(function(h){ return previewMapMarkers[hotels.indexOf(h)]; });
-              var g = L.featureGroup(focusMarkers);
-              map.fitBounds(g.getBounds().pad(0.25), { maxZoom: 8, animate: true, duration: 0.4 });
-            }
-            setTimeout(() => map.invalidateSize(), 120);
-          };
-          if (window.L) { setTimeout(doRender, 50); }
-          else {
-            const css = document.createElement('link'); css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
-            const js = document.createElement('script'); js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            js.onload = () => setTimeout(doRender, 50);
-            document.head.appendChild(js);
-          }
-        };
-
-        if (tagsEl) {
-          tagsEl.innerHTML = meta.relatedTags.map(function(t) {
-            var ic = TAG_TO_ICON[t.toLowerCase()];
-            var icHtml = ic && SEARCH_ICON[ic] ? '<span class="wd-booking__dd-preview-tag-icon">' + SEARCH_ICON[ic] + '</span>' : '';
-            return '<button type="button" class="wd-booking__dd-preview-tag" data-tag="' + esc(t) + '">' + icHtml + esc(t) + '</button>';
-          }).join('') + '<button type="button" class="wd-booking__dd-preview-tag-clear" style="display:none">Effacer</button>';
-          const clearBtn = tagsEl.querySelector('.wd-booking__dd-preview-tag-clear');
-          const updateTagUI = function() {
-            clearBtn.style.display = activeTags.length ? '' : 'none';
-            const sub = getSubFiltered();
-            renderResults(sub);
-            renderMap(sub.length ? sub : filtered.slice(0, 3));
-          };
-          tagsEl.addEventListener('click', function(e) {
-            const btn = e.target.closest('.wd-booking__dd-preview-tag');
-            if (e.target.closest('.wd-booking__dd-preview-tag-clear')) {
-              activeTags = [];
-              tagsEl.querySelectorAll('.wd-booking__dd-preview-tag--active').forEach(function(t) { t.classList.remove('wd-booking__dd-preview-tag--active'); });
-              updateTagUI();
-              return;
-            }
-            if (!btn) return;
-            const tag = btn.dataset.tag;
-            const idx = activeTags.indexOf(tag);
-            if (idx >= 0) { activeTags.splice(idx, 1); btn.classList.remove('wd-booking__dd-preview-tag--active'); }
-            else { activeTags.push(tag); btn.classList.add('wd-booking__dd-preview-tag--active'); }
-            updateTagUI();
-          });
-        }
-
-        renderResults(filtered);
-        renderMap(filtered);
-
-        listEl.onmouseenter = null; listEl.onmouseleave = null;
-        listEl.addEventListener('mouseover', (e) => { const card = e.target.closest('.wd-booking__dd-preview-card'); if(card) { highlightMarker(+card.dataset.idx); card.classList.add('wd-booking__dd-preview-card--active'); } });
-        listEl.addEventListener('mouseout', (e) => { const card = e.target.closest('.wd-booking__dd-preview-card'); if(card) { highlightMarker(-1); card.classList.remove('wd-booking__dd-preview-card--active'); } });
-        listEl.addEventListener('click', (e) => { const card = e.target.closest('.wd-booking__dd-preview-card'); if (card) { const idx = +card.dataset.idx; const sub = getSubFiltered(); const h = sub[idx]; if (h) { window.location.href = searchBase + '?q=' + encodeURIComponent(h.name.split(' ').slice(1).join(' ')); } } });
-      };
-
-      const showCountryPreview = (countryName) => {
-        emptyPanel.style.display = 'none'; inspiPanel.style.display = 'none'; acPanel.style.display = 'none'; previewPanel.style.display = '';
-        const countryNorm = norm(countryName);
-        const hotelsInCountry = PREVIEW_HOTELS.filter(h => norm(h.loc).includes(countryNorm));
-        const countryData = MOCK_AUTOCOMPLETE.destinations.find(d => d.type === 'Pays' && norm(d.name) === countryNorm);
-
-        const categoryIcon = previewPanel.querySelector('.wd-booking__dd-preview-category-icon');
-        const categoryLabel = previewPanel.querySelector('.wd-booking__dd-preview-category-label');
-        const tagsEl = previewPanel.querySelector('.wd-booking__dd-preview-tags');
-        const listEl = previewPanel.querySelector('.wd-booking__dd-preview-list');
-        const countEl = previewPanel.querySelector('.wd-booking__dd-preview-count');
-        const ctaEl = previewPanel.querySelector('.wd-booking__dd-preview-cta');
-
-        if (categoryIcon) categoryIcon.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.3"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z" stroke="currentColor" stroke-width="1.3"/></svg>`;
-        if (categoryLabel) categoryLabel.textContent = countryName;
-
-        const cities = [...new Set(hotelsInCountry.map(h => h.loc.split(',')[0].trim()))];
-        if (tagsEl) {
-          tagsEl.innerHTML = cities.map(c => `<button type="button" class="wd-booking__dd-preview-tag" data-tag="${esc(c)}">${esc(c)}</button>`).join('') + '<button type="button" class="wd-booking__dd-preview-tag-clear" style="display:none">Effacer</button>';
-          let activeCityTags = [];
-          const clearBtn = tagsEl.querySelector('.wd-booking__dd-preview-tag-clear');
-          const getFiltered = () => {
-            if (!activeCityTags.length) return hotelsInCountry;
-            return hotelsInCountry.filter(h => activeCityTags.some(c => h.loc.includes(c)));
-          };
-          const updateUI = () => {
-            clearBtn.style.display = activeCityTags.length ? '' : 'none';
-            const filtered = getFiltered();
-            renderCountryResults(filtered);
-            renderCountryMap(filtered.length ? filtered : hotelsInCountry, countryData);
-          };
-          tagsEl.addEventListener('click', (ev) => {
-            if (ev.target.closest('.wd-booking__dd-preview-tag-clear')) { activeCityTags = []; tagsEl.querySelectorAll('.wd-booking__dd-preview-tag--active').forEach(t => t.classList.remove('wd-booking__dd-preview-tag--active')); updateUI(); return; }
-            const btn = ev.target.closest('.wd-booking__dd-preview-tag');
-            if (!btn) return;
-            const tag = btn.dataset.tag;
-            const idx = activeCityTags.indexOf(tag);
-            if (idx >= 0) { activeCityTags.splice(idx, 1); btn.classList.remove('wd-booking__dd-preview-tag--active'); }
-            else { activeCityTags.push(tag); btn.classList.add('wd-booking__dd-preview-tag--active'); }
-            updateUI();
-          });
-        }
-
-        const renderCountryResults = (hotels) => {
-          listEl.innerHTML = hotels.map((h, i) => `<div class="wd-booking__dd-preview-card" data-idx="${i}">
-            <img class="wd-booking__dd-preview-card-img" src="${h.img}" alt="${esc(h.name)}" loading="lazy" />
-            <div class="wd-booking__dd-preview-card-info">
-              <span class="wd-booking__dd-preview-card-name">${esc(h.name)}${h.services && h.services.includes('pet-friendly') ? ' <span class="wd-booking__dd-preview-card-pet" title="Animaux acceptés">🐾</span>' : ''}</span>
-              <span class="wd-booking__dd-preview-card-loc">${esc(h.loc)}</span>
-              <div class="wd-booking__dd-preview-card-features">${h.features.split(' · ').map(f => `<span class="wd-booking__dd-preview-card-tag">${esc(f)}</span>`).join('')}</div>
-              <span class="wd-booking__dd-preview-card-price">à partir de <strong>${h.price} EUR</strong> / nuit</span>
-            </div>
-          </div>`).join('');
-          countEl.textContent = hotels.length + ' hôtel' + (hotels.length > 1 ? 's' : '') + ' en ' + countryName;
-          ctaEl.textContent = 'Explorer les ' + hotels.length + ' hôtels';
-          ctaEl.href = searchBase + '?q=' + encodeURIComponent(countryName);
-        };
-
-        const renderCountryMap = (hotels, cData) => {
-          const mapEl = previewPanel.querySelector('#wd-preview-map');
-          if (!mapEl) return;
-          const doRender = () => {
-            if (mapEl._leaflet_id) { mapEl._map.remove(); delete mapEl._leaflet_id; }
-            const centerLat = cData ? cData.lat : 46.5;
-            const centerLng = cData ? cData.lng : 2.5;
-            const zoom = cData ? cData.zoom : 5;
-            const map = L.map(mapEl, { zoomControl: false, attributionControl: false }).setView([centerLat, centerLng], zoom);
-            mapEl._map = map;
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
-            previewMapMarkers = [];
-            hotels.forEach((h, i) => {
-              const shortName = h.name.replace('Pullman ', '');
-              const html = '<div class="wd-preview-pin"><span class="wd-preview-pin-dot"></span>' + esc(shortName) + '</div>';
-              const icon = L.divIcon({ className:'', html: html, iconSize: null, iconAnchor:[12,12] });
-              const m = L.marker([h.lat, h.lng], { icon: icon, interactive: true }).addTo(map);
-              previewMapMarkers.push(m);
-              m.on('mouseover', () => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.add('wd-preview-pin--active'); const card = listEl.querySelector('[data-idx="'+i+'"]'); if(card) { card.classList.add('wd-booking__dd-preview-card--active'); card.scrollIntoView({ block:'nearest', behavior:'smooth' }); } });
-              m.on('mouseout', () => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.remove('wd-preview-pin--active'); const card = listEl.querySelector('[data-idx="'+i+'"]'); if(card) card.classList.remove('wd-booking__dd-preview-card--active'); });
-              m.on('click', () => { selectDest(h.loc.split(',')[0].trim()); });
-            });
-            if (hotels.length > 1) {
-              const g = L.featureGroup(previewMapMarkers);
-              map.fitBounds(g.getBounds().pad(0.2), { maxZoom: zoom + 1, animate: true, duration: 0.4 });
-            }
-            setTimeout(() => map.invalidateSize(), 120);
-          };
-          if (window.L) { setTimeout(doRender, 50); }
-          else {
-            const css = document.createElement('link'); css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
-            const js = document.createElement('script'); js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            js.onload = () => setTimeout(doRender, 50);
-            document.head.appendChild(js);
-          }
-        };
-
-        renderCountryResults(hotelsInCountry);
-        renderCountryMap(hotelsInCountry, countryData);
-
-        listEl.addEventListener('mouseover', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { const idx = +card.dataset.idx; card.classList.add('wd-booking__dd-preview-card--active'); if(previewMapMarkers[idx]) { const el = previewMapMarkers[idx].getElement(); if(el) el.querySelector('.wd-preview-pin').classList.add('wd-preview-pin--active'); } } });
-        listEl.addEventListener('mouseout', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { card.classList.remove('wd-booking__dd-preview-card--active'); previewMapMarkers.forEach(m => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.remove('wd-preview-pin--active'); }); } });
-        listEl.addEventListener('click', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { const idx = +card.dataset.idx; const h = hotelsInCountry[idx]; if(h) selectDest(h.loc.split(',')[0].trim()); } });
-      };
-
-      const haversine = (lat1, lng1, lat2, lng2) => {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLng = (lng2 - lng1) * Math.PI / 180;
-        const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      };
-      const fmtDist = (km) => km < 1 ? Math.round(km * 1000) + ' m' : km.toFixed(1) + ' km';
-
-      const showDestPreview = (destName, lieuData) => {
-        emptyPanel.style.display = 'none'; inspiPanel.style.display = 'none'; acPanel.style.display = 'none'; previewPanel.style.display = '';
-        const destNorm = norm(destName);
-        const hotels = PREVIEW_HOTELS.filter(h => norm(h.loc).includes(destNorm));
-        if (!hotels.length) { selectDest(destName); return; }
-
-        const headerEl = previewPanel.querySelector('.wd-booking__dd-preview-header');
-        const listEl = previewPanel.querySelector('.wd-booking__dd-preview-list');
-        const footerEl = previewPanel.querySelector('.wd-booking__dd-preview-footer');
-
-        const headerTitle = lieuData ? `${lieuData.name} <span style="opacity:.5;font-weight:400;font-size:14px">· ${lieuData.type}, ${destName}</span>` : destName;
-        const headerIcon = lieuData ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="var(--pul-highlight,#5FEF91)" opacity=".2" stroke="var(--pul-highlight,#5FEF91)" stroke-width="1.3"/><circle cx="12" cy="9" r="2.5" fill="var(--pul-highlight,#5FEF91)"/></svg>` : SEARCH_ICON.search;
-        headerEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px">${headerIcon}<span style="font-size:18px;font-weight:600;color:#fff">${headerTitle}</span></div>`;
-
-        const renderCards = (list) => {
-          listEl.innerHTML = list.map((h, i) => {
-            const shortName = h.name.replace('Pullman ', '');
-            const dist = lieuData ? fmtDist(haversine(lieuData.lat, lieuData.lng, h.lat, h.lng)) : '';
-            return `<div class="wd-booking__dd-preview-card" data-idx="${i}"><img src="${h.img}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:4px"><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(shortName)}${h.services && h.services.includes('pet-friendly') ? ' <span class="wd-booking__dd-preview-card-pet" title="Animaux acceptés">🐾</span>' : ''}</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px">${esc(h.loc)}${dist ? ` · <span style="color:var(--pul-highlight,#5FEF91);font-weight:500">à ${dist}</span>` : ''}</div><div class="wd-booking__dd-preview-card-features">${h.features.split(' · ').slice(0,3).map(f => `<span class="wd-booking__dd-preview-card-tag">${esc(f)}</span>`).join('')}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:600;color:#fff">${h.price} €</div><div style="font-size:10px;color:rgba(255,255,255,.4)">/ nuit</div></div></div>`;
-          }).join('');
-        };
-
-        const renderMap = (list) => {
-          const mapEl = previewPanel.querySelector('#wd-preview-map');
-          if (!mapEl) return;
-          const doRender = () => {
-            if (mapEl._leaflet_id) { mapEl._map.remove(); delete mapEl._leaflet_id; }
-            mapEl.innerHTML = '';
-            const centerLat = lieuData ? lieuData.lat : list.reduce((s,h) => s+h.lat, 0) / list.length;
-            const centerLng = lieuData ? lieuData.lng : list.reduce((s,h) => s+h.lng, 0) / list.length;
-            const zoom = lieuData ? 13 : 12;
-            const map = L.map(mapEl, { zoomControl: false, attributionControl: false }).setView([centerLat, centerLng], zoom);
-            mapEl._map = map;
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
-            previewMapMarkers = [];
-
-            if (lieuData) {
-              const lieuIcon = L.divIcon({ className: '', html: `<div class="wd-preview-pin" style="background:var(--pul-highlight,#5FEF91);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(95,239,145,.4)"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a2a1e"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></div>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-              L.marker([lieuData.lat, lieuData.lng], { icon: lieuIcon }).addTo(map).bindTooltip(lieuData.name, { permanent: true, direction: 'top', offset: [0, -16], className: 'wd-preview-pin-tooltip' });
-            }
-
-            list.forEach((h, i) => {
-              const shortName = h.name.replace('Pullman ', '');
-              const icon = L.divIcon({ className: '', html: `<div class="wd-preview-pin"><div class="wd-preview-pin-dot"></div></div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
-              const m = L.marker([h.lat, h.lng], { icon }).addTo(map);
-              m.bindTooltip(shortName, { direction: 'top', offset: [0, -14] });
-              m.on('mouseover', () => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.add('wd-preview-pin--active'); const card = listEl.querySelector(`[data-idx="${i}"]`); if(card) { card.classList.add('wd-booking__dd-preview-card--active'); card.scrollIntoView({block:'nearest'}); } });
-              m.on('mouseout', () => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.remove('wd-preview-pin--active'); listEl.querySelectorAll('.wd-booking__dd-preview-card--active').forEach(c => c.classList.remove('wd-booking__dd-preview-card--active')); });
-              m.on('click', () => selectDest(h.loc.split(',')[0].trim()));
-              previewMapMarkers.push(m);
-            });
-
-            if (list.length > 1 && !lieuData) {
-              const bounds = L.latLngBounds(list.map(h => [h.lat, h.lng]));
-              map.fitBounds(bounds, { padding: [30, 30] });
-            }
-            setTimeout(() => map.invalidateSize(), 120);
-          };
-          if (window.L) { setTimeout(doRender, 60); }
-          else {
-            const css = document.createElement('link'); css.rel='stylesheet'; css.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(css);
-            const js = document.createElement('script'); js.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            js.onload = () => setTimeout(doRender, 60);
-            document.head.appendChild(js);
-          }
-        };
-
-        renderCards(hotels);
-        renderMap(hotels);
-
-        footerEl.innerHTML = `<span style="color:var(--pul-highlight,#5FEF91);font-size:13px;font-style:italic">${hotels.length} hôtel${hotels.length > 1 ? 's' : ''} ${lieuData ? 'près de ' + lieuData.name : 'à ' + destName}</span><button class="wd-booking__dd-preview-cta" style="padding:10px 24px;border:none;border-radius:6px;background:#5FEF91;color:#1a2a1e;font-weight:600;font-size:13px;cursor:pointer">Explorer les ${hotels.length} hôtel${hotels.length > 1 ? 's' : ''}</button>`;
-        footerEl.querySelector('.wd-booking__dd-preview-cta')?.addEventListener('click', () => selectDest(destName));
-
-        listEl.addEventListener('mouseover', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { card.classList.add('wd-booking__dd-preview-card--active'); const idx = +card.dataset.idx; if(previewMapMarkers[idx]) { const el = previewMapMarkers[idx].getElement(); if(el) el.querySelector('.wd-preview-pin').classList.add('wd-preview-pin--active'); } } });
-        listEl.addEventListener('mouseout', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { card.classList.remove('wd-booking__dd-preview-card--active'); previewMapMarkers.forEach(m => { const el = m.getElement(); if(el) el.querySelector('.wd-preview-pin').classList.remove('wd-preview-pin--active'); }); } });
-        listEl.addEventListener('click', (ev) => { const card = ev.target.closest('.wd-booking__dd-preview-card'); if(card) { const idx = +card.dataset.idx; const h = hotels[idx]; if(h) selectDest(h.loc.split(',')[0].trim()); } });
-      };
-
-      const renderInspirationCards = (theme) => {
-        const dests = THEME_DESTINATIONS[theme] || [];
-        const intention = MOCK_AUTOCOMPLETE.intentions.find(i => i.filter === theme);
-        const iconEl = inspiPanel.querySelector('.wd-booking__dd-inspi-icon');
-        const titleEl = inspiPanel.querySelector('.wd-booking__dd-inspi-title');
-        const grid = inspiPanel.querySelector('.wd-booking__dd-inspi-grid');
-        if (iconEl && intention) iconEl.innerHTML = SEARCH_ICON[intention.icon] || '';
-        if (titleEl && intention) titleEl.textContent = intention.title;
-        if (grid) {
-          grid.innerHTML = dests.map((d, i) => `<button class="wd-booking__dd-inspi-card" data-city="${esc(d.city)}" data-theme="${esc(theme)}" type="button" style="background-image:url('${d.img}');animation-delay:${i * 60}ms">
-            <div class="wd-booking__dd-inspi-card-overlay">
-              <span class="wd-booking__dd-inspi-card-flag">${d.flag}</span>
-              <span class="wd-booking__dd-inspi-card-city">${esc(d.city)}</span>
-              <span class="wd-booking__dd-inspi-card-tagline">${esc(d.tagline)}</span>
-            </div>
-          </button>`).join('');
-        }
-      };
-
       destField.addEventListener('click', () => { if (dropdown.dataset.state !== 'open') open(); });
       document.addEventListener('mousedown', e => {
         if (dropdown.dataset.state === 'open' && !e.target.closest('.wd-booking')) close();
@@ -2404,337 +1896,14 @@
         if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); if (dropdown.dataset.state !== 'open') open(); else destInput.focus(); }
       });
 
-      if (recentListEl) {
-        recentListEl.addEventListener('click', e => {
-          const closeBtn = e.target.closest('.wd-booking__dd-recent-close');
-          if (!closeBtn) return;
-          e.stopPropagation();
-          const item = closeBtn.closest('.wd-booking__dd-recent-item');
-          const dest = item?.querySelector('.wd-booking__dd-recent-dest')?.textContent;
-          if (dest) removeRecent(dest);
-          renderRecents();
-        });
-      }
-
-      const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-      const highlight = (text, q) => {
-        if (!q) return esc(text);
-        const nq = norm(q), nt = norm(text);
-        const idx = nt.indexOf(nq);
-        if (idx === -1) return esc(text);
-        return esc(text.substring(0, idx)) + '<mark class="wd-booking__dd-highlight">' + esc(text.substring(idx, idx + q.length)) + '</mark>' + esc(text.substring(idx + q.length));
-      };
-
-      let activeTheme = null;
-
-      const THEME_MAP = {
-        spa: "wellness", gastronomie: "gastro", famille: "family",
-        business: "business", romantique: "romance", culture: "culture",
-      };
-
-      const SERVICE_SYNONYMS = {
-        "pool": ["piscine", "piscines", "bassin", "baignade", "nager", "swimming", "pool"],
-        "spa": ["spa", "hammam", "sauna", "jacuzzi", "bain", "bains", "soin", "soins", "massage", "massages", "bien-être", "bien etre", "wellness"],
-        "gym": ["gym", "salle de sport", "sport", "fitness", "musculation", "salle de fitness"],
-        "restaurant": ["restaurant", "restaurants", "dîner", "diner", "déjeuner", "dejeuner", "petit-déjeuner", "petit dejeuner", "buffet", "table", "gastronomique"],
-        "bar": ["bar", "cocktail", "cocktails", "lounge", "happy hour"],
-        "rooftop": ["rooftop", "toit-terrasse", "toit terrasse", "vue panoramique", "vue", "skybar"],
-        "terrace": ["terrasse", "terrasses", "extérieur", "exterieur", "plein air", "en terrasse"],
-        "meeting-room": ["salle de réunion", "salle de reunion", "salle de conférence", "salle de conference", "meeting", "séminaire", "seminaire", "réunion", "reunion", "conférence", "conference", "boardroom"],
-        "business-center": ["business center", "centre d'affaires", "centre affaires", "espace business"],
-        "coworking": ["coworking", "co-working", "espace de travail", "espace travail", "travailler", "wifi pro", "workstation"],
-        "parking": ["parking", "garage", "stationnement", "voiture", "se garer"],
-        "kids-club": ["club enfants", "club enfant", "kids club", "kids", "enfants", "aire de jeux", "jeux enfants", "garderie", "baby-sitting", "babysitting"],
-        "concierge": ["conciergerie", "concierge", "assistance", "réception 24h"],
-        "valet": ["voiturier", "valet", "valet parking"],
-        "wifi": ["wifi", "wi-fi", "internet", "connexion"],
-        "room-service": ["room service", "service en chambre", "service chambre", "plateau repas"],
-        "shuttle": ["navette", "shuttle", "transfert", "transfert aéroport", "transfert aeroport", "navette aéroport"],
-        "laundry": ["blanchisserie", "pressing", "laverie", "linge", "repassage", "nettoyage"],
-        "pet-friendly": ["animaux", "animal", "chien", "chiens", "chat", "pet", "pet-friendly", "animaux acceptés", "animaux admis"],
-        "ev-charging": ["borne de recharge", "recharge électrique", "recharge electrique", "voiture électrique", "voiture electrique", "borne", "ev", "tesla"],
-        "bike-rental": ["vélo", "velo", "vélos", "velos", "location vélo", "location velo", "bicyclette", "cycling"],
-        "golf": ["golf", "parcours de golf", "green"],
-        "yoga": ["yoga", "méditation", "meditation", "pilates", "stretching"],
-        "garden": ["jardin", "jardins", "parc", "espace vert", "verdure"]
-      };
-      const SERVICE_LABELS = {
-        "pool": "Piscine", "spa": "Spa & bien-être", "gym": "Salle de sport", "restaurant": "Restaurant",
-        "bar": "Bar & lounge", "rooftop": "Rooftop", "terrace": "Terrasse", "meeting-room": "Salle de réunion",
-        "business-center": "Business center", "coworking": "Espace coworking", "parking": "Parking",
-        "kids-club": "Club enfants", "concierge": "Conciergerie", "valet": "Voiturier",
-        "wifi": "WiFi", "room-service": "Room service", "shuttle": "Navette",
-        "laundry": "Blanchisserie", "pet-friendly": "Animaux acceptés", "ev-charging": "Borne de recharge",
-        "bike-rental": "Location vélos", "golf": "Golf", "yoga": "Yoga & méditation", "garden": "Jardin"
-      };
-
-      const filterAC = (q, theme) => {
-        let ql = norm(q);
-        const proximityPatterns = [/proche\s+d[eu']\s*(?:la\s+|l['']|du\s+|des\s+)?(.+)/i, /pr[eè]s\s+d[eu']\s*(?:la\s+|l['']|du\s+|des\s+)?(.+)/i, /[àa]\s+c[oô]t[eé]\s+d[eu']\s*(?:la\s+|l['']|du\s+|des\s+)?(.+)/i, /autour\s+d[eu']\s*(?:la\s+|l['']|du\s+|des\s+)?(.+)/i, /near\s+(?:the\s+)?(.+)/i];
-        let proximitySubject = null;
-        for (const pat of proximityPatterns) {
-          const m = q.match(pat);
-          if (m && m[1] && m[1].trim().length > 1) { proximitySubject = m[1].trim(); break; }
-        }
-
-        const servicePatterns = [/avec\s+(?:un[e]?\s+|la\s+|le\s+|l['']|des\s+|du\s+)?(.+)/i, /proposant\s+(?:un[e]?\s+|la\s+|le\s+|l['']|des\s+|du\s+)?(.+)/i, /(?:qui\s+)?(?:dispose|offre|propose)[nt]?\s+(?:d['']un[e]?\s+|d['']|de\s+la\s+|du\s+|des\s+)?(.+)/i, /(?:with|having)\s+(?:a\s+)?(.+)/i, /(?:où|ou)\s+(?:il y a|on peut|je peux)\s+(.+)/i];
-        let serviceSubject = null;
-        for (const pat of servicePatterns) {
-          const m = q.match(pat);
-          if (m && m[1] && m[1].trim().length > 1) { serviceSubject = m[1].trim(); break; }
-        }
-
-        let matchedServiceKeys = [];
-        let locationFromQuery = null;
-        if (serviceSubject) {
-          const locPatterns = [/\s+[àa]\s+(.+)$/i, /\s+sur\s+(.+)$/i, /\s+en\s+(.+)$/i, /\s+dans\s+(.+)$/i, /\s+at\s+(.+)$/i, /\s+in\s+(.+)$/i];
-          let serviceOnly = serviceSubject;
-          for (const lp of locPatterns) {
-            const lm = serviceSubject.match(lp);
-            if (lm && lm[1] && lm[1].trim().length > 1) {
-              locationFromQuery = lm[1].trim();
-              serviceOnly = serviceSubject.substring(0, lm.index).trim();
-              break;
-            }
-          }
-          if (!locationFromQuery) {
-            const beforeService = q.substring(0, q.toLowerCase().indexOf(serviceSubject.toLowerCase())).trim();
-            for (const lp of locPatterns) {
-              const lm = beforeService.match(lp);
-              if (lm && lm[1] && lm[1].trim().length > 1) { locationFromQuery = lm[1].trim(); break; }
-            }
-          }
-          const serviceParts = serviceOnly.split(/\s+et\s+|\s+and\s+|\s*,\s*/i).map(s => s.trim()).filter(Boolean);
-          for (const part of serviceParts) {
-            const ns = norm(part);
-            for (const [key, syns] of Object.entries(SERVICE_SYNONYMS)) {
-              if (!matchedServiceKeys.includes(key) && syns.some(s => ns.includes(norm(s)) || norm(s).includes(ns))) { matchedServiceKeys.push(key); break; }
-            }
-          }
-        }
-        if (!matchedServiceKeys.length && !serviceSubject) {
-          const nql = norm(q);
-          for (const [key, syns] of Object.entries(SERVICE_SYNONYMS)) {
-            if (syns.some(s => nql.includes(norm(s)))) { matchedServiceKeys.push(key); }
-          }
-          if (matchedServiceKeys.length) {
-            const locPatterns2 = [/\s+[àa]\s+(.+?)(?:\s+avec|\s+proposant|$)/i, /\s+sur\s+(.+?)(?:\s+avec|\s+proposant|$)/i, /\s+en\s+(.+?)(?:\s+avec|\s+proposant|$)/i, /\s+dans\s+(.+?)(?:\s+avec|\s+proposant|$)/i];
-            for (const lp of locPatterns2) {
-              const lm = q.match(lp);
-              if (lm && lm[1] && lm[1].trim().length > 1) { locationFromQuery = lm[1].trim(); break; }
-            }
-          }
-        }
-
-        let effectiveQ = q;
-        if (proximitySubject) { effectiveQ = proximitySubject; ql = norm(effectiveQ); }
-        else if (matchedServiceKeys.length && locationFromQuery) { effectiveQ = locationFromQuery; ql = norm(effectiveQ); }
-        else if (matchedServiceKeys.length) { effectiveQ = ''; ql = ''; }
-        const textMatch = (s) => ql ? norm(s).includes(ql) : false;
-
-        const themeFilter = theme || null;
-        const intentionForTheme = themeFilter ? MOCK_AUTOCOMPLETE.intentions.find(i => i.filter === themeFilter) : null;
-        const themeKeywords = intentionForTheme ? intentionForTheme.keywords : [];
-
-        let destItems, hotelItems, lieuItems, inspiItems, intentionItems;
-
-        if (themeFilter && !q) {
-          destItems = [];
-          hotelItems = MOCK_AUTOCOMPLETE.hotels.filter(h => h.tags && h.tags.includes(themeFilter));
-          lieuItems = [];
-          inspiItems = MOCK_AUTOCOMPLETE.inspirations.filter(i => {
-            const iIcon = i.icon || '';
-            return iIcon === (intentionForTheme?.icon || '') || themeKeywords.some(k => norm(i.tag).includes(norm(k)) || norm(i.title).includes(norm(k)));
-          });
-          intentionItems = intentionForTheme ? [intentionForTheme] : [];
-        } else if (themeFilter && q) {
-          destItems = MOCK_AUTOCOMPLETE.destinations.filter(d => textMatch(d.name) || (d.country && textMatch(d.country)));
-          destItems.sort((a, b) => (a.type === 'Pays' ? 0 : 1) - (b.type === 'Pays' ? 0 : 1));
-          hotelItems = MOCK_AUTOCOMPLETE.hotels.filter(h => (h.tags && h.tags.includes(themeFilter)) && (textMatch(h.name) || textMatch(h.loc)));
-          if (!hotelItems.length) hotelItems = MOCK_AUTOCOMPLETE.hotels.filter(h => h.tags && h.tags.includes(themeFilter));
-          lieuItems = MOCK_AUTOCOMPLETE.lieux.filter(l => textMatch(l.name) || textMatch(l.loc));
-          inspiItems = MOCK_AUTOCOMPLETE.inspirations.filter(i => {
-            const iIcon = i.icon || '';
-            const matchesTheme = iIcon === (intentionForTheme?.icon || '') || themeKeywords.some(k => norm(i.tag).includes(norm(k)));
-            return matchesTheme && (textMatch(i.dest) || textMatch(i.title));
-          });
-          intentionItems = MOCK_AUTOCOMPLETE.intentions.filter(i => i.filter === themeFilter || i.keywords.some(k => textMatch(k) || k.includes(ql)));
-        } else {
-          const genericHotelTerms = ["hotel", "hôtel", "hotels", "hôtels", "pullman", "séjour", "sejour", "chambre", "nuit", "réserver", "reserver"];
-          const isGenericHotel = !matchedServiceKeys.length && genericHotelTerms.some(t => norm(t).includes(ql) || ql.includes(norm(t)));
-          const tagSynonyms = { beach: ["ocean", "océan", "mer", "plage", "bord de mer", "littoral", "côte", "cote", "maritime"], wellness: ["spa", "bien-être", "bien etre", "detente", "détente", "massage", "piscine"], gastro: ["restaurant", "gastronomie", "cuisine", "chef", "brunch"], romance: ["romantique", "couple", "amoureux", "lune de miel"], business: ["affaire", "travail", "bureau", "réunion", "reunion"], culture: ["musée", "musee", "histoire", "patrimoine", "monument"], family: ["famille", "enfant", "enfants", "kids"] };
-          let tagMatch = null;
-          if (!matchedServiceKeys.length) {
-            for (const [tag, syns] of Object.entries(tagSynonyms)) { if (syns.some(s => ql.includes(norm(s)) || norm(s).includes(ql))) { tagMatch = tag; break; } }
-          }
-          destItems = matchedServiceKeys.length && !locationFromQuery ? [] : MOCK_AUTOCOMPLETE.destinations.filter(d => textMatch(d.name) || (d.country && textMatch(d.country)));
-          destItems.sort((a, b) => (a.type === 'Pays' ? 0 : 1) - (b.type === 'Pays' ? 0 : 1));
-          if (matchedServiceKeys.length) {
-            const locNorm = locationFromQuery ? norm(locationFromQuery) : null;
-            const withService = MOCK_AUTOCOMPLETE.hotels.filter(h => h.services && matchedServiceKeys.every(k => h.services.includes(k)));
-            if (locNorm) {
-              const inLoc = withService.filter(h => norm(h.loc).includes(locNorm) || norm(h.name).includes(locNorm));
-              const others = withService.filter(h => !norm(h.loc).includes(locNorm) && !norm(h.name).includes(locNorm));
-              hotelItems = inLoc.concat(others);
-            } else {
-              hotelItems = withService;
-            }
-            if (locNorm && !destItems.length) {
-              destItems = MOCK_AUTOCOMPLETE.destinations.filter(d => norm(d.name).includes(locNorm) || norm(d.country).includes(locNorm));
-            }
-          } else {
-            hotelItems = isGenericHotel ? MOCK_AUTOCOMPLETE.hotels : tagMatch ? MOCK_AUTOCOMPLETE.hotels.filter(h => h.tags && h.tags.includes(tagMatch)) : MOCK_AUTOCOMPLETE.hotels.filter(h => textMatch(h.name) || textMatch(h.loc) || (h.tags && h.tags.some(t => t.includes(ql))));
-          }
-          lieuItems = matchedServiceKeys.length && !locationFromQuery ? [] : MOCK_AUTOCOMPLETE.lieux.filter(l => textMatch(l.name) || textMatch(l.loc));
-          inspiItems = matchedServiceKeys.length ? [] : MOCK_AUTOCOMPLETE.inspirations.filter(i => textMatch(i.dest) || textMatch(i.title) || textMatch(i.tag));
-          intentionItems = matchedServiceKeys.length ? [] : MOCK_AUTOCOMPLETE.intentions.filter(i => i.keywords.some(k => textMatch(k) || k.includes(ql)));
-        }
-
-        const totalResults = destItems.length + hotelItems.length + lieuItems.length + inspiItems.length + intentionItems.length;
-        const noResultsEl = acPanel.querySelector('.wd-booking__dd-no-results');
-
-        if (totalResults === 0) {
-          if (noResultsEl) noResultsEl.style.display = '';
-          else {
-            const div = document.createElement('div');
-            div.className = 'wd-booking__dd-no-results';
-            div.innerHTML = `<p class="wd-booking__dd-no-results-msg">${SEARCH_ICON.search} Aucun résultat pour « <strong>${esc(q || '')}</strong> »</p><p class="wd-booking__dd-no-results-hint">Essayez un autre mot-clé ou explorez nos inspirations</p>`;
-            acPanel.prepend(div);
-          }
-        } else {
-          if (noResultsEl) noResultsEl.style.display = 'none';
-        }
-
-        const origQl = norm(q);
-        const proximityTerms = ["proche", "proches", "proximite", "proximité", "pres de", "près de", "a cote", "à côté", "autour de", "nearby", "around", "near", "ici", "coin"];
-        const isProximity = proximitySubject || proximityTerms.some(t => origQl.includes(norm(t)));
-        const proximityGroup = acPanel.querySelector('[data-group="proximity"]');
-        if (isProximity) {
-          proximityGroup.style.display = '';
-          const proxTitle = proximityGroup.querySelector('.wd-booking__dd-proximity-title');
-          const proxSub = proximityGroup.querySelector('.wd-booking__dd-proximity-sub');
-          if (proximitySubject) {
-            proxTitle.textContent = 'Hôtels à proximité de ' + proximitySubject.charAt(0).toUpperCase() + proximitySubject.slice(1);
-            proxSub.textContent = 'Voir les établissements les plus proches';
-          } else {
-            proxTitle.textContent = 'Hôtels à proximité';
-            proxSub.textContent = 'Basé sur votre position actuelle';
-          }
-        } else {
-          proximityGroup.style.display = 'none';
-        }
-
-        const destGroup = acPanel.querySelector('[data-group="destinations"]');
-        const destList = destGroup.querySelector('.wd-booking__dd-ac-list');
-        if (!destItems.length) { destGroup.style.display = 'none'; }
-        else {
-          destGroup.style.display = '';
-          destList.innerHTML = destItems.map(d => {
-            const dNorm = norm(d.name);
-            const isCountry = d.type === 'Pays';
-            let hotelsInDest;
-            if (isCountry) {
-              hotelsInDest = MOCK_AUTOCOMPLETE.hotels.filter(h => norm(h.loc).includes(dNorm));
-            } else {
-              hotelsInDest = MOCK_AUTOCOMPLETE.hotels.filter(h => norm(h.loc).includes(dNorm));
-            }
-            if (matchedServiceKeys.length) hotelsInDest = hotelsInDest.filter(h => h.services && matchedServiceKeys.every(k => h.services.includes(k)));
-            const hotelCount = hotelsInDest.length || d.count;
-            const hotelNames = hotelsInDest.length ? hotelsInDest.map(h => h.name.replace('Pullman ', '')).join(', ') : '';
-            const icon = isCountry ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.3"/><path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9z" stroke="currentColor" stroke-width="1.3"/></svg>` : SEARCH_ICON.search;
-            const label = isCountry ? highlight(d.name, effectiveQ) : highlight(d.name + (d.country ? ', ' + d.country : ''), effectiveQ);
-            const typeTag = isCountry ? `<span class="wd-booking__dd-ac-type-tag">Pays</span>` : (d.type === 'Région' || d.type === 'Île' ? `<span class="wd-booking__dd-ac-type-tag">${esc(d.type)}</span>` : '');
-            return `<li class="wd-booking__dd-ac-item${isCountry ? ' wd-booking__dd-ac-item--country' : ''}" data-dest-type="${esc(d.type)}" data-dest-name="${esc(d.name)}">${icon}<span class="wd-booking__dd-ac-name">${label}${typeTag}${hotelNames ? `<span class="wd-booking__dd-ac-dest-hotels">${esc(hotelNames)}</span>` : ''}</span><span class="wd-booking__dd-ac-count">${hotelCount} hôtel${hotelCount > 1 ? 's' : ''}</span></li>`;
-          }).join('');
-        }
-
-        const lieuGroup = acPanel.querySelector('[data-group="lieux"]');
-        const lieuList = lieuGroup.querySelector('.wd-booking__dd-ac-list');
-        if (!lieuItems.length) { lieuGroup.style.display = 'none'; }
-        else {
-          lieuGroup.style.display = '';
-          lieuList.innerHTML = lieuItems.map(l => `<li class="wd-booking__dd-ac-item" data-loc="${esc(l.loc)}">${SEARCH_ICON.search}<span class="wd-booking__dd-ac-name">${highlight(l.name, effectiveQ)}</span><span class="wd-booking__dd-ac-tag">${esc(l.type)} · ${esc(l.loc)}</span></li>`).join('');
-        }
-
-        const hotelGroup = acPanel.querySelector('[data-group="hotels"]');
-        const hotelList = hotelGroup.querySelector('.wd-booking__dd-ac-hotels');
-        if (!hotelItems.length) { hotelGroup.style.display = 'none'; }
-        else {
-          hotelGroup.style.display = '';
-          const locNormForBadge = locationFromQuery ? norm(locationFromQuery) : null;
-          hotelList.innerHTML = hotelItems.slice(0, 5).map(h => {
-            const isLocMatch = locNormForBadge && (norm(h.loc).includes(locNormForBadge) || norm(h.name).includes(locNormForBadge));
-            return `<a href="#" class="wd-booking__dd-hotel-row">
-            <img class="wd-booking__dd-hotel-thumb" src="${h.img}" alt="${esc(h.name)}" />
-            <div class="wd-booking__dd-hotel-info">
-              <span class="wd-booking__dd-hotel-name">${highlight(h.name, effectiveQ)}${isLocMatch ? `<span class="wd-booking__dd-hotel-loc-badge">${esc(locationFromQuery)}</span>` : ''}</span>
-              <span class="wd-booking__dd-hotel-loc">${esc(h.loc)}</span>
-              ${matchedServiceKeys.length && h.services && matchedServiceKeys.every(k => h.services.includes(k)) ? `<span class="wd-booking__dd-hotel-tags wd-booking__dd-hotel-tags--service">${matchedServiceKeys.map(k => `<span class="wd-booking__dd-service-badge"><span class="wd-booking__dd-service-dot"></span>${esc(SERVICE_LABELS[k] || k)}</span>`).join('')}${h.services.filter(s => !matchedServiceKeys.includes(s)).slice(0, 3).map(s => `<span class="wd-booking__dd-service-pill">${esc(SERVICE_LABELS[s] || s)}</span>`).join('')}</span>` : h.tags ? `<span class="wd-booking__dd-hotel-tags">${h.tags.slice(0, 2).map(t => { const intention = MOCK_AUTOCOMPLETE.intentions.find(i => i.filter === t); return intention ? esc(intention.title.split(' ').slice(0, 2).join(' ')) : ''; }).filter(Boolean).join(' · ')}</span>` : ''}
-            </div>
-          </a>`;
-          }).join('');
-        }
-
-        const acCols = acPanel.querySelector('.wd-booking__dd-cols');
-        if (acCols) {
-          const leftEmpty = destGroup.style.display === 'none' && lieuGroup.style.display === 'none';
-          const rightEmpty = hotelGroup.style.display === 'none';
-          if (leftEmpty && !rightEmpty) { acCols.style.gridTemplateColumns = '1fr'; hotelGroup.style.maxWidth = '100%'; }
-          else if (rightEmpty && !leftEmpty) { acCols.style.gridTemplateColumns = '1fr'; }
-          else { acCols.style.gridTemplateColumns = ''; hotelGroup.style.maxWidth = ''; }
-        }
-      };
-
-      destInput.addEventListener('input', () => {
-        const q = destInput.value.trim();
-        if (q.length >= 1) { showAC(); filterAC(q, activeTheme); }
-        else if (activeTheme) { showAC(); filterAC('', activeTheme); }
-        else { showEmpty(); }
-      });
-
-      const backBtn = previewPanel.querySelector('.wd-booking__dd-preview-back');
-      if (backBtn) backBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (activeTheme) {
-          activeTheme = null;
-          this.querySelectorAll('.wd-booking__dd-chip--active').forEach(c => c.classList.remove('wd-booking__dd-chip--active'));
-        }
-        destInput.value = '';
-        showEmpty();
-        destInput.focus();
-      });
-
-      const searchBase = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'search-results.html';
-      const goToSearch = (q) => { if (q && q !== 'nearby') recordSearch(q, q); const url = searchBase + (q ? '?q=' + encodeURIComponent(q) : ''); try { const a = document.createElement('a'); a.href = url; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); } catch(_) { window.location.href = url; } };
-      const goToTheme = (theme) => { const label = (THEME_META[theme] && THEME_META[theme].label) || theme; recordSearch(label, theme); const url = searchBase + '?theme=' + encodeURIComponent(theme); try { const a = document.createElement('a'); a.href = url; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); } catch(_) { window.location.href = url; } };
-
-      const chips = this.querySelectorAll('.wd-booking__dd-chip');
-      chips.forEach(chip => {
-        chip.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const keyword = chip.dataset.chip;
-          const theme = THEME_MAP[keyword] || keyword;
-          if (activeTheme === theme) {
-            activeTheme = null;
-            chips.forEach(c => c.classList.remove('wd-booking__dd-chip--active'));
-            destInput.value = '';
-            showEmpty();
-          } else {
-            activeTheme = theme;
-            chips.forEach(c => c.classList.remove('wd-booking__dd-chip--active'));
-            chip.classList.add('wd-booking__dd-chip--active');
-            destInput.value = '';
-            showPreview(theme);
-          }
-        });
-      });
-
       const ctaBtn = this.querySelector('.wd-booking__cta');
       if (ctaBtn) {
+        const searchBase = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'search-results.html';
         const updateCTAHref = () => {
-          let href;
-          if (activeTheme) { href = searchBase + '?theme=' + encodeURIComponent(activeTheme); }
-          else { const q = selectedDest || destInput.value.trim(); href = searchBase + (q ? '?q=' + encodeURIComponent(q) : ''); }
+          const chips = buildChips();
+          const labels = chips.map(c => c.label);
+          const q = destInput.value.trim() || labels.join(', ');
+          let href = searchBase + (q ? '?q=' + encodeURIComponent(q) : '');
           const fmtISO = (dt) => dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
           if (dpCheckIn) href += (href.includes('?') ? '&' : '?') + 'checkin=' + fmtISO(dpCheckIn);
           if (dpCheckOut) href += '&checkout=' + fmtISO(dpCheckOut);
@@ -2743,48 +1912,8 @@
         };
         updateCTAHref();
         destInput.addEventListener('input', updateCTAHref);
-        ctaBtn.addEventListener('click', () => {
-          if (activeTheme) { const label = (THEME_META[activeTheme] && THEME_META[activeTheme].label) || activeTheme; recordSearch(label, activeTheme); }
-          else { const q = (selectedDest || destInput.value).trim(); if (q) recordSearch(q, q); }
-        });
       }
 
-      this.addEventListener('click', (e) => {
-        const inspiCard = e.target.closest('.wd-booking__dd-inspi-card');
-        if (inspiCard) { const city = inspiCard.dataset.city; const th = inspiCard.dataset.theme; if (city) recordSearch(city, city); window.location.href = searchBase + '?theme=' + encodeURIComponent(th) + '&q=' + encodeURIComponent(city); return; }
-        const proxBanner = e.target.closest('.wd-booking__dd-proximity-banner');
-        if (proxBanner) { goToSearch('nearby'); return; }
-        const destItem = e.target.closest('.wd-booking__dd-ac-item');
-        if (destItem) {
-          if (destItem.dataset.destType === 'Pays') {
-            showCountryPreview(destItem.dataset.destName);
-            return;
-          }
-          if (destItem.dataset.loc) {
-            const lieuName = destItem.querySelector('.wd-booking__dd-ac-name')?.textContent.split('·')[0].trim();
-            const lieuObj = MOCK_AUTOCOMPLETE.lieux.find(l => norm(l.name) === norm(lieuName));
-            if (lieuObj) { showDestPreview(lieuObj.loc, lieuObj); return; }
-            selectDest(destItem.dataset.loc);
-            return;
-          }
-          const destName = destItem.dataset.destName || destItem.querySelector('.wd-booking__dd-ac-name')?.textContent.split(',')[0].trim();
-          if (destName) {
-            const destNorm = norm(destName);
-            const hotelsCount = PREVIEW_HOTELS.filter(h => norm(h.loc).includes(destNorm)).length;
-            if (hotelsCount >= 2) { showDestPreview(destName, null); }
-            else { selectDest(destName); }
-          }
-          return;
-        }
-        const hotelRow = e.target.closest('.wd-booking__dd-hotel-row');
-        if (hotelRow) { e.preventDefault(); const n = hotelRow.querySelector('.wd-booking__dd-hotel-name'); if (n) { selectDest(n.textContent.trim()); } return; }
-        const recentItem = e.target.closest('.wd-booking__dd-recent-item');
-        if (recentItem && !e.target.closest('.wd-booking__dd-recent-close')) { const q = recentItem.dataset.q || recentItem.querySelector('.wd-booking__dd-recent-dest')?.textContent.split(',')[0].trim(); if (q) goToSearch(q); return; }
-        const promoItem = e.target.closest('.wd-booking__dd-promo-card');
-        if (promoItem) { const t = promoItem.querySelector('.wd-booking__dd-promo-title'); if (t) { const m = t.textContent.match(/à\s+(.+)/i); goToSearch(m ? m[1] : ''); } return; }
-        const seeAll = e.target.closest('.wd-booking__dd-see-all-hotels');
-        if (seeAll) { e.preventDefault(); goToSearch(''); return; }
-      });
     }
   });
 
@@ -3652,11 +2781,10 @@
       return {
         currentStep: 1,
         stepHistory: [],
-        carouselIndex: 2,
-        // Dimension "connexion" (indépendante de selectedWho). Défaut : déconnecté,
-        // parcours identique à l'existant. userProfile mocké quand isConnected=true.
+        carouselIndex: 1,
         isConnected: false,
         userProfile: null,
+        selectedStayType: null,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -3673,7 +2801,19 @@
         businessLocation: null,
         checkInDate: null,
         checkOutDate: null,
-        results: []
+        results: [],
+        // État événement (branche V2)
+        eventFamily: null,
+        eventSubType: null,
+        eventVolume: null,
+        eventNeeds: [],
+        // État pro V2
+        proContext: null,
+        proNeeds: [],
+        bleisureChoice: null,
+        // État guide (mini-triage)
+        guideWork: null,
+        guideGroup: null
       };
     }
 
@@ -3733,47 +2873,76 @@
     }
 
     render() {
-      if (this.state.currentStep === 1) {
+      const step = this.state.currentStep;
+      if (step === 1) {
         return this.renderQuestion1();
-      } else if (this.state.currentStep === 1.5) {
+      } else if (step === 1.5) {
         return this.renderQuestion1_5();
-      } else if (this.state.currentStep === 2) {
+      } else if (step === 2) {
         return this.renderQuestion2();
-      } else if (this.state.currentStep === 'business-location') {
+      } else if (step === 'pro-location' || step === 'event-location') {
         return this.renderQuestion_BusinessLocation();
-      } else if (this.state.currentStep === 'business-dates') {
+      } else if (step === 'pro-dates' || step === 'event-dates') {
         return this.renderQuestion_BusinessDates();
-      } else if (this.state.currentStep === 3) {
+      } else if (step === 'business-location') {
+        return this.renderQuestion_BusinessLocation();
+      } else if (step === 'business-dates') {
+        return this.renderQuestion_BusinessDates();
+      } else if (step === 'pro-needs') {
+        return this.renderProNeeds();
+      } else if (step === 'pro-bleisure') {
+        return this.renderProBleisure();
+      } else if (step === 'event-family') {
+        return this.renderEventFamily();
+      } else if (step === 'event-subtype') {
+        return this.renderEventSubtype();
+      } else if (step === 'event-volume') {
+        return this.renderEventVolume();
+      } else if (step === 'event-needs') {
+        return this.renderEventNeeds();
+      } else if (step === 'guide-1') {
+        return this.renderGuide1();
+      } else if (step === 'guide-2') {
+        return this.renderGuide2();
+      } else if (step === 3) {
         return this.renderQuestion3();
-      } else if (this.state.currentStep === 3.1) {
+      } else if (step === 3.1) {
         return this.renderQuestion3_OneDestination();
-      } else if (this.state.currentStep === 3.2) {
+      } else if (step === 3.2) {
         return this.renderQuestion3_MultipleDestinations();
-      } else if (this.state.currentStep === 3.3) {
+      } else if (step === 3.3) {
         return this.renderQuestion3_Regions();
-      } else if (this.state.currentStep === 'wishlist') {
+      } else if (step === 'wishlist') {
         return this.renderQuestion3_Wishlist();
-      } else if (this.state.currentStep === 4) {
+      } else if (step === 4) {
         return this.renderQuestion4_Period();
-      } else if (this.state.currentStep === 5) {
+      } else if (step === 5) {
         return this.renderQuestion5_Services();
-      } else if (this.state.currentStep === 6) {
+      } else if (step === 6) {
         return this.renderQuestion5_Services();
-      } else if (this.state.currentStep === 'results-loading') {
+      } else if (step === 'results-loading') {
         return this.renderResultsLoading();
-      } else if (this.state.currentStep === 'results') {
+      } else if (step === 'results') {
         return this.renderResults();
       }
       return '';
     }
 
+    _getStepTotal() {
+      switch (this.state.selectedStayType) {
+        case 'pro': return 5;
+        case 'event': return 7;
+        case 'guide': return 3;
+        default: return 7;
+      }
+    }
+
     renderQuestion1() {
       const options = [
-        { value: 'solo', label: 'Solo', image: '../../assets/images/discovery/solo.jpg' },
-        { value: 'couple', label: 'En couple', image: '../../assets/images/discovery/couple.jpg' },
-        { value: 'family', label: 'En famille', image: '../../assets/images/discovery/family.jpg' },
-        { value: 'friends', label: 'Entre amis', image: '../../assets/images/discovery/friendtravel.avif' },
-        { value: 'business', label: 'Business', image: '../../assets/images/discovery/businesstravel.avif' }
+        { value: 'escapade', label: 'Une escapade', desc: 'Séjour loisir, détente, découverte', image: '../../assets/images/discovery/couple.jpg' },
+        { value: 'pro', label: 'Un déplacement pro', desc: 'Voyage d\'affaires, coworking', image: '../../assets/images/discovery/businesstravel.avif' },
+        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/discovery/friendtravel.avif' },
+        { value: 'guide', label: 'Je me laisse guider', desc: 'Pas encore sûr ? On vous oriente', image: '../../assets/images/discovery/solo.jpg' }
       ];
 
       return `
@@ -3782,42 +2951,38 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
-            <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, quel séjour préparez-vous ?` : 'Quel séjour préparez-vous ?'}</h2>
+            <p class="wd-discovery-modal__subtitle">Dites-nous ce qui vous amène et nous vous guiderons vers l'expérience Pullman idéale.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">1. Avec qui voyagez-vous ?</label>
+              <label class="wd-discovery-modal__question-label">1. Quel type de séjour préparez-vous ?</label>
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
-                  const isSelected = this.state.selectedWho === opt.value;
+                  const isSelected = this.state.selectedStayType === opt.value;
                   let className = 'wd-discovery-modal__option wd-discovery-modal__option--card';
                   const idx = this.state.carouselIndex;
-                  const distance = Math.abs(i - idx);
-                  const isLeft = i < idx;
 
                   if (i === idx) {
                     className += ' is-active';
                   } else if (i === (idx - 1 + options.length) % options.length) {
-                    className += ' is-prev'; // Distance 1 gauche
+                    className += ' is-prev';
                   } else if (i === (idx + 1) % options.length) {
-                    className += ' is-next'; // Distance 1 droite
-                  } else if (distance === 2 || (distance === options.length - 2)) {
-                    className += isLeft ? ' is-hidden-left-1' : ' is-hidden-right-1'; // Distance 2
+                    className += ' is-next';
                   } else {
-                    className += isLeft ? ' is-hidden-left' : ' is-hidden-right'; // Distance 3+
+                    className += i < idx ? ' is-hidden-left-1' : ' is-hidden-right-1';
                   }
 
                   if (isSelected) {
                     className += ' is-selected';
                   }
 
-                  const bgPosition = opt.value === 'business' ? 'center 30%' : 'center';
-                  return `<button class="${className}" data-value="${opt.value}" data-index="${i}" style="background-image: url('${opt.image}'); background-size: cover; background-position: ${bgPosition};">
+                  return `<button class="${className}" data-value="${opt.value}" data-index="${i}" style="background-image: url('${opt.image}'); background-size: cover; background-position: center;">
                     <div class="wd-discovery-modal__option-checkbox">
                       ${ICON.check}
                     </div>
                     <div class="wd-discovery-modal__option-content">
                       <span>${opt.label}</span>
+                      <small style="opacity: 0.8; font-size: 11px; display: block; margin-top: 2px;">${opt.desc}</small>
                     </div>
                   </button>`;
                 }).join('')}
@@ -3828,11 +2993,11 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 1/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 1/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">
                 Recommencer
               </button>
-              <button class="wd-discovery-modal__continue${this.state.selectedWho ? ' is-active' : ''}" aria-label="Continuer">
+              <button class="wd-discovery-modal__continue${this.state.selectedStayType ? ' is-active' : ''}" aria-label="Continuer">
                 Continuer
               </button>
             </div>
@@ -3842,16 +3007,33 @@
     }
 
     renderQuestion1_5() {
+      const whoOptions = [
+        { value: 'solo', label: 'Solo' },
+        { value: 'couple', label: 'En couple' },
+        { value: 'family', label: 'En famille' },
+        { value: 'friends', label: 'Entre amis' }
+      ];
+
       const isFamilyMode = this.state.selectedWho === 'family';
+      const isFriendsMode = this.state.selectedWho === 'friends';
+      const needsDetails = isFamilyMode || isFriendsMode;
 
       if (isFamilyMode) this._prefillFamilyFromProfile();
 
-      const title = isFamilyMode ? 'Parlez-nous de votre famille' : 'Combien serez-vous ?';
       const hasPrefill = isFamilyMode && this.state.familyDetails.childrenNames.length > 0;
       const prefillValid = hasPrefill
         && this.state.familyDetails.adultsCount >= 1
         && this.state.familyDetails.childrenCount > 0
         && this.state.familyDetails.childrenAges.length === this.state.familyDetails.childrenCount;
+
+      let canContinue = false;
+      if (this.state.selectedWho === 'solo' || this.state.selectedWho === 'couple') {
+        canContinue = true;
+      } else if (isFamilyMode) {
+        canContinue = prefillValid;
+      } else if (isFriendsMode) {
+        canContinue = this.state.friendsDetails.adultsCount >= 2;
+      }
 
       return `
         <div class="wd-discovery-modal">
@@ -3859,11 +3041,21 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
-            <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, avec qui partez-vous ?` : 'Avec qui partez-vous ?'}</h2>
+            <p class="wd-discovery-modal__subtitle">Dites-nous qui vous accompagne pour adapter nos suggestions.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">1. ${title}</label>
+              <label class="wd-discovery-modal__question-label">2. Avec qui voyagez-vous ?</label>
+              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                ${whoOptions.map(opt => `
+                  <button class="wd-discovery-modal__chip${this.state.selectedWho === opt.value ? ' is-selected' : ''}" data-who="${opt.value}" style="
+                    padding: 10px 20px; border-radius: 24px; border: 1.5px solid ${this.state.selectedWho === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                    background: ${this.state.selectedWho === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                    color: ${this.state.selectedWho === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                    font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+                  ">${opt.label}</button>
+                `).join('')}
+              </div>
 
               ${isFamilyMode ? `
                 <div class="wd-discovery-modal__form-group">
@@ -3885,23 +3077,25 @@
                     `).join('') : ''}
                   </div>
                 </div>
-              ` : `
+              ` : ''}
+
+              ${isFriendsMode ? `
                 <div class="wd-discovery-modal__form-group">
                   <label class="wd-discovery-modal__form-label">Nombre d'adultes</label>
                   <input type="number" min="2" max="20" class="wd-discovery-modal__form-input" id="adultsCount" value="${this.state.friendsDetails.adultsCount || ''}" />
                 </div>
-              `}
+              ` : ''}
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 1/7</div>
+              <div class="wd-discovery-modal__stepper">Étape 2/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">
                 Recommencer
               </button>
-              <button class="wd-discovery-modal__continue${prefillValid ? ' is-active' : ''}" aria-label="Continuer">
+              <button class="wd-discovery-modal__continue${canContinue ? ' is-active' : ''}" aria-label="Continuer">
                 Continuer
               </button>
             </div>
@@ -4767,27 +3961,44 @@
       `;
     }
 
+    _getStepNumber() {
+      const stepMap = {
+        1: 1,
+        1.5: 2,
+        2: 3,
+        3: 4, 3.1: 4, 3.2: 4, 3.3: 4, 'wishlist': 4,
+        4: 5,
+        5: 6,
+        'pro-location': 2, 'pro-dates': 3, 'pro-needs': 4, 'pro-bleisure': 5,
+        'event-family': 2, 'event-subtype': 3, 'event-location': 4, 'event-dates': 5, 'event-volume': 6, 'event-needs': 7,
+        'guide-1': 2, 'guide-2': 3
+      };
+      return stepMap[this.state.currentStep] || '?';
+    }
+
     renderQuestion_BusinessLocation() {
+      const isEvent = this.state.selectedStayType === 'event';
+      const title = isEvent ? 'Où souhaitez-vous organiser votre événement ?' : 'Où vous rendez-vous ?';
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content">
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
-            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
-            <p class="wd-discovery-modal__subtitle">Précisez votre destination pour un voyage d'affaires</p>
+            <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, ${title.toLowerCase()}` : title}</h2>
+            <p class="wd-discovery-modal__subtitle">Précisez votre destination pour trouver le Pullman idéal.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Dans quelle ville ou région souhaitez-vous séjourner ?</label>
+              <label class="wd-discovery-modal__question-label">Dans quelle ville ou région ?</label>
 
               <div class="wd-discovery-modal__form-group wd-discovery-modal__autocomplete">
-                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Tokyo, Singapour..." value="${this.state.businessLocation || ''}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
+                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation || ''}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
                 <ul class="wd-discovery-modal__autocomplete-list" id="businessLocationList" role="listbox" hidden></ul>
               </div>
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 3/6</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -4873,6 +4084,270 @@
       `;
     }
 
+    // ── Stub renderers V2 (Phase 1 : écrans placeholder) ──
+
+    _renderStubScreen(title, subtitle, label, options, selectedKey, stateField) {
+      const selected = this.state[stateField];
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <h2 class="wd-discovery-modal__title">${title}</h2>
+            <p class="wd-discovery-modal__subtitle">${subtitle}</p>
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">${label}</label>
+              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                ${options.map(opt => `
+                  <button class="wd-discovery-modal__chip${selected === opt.value ? ' is-selected' : ''}" data-stub-value="${opt.value}" data-stub-field="${stateField}" style="
+                    padding: 12px 20px; border-radius: 12px; border: 1.5px solid ${selected === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                    background: ${selected === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                    color: ${selected === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                    font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left;
+                  "><span style="display:block; font-weight:600;">${opt.label}</span>${opt.desc ? `<small style="opacity:0.7; font-size:12px; display:block; margin-top:2px;">${opt.desc}</small>` : ''}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+              <button class="wd-discovery-modal__continue${selected ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    _renderMultiSelectScreen(title, subtitle, label, options, stateField) {
+      const selected = this.state[stateField] || [];
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <h2 class="wd-discovery-modal__title">${title}</h2>
+            <p class="wd-discovery-modal__subtitle">${subtitle}</p>
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">${label}</label>
+              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+                ${options.map(opt => {
+                  const isSel = selected.includes(opt.value);
+                  return `
+                  <button class="wd-discovery-modal__chip${isSel ? ' is-selected' : ''}" data-multi-value="${opt.value}" data-multi-field="${stateField}" style="
+                    padding: 10px 18px; border-radius: 24px; border: 1.5px solid ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                    background: ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                    color: ${isSel ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                    font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+                  ">${opt.label}</button>`;
+                }).join('')}
+              </div>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+              <button class="wd-discovery-modal__continue${selected.length > 0 ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    renderProNeeds() {
+      const contextOptions = [
+        { value: 'solo', label: 'Solo' },
+        { value: 'team', label: 'En équipe' },
+        { value: 'client', label: 'Rencontre client' }
+      ];
+      const needsOptions = [
+        { value: 'work-room', label: 'Chambre équipée pour travailler' },
+        { value: 'coworking', label: 'Accès coworking' },
+        { value: 'meeting-small', label: 'Petite salle de réunion (2-8 pers.)' },
+        { value: 'spa', label: 'Spa' },
+        { value: 'restaurant', label: 'Restaurant' },
+        { value: 'local', label: 'Vie locale' }
+      ];
+      const ctx = this.state.proContext;
+      const needs = this.state.proNeeds || [];
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <h2 class="wd-discovery-modal__title">De quoi avez-vous besoin ?</h2>
+            <p class="wd-discovery-modal__subtitle">Sélectionnez votre contexte puis les services souhaités.</p>
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label" style="margin-bottom: 8px;">Contexte</label>
+              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+                ${contextOptions.map(opt => `
+                  <button class="wd-discovery-modal__chip" data-stub-value="${opt.value}" data-stub-field="proContext" style="
+                    padding: 10px 20px; border-radius: 24px; border: 1.5px solid ${ctx === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                    background: ${ctx === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                    color: ${ctx === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                    font-size: 14px; font-weight: 500; cursor: pointer;
+                  ">${opt.label}</button>
+                `).join('')}
+              </div>
+              <label class="wd-discovery-modal__question-label" style="margin-bottom: 8px;">Services</label>
+              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${needsOptions.map(opt => {
+                  const isSel = needs.includes(opt.value);
+                  return `<button class="wd-discovery-modal__chip" data-multi-value="${opt.value}" data-multi-field="proNeeds" style="
+                    padding: 10px 18px; border-radius: 24px; border: 1.5px solid ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                    background: ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                    color: ${isSel ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                    font-size: 13px; font-weight: 500; cursor: pointer;
+                  ">${opt.label}</button>`;
+                }).join('')}
+              </div>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+              <button class="wd-discovery-modal__continue${ctx && needs.length > 0 ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    renderProBleisure() {
+      const choice = this.state.bleisureChoice;
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <h2 class="wd-discovery-modal__title">Et si vous restiez un peu plus ?</h2>
+            <p class="wd-discovery-modal__subtitle">Découvrez ce que Pullman ${this.state.businessLocation || ''} vous réserve au-delà du travail.</p>
+            <div class="wd-discovery-modal__question">
+              <label class="wd-discovery-modal__question-label">Prolonger votre séjour ?</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
+                <button class="wd-discovery-modal__chip" data-stub-value="yes" data-stub-field="bleisureChoice" style="
+                  flex: 1; min-width: 140px; padding: 20px; border-radius: 12px; text-align: center;
+                  border: 2px solid ${choice === 'yes' ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                  background: ${choice === 'yes' ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                  color: ${choice === 'yes' ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                  font-size: 15px; font-weight: 600; cursor: pointer;
+                ">Prolonger mon séjour</button>
+                <button class="wd-discovery-modal__chip" data-stub-value="no" data-stub-field="bleisureChoice" style="
+                  flex: 1; min-width: 140px; padding: 20px; border-radius: 12px; text-align: center;
+                  border: 2px solid ${choice === 'no' ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
+                  background: ${choice === 'no' ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
+                  color: ${choice === 'no' ? '#fff' : 'var(--color-ink, #1a1a18)'};
+                  font-size: 15px; font-weight: 600; cursor: pointer;
+                ">Pas cette fois</button>
+              </div>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+              <button class="wd-discovery-modal__continue${choice ? ' is-active' : ''}" aria-label="Continuer">Continuer</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    renderEventFamily() {
+      return this._renderStubScreen(
+        'Quel type d\'événement ?',
+        'Deux univers, deux ambiances — choisissez celui qui vous correspond.',
+        'Famille d\'événement',
+        [
+          { value: 'pro', label: 'Événement professionnel', desc: 'Séminaire, conférence, team building, lancement...' },
+          { value: 'celebration', label: 'Célébration privée', desc: 'Mariage, anniversaire, EVG/EVJF...' }
+        ],
+        'eventFamily', 'eventFamily'
+      );
+    }
+
+    renderEventSubtype() {
+      const isPro = this.state.eventFamily === 'pro';
+      const options = isPro
+        ? [
+            { value: 'seminar', label: 'Séminaire / réunion' },
+            { value: 'conference', label: 'Conférence / congrès' },
+            { value: 'teambuilding', label: 'Team building' },
+            { value: 'corporate', label: 'Événement d\'entreprise' }
+          ]
+        : [
+            { value: 'wedding', label: 'Mariage' },
+            { value: 'evg-evjf', label: 'EVG / EVJF' },
+            { value: 'birthday', label: 'Anniversaire' },
+            { value: 'other', label: 'Autre célébration' }
+          ];
+      return this._renderStubScreen(
+        'Précisez votre événement',
+        isPro ? 'Quel format professionnel envisagez-vous ?' : 'Quelle célébration préparez-vous ?',
+        'Type d\'événement',
+        options,
+        'eventSubType', 'eventSubType'
+      );
+    }
+
+    renderEventVolume() {
+      return this._renderStubScreen(
+        'Combien de participants ?',
+        'Le nombre d\'invités nous aide à dimensionner les espaces et services.',
+        'Volume',
+        [
+          { value: 'small', label: 'Moins de 20' },
+          { value: 'medium', label: '20 – 50' },
+          { value: 'large', label: '50 – 150' },
+          { value: 'xlarge', label: '150+' }
+        ],
+        'eventVolume', 'eventVolume'
+      );
+    }
+
+    renderEventNeeds() {
+      const isPro = this.state.eventFamily === 'pro';
+      const options = isPro
+        ? [
+            { value: 'meeting-room', label: 'Salle de réunion' },
+            { value: 'plenary', label: 'Plénière' },
+            { value: 'coworking', label: 'Coworking' },
+            { value: 'catering', label: 'Restauration / pauses' },
+            { value: 'rooms', label: 'Nuitées invités' },
+            { value: 'av', label: 'Matériel AV' }
+          ]
+        : [
+            { value: 'reception', label: 'Espace réception' },
+            { value: 'catering', label: 'Traiteur' },
+            { value: 'rooms', label: 'Hébergement invités' },
+            { value: 'rooftop', label: 'Soirée / rooftop' }
+          ];
+      return this._renderMultiSelectScreen(
+        'De quoi avez-vous besoin ?',
+        isPro ? 'Sélectionnez les prestations pour votre événement professionnel.' : 'Sélectionnez les prestations pour votre célébration.',
+        'Besoins',
+        options,
+        'eventNeeds'
+      );
+    }
+
+    renderGuide1() {
+      return this._renderStubScreen(
+        'On vous guide !',
+        'Quelques questions rapides pour vous orienter vers la bonne expérience.',
+        'C\'est pour le travail ?',
+        [
+          { value: 'yes', label: 'Oui, c\'est professionnel' },
+          { value: 'no', label: 'Non, c\'est personnel' }
+        ],
+        'guideWork', 'guideWork'
+      );
+    }
+
+    renderGuide2() {
+      return this._renderStubScreen(
+        'Précisons ensemble',
+        'Une dernière question pour vous orienter.',
+        'Vous organisez quelque chose pour un groupe ?',
+        [
+          { value: 'yes', label: 'Oui, un événement à organiser' },
+          { value: 'no', label: 'Non, un déplacement individuel' }
+        ],
+        'guideGroup', 'guideGroup'
+      );
+    }
+
     afterRender() {
       console.log('🔄 afterRender called, currentStep:', this.state.currentStep, 'selectedWho:', this.state.selectedWho);
       this.modal = this.querySelector('.wd-discovery-modal');
@@ -4902,8 +4377,19 @@
         this._mainListenersAttached = true;
       }
 
-      // Question 1.5: Inputs pour famille ou amis
+      // Question 1.5: chips "avec qui" + inputs famille/amis
       if (this.state.currentStep === 1.5) {
+        this.querySelectorAll('.wd-discovery-modal__chip[data-who]').forEach(chip => {
+          chip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const who = chip.dataset.who;
+            this.state.selectedWho = who;
+            this._rerenderContent();
+            const mc = this.querySelector('.wd-discovery-modal__content');
+            if (mc) mc.scrollTop = 0;
+          });
+        });
+
         const isFamilyMode = this.state.selectedWho === 'family';
 
         if (isFamilyMode) {
@@ -5366,6 +4852,34 @@
         }
       }
 
+      // Handlers génériques pour chips stub (single select)
+      this.querySelectorAll('[data-stub-value]').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const field = chip.dataset.stubField;
+          const value = chip.dataset.stubValue;
+          this.state[field] = value;
+          this._rerenderContent();
+        });
+      });
+
+      // Handlers génériques pour chips multi-select
+      this.querySelectorAll('[data-multi-value]').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const field = chip.dataset.multiField;
+          const value = chip.dataset.multiValue;
+          if (!Array.isArray(this.state[field])) this.state[field] = [];
+          const idx = this.state[field].indexOf(value);
+          if (idx >= 0) {
+            this.state[field].splice(idx, 1);
+          } else {
+            this.state[field].push(value);
+          }
+          this._rerenderContent();
+        });
+      });
+
       // Bouton "Retour"
       const backBtn = this.querySelector('.wd-discovery-modal__back');
       if (backBtn) {
@@ -5381,10 +4895,10 @@
             console.log('Going back to step:', previousStep);
             this.state.currentStep = previousStep;
 
-            // Centrer carousel pour Q1, Q2, Q3.3
-            if (previousStep === 1 || previousStep === 2 || previousStep === 3.3) {
-              // En business, Q2 démarre sur la 1re carte pro (salle de réunion)
-              this.state.carouselIndex = (previousStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
+            if (previousStep === 1) {
+              this.state.carouselIndex = 1;
+            } else if (previousStep === 2 || previousStep === 3.3) {
+              this.state.carouselIndex = (previousStep === 2 && this.state.selectedStayType === 'pro') ? 0 : 2;
             }
 
             // Re-render + scroll en haut (évite un décalage visuel hérité
@@ -5418,10 +4932,7 @@
       if (continueBtn) {
         continueBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          console.log('=== CONTINUE BUTTON CLICKED ===');
-          console.log('Current step:', this.state.currentStep);
-          console.log('Button has is-active class?', continueBtn.classList.contains('is-active'));
-          console.log('State selectedWho:', this.state.selectedWho);
+          if (!continueBtn.classList.contains('is-active')) return;
 
           // Pousser l'étape actuelle dans l'historique avant de naviguer
           this.state.stepHistory.push(this.state.currentStep);
@@ -5442,10 +4953,8 @@
           console.log('Advancing from', this.state.currentStep, 'to', nextStep);
           this.state.currentStep = nextStep;
 
-          // Centrer carousel pour Q2, Q3.2, Q3.3
           if (nextStep === 2 || nextStep === 3.2 || nextStep === 3.3) {
-            // En business, Q2 démarre sur la 1re carte pro (salle de réunion)
-            this.state.carouselIndex = (nextStep === 2 && this.state.selectedWho === 'business') ? 0 : 2;
+            this.state.carouselIndex = 2;
           }
 
           // Re-render + scroll en haut pour la nouvelle étape
@@ -5551,21 +5060,31 @@
           else if (this.state.currentStep === 1) {
             if (clickedIndex === this.state.carouselIndex) {
               console.log('Q1: Active card clicked, value:', value);
-              // Retirer la sélection de toutes les cartes
               this.querySelectorAll('.wd-discovery-modal__option').forEach(opt => {
                 opt.classList.remove('is-selected');
               });
 
-              this.state.selectedWho = value;
-              console.log('Set selectedWho to:', value);
-              // Ajouter feedback visuel
+              this.state.selectedStayType = value;
+              this.state.selectedWho = value === 'pro' ? 'business' : null;
+              // Nettoyer l'état des autres branches
+              this.state.eventFamily = null;
+              this.state.eventSubType = null;
+              this.state.proContext = null;
+              this.state.proNeeds = [];
+              this.state.bleisureChoice = null;
+              this.state.guideWork = null;
+              this.state.guideGroup = null;
+              console.log('Set selectedStayType to:', value);
               option.classList.add('is-selected');
               const continueBtn = this.querySelector('.wd-discovery-modal__continue');
               if (continueBtn) {
                 continueBtn.classList.add('is-active');
               }
+              const stepper = this.querySelector('.wd-discovery-modal__stepper');
+              if (stepper) {
+                stepper.textContent = `Étape 1/${this._getStepTotal()}`;
+              }
             } else {
-              // Clic sur carte non-active → navigation
               console.log('Q1: Not active card, navigating to:', clickedIndex);
               this.state.carouselIndex = clickedIndex;
               this.updateCarouselPosition();
@@ -5602,8 +5121,7 @@
 
         this.keydownHandler = (e) => {
           if (!this.isOpen) return;
-          // Q1: 5 (qui), Q2: 5 (style), Q3: 5 (types) - tous ont carousel
-          const totalOptions = this.state.currentStep === 1 ? 5 : (this.state.currentStep === 2 ? 5 : 5);
+          const totalOptions = this.state.currentStep === 1 ? 4 : (this.state.currentStep === 2 ? 5 : 5);
 
           if (e.key === 'ArrowLeft') {
             e.preventDefault();
@@ -5767,7 +5285,7 @@
     }
 
     handleSwipe() {
-      const totalOptions = this.state.currentStep === 1 ? 5 : (this.state.currentStep === 2 ? 5 : 0);
+      const totalOptions = this.state.currentStep === 1 ? 4 : (this.state.currentStep === 2 ? 5 : 0);
       if (totalOptions === 0) return; // Q3 n'a pas de carousel
       if (touchEndX < touchStartX - 50) {
         // Swipe left
@@ -5833,92 +5351,84 @@
       return next;
     }
 
-    // Dimension "profil" : logique existante, inchangée.
     _getNextStepByProfile(currentStep, state) {
-      // Flux business divergent
-      if (state.selectedWho === 'business') {
-        switch (currentStep) {
-          case 1:
-            return 2;
-          case 2:
-            return 'business-location';
-          case 'business-location':
-            return 'business-dates';
-          case 'business-dates':
-            return 6;
-          case 6:
-            return 'results';
-          default:
-            return currentStep;
+      // Q1 → branche selon selectedStayType
+      if (currentStep === 1) {
+        switch (state.selectedStayType) {
+          case 'escapade': return 1.5;
+          case 'pro': return 'pro-location';
+          case 'event': return 'event-family';
+          case 'guide': return 'guide-1';
+          default: return 1;
         }
       }
 
-      // Flux standard pour solo/couple/family/friends
-      switch (currentStep) {
-        case 1:
-          // Q1 → Q1.5 si family/friends, sinon Q2
-          if (state.selectedWho === 'family' || state.selectedWho === 'friends') {
+      // ── Branche Escapade (flux loisir, ex-V1) ──
+      if (state.selectedStayType === 'escapade') {
+        switch (currentStep) {
+          case 1.5: return 2;
+          case 2: return 3;
+          case 3:
+            if (state.destinationIdea === 'yes') return 3.2;
+            if (state.destinationIdea === 'no' || state.destinationIdea === 'multiple') return 3.3;
+            if (state.destinationIdea === 'wishlist') return 'wishlist';
+            return 3;
+          case 3.1: return 4;
+          case 3.2: return 4;
+          case 3.3: return 4;
+          case 'wishlist': return state.destinationInput ? 4 : 'wishlist';
+          case 4: return 5;
+          case 5: return 'results';
+          default: return currentStep;
+        }
+      }
+
+      // ── Branche Pro ──
+      if (state.selectedStayType === 'pro') {
+        switch (currentStep) {
+          case 'pro-location': return 'pro-dates';
+          case 'pro-dates': return 'pro-needs';
+          case 'pro-needs': return 'pro-bleisure';
+          case 'pro-bleisure': return 'results';
+          default: return currentStep;
+        }
+      }
+
+      // ── Branche Événement ──
+      if (state.selectedStayType === 'event') {
+        switch (currentStep) {
+          case 'event-family': return 'event-subtype';
+          case 'event-subtype': return 'event-location';
+          case 'event-location': return 'event-dates';
+          case 'event-dates': return 'event-volume';
+          case 'event-volume': return 'event-needs';
+          case 'event-needs': return 'results';
+          default: return currentStep;
+        }
+      }
+
+      // ── Branche Guide (mini-triage) ──
+      if (state.selectedStayType === 'guide') {
+        if (currentStep === 'guide-1') {
+          if (state.guideWork === 'no') {
+            state.selectedStayType = 'escapade';
             return 1.5;
           }
-          return 2;
-
-        case 1.5:
-          // Q1.5 → Q2
-          return 2;
-
-        case 2:
-          // Q2 → Q3
-          return 3;
-
-        case 3:
-          // Q3 : "oui, j'ai des idées" → on demande les destinations (3.2).
-          //      "non, pas encore d'idées" → inspiration par régions (3.3),
-          //      surtout PAS la question "entre quelles destinations hésitez-vous".
-          //      "repartir de ma wishlist" (connecté) → écran wishlist.
-          if (state.destinationIdea === 'yes') {
-            return 3.2;
-          } else if (state.destinationIdea === 'no') {
-            return 3.3;
-          } else if (state.destinationIdea === 'multiple') {
-            return 3.3;
-          } else if (state.destinationIdea === 'wishlist') {
-            return 'wishlist';
+          return 'guide-2';
+        }
+        if (currentStep === 'guide-2') {
+          if (state.guideGroup === 'yes') {
+            state.selectedStayType = 'event';
+            return 'event-family';
           }
-          return 3;
-
-        case 3.1:
-          // Q3.1 → Q4
-          return 4;
-
-        case 3.2:
-          // Q3.2 (destinations saisies) → Q4 (période)
-          return 4;
-
-        case 3.3:
-          // Q3.3 → Q4
-          return 4;
-
-        case 'wishlist':
-          // Écran wishlist → Q5 (période), seulement si une destination est retenue
-          return state.destinationInput ? 4 : 'wishlist';
-
-        case 4:
-          // Q4 → Q5
-          return 5;
-
-        case 5:
-          // Q6 services (flux standard) → Résultats
-          // (l'étape 6 n'est utilisée que par le flux business, qui affiche
-          //  les services à l'étape 6)
-          return 'results';
-
-        case 6:
-          // Q6 services (flux business) → Résultats
-          return 'results';
-
-        default:
-          return currentStep;
+          state.selectedStayType = 'pro';
+          state.selectedWho = 'business';
+          return 'pro-location';
+        }
+        return currentStep;
       }
+
+      return currentStep;
     }
 
     restart() {
