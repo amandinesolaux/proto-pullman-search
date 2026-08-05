@@ -268,11 +268,14 @@
 .wd-discovery-modal__option-content {
   position: relative;
   z-index: 2;
+  width: 100%;
   height: 100%;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 32px 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 16px 24px;
+  text-align: center;
 }
 
 .wd-discovery-modal__option svg {
@@ -280,15 +283,17 @@
 }
 
 .wd-discovery-modal__option:not(.wd-discovery-modal__option--choice) span {
-  font-family: var(--font-sans);
-  font-size: 16px;
-  font-weight: 500;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
   color: #ffffff;
   text-align: center;
   text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  line-height: 22px;
+  line-height: 24px;
   opacity: 0.7;
   transition: opacity 0.4s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .wd-discovery-modal__option.is-active span {
@@ -445,6 +450,96 @@
   width: 24px;
   border-radius: 4px;
   background: #445047;
+}
+
+/* Card description (small text under label) */
+.wd-discovery-modal__option-desc {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: #ffffff;
+  opacity: 0.75;
+  display: block;
+  margin-top: 4px;
+  text-align: center;
+  line-height: 16px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* --- Chips (single-select & multi-select) --- */
+.wd-discovery-modal__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-outline-low, #BCCABE);
+  background: var(--color-surface, #fff);
+  color: var(--color-on-surface-hi, #445047);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.wd-discovery-modal__chip:hover {
+  border-color: var(--color-accent, #445047);
+  background: var(--color-hover-transparent, rgba(8,19,13,0.08));
+}
+
+.wd-discovery-modal__chip.is-selected {
+  border-color: var(--color-accent, #445047);
+  background: var(--color-accent, #445047);
+  color: var(--color-on-accent, #fff);
+}
+
+/* Chip with description (two-line layout) */
+.wd-discovery-modal__chip--rich {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 14px 20px;
+  border-radius: 12px;
+}
+
+.wd-discovery-modal__chip-label {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.wd-discovery-modal__chip-desc {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.7;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.wd-discovery-modal__chip.is-selected .wd-discovery-modal__chip-desc {
+  opacity: 0.85;
+}
+
+/* Chips container */
+.wd-discovery-modal__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Large chip (bleisure style) */
+.wd-discovery-modal__chip--large {
+  flex: 1;
+  min-width: 140px;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  border-width: 2px;
 }
 
 /* Footer */

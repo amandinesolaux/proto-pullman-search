@@ -2939,10 +2939,10 @@
 
     renderQuestion1() {
       const options = [
-        { value: 'escapade', label: 'Une escapade', desc: 'Séjour loisir, détente, découverte', image: '../../assets/images/discovery/couple.jpg' },
-        { value: 'pro', label: 'Un déplacement pro', desc: 'Voyage d\'affaires, coworking', image: '../../assets/images/discovery/businesstravel.avif' },
-        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/discovery/friendtravel.avif' },
-        { value: 'guide', label: 'Je me laisse guider', desc: 'Pas encore sûr ? On vous oriente', image: '../../assets/images/discovery/solo.jpg' }
+        { value: 'escapade', label: 'Une escapade', desc: 'Séjour loisir, détente, découverte', image: '../../assets/images/discovery/couple.avif' },
+        { value: 'pro', label: 'Un déplacement pro', desc: 'Voyage d\'affaires, coworking', image: '../../assets/images/discovery/business.avif' },
+        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/discovery/events.avif' },
+        { value: 'guide', label: 'Je me laisse guider', desc: 'Pas encore sûr ? On vous oriente', image: '../../assets/images/discovery/city.avif' }
       ];
 
       return `
@@ -2982,7 +2982,7 @@
                     </div>
                     <div class="wd-discovery-modal__option-content">
                       <span>${opt.label}</span>
-                      <small style="opacity: 0.8; font-size: 11px; display: block; margin-top: 2px;">${opt.desc}</small>
+                      <small class="wd-discovery-modal__option-desc">${opt.desc}</small>
                     </div>
                   </button>`;
                 }).join('')}
@@ -3046,14 +3046,9 @@
 
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">2. Avec qui voyagez-vous ?</label>
-              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+              <div class="wd-discovery-modal__chips" style="margin-bottom: 20px;">
                 ${whoOptions.map(opt => `
-                  <button class="wd-discovery-modal__chip${this.state.selectedWho === opt.value ? ' is-selected' : ''}" data-who="${opt.value}" style="
-                    padding: 10px 20px; border-radius: 24px; border: 1.5px solid ${this.state.selectedWho === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                    background: ${this.state.selectedWho === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                    color: ${this.state.selectedWho === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                    font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-                  ">${opt.label}</button>
+                  <button class="wd-discovery-modal__chip${this.state.selectedWho === opt.value ? ' is-selected' : ''}" data-who="${opt.value}">${opt.label}</button>
                 `).join('')}
               </div>
 
@@ -4096,14 +4091,9 @@
             <p class="wd-discovery-modal__subtitle">${subtitle}</p>
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">${label}</label>
-              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+              <div class="wd-discovery-modal__chips" style="margin-top: 12px;">
                 ${options.map(opt => `
-                  <button class="wd-discovery-modal__chip${selected === opt.value ? ' is-selected' : ''}" data-stub-value="${opt.value}" data-stub-field="${stateField}" style="
-                    padding: 12px 20px; border-radius: 12px; border: 1.5px solid ${selected === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                    background: ${selected === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                    color: ${selected === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                    font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left;
-                  "><span style="display:block; font-weight:600;">${opt.label}</span>${opt.desc ? `<small style="opacity:0.7; font-size:12px; display:block; margin-top:2px;">${opt.desc}</small>` : ''}</button>
+                  <button class="wd-discovery-modal__chip${opt.desc ? ' wd-discovery-modal__chip--rich' : ''}${selected === opt.value ? ' is-selected' : ''}" data-stub-value="${opt.value}" data-stub-field="${stateField}"><span class="wd-discovery-modal__chip-label">${opt.label}</span>${opt.desc ? `<span class="wd-discovery-modal__chip-desc">${opt.desc}</span>` : ''}</button>
                 `).join('')}
               </div>
             </div>
@@ -4127,16 +4117,11 @@
             <p class="wd-discovery-modal__subtitle">${subtitle}</p>
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">${label}</label>
-              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+              <div class="wd-discovery-modal__chips" style="margin-top: 12px;">
                 ${options.map(opt => {
                   const isSel = selected.includes(opt.value);
                   return `
-                  <button class="wd-discovery-modal__chip${isSel ? ' is-selected' : ''}" data-multi-value="${opt.value}" data-multi-field="${stateField}" style="
-                    padding: 10px 18px; border-radius: 24px; border: 1.5px solid ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                    background: ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                    color: ${isSel ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                    font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-                  ">${opt.label}</button>`;
+                  <button class="wd-discovery-modal__chip${isSel ? ' is-selected' : ''}" data-multi-value="${opt.value}" data-multi-field="${stateField}">${opt.label}</button>`;
                 }).join('')}
               </div>
             </div>
@@ -4174,26 +4159,16 @@
             <p class="wd-discovery-modal__subtitle">Sélectionnez votre contexte puis les services souhaités.</p>
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label" style="margin-bottom: 8px;">Contexte</label>
-              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;">
+              <div class="wd-discovery-modal__chips" style="margin-bottom: 20px;">
                 ${contextOptions.map(opt => `
-                  <button class="wd-discovery-modal__chip" data-stub-value="${opt.value}" data-stub-field="proContext" style="
-                    padding: 10px 20px; border-radius: 24px; border: 1.5px solid ${ctx === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                    background: ${ctx === opt.value ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                    color: ${ctx === opt.value ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                    font-size: 14px; font-weight: 500; cursor: pointer;
-                  ">${opt.label}</button>
+                  <button class="wd-discovery-modal__chip${ctx === opt.value ? ' is-selected' : ''}" data-stub-value="${opt.value}" data-stub-field="proContext">${opt.label}</button>
                 `).join('')}
               </div>
               <label class="wd-discovery-modal__question-label" style="margin-bottom: 8px;">Services</label>
-              <div class="wd-discovery-modal__chips" style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <div class="wd-discovery-modal__chips">
                 ${needsOptions.map(opt => {
                   const isSel = needs.includes(opt.value);
-                  return `<button class="wd-discovery-modal__chip" data-multi-value="${opt.value}" data-multi-field="proNeeds" style="
-                    padding: 10px 18px; border-radius: 24px; border: 1.5px solid ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                    background: ${isSel ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                    color: ${isSel ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                    font-size: 13px; font-weight: 500; cursor: pointer;
-                  ">${opt.label}</button>`;
+                  return `<button class="wd-discovery-modal__chip${isSel ? ' is-selected' : ''}" data-multi-value="${opt.value}" data-multi-field="proNeeds">${opt.label}</button>`;
                 }).join('')}
               </div>
             </div>
@@ -4217,21 +4192,9 @@
             <p class="wd-discovery-modal__subtitle">Découvrez ce que Pullman ${this.state.businessLocation || ''} vous réserve au-delà du travail.</p>
             <div class="wd-discovery-modal__question">
               <label class="wd-discovery-modal__question-label">Prolonger votre séjour ?</label>
-              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px;">
-                <button class="wd-discovery-modal__chip" data-stub-value="yes" data-stub-field="bleisureChoice" style="
-                  flex: 1; min-width: 140px; padding: 20px; border-radius: 12px; text-align: center;
-                  border: 2px solid ${choice === 'yes' ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                  background: ${choice === 'yes' ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                  color: ${choice === 'yes' ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                  font-size: 15px; font-weight: 600; cursor: pointer;
-                ">Prolonger mon séjour</button>
-                <button class="wd-discovery-modal__chip" data-stub-value="no" data-stub-field="bleisureChoice" style="
-                  flex: 1; min-width: 140px; padding: 20px; border-radius: 12px; text-align: center;
-                  border: 2px solid ${choice === 'no' ? 'var(--color-pullman, #445047)' : 'var(--color-border, #E8E4DC)'};
-                  background: ${choice === 'no' ? 'var(--color-pullman, #445047)' : 'var(--color-card-bg, #fff)'};
-                  color: ${choice === 'no' ? '#fff' : 'var(--color-ink, #1a1a18)'};
-                  font-size: 15px; font-weight: 600; cursor: pointer;
-                ">Pas cette fois</button>
+              <div class="wd-discovery-modal__chips" style="margin-top: 12px; gap: 12px;">
+                <button class="wd-discovery-modal__chip wd-discovery-modal__chip--large${choice === 'yes' ? ' is-selected' : ''}" data-stub-value="yes" data-stub-field="bleisureChoice">Prolonger mon séjour</button>
+                <button class="wd-discovery-modal__chip wd-discovery-modal__chip--large${choice === 'no' ? ' is-selected' : ''}" data-stub-value="no" data-stub-field="bleisureChoice">Pas cette fois</button>
               </div>
             </div>
             <div class="wd-discovery-modal__footer">
