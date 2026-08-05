@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discovery Wizard Pullman — Cartographie V2</title>
+<style>
+  :root {
+    --pullman: #445047;
+    --pullman-light: #5a6b5e;
+    --stone: #B8A88A;
+    --stone-light: #D4C8B0;
+    --sand: #F5F0E8;
+    --ink: #1a1a18;
+    --muted: #6b6b66;
+    --bg: #FAFAF7;
+    --card-bg: #FFFFFF;
+    --border-c: #E8E4DC;
+    --step-bg: #F0EDE6;
+    --badge-connected: #2D6A4F;
+    --badge-connected-bg: #D8F3DC;
+    --badge-all: #6b6b66;
+    --badge-all-bg: #F0EDE6;
+    --highlight: #FFF3CD;
+    --highlight-border: #E6D9A0;
+    --family-accent: #8B5CF6;
+    --family-bg: #F3F0FF;
+    --friends-accent: #F59E0B;
+    --friends-bg: #FFFBEB;
+    --business-accent: #0369A1;
+    --business-bg: #E0F2FE;
+    --solo-accent: #445047;
+    --solo-bg: #F0F4F1;
+    --couple-accent: #DB2777;
+    --couple-bg: #FDF2F8;
+    --event-accent: #B45309;
+    --event-bg: #FDF3E7;
+    --vision-accent: #7C3AED;
+    --vision-bg: #F3EEFF;
+    --guide-accent: #6D6D6D;
+    --guide-bg: #F4F4F2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --pullman: #7A9B80;
+      --pullman-light: #5a6b5e;
+      --stone: #9B8D74;
+      --stone-light: #6B604D;
+      --sand: #2A2822;
+      --ink: #E8E6E0;
+      --muted: #9B9A94;
+      --bg: #1A1918;
+      --card-bg: #242320;
+      --border-c: #3A3830;
+      --step-bg: #2E2D28;
+      --badge-connected: #52B788;
+      --badge-connected-bg: #1B3D2F;
+      --badge-all: #9B9A94;
+      --badge-all-bg: #2E2D28;
+      --highlight: #3D3820;
+      --highlight-border: #5A5230;
+      --family-accent: #A78BFA;
+      --family-bg: #2D2640;
+      --friends-accent: #FBBF24;
+      --friends-bg: #3D3418;
+      --business-accent: #38BDF8;
+      --business-bg: #1A2E3D;
+      --solo-accent: #7A9B80;
+      --solo-bg: #242D26;
+      --couple-accent: #F472B6;
+      --couple-bg: #3D1A2E;
+      --event-accent: #F59E42;
+      --event-bg: #3A2A18;
+      --vision-accent: #A78BFA;
+      --vision-bg: #2D2640;
+      --guide-accent: #9B9A94;
+      --guide-bg: #2E2D28;
+    }
+  }
+  :root[data-theme="dark"] {
+    --pullman: #7A9B80; --stone: #9B8D74; --sand: #2A2822; --ink: #E8E6E0;
+    --muted: #9B9A94; --bg: #1A1918; --card-bg: #242320; --border-c: #3A3830;
+    --step-bg: #2E2D28; --badge-connected: #52B788; --badge-connected-bg: #1B3D2F;
+    --badge-all: #9B9A94; --badge-all-bg: #2E2D28; --highlight: #3D3820;
+    --highlight-border: #5A5230; --business-accent: #38BDF8; --business-bg: #1A2E3D;
+    --event-accent: #F59E42; --event-bg: #3A2A18; --vision-accent: #A78BFA; --vision-bg: #2D2640;
+    --guide-accent: #9B9A94; --guide-bg: #2E2D28;
+  }
+  :root[data-theme="light"] {
+    --pullman: #445047; --stone: #B8A88A; --sand: #F5F0E8; --ink: #1a1a18;
+    --muted: #6b6b66; --bg: #FAFAF7; --card-bg: #FFFFFF; --border-c: #E8E4DC;
+    --step-bg: #F0EDE6; --badge-connected: #2D6A4F; --badge-connected-bg: #D8F3DC;
+    --badge-all: #6b6b66; --badge-all-bg: #F0EDE6; --highlight: #FFF3CD;
+    --highlight-border: #E6D9A0; --business-accent: #0369A1; --business-bg: #E0F2FE;
+    --event-accent: #B45309; --event-bg: #FDF3E7; --vision-accent: #7C3AED; --vision-bg: #F3EEFF;
+    --guide-accent: #6D6D6D; --guide-bg: #F4F4F2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  .page { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-header { margin-bottom: 40px; }
+  .page-header h1 {
+    font-size: 26px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--pullman); margin-bottom: 6px;
+  }
+  .page-header p { font-size: 15px; color: var(--muted); max-width: 640px; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px;
+    padding: 16px 20px; background: var(--card-bg);
+    border: 1px solid var(--border-c); border-radius: 10px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 28px;
+    border-bottom: 1px solid var(--border-c); overflow-x: auto;
+  }
+  .tab {
+    padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--muted);
+    background: none; border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; white-space: nowrap; transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--pullman); border-bottom-color: var(--pullman); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .flow-section { margin-bottom: 36px; }
+  .flow-section h2 {
+    font-size: 18px; font-weight: 600; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .flow-section h2 .icon {
+    width: 28px; height: 28px; border-radius: 8px; display: flex;
+    align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;
+  }
+  .flow-section > p { font-size: 14px; color: var(--muted); margin-bottom: 20px; max-width: 720px; }
+
+  .flow-path {
+    background: var(--card-bg); border: 1px solid var(--border-c);
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
+  }
+  .flow-path h3 {
+    font-size: 15px; font-weight: 600; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .flow-path > .path-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+  .path-steps {
+    font-size: 13px; color: var(--muted); display: flex;
+    align-items: center; gap: 6px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .path-steps span {
+    background: var(--step-bg); padding: 2px 8px; border-radius: 4px;
+    color: var(--ink); font-weight: 500; font-size: 12px;
+  }
+  .path-steps .arr { color: var(--stone); font-size: 11px; background: none; }
+
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .step { display: flex; align-items: flex-start; gap: 14px; position: relative; padding-bottom: 16px; }
+  .step:last-child { padding-bottom: 0; }
+  .step-marker { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 28px; }
+  .step-dot {
+    width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--pullman);
+    background: var(--card-bg); z-index: 1; flex-shrink: 0;
+  }
+  .step-dot.filled { background: var(--pullman); }
+  .step-line { width: 2px; flex: 1; background: var(--border-c); min-height: 12px; }
+  .step:last-child .step-line { display: none; }
+  .step-content { flex: 1; padding-top: 0; min-width: 0; }
+  .step-label {
+    font-size: 12px; font-weight: 600; color: var(--pullman);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;
+  }
+  .step-question { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .step-note { font-size: 12px; color: var(--muted); margin-top: 4px; font-style: italic; }
+
+  .step-options { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .option-pill {
+    font-size: 12px; padding: 3px 10px; border-radius: 20px;
+    background: var(--step-bg); color: var(--muted); border: 1px solid var(--border-c);
+  }
+  .option-pill.highlight { background: var(--highlight); border-color: var(--highlight-border); color: var(--ink); }
+  .option-pill.work { background: var(--business-bg); border-color: var(--business-accent); color: var(--business-accent); }
+  .option-pill.event { background: var(--event-bg); border-color: var(--event-accent); color: var(--event-accent); }
+  .option-pill.guide { background: var(--guide-bg); border-color: var(--guide-accent); color: var(--guide-accent); }
+
+  .badge {
+    font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .badge-connected { background: var(--badge-connected-bg); color: var(--badge-connected); }
+  .badge-all { background: var(--badge-all-bg); color: var(--badge-all); }
+  .badge-new { background: var(--event-bg); color: var(--event-accent); }
+  .badge-vision { background: var(--vision-bg); color: var(--vision-accent); }
+  .badge-ux { background: #E8F5E9; color: #2E7D32; }
+  .badge-validated { background: #E8F5E9; color: #2E7D32; }
+
+  .diff-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .diff-table thead th {
+    text-align: left; padding: 10px 14px; background: var(--step-bg); font-weight: 600;
+    color: var(--ink); border-bottom: 2px solid var(--border-c); white-space: nowrap;
+  }
+  .diff-table tbody td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border-c);
+    vertical-align: top; color: var(--ink);
+  }
+  .diff-table tbody tr:last-child td { border-bottom: none; }
+  .check { color: var(--badge-connected); }
+  .cross { color: var(--muted); opacity: 0.5; }
+
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
+  .summary-card {
+    background: var(--card-bg); border: 1px solid var(--border-c);
+    border-radius: 12px; padding: 20px; border-left: 4px solid var(--pullman);
+  }
+  .summary-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .summary-card .num { font-size: 28px; font-weight: 700; color: var(--pullman); font-variant-numeric: tabular-nums; }
+  .summary-card .desc { font-size: 12px; color: var(--muted); }
+
+  .branch-fork { margin: 8px 0 8px 42px; padding: 12px 16px; background: var(--sand); border-radius: 8px; font-size: 13px; }
+  .branch-fork strong { color: var(--pullman); }
+
+  .callout {
+    padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; font-size: 13px; color: var(--ink);
+  }
+  .callout strong { display: block; margin-bottom: 2px; }
+  .callout-vision { background: var(--vision-bg); border-left: 3px solid var(--vision-accent); }
+  .callout-event { background: var(--event-bg); border-left: 3px solid var(--event-accent); }
+  .callout-work { background: var(--business-bg); border-left: 3px solid var(--business-accent); }
+  .callout-ux { background: #E8F5E9; border-left: 3px solid #2E7D32; }
+
+  .tier {
+    display: flex; gap: 14px; align-items: flex-start; padding: 14px 0;
+    border-bottom: 1px solid var(--border-c);
+  }
+  .tier:last-child { border-bottom: none; }
+  .tier-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .tier-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .tier-body p { font-size: 13px; color: var(--muted); }
+
+  .concierge-example {
+    background: var(--sand); border-radius: 8px; padding: 14px 18px;
+    margin: 10px 0; font-size: 13px; font-style: italic; color: var(--ink);
+    border-left: 3px solid var(--pullman);
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: 24px 16px 60px; }
+    .page-header h1 { font-size: 22px; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .tabs { gap: 0; }
+    .tab { padding: 8px 12px; font-size: 13px; }
+    .flow-path { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <h1>Discovery Wizard Pullman — Cartographie V2</h1>
+    <p>Refonte du wizard : la Q1 segmente par <strong>intention de sejour</strong> (et non plus par composition de groupe). Quatre choix dont un filet de securite pour les indecis. Trois branches principales — Escapade, Deplacement pro, Evenement — chacune alignee sur l'offre reelle Pullman. Cinq raffinements UX valides integres.</p>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background: var(--solo-accent);"></div>Escapade (loisir)</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--business-accent);"></div>Deplacement pro</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--event-accent);"></div>Evenement</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--guide-accent);"></div>Je me laisse guider</div>
+      <div class="legend-item"><div class="legend-dot" style="background: var(--vision-accent);"></div>Vision cible (self-service)</div>
+      <div class="legend-item"><span class="badge badge-ux">UX</span> Raffinement valide</div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="num">4</div>
+      <h4>Choix en Q1</h4>
+      <div class="desc">Escapade, Pro, Evenement, Guide</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--event-accent);">
+      <div class="num">7</div>
+      <h4>Ecrans Evenement</h4>
+      <div class="desc">E1a, E1b, E2, E3, E4, E5, Plan</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--business-accent);">
+      <div class="num">5</div>
+      <h4>Ecrans Pro</h4>
+      <div class="desc">Lieu, Dates, Besoins, Bleisure, Plan</div>
+    </div>
+    <div class="summary-card" style="border-left-color: #2E7D32;">
+      <div class="num">5</div>
+      <h4>Raffinements UX</h4>
+      <div class="desc">Q1 guide, fusion Nature+Besoins, E1 2 niveaux, recap concierge, bleisure teaser</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" role="tab" data-tab="overview">Vue d'ensemble</button>
+    <button class="tab" role="tab" data-tab="escapade">Escapade</button>
+    <button class="tab" role="tab" data-tab="pro">Deplacement pro</button>
+    <button class="tab" role="tab" data-tab="event">Evenement</button>
+    <button class="tab" role="tab" data-tab="plan">Modele de fin</button>
+    <button class="tab" role="tab" data-tab="changelog">V1 vs V2</button>
+  </div>
+
+  <!-- ==================== VUE D'ENSEMBLE ==================== -->
+  <div class="tab-panel active" data-panel="overview">
+    <div class="flow-section">
+      <h2>Nouvelle Q1 — le point de bascule</h2>
+      <p>La Q1 actuelle (&laquo; Avec qui voyagez-vous ? &raquo;) est remplacee. On segmente par intention de sejour. La composition du groupe (solo / couple / famille / amis) redescend en Q1.5, uniquement sur la branche Escapade.</p>
+
+      <div class="flow-path">
+        <h3>Q1 — &laquo; Quel type de sejour preparez-vous ? &raquo;</h3>
+        <p class="path-desc">Ecran d'entree. Quatre choix, un seul niveau de decision (le motif). Le mot &laquo; preparez &raquo; inclut aussi bien celui qui reserve que celui qui organise un evenement.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--solo-accent); background: var(--solo-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--solo-accent);">Branche 1 — Escapade</div>
+              <div class="step-question">Un sejour loisir</div>
+              <div class="step-note">Enchaine sur Q1.5 &laquo; avec qui &raquo;. Le reste du flux loisir est inchange par rapport a la V1.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Branche 2 — Deplacement pro</div>
+              <div class="step-question">Un deplacement professionnel</div>
+              <div class="step-note">Flux business enrichi : lieu, dates, besoins avec contexte integre, extension bleisure.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">Branche 3 — Evenement <span class="badge badge-new">nouveau</span></div>
+              <div class="step-question">Un evenement a organiser</div>
+              <div class="step-note">Flux inedit. Entree en 2 niveaux : d'abord Pro ou Celebration, puis sous-type.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--guide-accent); background: var(--guide-accent);"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--guide-accent);">Branche 4 — Je me laisse guider <span class="badge badge-ux">UX</span></div>
+              <div class="step-question">Je ne sais pas encore</div>
+              <div class="step-note">Filet de securite pour les indecis. Lance un mini-triage conversationnel (2-3 questions rapides) qui redirige vers la bonne branche. Evite le drop silencieux des utilisateurs qui ne se reconnaissent dans aucun motif.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-path">
+        <h3>Mini-triage &laquo; Je me laisse guider &raquo; <span class="badge badge-ux">UX</span></h3>
+        <p class="path-desc">Parcours court (2-3 questions fermees) qui oriente vers la bonne branche sans demander a l'utilisateur de se categoriser lui-meme.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--guide-accent); background: var(--guide-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--guide-accent);">Question 1</div>
+              <div class="step-question">&laquo; C'est pour le travail ? &raquo;</div>
+              <div class="step-options">
+                <span class="option-pill highlight">Oui &rarr; Question 2 pro</span>
+                <span class="option-pill highlight">Non &rarr; Branche Escapade</span>
+              </div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot" style="border-color: var(--guide-accent);"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--guide-accent);">Question 2 (si oui)</div>
+              <div class="step-question">&laquo; Vous organisez quelque chose pour un groupe ? &raquo;</div>
+              <div class="step-options">
+                <span class="option-pill highlight">Oui &rarr; Branche Evenement</span>
+                <span class="option-pill highlight">Non &rarr; Branche Pro</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-path">
+        <h3>Arborescence des branches</h3>
+
+        <div style="margin-bottom: 20px;">
+          <div class="step-label" style="color: var(--solo-accent);">Escapade</div>
+          <div class="path-steps">
+            <span>Q1</span><span class="arr">&rarr;</span>
+            <span>Q1.5</span><span class="arr">&rarr;</span>
+            <span>Q2</span><span class="arr">&rarr;</span>
+            <span>Q3</span><span class="arr">&rarr;</span>
+            <span>Q3.x</span><span class="arr">&rarr;</span>
+            <span>Q4</span><span class="arr">&rarr;</span>
+            <span>Q5</span><span class="arr">&rarr;</span>
+            <span>Resultats</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div class="step-label" style="color: var(--business-accent);">Deplacement pro</div>
+          <div class="path-steps">
+            <span>Q1</span><span class="arr">&rarr;</span>
+            <span>Lieu</span><span class="arr">&rarr;</span>
+            <span>Dates</span><span class="arr">&rarr;</span>
+            <span>Besoins</span><span class="arr">&rarr;</span>
+            <span>Bleisure</span><span class="arr">&rarr;</span>
+            <span>Plan compose</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <div class="step-label" style="color: var(--event-accent);">Evenement</div>
+          <div class="path-steps">
+            <span>Q1</span><span class="arr">&rarr;</span>
+            <span>E1a Famille</span><span class="arr">&rarr;</span>
+            <span>E1b Sous-type</span><span class="arr">&rarr;</span>
+            <span>E2 Lieu</span><span class="arr">&rarr;</span>
+            <span>E3 Dates</span><span class="arr">&rarr;</span>
+            <span>E4 Volume</span><span class="arr">&rarr;</span>
+            <span>E5 Besoins</span><span class="arr">&rarr;</span>
+            <span>Plan compose</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="step-label" style="color: var(--guide-accent);">Je me laisse guider</div>
+          <div class="path-steps">
+            <span>Q1</span><span class="arr">&rarr;</span>
+            <span>Triage 1</span><span class="arr">&rarr;</span>
+            <span>Triage 2</span><span class="arr">&rarr;</span>
+            <span>Redirection branche</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ESCAPADE ==================== -->
+  <div class="tab-panel" data-panel="escapade">
+    <div class="flow-section">
+      <h2><span class="icon" style="background: var(--solo-bg); color: var(--solo-accent);">E</span> Branche Escapade — loisir</h2>
+      <p>Le flux standard de la V1, inchange dans sa mecanique interne. Seul deplacement : la composition du groupe (Q1.5) n'est plus declenchee par un choix Famille/Amis en Q1, mais par la selection &laquo; Escapade &raquo; — elle qualifie alors solo / couple / famille / amis.</p>
+
+      <div class="flow-path" style="border-left: 4px solid var(--solo-accent);">
+        <h3>Flux complet</h3>
+        <div class="path-steps">
+          <span>Q1</span><span class="arr">&rarr;</span>
+          <span>Q1.5</span><span class="arr">&rarr;</span>
+          <span>Q2</span><span class="arr">&rarr;</span>
+          <span>Q3</span><span class="arr">&rarr;</span>
+          <span>Q3.x</span><span class="arr">&rarr;</span>
+          <span>Q4</span><span class="arr">&rarr;</span>
+          <span>Q5</span><span class="arr">&rarr;</span>
+          <span>Resultats</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--solo-accent); background: var(--solo-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--solo-accent);">Q1.5 — Avec qui voyagez-vous ?</div>
+              <div class="step-question">Composition du groupe</div>
+              <div class="step-options">
+                <span class="option-pill">Solo</span>
+                <span class="option-pill">En couple</span>
+                <span class="option-pill">En famille</span>
+                <span class="option-pill">Entre amis</span>
+              </div>
+              <div class="step-note">Famille &rarr; collecte nb enfants + ages (comme V1). Amis &rarr; nb adultes uniquement. Solo/Couple &rarr; pas de champ de composition.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--solo-accent); background: var(--solo-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--solo-accent);">Q2 &rarr; Q3 &rarr; Q3.x &rarr; Q4 &rarr; Q5 &rarr; Resultats</div>
+              <div class="step-question">Identique a la V1</div>
+              <div class="step-note">Aucune modification. Se reporter a la cartographie V1 pour le detail des ecrans (options Q2, 3 chemins destination Q3.2/Q3.3/Wishlist, periode/duree Q4, services adaptes Q5).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-ux">
+        <strong>Note d'implementation</strong>
+        La logique interne des ecrans Q2 &rarr; Resultats ne bouge pas. Le seul changement est le <em>declencheur</em> de Q1.5 : il ecoutait <code>selectedWho &isin; {family, friends}</code> ; il ecoute desormais <code>selectedStayType === 'escapade'</code>, puis <code>selectedWho</code> devient le resultat de Q1.5.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DEPLACEMENT PRO ==================== -->
+  <div class="tab-panel" data-panel="pro">
+    <div class="flow-section">
+      <h2><span class="icon" style="background: var(--business-bg); color: var(--business-accent);">P</span> Branche Deplacement pro — enrichie</h2>
+      <p>Le flux business V1 etait une reservation de chambre a peine habillee. On l'enrichit avec les deux dimensions propres a Pullman : le <strong>travail</strong> (Business Playground / coworking) et le <strong>bleisure</strong> (prolonger le deplacement en escapade).</p>
+
+      <div class="flow-path" style="border-left: 4px solid var(--business-accent);">
+        <h3>Flux complet</h3>
+        <div class="path-steps">
+          <span>Q1</span><span class="arr">&rarr;</span>
+          <span>Lieu</span><span class="arr">&rarr;</span>
+          <span>Dates</span><span class="arr">&rarr;</span>
+          <span>Besoins</span><span class="arr">&rarr;</span>
+          <span>Bleisure</span><span class="arr">&rarr;</span>
+          <span>Plan compose</span>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Lieu</div>
+              <div class="step-question">Ou vous rendez-vous ?</div>
+              <div class="step-note">Autocomplete ville / hotel. Reutilise le composant Business-Location de la V1.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Dates</div>
+              <div class="step-question">Quand ?</div>
+              <div class="step-note">Calendrier range. Reutilise Business-Dates de la V1.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Besoins — avec contexte integre <span class="badge badge-ux">UX</span> <span class="badge badge-validated">valide</span></div>
+              <div class="step-question">De quoi avez-vous besoin ?</div>
+              <div class="step-note">Fusion de l'ancien ecran &laquo; Nature du deplacement &raquo; et &laquo; Besoins &raquo; en un seul ecran. Un toggle de contexte en haut (chips) pre-selectionne les options pertinentes selon le type de deplacement. Un ecran de moins dans le parcours, meme richesse d'info collectee.</div>
+
+              <div style="margin-top: 12px; padding: 12px 16px; background: var(--sand); border-radius: 8px; font-size: 13px;">
+                <strong style="color: var(--business-accent);">Toggle contexte :</strong>
+                <div class="step-options" style="margin-top: 6px;">
+                  <span class="option-pill work">Solo</span>
+                  <span class="option-pill work">En equipe</span>
+                  <span class="option-pill work">Rencontre client</span>
+                </div>
+              </div>
+
+              <div class="branch-fork" style="margin-left: 0; margin-top: 10px;">
+                <strong>Solo selectionne</strong> &rarr; met en avant : chambre equipee pour travailler, acces coworking.<br>
+                <strong>En equipe</strong> &rarr; met en avant : petite salle de reunion, nuitees groupees.<br>
+                <strong>Rencontre client</strong> &rarr; met en avant : lieu representatif, salle privative.
+              </div>
+
+              <div class="step-note" style="font-style: normal; margin-top: 10px; font-weight: 500; color: var(--business-accent);">Options disponibles :</div>
+              <div class="step-options" style="margin-top: 4px;">
+                <span class="option-pill work">Chambre equipee pour travailler</span>
+                <span class="option-pill work">Acces coworking</span>
+                <span class="option-pill work">Petite salle de reunion (2-8 pers.)</span>
+                <span class="option-pill">Spa</span>
+                <span class="option-pill">Restaurant</span>
+                <span class="option-pill">Vie locale</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Bleisure — carte teaser <span class="badge badge-ux">UX</span> <span class="badge badge-validated">valide</span></div>
+              <div class="step-question">&laquo; Et si vous restiez un peu plus ? &raquo;</div>
+              <div class="step-note">Plus un simple oui/non mais un ecran d'inspiration. On montre concretement ce que Pullman propose sur place via des mini-cards visuelles contextualisees selon le lieu selectionne. C'est le moment de discovery le plus fort du wizard et un levier d'upsell naturel.</div>
+
+              <div style="margin-top: 12px; padding: 14px 18px; background: var(--sand); border-radius: 8px; font-size: 13px;">
+                <strong style="color: var(--pullman);">Exemple pour Lyon :</strong>
+                <div class="step-options" style="margin-top: 8px;">
+                  <span class="option-pill" style="padding: 6px 14px;">Spa &amp; Wellness</span>
+                  <span class="option-pill" style="padding: 6px 14px;">Gastronomie locale</span>
+                  <span class="option-pill" style="padding: 6px 14px;">Experiences</span>
+                </div>
+                <div class="step-note" style="font-style: normal; margin-top: 8px;">Chaque card = photo de l'offre reelle de l'hotel + titre court. L'utilisateur voit ce qu'il pourrait vivre, pas une question abstraite.</div>
+              </div>
+
+              <div class="step-options" style="margin-top: 10px;">
+                <span class="option-pill highlight">Prolonger mon sejour</span>
+                <span class="option-pill">Pas cette fois</span>
+              </div>
+              <div class="step-note">&laquo; Prolonger &raquo; ajoute des nuits + les experiences selectionnees au plan compose.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--business-accent); background: var(--business-accent);"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--business-accent);">Plan compose</div>
+              <div class="step-question">Recap concierge + plan composable</div>
+              <div class="step-note">Fin en plan composable (voir onglet &laquo; Modele de fin &raquo;). Ouvert par un recap en langage naturel.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="callout callout-work">
+        <strong>Continuum pro &harr; evenement</strong>
+        Deplacement solo &rarr; petit meeting d'equipe &rarr; seminaire &rarr; congres forment un continuum. Les branches Pro et Evenement partagent le meme modele de fin (le plan composable) ; seul le curseur autonomie/devis est place differemment.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== EVENEMENT ==================== -->
+  <div class="tab-panel" data-panel="event">
+    <div class="flow-section">
+      <h2><span class="icon" style="background: var(--event-bg); color: var(--event-accent);">E</span> Branche Evenement — nouvelle</h2>
+      <p>Branche inedite, calquee sur l'offre reelle Pullman. Un evenement ne se reserve pas comme une chambre — chez Pullman il passe par un Event Manager et une logique de devis. Le job du wizard : <strong>qualifier &rarr; composer un plan / preremplir la demande</strong>.</p>
+
+      <div class="callout callout-event">
+        <strong>Deux familles issues de l'offre Pullman</strong>
+        <strong style="font-weight:600; display:inline;">Professionnel</strong> — seminaires, conferences, congres, workshops, team building, lancements produit, soirees d'entreprise (CoMeeting / Business Playground).<br>
+        <strong style="font-weight:600; display:inline;">Celebration</strong> — mariage, EVG/EVJF, anniversaire, baby shower, bar mitzvah (Event Manager / wedding planners, dispositifs lifestyle type cinema prive, Pamper Bar).
+      </div>
+
+      <div class="flow-path" style="border-left: 4px solid var(--event-accent);">
+        <h3>Flux complet</h3>
+        <div class="path-steps">
+          <span>Q1</span><span class="arr">&rarr;</span>
+          <span>E1a Famille</span><span class="arr">&rarr;</span>
+          <span>E1b Sous-type</span><span class="arr">&rarr;</span>
+          <span>E2 Lieu</span><span class="arr">&rarr;</span>
+          <span>E3 Dates</span><span class="arr">&rarr;</span>
+          <span>E4 Volume</span><span class="arr">&rarr;</span>
+          <span>E5 Besoins</span><span class="arr">&rarr;</span>
+          <span>Plan compose</span>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E1a — Famille d'evenement <span class="badge badge-ux">UX</span> <span class="badge badge-validated">valide</span></div>
+              <div class="step-question">Quel type d'evenement ?</div>
+              <div class="step-note">Deux grandes cartes visuelles. Les univers mentaux d'un mariage et d'un seminaire sont radicalement differents — les melanger cree de la dissonance. Separer permet d'adapter le ton et l'imagerie des E1b.</div>
+              <div class="step-options" style="margin-top: 8px;">
+                <span class="option-pill work" style="padding: 6px 16px;">Evenement professionnel</span>
+                <span class="option-pill event" style="padding: 6px 16px;">Celebration privee</span>
+              </div>
+              <div class="step-note">Deux grandes cartes avec image immersive (salle de reunion Pullman vs. reception/rooftop). L'organisateur de mariage se sent accueilli dans &laquo; son &raquo; univers.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E1b — Sous-type <span class="badge badge-ux">UX</span></div>
+              <div class="step-question">Precisez</div>
+              <div class="step-note">Options adaptees a la famille choisie en E1a. Le ton et l'imagerie s'ajustent.</div>
+              <div class="step-note" style="font-style: normal; color: var(--business-accent); font-weight: 600; margin-top:8px;">Si Professionnel :</div>
+              <div class="step-options">
+                <span class="option-pill work">Seminaire / reunion</span>
+                <span class="option-pill work">Conference / congres</span>
+                <span class="option-pill work">Team building</span>
+                <span class="option-pill work">Evenement d'entreprise</span>
+              </div>
+              <div class="step-note" style="font-style: normal; color: var(--event-accent); font-weight: 600; margin-top:8px;">Si Celebration :</div>
+              <div class="step-options">
+                <span class="option-pill event">Mariage</span>
+                <span class="option-pill event">EVG / EVJF</span>
+                <span class="option-pill event">Anniversaire</span>
+                <span class="option-pill event">Autre celebration</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E2 — Lieu</div>
+              <div class="step-question">Ou ?</div>
+              <div class="step-note">Autocomplete ville / hotel. Reutilise le composant Business-Location.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E3 — Dates</div>
+              <div class="step-question">Quand ?</div>
+              <div class="step-options">
+                <span class="option-pill">Calendrier range</span>
+                <span class="option-pill highlight">Pas encore fixe / flexible</span>
+              </div>
+              <div class="step-note">L'option &laquo; pas encore fixe &raquo; est indispensable en evenementiel. Sur un devis, une date floue n'est pas bloquante.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E4 — Volume</div>
+              <div class="step-question">Combien de participants ?</div>
+              <div class="step-options">
+                <span class="option-pill">&lt; 20</span>
+                <span class="option-pill">20-50</span>
+                <span class="option-pill">50-150</span>
+                <span class="option-pill">150+</span>
+              </div>
+              <div class="step-note">Dimensionne salles et nuitees. Le volume influence le curseur du plan (au-dela d'un seuil, bascule sur devis).</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">E5 — Besoins <span class="badge badge-new">branche sur E1</span></div>
+              <div class="step-question">De quoi avez-vous besoin ?</div>
+              <div class="step-note">Les options changent selon la famille choisie en E1a — un EVJF et un seminaire ne voient jamais les memes.</div>
+              <div class="step-note" style="font-style: normal; color: var(--business-accent); font-weight: 600; margin-top:8px;">Si Pro :</div>
+              <div class="step-options">
+                <span class="option-pill work">Salle de reunion</span>
+                <span class="option-pill work">Pleniere</span>
+                <span class="option-pill work">Coworking</span>
+                <span class="option-pill work">Restauration / pauses</span>
+                <span class="option-pill work">Nuitees invites</span>
+                <span class="option-pill work">Materiel AV</span>
+              </div>
+              <div class="step-note" style="font-style: normal; color: var(--event-accent); font-weight: 600; margin-top:8px;">Si Celebration :</div>
+              <div class="step-options">
+                <span class="option-pill event">Espace reception</span>
+                <span class="option-pill event">Traiteur</span>
+                <span class="option-pill event">Hebergement invites</span>
+                <span class="option-pill event">Soiree / rooftop</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: var(--event-accent); background: var(--event-accent);"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: var(--event-accent);">Plan compose</div>
+              <div class="step-question">Recap concierge + plan composable</div>
+              <div class="step-note">Le mariage et le gros congres basculent sur &laquo; mise en relation Event Manager &raquo; plutot qu'une reservation directe — comme dans la vraie vie.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODELE DE FIN ==================== -->
+  <div class="tab-panel" data-panel="plan">
+    <div class="flow-section">
+      <h2>Modele de fin — recap concierge + plan composable</h2>
+      <p>Les branches Pro et Evenement ne finissent plus sur une sortie binaire (reserver &harr; demander un devis) mais sur un <strong>plan que l'utilisateur assemble</strong>, introduit par un recap en langage naturel.</p>
+
+      <!-- Recap concierge -->
+      <div class="flow-path" style="border-left: 4px solid var(--pullman);">
+        <h3>Recap concierge <span class="badge badge-ux">UX</span> <span class="badge badge-validated">valide</span></h3>
+        <p class="path-desc">Le premier element lu n'est plus un tableau question/reponse froid mais un mini-brief personnalise, comme si un concierge Pullman reformulait la demande. Le recap factuel (donnees brutes) reste accessible en dessous en petit.</p>
+
+        <div class="step-note" style="font-style: normal; font-weight: 500; color: var(--pullman); margin-bottom: 8px;">Exemples de formulation :</div>
+
+        <div class="concierge-example">
+          <strong style="color: var(--solo-accent); font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Escapade famille</strong><br>
+          &laquo; Un sejour en famille en Asie, en octobre, pour deux semaines — avec un spa et un club enfants pour vos deux enfants. &raquo;
+        </div>
+
+        <div class="concierge-example">
+          <strong style="color: var(--business-accent); font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Pro solo</strong><br>
+          &laquo; Un deplacement solo a Lyon du 14 au 16 octobre — avec un espace coworking et un acces spa pour decompresser apres vos journees. &raquo;
+        </div>
+
+        <div class="concierge-example">
+          <strong style="color: var(--business-accent); font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Pro avec bleisure</strong><br>
+          &laquo; Un deplacement en equipe a Singapour du 10 au 12 novembre, avec salle de reunion et nuitees pour 6 personnes — et un week-end prolonge pour decouvrir les experiences locales. &raquo;
+        </div>
+
+        <div class="concierge-example">
+          <strong style="color: var(--event-accent); font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Evenement</strong><br>
+          &laquo; Un seminaire d'equipe pour 30 personnes a Paris en novembre — salle de reunion, restauration et nuitees invites. &raquo;
+        </div>
+
+        <div class="concierge-example">
+          <strong style="color: var(--event-accent); font-style: normal; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">Celebration</strong><br>
+          &laquo; Un mariage pour environ 80 invites a Marrakech au printemps — espace reception, traiteur et hebergement invites. &raquo;
+        </div>
+
+        <div class="step-note" style="margin-top: 12px;">La phrase est generee dynamiquement a partir des reponses collectees. Elle renforce le positionnement concierge/premium de Pullman et donne le sentiment que le wizard a compris le besoin.</div>
+      </div>
+
+      <!-- Plan composable -->
+      <div class="flow-path">
+        <h3>Plan composable — trois niveaux de traitement</h3>
+
+        <div class="callout callout-vision" style="margin-top: 0;">
+          <strong>Statut <span class="badge badge-vision">vision cible</span></strong>
+          Aujourd'hui, salles et prestations passent 100 % par devis / Event Manager. Le plan composable est la <em>cible</em> ; a arbitrer si on le mocke des cette iteration pour tester la desirabilite, ou si le devis reste la fin reelle en attendant.
+        </div>
+
+        <div class="tier">
+          <div class="tier-dot" style="background: var(--badge-connected);"></div>
+          <div class="tier-body">
+            <h4>Reservable en autonomie — confirmation immediate</h4>
+            <p>Nuitees invites, day-use, acces coworking, creneau de petite salle. C'est la que le self-service est credible.</p>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="tier-dot" style="background: var(--friends-accent);"></div>
+          <div class="tier-body">
+            <h4>Sur demande — confirme sous 24-48h</h4>
+            <p>Grande salle, pleniere. La brique est ajoutee au plan puis confirmee par l'hotel.</p>
+          </div>
+        </div>
+        <div class="tier">
+          <div class="tier-dot" style="background: var(--stone);"></div>
+          <div class="tier-body">
+            <h4>Sur devis / Event Manager — sur-mesure lourd</h4>
+            <p>Mariage, gros congres, traiteur evenementiel. Le devis devient le <em>fallback</em> du complexe, plus le point d'entree par defaut.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-path">
+        <h3>Position du curseur selon le cas</h3>
+        <div style="overflow-x: auto;">
+          <table class="diff-table" style="display: table;">
+            <thead>
+              <tr><th>Cas</th><th>Part autonome</th><th>Part sur devis</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Deplacement solo</td><td class="check">Elevee — chambre, coworking</td><td class="cross">Quasi nulle</td></tr>
+              <tr><td>Petit meeting d'equipe</td><td class="check">Elevee — petite salle, nuitees</td><td>Faible</td></tr>
+              <tr><td>Seminaire</td><td>Moyenne</td><td>Moyenne — grande salle sur demande</td></tr>
+              <tr><td>Congres / gros volume</td><td class="cross">Faible</td><td class="check">Elevee — Event Manager</td></tr>
+              <tr><td>EVG / EVJF</td><td>Moyenne — soiree, hebergement</td><td>Moyenne</td></tr>
+              <tr><td>Mariage</td><td class="cross">Faible</td><td class="check">Elevee — wedding planner, devis</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHANGELOG ==================== -->
+  <div class="tab-panel" data-panel="changelog">
+    <div class="flow-section">
+      <h2>Ce qui change par rapport a la V1</h2>
+      <p>Synthese des ecarts. Inclut les 5 raffinements UX valides.</p>
+
+      <div class="flow-path">
+        <h3>Tableau des ecarts V1 &rarr; V2</h3>
+        <div style="overflow-x: auto;">
+          <table class="diff-table" style="display: table;">
+            <thead>
+              <tr><th>Aspect</th><th>V1</th><th>V2</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Q1</strong></td>
+                <td>&laquo; Avec qui voyagez-vous ? &raquo; — 5 profils (solo, couple, famille, amis, business)</td>
+                <td>&laquo; Quel type de sejour preparez-vous ? &raquo; — 4 choix (escapade, pro, evenement, guide) <span class="badge badge-ux">UX</span></td>
+              </tr>
+              <tr>
+                <td><strong>Q1 indecis</strong></td>
+                <td><span class="cross">Absent</span></td>
+                <td>&laquo; Je me laisse guider &raquo; — mini-triage 2-3 questions &rarr; redirection branche <span class="badge badge-ux">UX</span></td>
+              </tr>
+              <tr>
+                <td><strong>Q1.5</strong></td>
+                <td>Declenchee si <code>selectedWho &isin; {family, friends}</code></td>
+                <td>Declenchee si <code>selectedStayType === 'escapade'</code> ; qualifie solo/couple/famille/amis</td>
+              </tr>
+              <tr>
+                <td><strong>Branche loisir</strong></td>
+                <td>Flux standard</td>
+                <td>Inchange (rebranche sous &laquo; Escapade &raquo;)</td>
+              </tr>
+              <tr>
+                <td><strong>Branche business</strong></td>
+                <td>Q2 &rarr; Lieu &rarr; Dates &rarr; Q6 &rarr; Resultats</td>
+                <td>Lieu &rarr; Dates &rarr; Besoins (avec contexte integre) &rarr; Bleisure &rarr; Plan compose</td>
+              </tr>
+              <tr>
+                <td><strong>Nature + Besoins pro</strong></td>
+                <td>Nature absent, besoins melanges dans Q2</td>
+                <td>Un seul ecran avec toggle de contexte (solo / equipe / client) en haut — les options s'adaptent <span class="badge badge-ux">UX</span></td>
+              </tr>
+              <tr>
+                <td><strong>Bleisure</strong></td>
+                <td><span class="cross">Absent</span></td>
+                <td>Carte teaser avec mini-cards de l'offre locale (spa, gastro, experiences) au lieu d'un oui/non <span class="badge badge-ux">UX</span></td>
+              </tr>
+              <tr>
+                <td><strong>Branche evenement</strong></td>
+                <td><span class="cross">Absente</span></td>
+                <td>Nouvelle : E1a Famille &rarr; E1b Sous-type &rarr; E2 Lieu &rarr; E3 Dates &rarr; E4 Volume &rarr; E5 Besoins &rarr; Plan</td>
+              </tr>
+              <tr>
+                <td><strong>E1 evenement</strong></td>
+                <td><span class="cross">Absent</span></td>
+                <td>2 niveaux : d'abord Pro ou Celebration (2 grandes cartes), puis sous-type adapte <span class="badge badge-ux">UX</span></td>
+              </tr>
+              <tr>
+                <td><strong>Modele de fin</strong></td>
+                <td>Liste d'hotels a reserver</td>
+                <td>Recap concierge (phrase naturelle) + plan composable (reservable / sur demande / sur devis) <span class="badge badge-ux">UX</span> <span class="badge badge-vision">vision</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="flow-path">
+        <h3>Les 5 raffinements UX valides</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: #2E7D32; background: #2E7D32;"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: #2E7D32;">#1 — Q1 a 4 choix</div>
+              <div class="step-question">Ajout de &laquo; Je me laisse guider &raquo; comme filet de securite</div>
+              <div class="step-note">Evite le drop des utilisateurs qui ne se reconnaissent dans aucun motif. Mini-triage conversationnel (2-3 questions fermees) qui redirige vers la bonne branche.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: #2E7D32; background: #2E7D32;"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: #2E7D32;">#2 — Nature + Besoins fusionnes</div>
+              <div class="step-question">Un seul ecran avec toggle de contexte en haut</div>
+              <div class="step-note">&laquo; Nature du deplacement &raquo; est un qualificatif factuel, pas une vraie exploration. L'integrer comme chips (Solo / En equipe / Client) reduit le nombre d'etapes sans perdre d'info. Les options se pre-selectionnent dynamiquement.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: #2E7D32; background: #2E7D32;"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: #2E7D32;">#3 — E1 evenement en 2 niveaux</div>
+              <div class="step-question">D'abord Pro ou Celebration, puis sous-type</div>
+              <div class="step-note">Les univers mentaux sont trop differents (mariage vs. seminaire). Separer reduit la charge cognitive et permet d'adapter le ton et l'imagerie des le sous-type.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: #2E7D32; background: #2E7D32;"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: #2E7D32;">#4 — Recap concierge</div>
+              <div class="step-question">Phrase naturelle personnalisee plutot que tableau question/reponse</div>
+              <div class="step-note">Renforce le positionnement concierge/premium de Pullman. Donne le sentiment que le wizard a compris le besoin, pas juste collecte des champs. Le recap factuel reste accessible en dessous.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot filled" style="border-color: #2E7D32; background: #2E7D32;"></div></div>
+            <div class="step-content">
+              <div class="step-label" style="color: #2E7D32;">#5 — Bleisure en carte teaser</div>
+              <div class="step-question">Inspiration visuelle avec mini-cards de l'offre locale</div>
+              <div class="step-note">L'utilisateur voit ce qu'il pourrait vivre (spa, gastro, experiences de l'hotel concerne) au lieu de repondre a une question abstraite oui/non. Levier d'upsell naturel pour Pullman.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-path">
+        <h3>Notes de robustesse pour l'implementation</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-marker"><div class="step-dot"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-question">Etat de la Q1 : <code>selectedStayType</code></div>
+              <div class="step-note">Nouvelle variable racine. Remplace <code>selectedWho</code> comme premier discriminant. <code>selectedWho</code> subsiste mais devient dependant de la branche Escapade.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-question">Recalcul du stepper</div>
+              <div class="step-note">Chaque branche a un nombre d'etapes different (escapade ~ 7, pro ~ 5, evenement ~ 7). Le stepper &laquo; /N &raquo; doit se recalculer a la selection de Q1, et re-recalculer si l'ecran Bleisure optionnel est saute.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-question">Nettoyage d'etat au back-navigation</div>
+              <div class="step-note">Changer de branche en revenant sur Q1 doit purger l'etat de la branche quittee (ex. <code>eventType</code>, <code>selectedNeeds</code>) pour eviter les ghost states.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot"></div><div class="step-line"></div></div>
+            <div class="step-content">
+              <div class="step-question">Toggle contexte pro</div>
+              <div class="step-note">Le toggle Solo / En equipe / Client est un filtre UI, pas un ecran. Il modifie les pre-selections et l'ordre des options sans changer d'etape dans le stepper.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-marker"><div class="step-dot"></div></div>
+            <div class="step-content">
+              <div class="step-question">Recap concierge : generation dynamique</div>
+              <div class="step-note">La phrase se construit par templates avec placeholders (<code>{who}</code>, <code>{destination}</code>, <code>{dates}</code>, <code>{needs}</code>). Prevoir des variantes par branche (escapade / pro / pro+bleisure / evenement pro / celebration).</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-ux">
+        <strong>Hors scope de cette iteration</strong>
+        Algorithme de matching / scoring des resultats (inchange) · contenu detaille des ecrans loisir Q2&rarr;Q5 (voir cartographie V1) · assets visuels finaux (placeholders) · logique connecte/non-connecte et wishlist (reprise telle quelle de la V1, a rebrancher sous Escapade).
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const panel = document.querySelector(`[data-panel="${tab.dataset.tab}"]`);
+      if (panel) panel.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
