@@ -756,6 +756,7 @@
     }
 
     afterRender() {
+      const progressiveMode = this.hasAttribute('progressive'); // divulgation progressive : continents seuls à l'ouverture
       const bookingTabs = this.querySelectorAll('.wd-booking__tab');
       const bookingFields = this.querySelector('.wd-booking__fields');
       const destStaticLabel = this.querySelector('.wd-booking__label');
@@ -1291,6 +1292,14 @@
           body + '</div>';
       };
 
+      // Divulgation progressive : y a-t-il un périmètre de recherche actif (continent, pays, hôtel, ville, saisie) ?
+      const hasSearchScope = () => !!(
+        searchState.continent || searchState.expandedCountry || searchState.selectedHotel ||
+        searchState.city || (searchState.freeText && searchState.freeText.trim().length >= 1)
+      );
+      // État intermédiaire = mode progressif ET aucun périmètre choisi -> on n'affiche que les continents
+      const isIntermediate = () => progressiveMode && !hasSearchScope();
+
       const renderResultsCount = () => {
         const { pool, label } = getResultsPool();
         const count = pool.filter(hotelMatchesCriteria).length;
@@ -1319,6 +1328,11 @@
       const isGenericQuery = (q) => { const t = (q || '').trim(); return t.length > 0 && t.split(/\s+/).every(w => GENERIC_QUERY_TERMS.has(w)); };
       const renderDestList = () => {
         const query = searchState.freeText.toLowerCase();
+        if (isIntermediate()) {
+          // Continents seuls : on masque la liste des pays, on garde juste le repère chiffré
+          destListEl.innerHTML = '<div class="wd-booking__dd-results-bar wd-booking__dd-results-bar--hint">' + renderResultsCount() + '</div>';
+          return;
+        }
         if (!searchState.continent) {
           const allHotels = REGION_HOTELS.flatMap(r => r.hotels);
           const allCountries = [...new Set(allHotels.map(h => h.country))].sort();
@@ -1443,6 +1457,7 @@
       };
 
       const renderCriteria = () => {
+        if (isIntermediate()) { criteriaListEl.innerHTML = ''; return; }
         const groups = getActiveCriteriaGroups();
         const activeCriteria = getActiveCriteria();
         if (!groups.length) { criteriaListEl.innerHTML = ''; return; }
@@ -1505,6 +1520,8 @@
         renderDestList();
         renderCriteria();
         renderChips();
+        // État de divulgation porté par le composant (robuste aux re-rendus du panneau)
+        if (progressiveMode) this.dataset.disclosure = isIntermediate() ? 'intermediate' : 'full';
       };
 
       const open = () => {

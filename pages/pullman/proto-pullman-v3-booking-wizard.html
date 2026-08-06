@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=214"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=220"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,10 +17,10 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/components/components.js?v=214"></script>
+  <script src="../../core/components/components.js?v=220"></script>
   <script src="../../brands/pullman/pullman.js"></script>
   <script src="../../core/components/booking-map.js?v=103"></script>
-  <script src="../../core/components/map-interface-enhance.js"></script>
+  <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
 
@@ -40,7 +40,7 @@
 ></wd-hero>
 
 <!-- ===== BOOKING ENGINE ===== -->
-<wd-booking cta="Rechercher"></wd-booking>
+<wd-booking cta="Rechercher" progressive></wd-booking>
 
 <!-- ===== CONTENT ===== -->
 <div class="wd-content" style="padding: 120px 64px; max-width: 1340px; margin: 0 auto; display: flex; flex-direction: column; gap: 120px;">
@@ -372,106 +372,73 @@
   height: 100%;
 }
 
-/* ===== Wizard entry — bannière (Option A, dropdown sombre, marque Pullman) =====
-   Alignée à gauche sur la gouttière 48px, sans gradient ni radius, avec croix de fermeture. */
-.wd-booking__wizard-entry {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0 0 20px;
-  border-radius: 0;
-  background: #445047;
-}
-.wd-booking__wizard-entry-main {
-  flex: 1 1 auto;
-  display: flex;
+/* ===== CTA wizard — bordure « IA » shimmer légère, en haut à droite du dropdown ===== */
+.wd-booking__dd-body { position: relative; }
+@property --wd-ai-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.wd-booking__wizard-cta {
+  position: absolute;
+  top: 14px;
+  right: 48px;
+  z-index: 6;
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  min-width: 0;
-  padding: 10px 12px 10px 17px;
+  gap: 8px;
+  padding: 9px 16px;
   border: none;
-  background: transparent;
-  cursor: pointer;
-  text-align: left;
+  border-radius: 100px;
+  background: #28332B;
+  color: #F5F2E9;
   font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  isolation: isolate;
   transition: background 0.2s ease;
 }
-.wd-booking__wizard-entry-main:hover {
-  background: rgba(255, 255, 255, 0.06);
+.wd-booking__wizard-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--wd-ai-angle),
+    #5FEF91, #BFF7D6, #5FEF91, #3a6b4d, #5FEF91);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation: wd-ai-spin 4.5s linear infinite;
+  pointer-events: none;
+  z-index: -1;
 }
-.wd-booking__wizard-entry-main:focus-visible,
-.wd-booking__wizard-entry-close:focus-visible {
-  outline: 2px solid var(--pul-highlight, #5FEF91);
-  outline-offset: -2px;
+@keyframes wd-ai-spin { to { --wd-ai-angle: 360deg; } }
+.wd-booking__wizard-cta:hover { background: #2f3d33; }
+.wd-booking__wizard-cta:hover::before { animation-duration: 2.5s; }
+.wd-booking__wizard-cta:focus-visible { outline: 2px solid #5FEF91; outline-offset: 2px; }
+.wd-booking__wizard-cta-icon { display: inline-flex; color: #5FEF91; }
+@media (prefers-reduced-motion: reduce) {
+  .wd-booking__wizard-cta::before { animation: none; }
 }
-.wd-booking__wizard-entry-icon {
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0;
-  background: #28332B;
-  color: var(--pul-highlight, #5FEF91);
-  position: relative;
+
+/* ===== Divulgation progressive : la colonne Critères se révèle au clic sur un continent ===== */
+wd-booking[data-disclosure="intermediate"] .wd-booking__dd-criteria-col {
+  display: none;
 }
-/* ===== Halo de révélation : une lueur verte douce apparaît AUTOUR de la bannière, une seule fois puis disparaît ===== */
-.wd-booking__wizard-entry { position: relative; }
-.wd-booking__wizard-entry.is-glow {
-  animation: wd-banner-glow 1.8s ease-out forwards;
+wd-booking[data-disclosure="intermediate"] .wd-booking__dd-dest-col {
+  border-right-color: transparent;
+  flex: 1;
 }
-@keyframes wd-banner-glow {
-  0%   { box-shadow: 0 0 0 0 rgba(95, 239, 145, 0); }
-  35%  { box-shadow: 0 0 13px 1px rgba(95, 239, 145, 0.28); }
-  100% { box-shadow: 0 0 0 0 rgba(95, 239, 145, 0); }
+wd-booking[data-disclosure="full"] .wd-booking__dd-criteria-col {
+  max-width: none;
+  opacity: 1;
+  transition: none;
+  animation: wd-reveal-col 0.32s ease-out both;
+}
+@keyframes wd-reveal-col {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .wd-booking__wizard-entry.is-glow { animation: none; }
-}
-.wd-booking__wizard-entry-text {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-.wd-booking__wizard-entry-title {
-  font-family: var(--font-serif);
-  font-weight: 800;
-  font-size: 13.5px;
-  line-height: 1.1;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: #F5F2E9;
-}
-.wd-booking__wizard-entry-sub {
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 1.3;
-  color: #C9D2C4;
-}
-.wd-booking__wizard-entry-close {
-  flex: 0 0 auto;
-  width: 40px;
-  align-self: stretch;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: rgba(245, 242, 233, 0.7);
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-.wd-booking__wizard-entry-close:hover {
-  color: #F5F2E9;
-  background: rgba(0, 0, 0, 0.15);
-}
-@media (prefers-reduced-motion: reduce) {
-  .wd-booking__wizard-entry-main,
-  .wd-booking__wizard-entry-close { transition: none; }
+  wd-booking[data-disclosure="full"] .wd-booking__dd-criteria-col { animation: none; }
 }
 
 /* ===== Alignement à gauche sur la gouttière 48px (comme bannière / destinations) =====
@@ -542,22 +509,14 @@ document.addEventListener('keydown', (e) => {
 <!-- ===== V3 : point d'entrée du Discovery Wizard DANS le dropdown du booking engine (Option A) ===== -->
 <script>
 (function () {
-  const MAIN_HTML =
-    '<span class="wd-booking__wizard-entry-icon" aria-hidden="true">' +
-      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+  const CTA_HTML =
+    '<span class="wd-booking__wizard-cta-icon" aria-hidden="true">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
         '<path d="M12 3l1.8 4.5L18.5 9.3l-4.7 1.8L12 15.6l-1.8-4.5L5.5 9.3l4.7-1.8L12 3z"/>' +
-        '<path d="M18.5 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>' +
+        '<path d="M18.5 14.5l.6 1.6 1.6.6-1.6.6-.6 1.6-.6-1.6-1.6-.6 1.6-.6z"/>' +
       '</svg>' +
     '</span>' +
-    '<span class="wd-booking__wizard-entry-text">' +
-      '<span class="wd-booking__wizard-entry-title">Pas encore décidé&nbsp;?</span>' +
-      '<span class="wd-booking__wizard-entry-sub">Laissez-vous guider vers l\'inspiration Pullman</span>' +
-    '</span>';
-
-  const CLOSE_HTML =
-    '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">' +
-      '<line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>' +
-    '</svg>';
+    '<span>Laissez-vous guider</span>';
 
   function openWizard() {
     // Ferme le dropdown du booking engine
@@ -580,42 +539,15 @@ document.addEventListener('keydown', (e) => {
       if (retries > 0) setTimeout(() => initWizardEntry(retries - 1), 150);
       return;
     }
-    if (ddBody.querySelector('.wd-booking__wizard-entry')) return; // déjà injecté
+    if (ddBody.querySelector('.wd-booking__wizard-cta')) return; // déjà injecté
 
-    const entry = document.createElement('div');
-    entry.className = 'wd-booking__wizard-entry';
-
-    const main = document.createElement('button');
-    main.type = 'button';
-    main.className = 'wd-booking__wizard-entry-main';
-    main.setAttribute('aria-label', 'Pas encore décidé ? Laissez-vous guider vers l\'inspiration Pullman');
-    main.innerHTML = MAIN_HTML;
-    main.addEventListener('click', openWizard);
-
-    const close = document.createElement('button');
-    close.type = 'button';
-    close.className = 'wd-booking__wizard-entry-close';
-    close.setAttribute('aria-label', 'Masquer cette suggestion');
-    close.innerHTML = CLOSE_HTML;
-    close.addEventListener('click', (e) => { e.stopPropagation(); entry.remove(); });
-
-    entry.appendChild(main);
-    entry.appendChild(close);
-    ddBody.prepend(entry); // toujours en tête du dropdown
-
-    // Balayage lumineux : une seule passe, rejouée à chaque ouverture du dropdown
-    const dropdown = document.querySelector('.wd-booking__dropdown');
-    const triggerGlow = () => {
-      entry.classList.remove('is-glow');
-      void entry.offsetWidth; // reflow pour relancer l'animation
-      entry.classList.add('is-glow');
-    };
-    if (dropdown) {
-      new MutationObserver(() => {
-        if (dropdown.dataset.state === 'open') triggerGlow();
-      }).observe(dropdown, { attributes: true, attributeFilter: ['data-state'] });
-      if (dropdown.dataset.state === 'open') triggerGlow();
-    }
+    const cta = document.createElement('button');
+    cta.type = 'button';
+    cta.className = 'wd-booking__wizard-cta';
+    cta.setAttribute('aria-label', 'Laissez-vous guider vers l\'inspiration Pullman');
+    cta.innerHTML = CTA_HTML;
+    cta.addEventListener('click', openWizard);
+    ddBody.appendChild(cta); // positionné en absolu, en haut à droite du dropdown
   }
 
   if (document.readyState === 'loading') {

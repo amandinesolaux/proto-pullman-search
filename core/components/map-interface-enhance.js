@@ -81,11 +81,16 @@ const observer = new MutationObserver((mutations) => {
   });
 });
 
-// Démarrer l'observation du DOM
-observer.observe(document.body, {
+// Démarrer l'observation du DOM (body pas encore présent si le script est chargé dans <head>)
+const startObserving = () => observer.observe(document.body, {
   childList: true,
   subtree: true
 });
+if (document.body) {
+  startObserving();
+} else {
+  document.addEventListener('DOMContentLoaded', startObserving);
+}
 
 // Appliquer immédiatement si les cards existent déjà
 if (document.readyState === 'loading') {
