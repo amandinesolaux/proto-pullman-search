@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
+  <link rel="stylesheet" href="../../core/tokens/brands.css"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=214"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
+  <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
+
+  <!-- Leaflet.js pour la carte interactive -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+  <script src="../../core/components/components.js?v=214"></script>
+  <script src="../../brands/pullman/pullman.js"></script>
+  <script src="../../core/components/booking-map.js?v=103"></script>
+  <script src="../../core/components/map-interface-enhance.js"></script>
+</head>
+<body class="brand-pullman">
+
+<!-- ===== HEADER ===== -->
+<wd-header
+  nav="Destinations|Expériences|Offres|À propos de Pullman|Fidélité|Magazine"
+  dropdowns="Destinations|Expériences|À propos de Pullman|Magazine"
+  lang="EN"
+  currency="USD ($)"
+></wd-header>
+
+<!-- ===== HERO ===== -->
+<wd-hero
+  img="https://m.ahstatic.com/is/image/accorhotels/PullmanLifestyle1:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=1600&hei=900&qlt=80"
+  title="Des séjours inspirants à travers le monde"
+  subtitle="Là où les échanges prennent vie et les esprits se rencontrent."
+></wd-hero>
+
+<!-- ===== BOOKING ENGINE ===== -->
+<wd-booking cta="Rechercher"></wd-booking>
+
+<!-- ===== CONTENT ===== -->
+<div class="wd-content" style="padding: 120px 64px; max-width: 1340px; margin: 0 auto; display: flex; flex-direction: column; gap: 120px;">
+
+  <!-- Section 1 : Destinations (carrousel) -->
+  <section>
+    <wd-carousel title="Explorez le monde autrement" tabs="Asie|Europe|Amériques|Moyen-Orient|Pacifique|Afrique" showmap seeall="Découvrir nos destinations">
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Asie" title="Singapour"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_2810-66:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Asie" title="Shanghai"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Moyen-Orient" title="Dubaï"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/GettyImages-1187421561:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Europe" title="Paris"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_0626-10:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Amériques" title="São Paulo"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Pacifique" title="Sydney"></wd-dest-card>
+      <wd-dest-card img="https://m.ahstatic.com/is/image/accorhotels/aja_p_7014-44:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=480&hei=853&qlt=80" kicker="Europe" title="Toulouse"></wd-dest-card>
+    </wd-carousel>
+  </section>
+
+  <!-- Section 2 : Voir l'ordinaire différemment -->
+  <section>
+    <wd-section-heading
+      title="Voir l'ordinaire différemment"
+      desc="Depuis plus de 150 ans, nous réinventons l'hospitalité avec un esprit pionnier et une curiosité sans limites."
+      link="true"
+      link-label="En savoir plus"
+    ></wd-section-heading>
+
+    <wd-editorial
+      img="https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=800&hei=667&qlt=80"
+      kicker="Notre héritage"
+      title="Un héritage d'innovation"
+      desc="L'innovation audacieuse, notre marque de fabrique. De l'exploit de déplacer un quartier entier à l'invention du pain de mie carré aux couchettes de luxe, Pullman façonne et inspire, aujourd'hui plus que jamais, l'avenir de l'hôtellerie mondiale."
+      cta="Découvrir notre histoire"
+      pager="1 / 3"
+      caption="© Pullman Hotels & Resorts"
+      white
+    ></wd-editorial>
+  </section>
+
+  <!-- Section 3 : Nos offres du moment -->
+  <section>
+    <wd-section-heading
+      title="Nos offres du moment"
+      desc="Profitez de conditions avantageuses sur nos chambres, suites et services pour un séjour inoubliable, qu'il soit professionnel ou personnel."
+      link="true"
+      link-label="Toutes les offres"
+    ></wd-section-heading>
+
+    <wd-editorial
+      img="https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=800&qlt=80"
+      kicker="Offre spéciale"
+      title="Laissez place à l'imprévu"
+      desc="Commencez la journée avec un petit-déjeuner généreux et healthy, puis profitez d'un dîner savoureux, pour que chaque repas soit un moment à apprécier et à partager."
+      cta="Découvrir l'offre"
+      caption="© Pullman Hotels & Resorts"
+      image-left
+      white
+    ></wd-editorial>
+  </section>
+
+  <!-- Section 4 : Callout (Hôtels emblématiques) -->
+  <section>
+    <wd-callout-section
+      title="Découvrez des espaces inspirants à travers le monde"
+      desc="Avec plus de 155 hôtels dans le monde, Pullman ouvre les portes à de nouvelles idées. Découvrez nos hôtels les plus emblématiques, partez à la rencontre de ce qui vous anime."
+      link="Laissez-vous guider"
+    >
+      <wd-callout-card
+        img="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=600&hei=338&qlt=80"
+        title="Pullman Paris Montparnasse"
+        desc="Le Pullman Paris Montparnasse, flagship de la marque Pullman, est la destination incontournable de la capitale pour vos séjours affaires ou loisirs."
+      ></wd-callout-card>
+      <wd-callout-card
+        img="https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=600&hei=338&qlt=80"
+        title="Pullman Lyon"
+        desc="Face à la gare de la Part-Dieu et au pied de la tour To-Lyon, Le Pullman Lyon est le lieu stratégique pour vos séjours et événements."
+      ></wd-callout-card>
+      <wd-callout-card
+        img="https://m.ahstatic.com/is/image/accorhotels/6556-1:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=600&hei=338&qlt=80"
+        title="Pullman Bali Legian Beach"
+        desc="A seulement 20 minutes de l'aéroport international Ngurah Rai, le Pullman Bali Legian Beach vous promet un paradis pur et le charme de la vie insulaire."
+      ></wd-callout-card>
+      <wd-callout-card
+        img="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=600&hei=338&qlt=80"
+        title="Pullman Budapest"
+        desc="Situé au coeur du centre-ville, à seulement deux minutes à pied de l'Opéra national hongrois, le 5 étoiles Pullman Budapest offre un confort moderne."
+      ></wd-callout-card>
+    </wd-callout-section>
+  </section>
+
+  <!-- Section 5 : Expériences (Marketing) -->
+  <wd-marketing
+    title="Des espaces conçus pour inspirer et se rencontrer"
+    desc="Réunion, détente, rencontres, bien-être : chez Pullman, chaque moment stimule vos idées et votre inspiration."
+    link="true"
+    link-label="Toutes les expériences"
+    tabs="Réunions|Co-working|Restaurants & Bars|Pullman xChange"
+    img="https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=800&hei=1422&qlt=80"
+    kicker="Réunions et événements"
+    card-title="Réunions et événements"
+    card-desc="Co-créez et échangez dans nos espaces modulables, conçus pour s'adapter à chaque projet. Des expériences immersives aux discussions autour d'un café, nous créons des moments d'exception."
+    cta="En savoir plus"
+    caption="© Pullman Hotels & Resorts"
+  ></wd-marketing>
+
+  <!-- Section 6 : Magazine (Highlight V2) -->
+  <wd-highlight-v2
+    img="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=500&qlt=80"
+    kicker="Magazine"
+    title="Magazine Pullman"
+    desc="Des nouvelles idées aux perspectives culturelles, voici ce qui nous occupe, nous inspire et nous passionne en ce moment. Nouvelle expression. Nouveaux horizons."
+    cta1="Découvrir ici"
+    cta2="Voir les articles"
+    caption="© Pullman Hotels & Resorts"
+  ></wd-highlight-v2>
+
+  <!-- Section 7 : Hôtellerie responsable (Billboard) -->
+  <wd-billboard
+    kicker="Développement durable"
+    title="Hôtellerie responsable"
+    desc="Chez Pullman, le développement durable n'est pas une finalité, mais un cheminement que nous abordons avec passion et conviction. Nos pratiques ont un impact positif sur l'environnement et la culture."
+    img="https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-57:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=600&hei=600&qlt=80"
+  ></wd-billboard>
+
+  <!-- Section 8 : Social Media -->
+  <wd-social
+    title="#Pullman"
+    post="How about enjoying a tropical meal and some healthy mocktails by the pool of @moku_cairns, @novotelcairns restaurant? 🍹 #NovotelHotels #YourTimeYourWay #travelinaustralia #hotelbar"
+  >
+    <img src="https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Singapour" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Paris" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Bali" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Dubaï" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/Pullman-bar:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Restaurant" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Sydney" loading="lazy"/>
+    <img src="https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=400&hei=400&qlt=80" alt="Pullman Budapest" loading="lazy"/>
+  </wd-social>
+
+  <!-- Section 9 : Loyalty Billboard -->
+  <wd-loyalty
+    title="Jusqu'à 10 % de réduction pour les membres ALL"
+    benefits="Profitez de séjours à prix réduit|Obtenez facilement des récompenses|Accueil prioritaire et hospitalité VIP"
+    cta1="Inscrivez-vous gratuitement"
+    cta2="En savoir plus"
+    img="https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:16by9?fmt=jpg&op_usm=1.75,0.3,2,0&resMode=sharp2&iccEmbed=true&icc=sRGB&dpr=on,1.5&wid=800&hei=450&qlt=80"
+    caption="© Pullman Hotels & Resorts"
+  ></wd-loyalty>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<wd-footer></wd-footer>
+
+<!-- Discovery Wizard -->
+<wd-discovery-wizard></wd-discovery-wizard>
+
+<!-- Discovery Modal -->
+<wd-discovery-modal></wd-discovery-modal>
+
+<!-- Map Interface Modal -->
+<div class="map-modal" id="mapModal" style="display: none;">
+  <div class="map-modal__sidebar">
+    <div class="map-modal__header">
+      <h2 style="font-family: var(--font-serif); font-size: 24px; color: #fff; margin: 0 0 8px 0;">Nos destinations</h2>
+      <p style="font-family: var(--font-sans); font-size: 13px; color: rgba(255,255,255,0.6); margin: 0;">155 hôtels à travers le monde</p>
+    </div>
+
+    <div class="map-modal__section">
+      <h4 class="map-modal__title">DESTINATION</h4>
+      <div class="map-modal__continents">
+        <button class="continent-card" data-continent="europe" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <span>EUROPE</span>
+        </button>
+        <button class="continent-card" data-continent="asie" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <span>ASIE</span>
+        </button>
+        <button class="continent-card" data-continent="moyen-orient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+          <span>MOYEN-ORIENT</span>
+        </button>
+        <button class="continent-card" data-continent="oceanie" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+          <span>OCÉANIE</span>
+        </button>
+        <button class="continent-card is-active" data-continent="ameriques" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+          <span>AMÉRIQUES</span>
+        </button>
+        <button class="continent-card" data-continent="afrique" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+          <span>AFRIQUE</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="map-modal__section">
+      <h4 class="map-modal__title">PAYS</h4>
+      <div id="country-list-container"></div>
+    </div>
+
+    <div class="map-modal__section">
+      <h4 class="map-modal__title">CRITÈRES</h4>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <label style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 14px; cursor: pointer;">
+          <input type="checkbox" data-amenity="pool"> Piscine
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 14px; cursor: pointer;">
+          <input type="checkbox" data-amenity="spa"> Spa
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 14px; cursor: pointer;">
+          <input type="checkbox" data-amenity="restaurant"> Restaurant
+        </label>
+        <label style="display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 14px; cursor: pointer;">
+          <input type="checkbox" data-amenity="gym"> Fitness
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <button class="map-modal__close" onclick="closeMapModal()">✕</button>
+
+  <div class="map-modal__content">
+    <div id="wd-booking-map"></div>
+  </div>
+</div>
+
+<style>
+.map-modal {
+  position: fixed;
+  inset: 0;
+  background: #1a2220;
+  z-index: 10000;
+  display: flex;
+}
+
+.map-modal__sidebar {
+  width: 360px;
+  background: #1a2220;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  overflow-y: auto;
+  padding: 0;
+}
+
+.map-modal__header {
+  padding: 32px 24px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.map-modal__section {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.map-modal__title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 16px 0;
+}
+
+.map-modal__continents {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.continent-card {
+  height: 90px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+}
+
+.continent-card span {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+
+.continent-card:hover {
+  border-color: rgba(95,239,145,0.5);
+  transform: scale(1.03);
+}
+
+.continent-card.is-active {
+  border-color: #5FEF91;
+  box-shadow: 0 0 0 1px #5FEF91, 0 4px 12px rgba(95,239,145,0.3);
+}
+
+.map-modal__close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  background: rgba(26,34,32,0.95);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 100;
+}
+
+.map-modal__close:hover {
+  border-color: #5FEF91;
+  background: #1a2220;
+}
+
+.map-modal__content {
+  flex: 1;
+  position: relative;
+}
+
+#wd-booking-map {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== Wizard entry — bannière (Option A, dropdown sombre, marque Pullman) =====
+   Alignée à gauche sur la gouttière 48px, sans gradient ni radius, avec croix de fermeture. */
+.wd-booking__wizard-entry {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 20px;
+  border-radius: 0;
+  background: #445047;
+}
+.wd-booking__wizard-entry-main {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 10px 12px 10px 17px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: background 0.2s ease;
+}
+.wd-booking__wizard-entry-main:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.wd-booking__wizard-entry-main:focus-visible,
+.wd-booking__wizard-entry-close:focus-visible {
+  outline: 2px solid var(--pul-highlight, #5FEF91);
+  outline-offset: -2px;
+}
+.wd-booking__wizard-entry-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  background: #28332B;
+  color: var(--pul-highlight, #5FEF91);
+  position: relative;
+}
+/* ===== Halo de révélation : une lueur verte douce apparaît AUTOUR de la bannière, une seule fois puis disparaît ===== */
+.wd-booking__wizard-entry { position: relative; }
+.wd-booking__wizard-entry.is-glow {
+  animation: wd-banner-glow 1.8s ease-out forwards;
+}
+@keyframes wd-banner-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(95, 239, 145, 0); }
+  35%  { box-shadow: 0 0 13px 1px rgba(95, 239, 145, 0.28); }
+  100% { box-shadow: 0 0 0 0 rgba(95, 239, 145, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wd-booking__wizard-entry.is-glow { animation: none; }
+}
+.wd-booking__wizard-entry-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.wd-booking__wizard-entry-title {
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 13.5px;
+  line-height: 1.1;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: #F5F2E9;
+}
+.wd-booking__wizard-entry-sub {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.3;
+  color: #C9D2C4;
+}
+.wd-booking__wizard-entry-close {
+  flex: 0 0 auto;
+  width: 40px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: rgba(245, 242, 233, 0.7);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.wd-booking__wizard-entry-close:hover {
+  color: #F5F2E9;
+  background: rgba(0, 0, 0, 0.15);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wd-booking__wizard-entry-main,
+  .wd-booking__wizard-entry-close { transition: none; }
+}
+
+/* ===== Alignement à gauche sur la gouttière 48px (comme bannière / destinations) =====
+   On aligne le bloc du champ (et non le glyphe) à 48 : l'icône garde son retrait interne,
+   ce qui la fait tomber pile sous la tuile ✨ de la bannière. */
+body.brand-pullman .wd-booking__tabs { padding-left: 0; }
+body.brand-pullman .wd-booking__fields { padding-left: 0; }
+
+/* ===== Calendrier : même fond que le dropdown du booking engine (#1A2220) ===== */
+body.brand-pullman .wd-booking__datepicker { background: #1A2220; }
+
+/* ===== Masquer le placeholder du champ quand des critères (chips) sont présents — toutes tabs ===== */
+body.brand-pullman .wd-booking__dest-chips:not(:empty) + .wd-booking__dest-input::placeholder {
+  color: transparent;
+}
+</style>
+
+<script>
+function openMapModal() {
+  const modal = document.getElementById('mapModal');
+  modal.style.display = 'flex';
+  initBookingMap('ameriques');
+  renderCountryList('ameriques');
+  setTimeout(() => refreshBookingMapSize(), 100);
+}
+
+function closeMapModal() {
+  document.getElementById('mapModal').style.display = 'none';
+}
+
+// Ouvrir au clic sur "Show map"
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.wd-carousel__map')) {
+    e.preventDefault();
+    openMapModal();
+  }
+});
+
+// Gestion des continents
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('.continent-card');
+  if (card) {
+    const continent = card.dataset.continent;
+    document.querySelectorAll('.continent-card').forEach(c => c.classList.remove('is-active'));
+    card.classList.add('is-active');
+    updateBookingMapContinent(continent);
+    renderCountryList(continent);
+  }
+});
+
+// Gestion des critères
+document.addEventListener('change', (e) => {
+  if (e.target.dataset.amenity) {
+    const criteria = new Set();
+    document.querySelectorAll('[data-amenity]:checked').forEach(cb => {
+      criteria.add(cb.dataset.amenity);
+    });
+    updateBookingMapCriteria(criteria);
+  }
+});
+
+// Fermer avec Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMapModal();
+});
+</script>
+
+<!-- ===== V3 : point d'entrée du Discovery Wizard DANS le dropdown du booking engine (Option A) ===== -->
+<script>
+(function () {
+  const MAIN_HTML =
+    '<span class="wd-booking__wizard-entry-icon" aria-hidden="true">' +
+      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M12 3l1.8 4.5L18.5 9.3l-4.7 1.8L12 15.6l-1.8-4.5L5.5 9.3l4.7-1.8L12 3z"/>' +
+        '<path d="M18.5 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>' +
+      '</svg>' +
+    '</span>' +
+    '<span class="wd-booking__wizard-entry-text">' +
+      '<span class="wd-booking__wizard-entry-title">Pas encore décidé&nbsp;?</span>' +
+      '<span class="wd-booking__wizard-entry-sub">Laissez-vous guider vers l\'inspiration Pullman</span>' +
+    '</span>';
+
+  const CLOSE_HTML =
+    '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">' +
+      '<line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>' +
+    '</svg>';
+
+  function openWizard() {
+    // Ferme le dropdown du booking engine
+    const dropdown = document.querySelector('.wd-booking__dropdown');
+    if (dropdown) dropdown.dataset.state = 'closed';
+    const destField = document.querySelector('.wd-booking__field--dest');
+    if (destField) destField.classList.remove('wd-booking__field--editing');
+    // Ouvre le Discovery Wizard
+    const modal = document.querySelector('wd-discovery-modal');
+    if (modal && typeof modal.open === 'function') {
+      modal.open();
+    } else {
+      console.warn('[V3] wd-discovery-modal introuvable ou sans méthode open()');
+    }
+  }
+
+  function initWizardEntry(retries) {
+    const ddBody = document.querySelector('.wd-booking__dd-body');
+    if (!ddBody) {
+      if (retries > 0) setTimeout(() => initWizardEntry(retries - 1), 150);
+      return;
+    }
+    if (ddBody.querySelector('.wd-booking__wizard-entry')) return; // déjà injecté
+
+    const entry = document.createElement('div');
+    entry.className = 'wd-booking__wizard-entry';
+
+    const main = document.createElement('button');
+    main.type = 'button';
+    main.className = 'wd-booking__wizard-entry-main';
+    main.setAttribute('aria-label', 'Pas encore décidé ? Laissez-vous guider vers l\'inspiration Pullman');
+    main.innerHTML = MAIN_HTML;
+    main.addEventListener('click', openWizard);
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'wd-booking__wizard-entry-close';
+    close.setAttribute('aria-label', 'Masquer cette suggestion');
+    close.innerHTML = CLOSE_HTML;
+    close.addEventListener('click', (e) => { e.stopPropagation(); entry.remove(); });
+
+    entry.appendChild(main);
+    entry.appendChild(close);
+    ddBody.prepend(entry); // toujours en tête du dropdown
+
+    // Balayage lumineux : une seule passe, rejouée à chaque ouverture du dropdown
+    const dropdown = document.querySelector('.wd-booking__dropdown');
+    const triggerGlow = () => {
+      entry.classList.remove('is-glow');
+      void entry.offsetWidth; // reflow pour relancer l'animation
+      entry.classList.add('is-glow');
+    };
+    if (dropdown) {
+      new MutationObserver(() => {
+        if (dropdown.dataset.state === 'open') triggerGlow();
+      }).observe(dropdown, { attributes: true, attributeFilter: ['data-state'] });
+      if (dropdown.dataset.state === 'open') triggerGlow();
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initWizardEntry(25));
+  } else {
+    initWizardEntry(25);
+  }
+})();
+</script>
+
+</body>
+</html>

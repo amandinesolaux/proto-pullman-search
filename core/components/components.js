@@ -1218,28 +1218,81 @@
         return true;
       };
 
-      const renderResultsCount = () => {
+      // Pool d'hôtels correspondant au périmètre géographique courant (hors critères)
+      const getResultsPool = () => {
         const allHotels = REGION_HOTELS.flatMap(r => r.hotels);
-        let pool = [];
-        let label = '';
         if (searchState.selectedHotel) {
           const country = searchState.expandedCountry || '';
           const region = getRegion();
-          pool = region ? region.hotels.filter(h => h.country === country) : [];
-          label = country;
+          return { pool: region ? region.hotels.filter(h => h.country === country) : [], label: country };
         } else if (searchState.expandedCountry) {
           const region = getRegion();
-          pool = region ? region.hotels.filter(h => h.country === searchState.expandedCountry) : [];
-          label = searchState.expandedCountry;
+          return { pool: region ? region.hotels.filter(h => h.country === searchState.expandedCountry) : [], label: searchState.expandedCountry };
         } else if (searchState.continent) {
           const region = getRegion();
-          pool = region ? region.hotels : [];
-          label = region ? region.label : '';
-        } else {
-          pool = allHotels;
-          const countryCount = new Set(allHotels.map(h => h.country)).size;
-          label = countryCount + ' pays';
+          return { pool: region ? region.hotels : [], label: region ? region.label : '' };
         }
+        const countryCount = new Set(allHotels.map(h => h.country)).size;
+        return { pool: allHotels, label: countryCount + ' pays' };
+      };
+
+      // Un hôtel matche-t-il un sous-ensemble donné de critères ?
+      const matchesCriteriaSet = (h, ids) => {
+        if (!h.services) return false;
+        for (const id of ids) {
+          const svcs = CRITERIA_TO_SERVICES[id];
+          if (!svcs || !svcs.length) continue;
+          if (!svcs.some(s => h.services.includes(s))) return false;
+        }
+        return true;
+      };
+
+      // Zero-result recovery : suggère de retirer LE critère qui débloque le plus d'hôtels
+      const renderRelaxation = () => {
+        const active = getActiveCriteria();
+        if (!active.size) return '';
+        const { pool } = getResultsPool();
+        if (!pool.length) return '';                                   // pas de destination -> rien à suggérer
+        if (pool.filter(hotelMatchesCriteria).length > 0) return '';   // il y a des résultats -> pas de message
+        const list = getActiveCriteriaList();
+        const activeIds = [...active];
+        const labelFor = (id) => { const c = list.find(x => x.id === id); return c ? c.label : id; };
+        let best = null;
+        activeIds.forEach(cId => {
+          const svcs = CRITERIA_TO_SERVICES[cId];
+          if (!svcs || !svcs.length) return;                           // critère non filtrant -> le retirer ne débloque rien
+          const reduced = activeIds.filter(x => x !== cId);
+          const matches = pool.filter(h => matchesCriteriaSet(h, reduced));
+          if (matches.length && (!best || matches.length > best.count)) {
+            best = { id: cId, label: labelFor(cId), count: matches.length, hotel: matches[0] };
+          }
+        });
+        const info = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.6" r=".7" fill="currentColor" stroke="none"/></svg>';
+        let body;
+        if (best) {
+          const plural = best.count > 1;
+          const namePart = plural ? '' : ' : <strong>' + esc(best.hotel.name) + '</strong>';
+          body = '<div class="wd-booking__dd-noresult-row">' +
+            '<p class="wd-booking__dd-noresult-text">En retirant <strong>« ' + esc(best.label) + ' »</strong>, <strong>' + best.count + ' hôtel' + (plural ? 's' : '') + '</strong> correspond' + (plural ? 'raient' : 'rait') + namePart + '.</p>' +
+            '<div class="wd-booking__dd-noresult-actions">' +
+            '<button type="button" class="wd-booking__dd-noresult-relax" data-criteria="' + best.id + '">Retirer « ' + esc(best.label) + ' »</button>' +
+            '<button type="button" class="wd-booking__dd-noresult-reset">Réinitialiser les critères</button>' +
+            '</div></div>';
+        } else {
+          body = '<div class="wd-booking__dd-noresult-row">' +
+            '<p class="wd-booking__dd-noresult-text">Aucun de vos critères ne peut être assoupli pour trouver un hôtel ici.</p>' +
+            '<div class="wd-booking__dd-noresult-actions">' +
+            '<button type="button" class="wd-booking__dd-noresult-reset">Réinitialiser les critères</button>' +
+            '</div></div>';
+        }
+        return '<div class="wd-booking__dd-noresult" role="status" aria-live="polite">' +
+          '<div class="wd-booking__dd-noresult-head">' + info +
+          '<span class="wd-booking__dd-noresult-title">Aucun hôtel ne correspond à tous vos critères</span></div>' +
+          body + '</div>';
+      };
+
+      const renderResultsCount = () => {
+        const { pool, label } = getResultsPool();
         const count = pool.filter(hotelMatchesCriteria).length;
         const activeCriteria = getActiveCriteria();
         const criteriaLabels = [];
@@ -1261,6 +1314,9 @@
         return '<div class="wd-booking__dd-results-count">' + desc + '</div>';
       };
 
+      // Termes trop génériques pour filtrer (tous les hôtels correspondent) -> on garde l'affichage par défaut
+      const GENERIC_QUERY_TERMS = new Set(['hotel', 'hotels', 'hôtel', 'hôtels', 'hotellerie', 'hôtellerie', 'pullman']);
+      const isGenericQuery = (q) => { const t = (q || '').trim(); return t.length > 0 && t.split(/\s+/).every(w => GENERIC_QUERY_TERMS.has(w)); };
       const renderDestList = () => {
         const query = searchState.freeText.toLowerCase();
         if (!searchState.continent) {
@@ -1268,7 +1324,7 @@
           const allCountries = [...new Set(allHotels.map(h => h.country))].sort();
           const allCities = [...new Set(allHotels.map(h => h.loc.split(',')[0].trim()))].sort();
           let html = '';
-          if (query.length >= 1) {
+          if (query.length >= 1 && !isGenericQuery(query)) {
             const parsed = parseQuery(searchState.freeText);
             let filteredHotels = allHotels;
             if (parsed.continent) filteredHotels = filteredHotels.filter(h => {
@@ -1347,7 +1403,7 @@
                 '</button>';
             }).join('');
           }
-          destListEl.innerHTML = html + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
+          destListEl.innerHTML = renderRelaxation() + html + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
           return;
         }
         const countries = getCountries();
@@ -1383,7 +1439,7 @@
           }
           return html;
         }).join('');
-        destListEl.innerHTML = '<div class="wd-booking__dd-dest-subtitle">Pays</div>' + countryListHtml + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
+        destListEl.innerHTML = renderRelaxation() + '<div class="wd-booking__dd-dest-subtitle">Pays</div>' + countryListHtml + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
       };
 
       const renderCriteria = () => {
@@ -1481,6 +1537,20 @@
         renderPanel();
       });
       destListEl.addEventListener('click', (e) => {
+        const relaxBtn = e.target.closest('.wd-booking__dd-noresult-relax');
+        if (relaxBtn) {
+          e.preventDefault();
+          getActiveCriteria().delete(relaxBtn.dataset.criteria);
+          renderPanel();
+          return;
+        }
+        const resetBtn = e.target.closest('.wd-booking__dd-noresult-reset');
+        if (resetBtn) {
+          e.preventDefault();
+          getActiveCriteria().clear();
+          renderPanel();
+          return;
+        }
         const hotelRow = e.target.closest('.wd-booking__dd-hotel-row');
         if (hotelRow) {
           e.preventDefault();
@@ -1592,6 +1662,20 @@
         } else if (val.length >= 2) {
           renderSuggestions(val);
           searchPanelEl.style.display = 'none';
+          // Continent déjà sélectionné : on parse quand même la saisie pour en extraire les critères
+          parseTimeout = setTimeout(() => {
+            const parsed = parseQuery(val);
+            let changed = false;
+            parsed.criteria.forEach(cId => { if (!getActiveCriteria().has(cId)) { getActiveCriteria().add(cId); changed = true; } });
+            if (changed) {
+              destInput.value = '';
+              searchState.freeText = '';
+              suggestionsEl.style.display = 'none';
+              searchPanelEl.style.display = '';
+              renderPanel();
+              destInput.focus();
+            }
+          }, 600);
         } else {
           suggestionsEl.style.display = 'none';
           searchPanelEl.style.display = '';
