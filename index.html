@@ -3,167 +3,187 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pullman Prototypes</title>
+  <title>Pullman · Prototypes Search & Discovery</title>
   <style>
+    @font-face {
+      font-family: 'Neue Power';
+      src: url('brands/pullman/fonts/NeuePower-Ultra.ttf') format('truetype');
+      font-weight: 800; font-style: normal; font-display: swap;
+    }
+    :root {
+      --bg-top: #3a463d;
+      --bg-bottom: #1c241f;
+      --ink: #f4f1e9;
+      --muted: rgba(244, 241, 233, 0.55);
+      --faint: rgba(244, 241, 233, 0.30);
+      --line: rgba(244, 241, 233, 0.12);
+      --accent: #5fef91;
+      --serif: 'Neue Power', 'Helvetica Neue', Arial, sans-serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, #445047 0%, #2a3329 100%);
+      font-family: var(--sans);
+      background: linear-gradient(165deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+      color: var(--ink);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 48px 24px;
+      -webkit-font-smoothing: antialiased;
     }
-    .container {
-      max-width: 900px;
-      width: 100%;
+    .wrap { width: 100%; max-width: 620px; }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+    .kicker::before {
+      content: "";
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(95, 239, 145, 0.6);
     }
     h1 {
-      color: #ffffff;
-      font-size: 48px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .subtitle {
-      color: #b8c4bb;
-      font-size: 18px;
-      text-align: center;
-      margin-bottom: 60px;
-    }
-    .versions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 32px;
-      margin-bottom: 40px;
-    }
-    .card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      text-decoration: none;
-      display: block;
-    }
-    .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
-    }
-    .card-label {
-      display: inline-block;
-      background: #5fef91;
-      color: #1a1f1c;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      text-transform: uppercase;
+      font-family: var(--serif);
+      font-weight: 800;
+      font-size: clamp(38px, 8vw, 58px);
+      line-height: 1.02;
       letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
     }
-    .card h2 {
-      color: #1a1f1c;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    .card p {
-      color: #6b7570;
+    .intro {
       font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 24px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 46ch;
+      margin-bottom: 52px;
     }
-    .features {
-      list-style: none;
-      margin-bottom: 24px;
+
+    .list {
+      border-top: 1px solid var(--line);
     }
-    .features li {
-      color: #445047;
-      font-size: 14px;
-      padding: 8px 0;
-      padding-left: 24px;
-      position: relative;
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      padding: 26px 8px 26px 4px;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      transition: padding-left 0.25s ease, background 0.25s ease;
     }
-    .features li:before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: #5fef91;
-      font-weight: 700;
+    .row:hover { padding-left: 14px; background: rgba(244, 241, 233, 0.03); }
+    .row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    .row-num {
+      flex: 0 0 auto;
+      font-family: var(--serif);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--faint);
+      letter-spacing: 1px;
+      transition: color 0.25s ease;
     }
-    .cta {
-      background: #445047;
-      color: #ffffff;
-      font-size: 16px;
-      font-weight: 600;
-      padding: 14px 28px;
-      border-radius: 8px;
-      text-align: center;
+    .row:hover .row-num { color: var(--accent); }
+
+    .row-main { flex: 1 1 auto; min-width: 0; }
+    .row-eyebrow {
       display: block;
-      transition: background 0.2s ease;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--faint);
+      margin-bottom: 5px;
     }
-    .card:hover .cta {
-      background: #2a3329;
+    .row-name {
+      display: block;
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      margin-bottom: 5px;
     }
+    .row-desc {
+      display: block;
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .row-arrow {
+      flex: 0 0 auto;
+      font-size: 22px;
+      color: var(--faint);
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+    .row:hover .row-arrow { color: var(--accent); transform: translateX(5px); }
+
     footer {
-      text-align: center;
-      color: #b8c4bb;
-      font-size: 14px;
-      margin-top: 60px;
+      margin-top: 48px;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      color: var(--faint);
+    }
+
+    @media (max-width: 480px) {
+      .row { gap: 16px; }
+      .row-num { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .row, .row-arrow, .row-num { transition: none; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Pullman Prototypes</h1>
-    <p class="subtitle">Explorez les trois versions de la homepage</p>
+  <main class="wrap">
+    <span class="kicker">Pullman · Prototypes</span>
+    <h1>Search &amp;<br/>Discovery</h1>
+    <p class="intro">Trois directions explorées pour repenser le parcours de recherche et de réservation.</p>
 
-    <div class="versions">
-      <a href="pages/pullman/proto-pullman-v1-map-filters.html" class="card">
-        <span class="card-label">Version 1</span>
-        <h2>Map & Filtres</h2>
-        <p>Découverte guidée par destination avec carte interactive et filtres thématiques</p>
-        <ul class="features">
-          <li>Booking engine avec tabs</li>
-          <li>Carte interactive des destinations</li>
-          <li>Filtres thématiques (Asie, Europe, etc.)</li>
-          <li>Carrousel de destinations</li>
-        </ul>
-        <span class="cta">Voir la V1 →</span>
+    <nav class="list" aria-label="Versions du prototype">
+      <a class="row" href="pages/pullman/proto-pullman-v1-map-filters.html">
+        <span class="row-num">01</span>
+        <span class="row-main">
+          <span class="row-eyebrow">Version 1</span>
+          <span class="row-name">Carte &amp; Filtres</span>
+          <span class="row-desc">Découverte par destination — carte interactive et filtres thématiques.</span>
+        </span>
+        <span class="row-arrow" aria-hidden="true">→</span>
       </a>
 
-      <a href="pages/pullman/proto-pullman-v2-discovery-wizard.html" class="card">
-        <span class="card-label">Version 2</span>
-        <h2>Discovery Wizard</h2>
-        <p>Questionnaire immersif pour guider les visiteurs indécis vers leur destination idéale</p>
-        <ul class="features">
-          <li>Questionnaire en 7 étapes</li>
-          <li>Carrousel 3D immersif</li>
-          <li>Modale full-screen</li>
-          <li>Résultats personnalisés</li>
-        </ul>
-        <span class="cta">Voir la V2 →</span>
+      <a class="row" href="pages/pullman/proto-pullman-v2-discovery-wizard.html">
+        <span class="row-num">02</span>
+        <span class="row-main">
+          <span class="row-eyebrow">Version 2</span>
+          <span class="row-name">Discovery Wizard</span>
+          <span class="row-desc">Questionnaire immersif qui guide les visiteurs indécis vers leur séjour idéal.</span>
+        </span>
+        <span class="row-arrow" aria-hidden="true">→</span>
       </a>
 
-      <a href="pages/pullman/proto-pullman-v3-booking-wizard.html" class="card">
-        <span class="card-label">Version 3</span>
-        <h2>Booking + Wizard</h2>
-        <p>Fusion des deux parcours : le Discovery Wizard s'ouvre directement depuis le booking engine</p>
-        <ul class="features">
-          <li>Booking engine amélioré (carte + filtres)</li>
-          <li>Entrée wizard dans le dropdown de recherche</li>
-          <li>« Pas encore décidé ? » → Discovery Wizard</li>
-          <li>Un seul parcours unifié</li>
-        </ul>
-        <span class="cta">Voir la V3 →</span>
+      <a class="row" href="pages/pullman/proto-pullman-v3-booking-wizard.html">
+        <span class="row-num">03</span>
+        <span class="row-main">
+          <span class="row-eyebrow">Version 3</span>
+          <span class="row-name">Booking + Wizard</span>
+          <span class="row-desc">Parcours unifié — le Discovery Wizard s'ouvre directement depuis le booking engine.</span>
+        </span>
+        <span class="row-arrow" aria-hidden="true">→</span>
       </a>
-    </div>
+    </nav>
 
-    <footer>
-      Pullman Hotels & Resorts • Prototypes Factory 2026
-    </footer>
-  </div>
+    <footer>Pullman Hotels &amp; Resorts — Prototypes Factory 2026</footer>
+  </main>
 </body>
 </html>
