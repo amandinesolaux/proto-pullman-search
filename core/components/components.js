@@ -669,6 +669,7 @@
                 <input type="text" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" />
               </div>
             </div>
+            <button class="wd-booking__dest-clear" id="wd-dest-clear" type="button" title="Effacer la recherche" aria-label="Effacer toute la recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
             <button class="wd-booking__map-toggle" title="Voir la carte" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/></svg></button>
           </div>
           <div class="wd-booking__sep"></div>
@@ -793,6 +794,7 @@
 
       const searchState = {
         continent: null,
+        showAll: false, // « Tous les continents » choisi explicitement (mode progressif)
         country: null,
         city: null,
         criteria: new Set(),
@@ -1093,7 +1095,17 @@
       const searchPanelEl = this.querySelector('#wd-search-panel');
 
       const renderContinents = () => {
-        continentsEl.innerHTML = REGION_HOTELS.map(r => {
+        // Mode progressif : une carte « Tous les continents » ouvre la vue complète sans choisir de zone
+        const allActive = searchState.showAll && !searchState.continent;
+        const ALL_IMG = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&h=200&fit=crop'; // Terre vue de l'espace
+        const allCard = !progressiveMode ? '' :
+          '<button class="wd-booking__dd-continent wd-booking__dd-continent--all' + (allActive ? ' wd-booking__dd-continent--active' : '') + '" data-continent="__all__" type="button" role="tab" aria-selected="' + allActive + '">' +
+            '<img class="wd-booking__dd-continent-img" src="' + ALL_IMG + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
+            '<div class="wd-booking__dd-continent-overlay"></div>' +
+            '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
+            '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
+          '</button>';
+        continentsEl.innerHTML = allCard + REGION_HOTELS.map(r => {
           const active = r.id === searchState.continent;
           return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button" role="tab" aria-selected="' + active + '">' +
             '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
@@ -1294,11 +1306,71 @@
 
       // Divulgation progressive : y a-t-il un périmètre de recherche actif (continent, pays, hôtel, ville, saisie) ?
       const hasSearchScope = () => !!(
-        searchState.continent || searchState.expandedCountry || searchState.selectedHotel ||
+        searchState.continent || searchState.showAll || searchState.expandedCountry || searchState.selectedHotel ||
         searchState.city || (searchState.freeText && searchState.freeText.trim().length >= 1)
       );
       // État intermédiaire = mode progressif ET aucun périmètre choisi -> on n'affiche que les continents
       const isIntermediate = () => progressiveMode && !hasSearchScope();
+
+      // ===== Recherches récentes — persistées en localStorage, reprise en un clic (façon Airbnb).
+      // L'état est capturé en continu (debounce) : pas besoin d'avoir cliqué « Rechercher ».
+      const RECENT_KEY = 'wd-recent-searches';
+      // Une seule entrée : la dernière recherche, dans son état le plus affiné (pas de doublons de raffinement)
+      const loadRecents = () => { try { return (JSON.parse(localStorage.getItem(RECENT_KEY)) || []).filter(r => r && r.geoLabel).slice(0, 1); } catch (e) { return []; } };
+      const storeRecents = (list) => { try { localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 1))); } catch (e) {} };
+      const fmtRecentDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso));
+      const buildRecentEntry = () => {
+        const active = getActiveCriteria();
+        const list = getActiveCriteriaList();
+        const criteriaLabels = [...active].map(id => { const c = list.find(x => x.id === id); return c ? c.label : id; });
+        const region = getRegion();
+        let geoLabel = '';
+        if (searchState.selectedHotel) geoLabel = searchState.selectedHotel;
+        else if (searchState.expandedCountry) geoLabel = searchState.expandedCountry;
+        else if (searchState.city) geoLabel = searchState.city;
+        else if (region) geoLabel = region.label;
+        else if (searchState.showAll) geoLabel = 'Tous les continents';
+        else if (searchState.freeText.trim()) geoLabel = searchState.freeText.trim();
+        const checkin = dpCheckIn ? dpCheckIn.toISOString() : null;
+        const checkout = dpCheckOut ? dpCheckOut.toISOString() : null;
+        if (!geoLabel) return null; // pas de destination -> rien à reprendre (et on ne clobber pas la dernière vraie recherche)
+        return {
+          ts: Date.now(), tab: searchState.activeTab,
+          geo: { continent: searchState.continent, showAll: searchState.showAll, country: searchState.expandedCountry, city: searchState.city, hotel: searchState.selectedHotel, freeText: searchState.freeText.trim() },
+          geoLabel, criteria: [...active], criteriaLabels, checkin, checkout, flex: dpFlex
+        };
+      };
+      const saveRecentNow = () => {
+        try {
+          const entry = buildRecentEntry();
+          if (!entry) return;
+          storeRecents([entry]); // remplace : chaque raffinement met à jour LA recherche retenue
+        } catch (e) {}
+      };
+      let recentTimer = null;
+      const scheduleRecentSave = () => { clearTimeout(recentTimer); recentTimer = setTimeout(saveRecentNow, 800); };
+      const applyRecent = (r) => {
+        if (!r) return;
+        if (r.tab && r.tab !== searchState.activeTab) {
+          const tabBtn = this.querySelector('.wd-booking__tab[data-tab="' + r.tab + '"]');
+          if (tabBtn) tabBtn.click();
+        }
+        searchState.continent = r.geo.continent || null;
+        searchState.showAll = !!r.geo.showAll;
+        searchState.expandedCountry = r.geo.country || null;
+        searchState.city = r.geo.city || null;
+        searchState.selectedHotel = r.geo.hotel || null;
+        searchState.freeText = '';
+        destInput.value = '';
+        const set = getActiveCriteria();
+        set.clear();
+        (r.criteria || []).forEach(id => set.add(id));
+        dpCheckIn = r.checkin ? new Date(r.checkin) : null;
+        dpCheckOut = r.checkout ? new Date(r.checkout) : null;
+        dpFlex = r.flex || 0;
+        formatDateField();
+        renderPanel();
+      };
 
       const renderResultsCount = () => {
         const { pool, label } = getResultsPool();
@@ -1329,8 +1401,35 @@
       const renderDestList = () => {
         const query = searchState.freeText.toLowerCase();
         if (isIntermediate()) {
-          // Continents seuls : on masque la liste des pays, on garde juste le repère chiffré
-          destListEl.innerHTML = '<div class="wd-booking__dd-results-bar wd-booking__dd-results-bar--hint">' + renderResultsCount() + '</div>';
+          // Continents seuls + reprise des recherches récentes ; le repère chiffré reste en pied
+          const clockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7.5v5l3.5 2"/></svg>';
+          const delIcon = '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg>';
+          const recents = loadRecents();
+          let html = '';
+          if (recents.length) {
+            html += '<div class="wd-booking__dd-dest-subtitle">Reprendre votre recherche</div>';
+            html += recents.map((r, i) => {
+              // Dates (avec repli), puis services recherchés
+              let datePart;
+              if (r.checkin && r.checkout) datePart = fmtRecentDay(r.checkin) + ' – ' + fmtRecentDay(r.checkout) + (r.flex ? ' · ±' + r.flex + 'j' : '');
+              else if (r.checkin) datePart = 'dès le ' + fmtRecentDay(r.checkin);
+              else datePart = 'Dates flexibles';
+              const servicePart = (r.criteriaLabels && r.criteriaLabels.length) ? r.criteriaLabels.join(', ') : null;
+              const subParts = [datePart, servicePart].filter(Boolean);
+              return '<div class="wd-booking__dd-recent-row">' +
+                '<button type="button" class="wd-booking__dd-recent" data-recent="' + i + '">' +
+                  '<span class="wd-booking__dd-recent-icon">' + clockIcon + '</span>' +
+                  '<span class="wd-booking__dd-recent-main">' +
+                    '<span class="wd-booking__dd-recent-title">' + esc(r.geoLabel || 'Recherche') + '</span>' +
+                    '<span class="wd-booking__dd-recent-sub">' + esc(subParts.join('  ·  ')) + '</span>' +
+                  '</span>' +
+                '</button>' +
+                '<button type="button" class="wd-booking__dd-recent-del" data-recent-del="' + i + '" aria-label="Supprimer cette recherche récente">' + delIcon + '</button>' +
+              '</div>';
+            }).join('');
+          }
+          // Pas de compteur global en état intermédiaire (peu pertinent tant qu'aucune zone n'est choisie)
+          destListEl.innerHTML = html;
           return;
         }
         if (!searchState.continent) {
@@ -1473,8 +1572,32 @@
         }).join('');
       };
 
+      // Bouton « tout effacer » (façon Spotify) : visible dès qu'il y a une recherche en cours
+      const clearBtn = this.querySelector('#wd-dest-clear');
+      const updateClearBtn = () => {
+        if (!clearBtn) return;
+        const hasSomething = buildChips().length > 0 || (searchState.freeText && searchState.freeText.trim().length > 0);
+        clearBtn.classList.toggle('wd-booking__dest-clear--visible', hasSomething);
+      };
+      const clearAllSearch = () => {
+        searchState.continent = null;
+        searchState.showAll = false;
+        searchState.country = null;
+        searchState.city = null;
+        searchState.expandedCountry = null;
+        searchState.selectedHotel = null;
+        searchState.freeText = '';
+        getActiveCriteria().clear();
+        destInput.value = '';
+        suggestionsEl.style.display = 'none';
+        if (!(ddMapview && ddMapview.style.display !== 'none')) searchPanelEl.style.display = '';
+        renderPanel();
+        destInput.focus();
+      };
+
       const MAX_VISIBLE_CHIPS = 3;
       const renderChips = () => {
+        updateClearBtn();
         const chips = buildChips();
         if (!chips.length) {
           chipsEl.innerHTML = '';
@@ -1522,6 +1645,7 @@
         renderChips();
         // État de divulgation porté par le composant (robuste aux re-rendus du panneau)
         if (progressiveMode) this.dataset.disclosure = isIntermediate() ? 'intermediate' : 'full';
+        scheduleRecentSave(); // capture continue de la recherche en cours (même sans clic sur « Rechercher »)
       };
 
       const open = () => {
@@ -1538,13 +1662,25 @@
         dropdown.dataset.state = 'closed';
         destField.classList.remove('wd-booking__field--editing');
         renderChips();
+        saveRecentNow(); // flush immédiat : la recherche est retenue même si l'utilisateur part sans chercher
       };
 
       continentsEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.wd-booking__dd-continent');
         if (!btn) return;
-        searchState.continent = btn.dataset.continent;
+        if (btn.dataset.continent === '__all__') {
+          // Toggle : re-cliquer « Tous les continents » désélectionne
+          const wasAll = searchState.showAll && !searchState.continent;
+          searchState.showAll = !wasAll;
+          searchState.continent = null;
+        } else {
+          // Toggle : re-cliquer le continent actif le désélectionne (retour à l'état initial)
+          const same = searchState.continent === btn.dataset.continent;
+          searchState.continent = same ? null : btn.dataset.continent;
+          searchState.showAll = false;
+        }
         searchState.expandedCountry = null;
+        searchState.selectedHotel = null;
         renderPanel();
       });
       breadcrumbEl.addEventListener('click', (e) => {
@@ -1554,6 +1690,21 @@
         renderPanel();
       });
       destListEl.addEventListener('click', (e) => {
+        const recentDel = e.target.closest('[data-recent-del]');
+        if (recentDel) {
+          e.preventDefault();
+          const list = loadRecents();
+          list.splice(parseInt(recentDel.dataset.recentDel, 10), 1);
+          storeRecents(list);
+          renderPanel();
+          return;
+        }
+        const recentBtn = e.target.closest('[data-recent]');
+        if (recentBtn) {
+          e.preventDefault();
+          applyRecent(loadRecents()[parseInt(recentBtn.dataset.recent, 10)]);
+          return;
+        }
         const relaxBtn = e.target.closest('.wd-booking__dd-noresult-relax');
         if (relaxBtn) {
           e.preventDefault();
@@ -1575,6 +1726,7 @@
           searchState.selectedHotel = searchState.selectedHotel === name ? null : name;
           renderDestList();
           renderChips();
+          scheduleRecentSave(); // la sélection d'hôtel fait partie de la recherche à retenir
           return;
         }
         const item = e.target.closest('.wd-booking__dd-dest-item');
@@ -1585,6 +1737,7 @@
         if (type === 'country') {
           searchState.expandedCountry = searchState.expandedCountry === value ? null : value;
           searchState.selectedHotel = null;
+          scheduleRecentSave(); // idem pour le pays déplié
           renderDestList();
           renderChips();
           return;
@@ -1626,6 +1779,7 @@
       destInput.addEventListener('input', () => {
         const val = destInput.value.trim();
         searchState.freeText = val;
+        updateClearBtn();
         clearTimeout(parseTimeout);
         if (isMapViewActive()) {
           if (val.length >= 2) {
@@ -1727,6 +1881,8 @@
       const ddMapview = this.querySelector('.wd-booking__dd-mapview');
       const mapViewContinents = this.querySelector('#wd-mapview-continents');
       const mapViewCriteria = this.querySelector('#wd-mapview-criteria');
+      if (clearBtn) clearBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); clearAllSearch(); });
+      updateClearBtn();
       let mapInitDone = false;
       if (mapToggle && ddMapview) {
         renderMapPanel = () => {
@@ -1864,6 +2020,7 @@
       };
 
       const formatDateField = () => {
+        scheduleRecentSave(); // les dates font partie de la recherche à retenir
         if (!dpCheckIn) {
           dateField.classList.remove('wd-booking__field--selected');
           if (dateLabel) dateLabel.innerHTML = 'À quelles dates ? <span style="font-weight:300;opacity:.6">(facultatif)</span>';

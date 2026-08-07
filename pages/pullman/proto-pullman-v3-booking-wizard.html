@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=220"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=232"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,7 +17,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/components/components.js?v=220"></script>
+  <script src="../../core/components/components.js?v=231"></script>
   <script src="../../brands/pullman/pullman.js"></script>
   <script src="../../core/components/booking-map.js?v=103"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
@@ -372,37 +372,79 @@
   height: 100%;
 }
 
-/* ===== CTA wizard — bordure « IA » shimmer légère, en haut à droite du dropdown ===== */
-.wd-booking__dd-body { position: relative; }
+/* ===== CTA wizard — bordure « IA » shimmer légère, aligné sur le bas des cartes destination ===== */
+.wd-booking__dd-body {
+  position: relative;
+  /* Empilement au-dessus des cartes, pour caler le CTA sans nombre magique :
+     padding du panneau + hauteur du titre « DESTINATION » + sa marge basse */
+  --wd-cards-top: calc(20px + 17px + 12px);
+  --wd-card-size: 72px;   /* .wd-booking__dd-continent */
+}
 @property --wd-ai-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
 .wd-booking__wizard-cta {
   position: absolute;
-  top: 14px;
+  /* bas du CTA = bas des cartes, quelle que soit sa hauteur */
+  top: calc(var(--wd-cards-top) + var(--wd-card-size));
+  transform: translateY(-100%);
   right: 48px;
   z-index: 6;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
+  justify-content: center;
+  gap: 10px;
+  /* mêmes métriques que le CTA « Rechercher » (.wd-booking__cta) pour une taille identique */
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 24px;
   border: none;
-  border-radius: 100px;
-  background: #28332B;
-  color: #F5F2E9;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
+  border-radius: 99px;
+  background: transparent;
+  color: #FFFFFF;
+  font-family: 'Noto Sans', var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
   cursor: pointer;
   isolation: isolate;
   transition: background 0.2s ease;
 }
+/* Le CTA « Rechercher » adopte la même hauteur que le CTA wizard (42px) */
+body.brand-pullman .wd-booking__cta { height: 42px; padding: 0 24px; }
+
+/* Chips de recherche : nom d'hôtel affiché en entier, sans troncature */
+body.brand-pullman .wd-booking__dest-chip { max-width: none; flex-shrink: 0; }
+/* La barre de recherche reste sur UNE ligne : l'input se comprime au lieu de passer à la ligne */
+body.brand-pullman .wd-booking__dest-input-row { flex-wrap: nowrap; overflow: hidden; }
+body.brand-pullman .wd-booking__dest-input { min-width: 30px; }
+
+/* État intermédiaire : le titre « Reprendre votre recherche » s'aligne sur la gouttière (comme DESTINATION) */
+wd-booking[data-disclosure="intermediate"] .wd-booking__dd-dest-subtitle { padding-left: 0; }
+
+/* Compteur de résultats : fond uni (même couleur que le dropdown), jamais de dégradé */
+body.brand-pullman .wd-booking__dd-results-bar { background: #1A2220; padding-top: 12px; }
+body.brand-pullman .wd-booking__dd-results-bar--hint { background: none; padding: 0; margin-top: 18px; } /* aligné sur la gouttière + respiration au-dessus du divider */
+
+@media (max-width: 600px) {
+  .wd-booking__dd-body { --wd-card-size: 60px; } /* cartes réduites au même breakpoint */
+}
+/* Sous ~820px le CTA viendrait chevaucher la dernière carte : on le remonte au-dessus de la rangée */
+@media (max-width: 820px) {
+  .wd-booking__wizard-cta { top: 14px; transform: none; }
+}
+/* Vue complète (continent choisi) : le CTA wizard se retire — re-cliquer le continent le fait revenir */
+wd-booking[data-disclosure="full"] .wd-booking__wizard-cta { display: none; }
 .wd-booking__wizard-cta::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  padding: 1.5px;
+  padding: 1px;
+  /* contour blanc constant + arc lumineux qui tourne */
   background: conic-gradient(from var(--wd-ai-angle),
-    #5FEF91, #BFF7D6, #5FEF91, #3a6b4d, #5FEF91);
+    rgba(255,255,255,.5) 0deg,
+    rgba(255,255,255,1) 30deg,
+    rgba(255,255,255,.5) 85deg,
+    rgba(255,255,255,.5) 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
@@ -411,10 +453,10 @@
   z-index: -1;
 }
 @keyframes wd-ai-spin { to { --wd-ai-angle: 360deg; } }
-.wd-booking__wizard-cta:hover { background: #2f3d33; }
+.wd-booking__wizard-cta:hover { background: rgba(255, 255, 255, 0.08); }
 .wd-booking__wizard-cta:hover::before { animation-duration: 2.5s; }
-.wd-booking__wizard-cta:focus-visible { outline: 2px solid #5FEF91; outline-offset: 2px; }
-.wd-booking__wizard-cta-icon { display: inline-flex; color: #5FEF91; }
+.wd-booking__wizard-cta:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+.wd-booking__wizard-cta-icon { display: inline-flex; color: #FFFFFF; }
 @media (prefers-reduced-motion: reduce) {
   .wd-booking__wizard-cta::before { animation: none; }
 }
@@ -426,6 +468,7 @@ wd-booking[data-disclosure="intermediate"] .wd-booking__dd-criteria-col {
 wd-booking[data-disclosure="intermediate"] .wd-booking__dd-dest-col {
   border-right-color: transparent;
   flex: 1;
+  min-height: 0; /* pas de vide sous le compteur : la colonne s'ajuste à son contenu */
 }
 wd-booking[data-disclosure="full"] .wd-booking__dd-criteria-col {
   max-width: none;
@@ -547,7 +590,7 @@ document.addEventListener('keydown', (e) => {
     cta.setAttribute('aria-label', 'Laissez-vous guider vers l\'inspiration Pullman');
     cta.innerHTML = CTA_HTML;
     cta.addEventListener('click', openWizard);
-    ddBody.appendChild(cta); // positionné en absolu, en haut à droite du dropdown
+    ddBody.appendChild(cta); // état intermédiaire : en haut à droite, aligné sur les cartes (masqué en vue complète via CSS)
   }
 
   if (document.readyState === 'loading') {

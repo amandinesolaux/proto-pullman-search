@@ -362,6 +362,11 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 
 /* Map toggle button in search bar */
 .wd-booking__map-toggle { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: transparent; color: rgba(255,255,255,.35); cursor: pointer; transition: all .2s ease; margin-left: 8px; }
+/* Bouton « tout effacer » (façon Spotify) : même conteneur que le toggle carte, apparaît quand une recherche est en cours */
+.wd-booking__dest-clear { display: none; align-items: center; justify-content: center; flex-shrink: 0; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: transparent; color: rgba(255,255,255,.5); cursor: pointer; transition: all .2s ease; margin-left: 8px; margin-right: -12px; }
+.wd-booking__dest-clear--visible { display: flex; }
+.wd-booking__dest-clear:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+.wd-booking__dest-clear:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 1px; }
 .wd-booking__map-toggle:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.6); border-color: rgba(255,255,255,.18); }
 .wd-booking__map-toggle--active { background: rgba(95,239,145,.1); color: var(--pul-highlight, #5FEF91); border-color: rgba(95,239,145,.25); }
 .wd-booking__map-toggle--active:hover { background: rgba(95,239,145,.15); }
@@ -471,6 +476,23 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__dd-continent:hover .wd-booking__dd-continent-img { transform: scale(1.05); }
 .wd-booking__dd-continent-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,.15) 60%); }
 .wd-booking__dd-continent-label { position: absolute; bottom: 6px; left: 6px; right: 6px; font-family: var(--font-sans); font-size: 9px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .4px; line-height: 1.2; }
+/* Carte « Tous les continents » (mode progressif) : même UI que les autres cartes */
+.wd-booking__dd-continent--all .wd-booking__dd-continent-fallback { align-items: center; justify-content: center; text-align: center; }
+
+/* Reprise de recherche — conteneur permanent, pleine largeur, aligné sur la gouttière */
+.wd-booking__dd-recent-row { display: flex; align-items: center; width: 100%; margin: 2px 0 0; border: 1px solid rgba(255,255,255,.08); border-radius: 0; background: var(--pul-bg, #445047); transition: background .12s, border-color .12s; }
+.wd-booking__dd-recent-row:hover { background: #4d5a51; border-color: rgba(255,255,255,.2); }
+.wd-booking__dd-recent { flex: 1; display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: none; border: none; cursor: pointer; text-align: left; min-width: 0; }
+.wd-booking__dd-recent:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: -2px; }
+.wd-booking__dd-recent-icon { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; color: #fff; }
+.wd-booking__dd-recent-icon svg { width: 18px; height: 18px; }
+.wd-booking__dd-recent-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wd-booking__dd-recent-title { font-family: var(--font-sans); font-size: 13.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wd-booking__dd-recent-sub { font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wd-booking__dd-recent-del { flex: 0 0 auto; width: 30px; height: 30px; margin-right: 8px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 50%; background: none; color: rgba(255,255,255,.4); cursor: pointer; transition: color .12s, background .12s; }
+.wd-booking__dd-recent-del:hover { color: #fff; background: rgba(255,255,255,.1); }
+.wd-booking__dd-recent-del:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: 1px; }
+.wd-booking__dd-recent-del svg { width: 11px; height: 11px; }
 .wd-booking__dd-continent-fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #2a3530; font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .5px; }
 
 /* Breadcrumb */
@@ -506,6 +528,8 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__dd-group-label { font-family: var(--font-sans); font-size: 10px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: rgba(255,255,255,.3); margin: 14px 0 6px; padding: 0 10px; }
 .wd-booking__dd-group-label:first-child { margin-top: 0; }
 .wd-booking__dd-results-bar { position: sticky; bottom: 0; z-index: 2; background: linear-gradient(to top, rgba(30,36,31,1) 55%, rgba(30,36,31,.92) 75%, rgba(30,36,31,0)); padding: 28px 12px 10px; pointer-events: none; }
+/* État intermédiaire : aucune liste ne défile sous le compteur -> pas de fondu de scroll */
+.wd-booking__dd-results-bar--hint { background: none; padding-top: 0; }
 .wd-booking__dd-results-count { display: flex; align-items: baseline; gap: 0; flex-wrap: wrap; font-family: var(--font-sans); font-size: 13px; font-weight: 500; color: rgba(255,255,255,.5); pointer-events: auto; border-top: 1px solid rgba(255,255,255,.06); padding-top: 10px; line-height: 1.4; }
 .wd-booking__dd-results-count-number { font-weight: 600; color: rgba(255,255,255,.75); }
 .wd-booking__dd-results-count-sep { margin: 0 5px; color: rgba(255,255,255,.2); }
