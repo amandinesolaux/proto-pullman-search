@@ -894,123 +894,123 @@
         { id:'europe', label:'Europe', img:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=200&h=200&fit=crop', hotels: [
           { name:'Pullman Bordeaux Lac', loc:'Bordeaux, France', country:'France', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/bordeaux-le-lac/0669.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
           { name:'Pullman Cannes Mandelieu', loc:'Mandelieu, France', country:'France', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/mandelieu-la-napoule/1168.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','beach'] },
-          { name:'Pullman Lyon', loc:'Lyon, France', country:'France', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/lyon/C177.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Lyon', loc:'Lyon, France', country:'France', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/lyon/C177.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Montpellier Centre', loc:'Montpellier, France', country:'France', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/montpellier/1294.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Paris Centre - Bercy', loc:'Paris, France', country:'France', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/paris/2192.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Paris La Défense', loc:'Paris La Défense, France', country:'France', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/paris/3013.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast'] },
+          { name:'Pullman Paris La Défense', loc:'Paris La Défense, France', country:'France', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/paris/3013.html', services:['restaurant','bar','parking','meeting-rooms','coworking','gym','wifi','breakfast','pets'] },
           { name:'Pullman Paris Tour Eiffel', loc:'Paris, France', country:'France', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/paris/7229.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
           { name:'Pullman Paris Montparnasse', loc:'Paris, France', country:'France', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/paris/8189.html', services:['restaurant','bar','rooftop','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Toulouse Airport', loc:'Toulouse, France', country:'France', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/toulouse/0565.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
-          { name:'Pullman Berlin Schweizerhof', loc:'Berlin, Allemagne', country:'Allemagne', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/berlin/5347.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Berlin Schweizerhof', loc:'Berlin, Allemagne', country:'Allemagne', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/berlin/5347.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Cologne', loc:'Cologne, Allemagne', country:'Allemagne', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/koeln/5366.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Munich', loc:'Munich, Allemagne', country:'Allemagne', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/munich/8657.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Stuttgart Fontana', loc:'Stuttgart, Allemagne', country:'Allemagne', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/stuttgart/5425.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Stuttgart Fontana', loc:'Stuttgart, Allemagne', country:'Allemagne', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/stuttgart/5425.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Brussels Centre Midi', loc:'Bruxelles, Belgique', country:'Belgique', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/brussels/7431.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Bucharest WTC', loc:'Bucarest, Roumanie', country:'Roumanie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/bucharest/1714.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Budapest', loc:'Budapest, Hongrie', country:'Hongrie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/budapest/C319.html', services:['restaurant','bar','rooftop','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Budapest', loc:'Budapest, Hongrie', country:'Hongrie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/budapest/C319.html', services:['restaurant','bar','rooftop','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Eindhoven Cocagne', loc:'Eindhoven, Pays-Bas', country:'Pays-Bas', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/eindhoven/5374.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Basel Europe', loc:'Bâle, Suisse', country:'Suisse', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/basel/5921.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Liverpool', loc:'Liverpool, Royaume-Uni', country:'Royaume-Uni', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/liverpool/9227.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Liverpool', loc:'Liverpool, Royaume-Uni', country:'Royaume-Uni', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/liverpool/9227.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman London St Pancras', loc:'Londres, Royaume-Uni', country:'Royaume-Uni', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/london/5309.html', services:['restaurant','bar','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Istanbul', loc:'Istanbul, Turquie', country:'Turquie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/istanbul/9429.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Riga Old Town', loc:'Riga, Lettonie', country:'Lettonie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/riga/9619.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Riga Old Town', loc:'Riga, Lettonie', country:'Lettonie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/riga/9619.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Tbilisi Axis Towers', loc:'Tbilissi, Géorgie', country:'Géorgie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/tbilisi/A1F1.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Zagreb', loc:'Zagreb, Croatie', country:'Croatie', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/zagreb/C030.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Gorni Okol', loc:'Gorni Okol, Bulgarie', country:'Bulgarie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/gorni-okol/B364.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Gorni Okol', loc:'Gorni Okol, Bulgarie', country:'Bulgarie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/gorni-okol/B364.html', services:['restaurant','bar','pool','spa','parking','meeting-rooms','gym','wifi','breakfast','garden','pets'] },
         ]},
         { id:'asie', label:'Asie', img:'https://images.unsplash.com/photo-1493780474015-ba834fd0ce2f?w=200&h=200&fit=crop', hotels: [
           { name:'Pullman Bangkok Hotel G', loc:'Bangkok, Thaïlande', country:'Thaïlande', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/bangkok/3616.html', badge:'RÉNOVÉ', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast'] },
           { name:'Pullman Bangkok King Power', loc:'Bangkok, Thaïlande', country:'Thaïlande', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/bangkok/6323.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Khon Kaen Raja Orchid', loc:'Khon Kaen, Thaïlande', country:'Thaïlande', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/khon-kaen/1877.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Khon Kaen Raja Orchid', loc:'Khon Kaen, Thaïlande', country:'Thaïlande', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/khon-kaen/1877.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Khao Lak Resort', loc:'Phang Nga, Thaïlande', country:'Thaïlande', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/phang-nga/B436.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
           { name:'Pullman Pattaya Hotel G', loc:'Pattaya, Thaïlande', country:'Thaïlande', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/pattaya/7540.html', services:['pool','restaurant','bar','spa','beach','gym','meeting-rooms','wifi','breakfast'] },
-          { name:'Pullman Phuket Arcadia', loc:'Phuket, Thaïlande', country:'Thaïlande', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/phuket/7488.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Phuket Arcadia', loc:'Phuket, Thaïlande', country:'Thaïlande', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/phuket/7488.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle','pets'] },
           { name:'Pullman Phuket Panwa Beach', loc:'Phuket, Thaïlande', country:'Thaïlande', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/phuket/A2E5.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
           { name:'Pullman Bali Legian Beach', loc:'Bali, Indonésie', country:'Indonésie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/legian/6556.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','meeting-rooms','wifi','breakfast'] },
-          { name:'Pullman Bandung Grand Central', loc:'Bandung, Indonésie', country:'Indonésie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/bandung/9109.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Bandung Grand Central', loc:'Bandung, Indonésie', country:'Indonésie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/bandung/9109.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Ciawi Vimala Hills', loc:'Bogor, Indonésie', country:'Indonésie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/bogor/9061.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','garden','golf'] },
           { name:'Pullman Jakarta Central Park', loc:'Jakarta, Indonésie', country:'Indonésie', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/jakarta/7536.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Jakarta Indonesia', loc:'Jakarta, Indonésie', country:'Indonésie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/jakarta/8491.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Jakarta Indonesia', loc:'Jakarta, Indonésie', country:'Indonésie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/jakarta/8491.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Lombok Merujani', loc:'Lombok, Indonésie', country:'Indonésie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/central-lombok/A1K2.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
           { name:'Pullman Danang Beach Resort', loc:'Danang, Vietnam', country:'Vietnam', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/danang/8838.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','meeting-rooms','wifi','breakfast'] },
-          { name:'Pullman Hai Phong', loc:'Hai Phong, Vietnam', country:'Vietnam', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/hai-phong/B4S6.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Hai Phong', loc:'Hai Phong, Vietnam', country:'Vietnam', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/hai-phong/B4S6.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Hanoi', loc:'Hanoï, Vietnam', country:'Vietnam', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/hanoi/7579.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Saigon Centre', loc:'Hô Chi Minh-Ville, Vietnam', country:'Vietnam', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/ho-chi-minh/7489.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','rooftop'] },
-          { name:'Pullman Phu Quoc Beach Resort', loc:'Phu Quoc, Vietnam', country:'Vietnam', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/phu-quoc/A248.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Phu Quoc Beach Resort', loc:'Phu Quoc, Vietnam', country:'Vietnam', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/phu-quoc/A248.html', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Vung Tau', loc:'Vung Tau, Vietnam', country:'Vietnam', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/ho-chi-minh/7133.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast'] },
           { name:'Pullman Beijing South', loc:'Pékin, Chine', country:'Chine', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/beijing/7025.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Lijiang Resort & Spa', loc:'Lijiang, Chine', country:'Chine', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/lijiang/7231.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Lijiang Resort & Spa', loc:'Lijiang, Chine', country:'Chine', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/lijiang/7231.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Oceanview Sanya Bay', loc:'Sanya, Chine', country:'Chine', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/sanya/7126.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','gym','wifi','breakfast'] },
           { name:'Pullman Shanghai Jing\'an', loc:'Shanghai, Chine', country:'Chine', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/shanghai/7598.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Shanghai Central', loc:'Shanghai, Chine', country:'Chine', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/shanghai/7298.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Shanghai Central', loc:'Shanghai, Chine', country:'Chine', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/shanghai/7298.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Guangzhou Baiyun Airport', loc:'Guangzhou, Chine', country:'Chine', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/guangzhou/B2W3.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
           { name:'Pullman Zhangjiajie', loc:'Zhangjiajie, Chine', country:'Chine', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/zhangjiajie/7934.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
-          { name:'Pullman Guiyang', loc:'Guiyang, Chine', country:'Chine', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/guiyang/8275.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Guiyang', loc:'Guiyang, Chine', country:'Chine', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/guiyang/8275.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Dali', loc:'Dali, Chine', country:'Chine', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/dali/8627.html', services:['pool','restaurant','bar','spa','parking','gym','wifi','breakfast','garden'] },
           { name:'Pullman New Delhi Aerocity', loc:'New Delhi, Inde', country:'Inde', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/new-delhi/7559.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
-          { name:'Pullman Chennai Anna Salai', loc:'Chennai, Inde', country:'Inde', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/chennai/C460.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Chennai Anna Salai', loc:'Chennai, Inde', country:'Inde', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/chennai/C460.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Kuala Lumpur City Centre', loc:'Kuala Lumpur, Malaisie', country:'Malaisie', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/kuala-lumpur/A0C5.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Kuching', loc:'Kuching, Malaisie', country:'Malaisie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/kuching-sarawak/6332.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Miri Waterfront', loc:'Miri, Malaisie', country:'Malaisie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/miri/9731.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Miri Waterfront', loc:'Miri, Malaisie', country:'Malaisie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/miri/9731.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Singapore Hill Street', loc:'Singapour', country:'Singapour', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/singapore/B5L7.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
           { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop'] },
-          { name:'Pullman Maldives Maamutaa', loc:'Maldives', country:'Maldives', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/maamutaa-island/9924.html', badge:'NOUVEAU', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Maldives Maamutaa', loc:'Maldives', country:'Maldives', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/maamutaa-island/9924.html', badge:'NOUVEAU', services:['pool','restaurant','bar','spa','beach','kids-club','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Luang Prabang', loc:'Luang Prabang, Laos', country:'Laos', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/luang-prabang/9112.html', services:['pool','restaurant','bar','spa','gym','wifi','breakfast','garden'] },
           { name:'Pullman Seoul', loc:'Séoul, Corée du Sud', country:'Corée du Sud', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/seoul/0966.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Tokyo Tamachi', loc:'Tokyo, Japon', country:'Japon', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/tokyo/B137.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
+          { name:'Pullman Tokyo Tamachi', loc:'Tokyo, Japon', country:'Japon', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/tokyo/B137.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast','pets'] },
         ]},
         { id:'moyen-orient', label:'Moyen-Orient', img:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=200&h=200&fit=crop', hotels: [
           { name:'Pullman Dubai Creek City Centre', loc:'Dubaï, EAU', country:'EAU', img:'6556-1', href:'https://pullman.accor.com/fr/hotels/dubai/2022.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','kids-club'] },
           { name:'Pullman Dubai Downtown', loc:'Dubaï, EAU', country:'EAU', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/dubai/B8D7.html', services:['pool','restaurant','bar','rooftop','spa','parking','meeting-rooms','coworking','gym','wifi','breakfast','airport-shuttle'] },
-          { name:'Pullman Dubai JLT', loc:'Dubaï, EAU', country:'EAU', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/dubai/6305.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Dubai JLT', loc:'Dubaï, EAU', country:'EAU', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/dubai/6305.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Resort Al Marjan Island', loc:'Ras Al Khaimah, EAU', country:'EAU', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/ras-al-khaimah/A0D2.html', services:['pool','restaurant','bar','spa','beach','kids-club','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
           { name:'Pullman Sharjah', loc:'Sharjah, EAU', country:'EAU', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sharjah/A0R4.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Doha West Bay', loc:'Doha, Qatar', country:'Qatar', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/doha/8112.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Doha West Bay', loc:'Doha, Qatar', country:'Qatar', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/doha/8112.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman ZamZam Makkah', loc:'La Mecque, Arabie Saoudite', country:'Arabie Saoudite', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/makkah/6036.html', services:['restaurant','bar','parking','meeting-rooms','wifi','breakfast'] },
           { name:'Pullman ZamZam Madinah', loc:'Médine, Arabie Saoudite', country:'Arabie Saoudite', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/al-madinah-al-munawarah/9245.html', services:['restaurant','bar','parking','meeting-rooms','wifi','breakfast'] },
         ]},
         { id:'oceanie', label:'Océanie', img:'https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=200&h=200&fit=crop', hotels: [
-          { name:'Pullman Adelaide', loc:'Adélaïde, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/adelaide/B217.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Adelaide', loc:'Adélaïde, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/adelaide/B217.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Sydney Hyde Park', loc:'Sydney, Australie', country:'Australie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sydney/8763.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Quay Grand Sydney Harbour', loc:'Sydney, Australie', country:'Australie', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/sydney/8779.html', services:['restaurant','bar','pool','parking','gym','wifi','breakfast','garden'] },
-          { name:'Pullman Sydney Airport', loc:'Sydney, Australie', country:'Australie', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/sydney/9522.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Sydney Airport', loc:'Sydney, Australie', country:'Australie', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/sydney/9522.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle','pets'] },
           { name:'Pullman Sydney Olympic Park', loc:'Sydney, Australie', country:'Australie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/sydney/6411.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Sydney Penrith', loc:'Sydney, Australie', country:'Australie', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/sydney/C0F1.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','golf','garden'] },
-          { name:'Pullman Brisbane King George Sq.', loc:'Brisbane, Australie', country:'Australie', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/brisbane/8784.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Brisbane King George Sq.', loc:'Brisbane, Australie', country:'Australie', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/brisbane/8784.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Brisbane Airport', loc:'Brisbane, Australie', country:'Australie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/brisbane/9559.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
           { name:'Pullman Cairns International', loc:'Cairns, Australie', country:'Australie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/cairns/8772.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Reef Hotel Casino', loc:'Cairns, Australie', country:'Australie', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/cairns/2901.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','casino'] },
+          { name:'Pullman Reef Hotel Casino', loc:'Cairns, Australie', country:'Australie', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/cairns/2901.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','casino','pets'] },
           { name:'Pullman Bunker Bay Resort', loc:'Margaret River, Australie', country:'Australie', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/naturaliste/8775.html', services:['pool','restaurant','bar','spa','beach','parking','gym','wifi','breakfast','garden'] },
           { name:'Pullman Melbourne City Centre', loc:'Melbourne, Australie', country:'Australie', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/melbourne/3028.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Melbourne Albert Park', loc:'Melbourne, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/melbourne/8788.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Melbourne Albert Park', loc:'Melbourne, Australie', country:'Australie', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/melbourne/8788.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Magenta Shores Resort', loc:'Magenta, Australie', country:'Australie', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/magenta/8791.html', services:['pool','restaurant','bar','spa','beach','parking','gym','wifi','breakfast','golf','garden'] },
           { name:'Pullman Palm Cove Sea Temple', loc:'Palm Cove, Australie', country:'Australie', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/palm-cove/8761.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden'] },
-          { name:'Pullman Port Douglas Sea Temple', loc:'Port Douglas, Australie', country:'Australie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/port-douglas/8762.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Port Douglas Sea Temple', loc:'Port Douglas, Australie', country:'Australie', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/port-douglas/8762.html', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Sails in the Desert', loc:'Ayers Rock, Australie', country:'Australie', img:'Pullman-bar', href:'https://pullman.accor.com/fr/hotels/yulara/8606.html', services:['pool','restaurant','bar','parking','gym','wifi','breakfast','garden'] },
           { name:'Pullman Auckland Hotel & Apts', loc:'Auckland, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/auckland/8219.html', services:['restaurant','bar','pool','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Auckland Airport', loc:'Auckland, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/auckland/A8U9.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
+          { name:'Pullman Auckland Airport', loc:'Auckland, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/auckland/A8U9.html', services:['restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle','pets'] },
           { name:'Pullman Rotorua', loc:'Rotorua, Nouvelle-Zélande', country:'Nouvelle-Zélande', img:'PullmanHeritageImage:6by5', href:'https://pullman.accor.com/fr/hotels/rotorua/A7W3.html', services:['restaurant','bar','pool','spa','parking','gym','wifi','breakfast','garden'] },
         ]},
         { id:'ameriques', label:'Amériques', img:'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=200&h=200&fit=crop', hotels: [
           { name:'Pullman São Paulo Vila Olímpia', loc:'São Paulo, Brésil', country:'Brésil', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/sao-paulo/8938.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman São Paulo Ibirapuera', loc:'São Paulo, Brésil', country:'Brésil', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/sao-paulo/2125.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman São Paulo Ibirapuera', loc:'São Paulo, Brésil', country:'Brésil', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/sao-paulo/2125.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman São Paulo Guarulhos Airport', loc:'Guarulhos, Brésil', country:'Brésil', img:'aja_p_7258-60', href:'https://pullman.accor.com/fr/hotels/sao-paulo/8923.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
           { name:'Pullman Lima Miraflores', loc:'Lima, Pérou', country:'Pérou', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/lima/B464.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Lima San Isidro', loc:'Lima, Pérou', country:'Pérou', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lima/B462.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Lima San Isidro', loc:'Lima, Pérou', country:'Pérou', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lima/B462.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Santiago El Bosque', loc:'Santiago, Chili', country:'Chili', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/santiago/B461.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Santiago Vitacura', loc:'Santiago, Chili', country:'Chili', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/santiago/B470.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Viña del Mar', loc:'Viña del Mar, Chili', country:'Chili', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/vina-del-mar/B463.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Viña del Mar', loc:'Viña del Mar, Chili', country:'Chili', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/vina-del-mar/B463.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Miami Airport', loc:'Miami, États-Unis', country:'États-Unis', img:'pullman-dinner-2', href:'https://pullman.accor.com/fr/hotels/miami/0889.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','airport-shuttle'] },
           { name:'Pullman Rosario City Center', loc:'Rosario, Argentine', country:'Argentine', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/rosario/6784.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
         ]},
         { id:'afrique', label:'Afrique', img:'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=200&h=200&fit=crop', hotels: [
-          { name:'Pullman Marrakech Palmeraie', loc:'Marrakech, Maroc', country:'Maroc', img:'aja_p_0795-31', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','kids-club'] },
+          { name:'Pullman Marrakech Palmeraie', loc:'Marrakech, Maroc', country:'Maroc', img:'aja_p_0795-31', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','kids-club','pets'] },
           { name:'Pullman Mazagan Royal Golf & Spa', loc:'El Jadida, Maroc', country:'Maroc', img:'aja_p_6935-96', href:'https://pullman.accor.com/fr/hotels/el-jadida/2960.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','kids-club'] },
           { name:'Pullman Abidjan', loc:'Abidjan, Côte d\'Ivoire', country:'Côte d\'Ivoire', img:'aja_p_1029-36', href:'https://pullman.accor.com/fr/hotels/abidjan/1146.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Cape Town', loc:'Le Cap, Afrique du Sud', country:'Afrique du Sud', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/cape-town/C0H1.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
+          { name:'Pullman Cape Town', loc:'Le Cap, Afrique du Sud', country:'Afrique du Sud', img:'aja_p_6783-26', href:'https://pullman.accor.com/fr/hotels/cape-town/C0H1.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
           { name:'Pullman Dakar Teranga', loc:'Dakar, Sénégal', country:'Sénégal', img:'aja_p_0795-31', href:'https://pullman.accor.com/fr/hotels/dakar/0563.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
           { name:'Pullman Kinshasa Grand Hôtel', loc:'Kinshasa, RD Congo', country:'RD Congo', img:'HCM_P_4528724', href:'https://pullman.accor.com/fr/hotels/kinshasa/9635.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
-          { name:'Pullman Lubumbashi Grand Karavia', loc:'Lubumbashi, RD Congo', country:'RD Congo', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lubumbashi/A0T4.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden'] },
+          { name:'Pullman Lubumbashi Grand Karavia', loc:'Lubumbashi, RD Congo', country:'RD Congo', img:'PullmanEvent', href:'https://pullman.accor.com/fr/hotels/lubumbashi/A0T4.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','garden','pets'] },
           { name:'Pullman Nairobi Upper Hill', loc:'Nairobi, Kenya', country:'Kenya', img:'aja_p_6409-72', href:'https://pullman.accor.com/fr/hotels/nairobi/C0D4.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
         ]},
       ];
@@ -1280,6 +1280,11 @@
             best = { id: cId, label: labelFor(cId), count: matches.length, hotel: matches[0] };
           }
         });
+        return buildNoResultBlock(best);
+      };
+
+      // Markup partagé du bloc « aucun résultat » (vue liste et vue carte)
+      const buildNoResultBlock = (best) => {
         const info = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.6" r=".7" fill="currentColor" stroke="none"/></svg>';
         let body;
         if (best) {
@@ -1302,6 +1307,29 @@
           '<div class="wd-booking__dd-noresult-head">' + info +
           '<span class="wd-booking__dd-noresult-title">Aucun hôtel ne correspond à tous vos critères</span></div>' +
           body + '</div>';
+      };
+
+      // Variante CARTE : calculée sur les données réellement affichées par la carte
+      // (PULLMAN_HOTELS_MAP + amenities), pour rester cohérente avec les pins visibles.
+      const renderMapRelaxation = () => {
+        if (typeof PULLMAN_HOTELS_MAP === 'undefined') return '';
+        const active = [...getActiveCriteria()];
+        if (!active.length) return '';
+        const pool = searchState.continent
+          ? PULLMAN_HOTELS_MAP.filter(h => h.continent === searchState.continent)
+          : PULLMAN_HOTELS_MAP.slice();
+        if (!pool.length) return '';
+        const matches = (h, ids) => ids.every(c => h.amenities && h.amenities.includes(c));
+        if (pool.some(h => matches(h, active))) return ''; // des pins correspondent encore
+        const list = getActiveCriteriaList();
+        const labelFor = (id) => { const c = list.find(x => x.id === id); return c ? c.label : id; };
+        let best = null;
+        active.forEach(cId => {
+          const reduced = active.filter(x => x !== cId);
+          const m = pool.filter(h => matches(h, reduced));
+          if (m.length && (!best || m.length > best.count)) best = { id: cId, label: labelFor(cId), count: m.length, hotel: m[0] };
+        });
+        return buildNoResultBlock(best);
       };
 
       // Divulgation progressive : y a-t-il un périmètre de recherche actif (continent, pays, hôtel, ville, saisie) ?
@@ -1398,6 +1426,7 @@
       // Termes trop génériques pour filtrer (tous les hôtels correspondent) -> on garde l'affichage par défaut
       const GENERIC_QUERY_TERMS = new Set(['hotel', 'hotels', 'hôtel', 'hôtels', 'hotellerie', 'hôtellerie', 'pullman']);
       const isGenericQuery = (q) => { const t = (q || '').trim(); return t.length > 0 && t.split(/\s+/).every(w => GENERIC_QUERY_TERMS.has(w)); };
+      let lastScrolledCountry = null; // évite de re-scroller à chaque re-rendu (critères, etc.)
       const renderDestList = () => {
         const query = searchState.freeText.toLowerCase();
         if (isIntermediate()) {
@@ -1553,6 +1582,20 @@
           return html;
         }).join('');
         destListEl.innerHTML = renderRelaxation() + '<div class="wd-booking__dd-dest-subtitle">Pays</div>' + countryListHtml + '<div class="wd-booking__dd-results-bar">' + renderResultsCount() + '</div>';
+        // Auto-scroll vers le pays nouvellement déplié (dans le panneau seulement, une fois par sélection)
+        if (searchState.expandedCountry && searchState.expandedCountry !== lastScrolledCountry) {
+          lastScrolledCountry = searchState.expandedCountry;
+          const target = destListEl.querySelector('.wd-booking__dd-dest-item--expanded');
+          const scroller = destListEl.closest('.wd-booking__dd-dest-col');
+          if (target && scroller) {
+            setTimeout(() => {
+              const delta = target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+              scroller.scrollTop = scroller.scrollTop + delta - 6;
+            }, 0);
+          }
+        } else if (!searchState.expandedCountry) {
+          lastScrolledCountry = null;
+        }
       };
 
       const renderCriteria = () => {
@@ -1819,7 +1862,8 @@
               if (!getActiveCriteria().has(cId)) { getActiveCriteria().add(cId); changed = true; }
             });
             if (parsed.continent && !searchState.continent) { searchState.continent = parsed.continent; changed = true; }
-            if (parsed.country && !searchState.country) { searchState.country = parsed.country; changed = true; }
+            // Un pays détecté filtre directement le pays (chip + liste dépliée), pas seulement le continent
+            if (parsed.country && !searchState.expandedCountry) { searchState.country = parsed.country; searchState.expandedCountry = parsed.country; changed = true; }
             if (parsed.city && !searchState.city) { searchState.city = parsed.city; changed = true; }
             if (changed) {
               destInput.value = '';
@@ -1833,11 +1877,18 @@
         } else if (val.length >= 2) {
           renderSuggestions(val);
           searchPanelEl.style.display = 'none';
-          // Continent déjà sélectionné : on parse quand même la saisie pour en extraire les critères
+          // Continent déjà sélectionné : on parse quand même la saisie (critères, pays, ville)
           parseTimeout = setTimeout(() => {
             const parsed = parseQuery(val);
             let changed = false;
             parsed.criteria.forEach(cId => { if (!getActiveCriteria().has(cId)) { getActiveCriteria().add(cId); changed = true; } });
+            if (parsed.country && searchState.expandedCountry !== parsed.country) {
+              if (parsed.continent) searchState.continent = parsed.continent;
+              searchState.country = parsed.country;
+              searchState.expandedCountry = parsed.country;
+              changed = true;
+            }
+            if (parsed.city && !searchState.city) { searchState.city = parsed.city; changed = true; }
             if (changed) {
               destInput.value = '';
               searchState.freeText = '';
@@ -1886,7 +1937,19 @@
       let mapInitDone = false;
       if (mapToggle && ddMapview) {
         renderMapPanel = () => {
-          mapViewContinents.innerHTML = REGION_HOTELS.map(r => {
+          // État de divulgation synchronisé aussi depuis la vue carte (critères / CTA wizard)
+          if (progressiveMode) this.dataset.disclosure = isIntermediate() ? 'intermediate' : 'full';
+          // Même carte « Tous les continents » que la vue liste (mode progressif)
+          const allActive = !searchState.continent;
+          const ALL_IMG = 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=200&h=200&fit=crop';
+          const allCard = !progressiveMode ? '' :
+            '<button class="wd-booking__dd-continent wd-booking__dd-continent--all' + (allActive ? ' wd-booking__dd-continent--active' : '') + '" data-continent="__all__" type="button">' +
+              '<img class="wd-booking__dd-continent-img" src="' + ALL_IMG + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
+              '<div class="wd-booking__dd-continent-overlay"></div>' +
+              '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
+              '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
+            '</button>';
+          mapViewContinents.innerHTML = allCard + REGION_HOTELS.map(r => {
             const active = r.id === searchState.continent;
             return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button">' +
               '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
@@ -1903,13 +1966,45 @@
             }).join('');
             return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
           }).join('');
+          // Zero-result recovery sur la carte : même bloc que la vue liste, calculé sur les données de la carte
+          const mapWrap = this.querySelector('.wd-booking__dd-mapview-wrap');
+          if (mapWrap) {
+            let overlay = mapWrap.querySelector('.wd-booking__dd-map-noresult');
+            const relaxHtml = renderMapRelaxation();
+            if (relaxHtml) {
+              if (!overlay) { overlay = document.createElement('div'); overlay.className = 'wd-booking__dd-map-noresult'; mapWrap.appendChild(overlay); }
+              overlay.innerHTML = relaxHtml;
+              overlay.style.display = '';
+            } else if (overlay) {
+              overlay.style.display = 'none';
+            }
+          }
         };
+
+        // Actions du bloc de récupération (délégué sur la vue carte)
+        const applyMapCriteriaChange = () => {
+          renderMapPanel();
+          renderChips();
+          if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
+        };
+        ddMapview.addEventListener('click', (e) => {
+          const relax = e.target.closest('.wd-booking__dd-noresult-relax');
+          if (relax) { e.preventDefault(); getActiveCriteria().delete(relax.dataset.criteria); applyMapCriteriaChange(); return; }
+          const reset = e.target.closest('.wd-booking__dd-noresult-reset');
+          if (reset) { e.preventDefault(); getActiveCriteria().clear(); applyMapCriteriaChange(); return; }
+        });
 
         mapViewContinents.addEventListener('click', (e) => {
           const btn = e.target.closest('.wd-booking__dd-continent');
           if (!btn) return;
           const id = btn.dataset.continent;
-          searchState.continent = searchState.continent === id ? null : id;
+          if (id === '__all__') {
+            searchState.continent = null;
+            searchState.showAll = true;
+          } else {
+            searchState.continent = searchState.continent === id ? null : id;
+            searchState.showAll = false;
+          }
           searchState.country = null;
           searchState.city = null;
           renderMapPanel();
@@ -1956,6 +2051,10 @@
           if (!showing && typeof initBookingMap === 'function') {
             setTimeout(() => {
               initBookingMap(searchState.continent);
+              // Reporter sur la carte les critères déjà cochés en vue liste
+              if (getActiveCriteria().size && typeof updateBookingMapCriteria === 'function') {
+                updateBookingMapCriteria(getActiveCriteria());
+              }
             }, 200);
             mapInitDone = true;
           }

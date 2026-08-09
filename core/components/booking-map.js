@@ -1,35 +1,35 @@
 const PULLMAN_HOTELS_MAP = [
   { name: "Pullman Paris Montparnasse", city: "Paris", country: "France", lat: 48.8410, lng: 2.3220, continent: "europe", amenities: ['restaurant','bar','gym','center','breakfast','meeting'] },
   { name: "Pullman Paris Tour Eiffel", city: "Paris", country: "France", lat: 48.8584, lng: 2.2945, continent: "europe", amenities: ['restaurant','bar','spa','gym','center','breakfast'] },
-  { name: "Pullman Paris La Défense", city: "Paris", country: "France", lat: 48.8928, lng: 2.2378, continent: "europe", amenities: ['restaurant','gym','meeting','parking','breakfast'] },
+  { name: "Pullman Paris La Défense", city: "Paris", country: "France", lat: 48.8928, lng: 2.2378, continent: "europe", amenities: ['restaurant','gym','meeting','parking','breakfast','pets'] },
   { name: "Pullman Lyon", city: "Lyon", country: "France", lat: 45.7600, lng: 4.8570, continent: "europe", amenities: ['restaurant','bar','gym','center','breakfast','parking'] },
   { name: "Pullman London St Pancras", city: "Londres", country: "UK", lat: 51.5308, lng: -0.1238, continent: "europe", amenities: ['restaurant','bar','gym','center','breakfast'] },
   { name: "Pullman Berlin Schweizerhof", city: "Berlin", country: "Allemagne", lat: 52.5033, lng: 13.3317, continent: "europe", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast','pets'] },
-  { name: "Pullman Barcelona Skipper", city: "Barcelone", country: "Espagne", lat: 41.3788, lng: 2.1912, continent: "europe", amenities: ['pool','spa','restaurant','bar','beach','gym','breakfast'] },
+  { name: "Pullman Barcelona Skipper", city: "Barcelone", country: "Espagne", lat: 41.3788, lng: 2.1912, continent: "europe", amenities: ['pool','spa','restaurant','bar','beach','gym','breakfast','pets'] },
   { name: "Pullman Budapest", city: "Budapest", country: "Hongrie", lat: 47.5032, lng: 19.0609, continent: "europe", amenities: ['restaurant','bar','gym','center','breakfast','meeting'] },
   { name: "Pullman Singapore Orchard", city: "Singapour", country: "Singapour", lat: 1.3048, lng: 103.8318, continent: "asie", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast'] },
-  { name: "Pullman Tokyo Tamachi", city: "Tokyo", country: "Japon", lat: 35.6478, lng: 139.7472, continent: "asie", amenities: ['restaurant','gym','center','breakfast','meeting'] },
+  { name: "Pullman Tokyo Tamachi", city: "Tokyo", country: "Japon", lat: 35.6478, lng: 139.7472, continent: "asie", amenities: ['restaurant','gym','center','breakfast','meeting','pets'] },
   { name: "Pullman Bangkok Hotel G", city: "Bangkok", country: "Thaïlande", lat: 13.7248, lng: 100.5315, continent: "asie", amenities: ['pool','restaurant','bar','gym','center','breakfast'] },
   { name: "Pullman Phuket Arcadia", city: "Phuket", country: "Thaïlande", lat: 8.0475, lng: 98.2761, continent: "asie", amenities: ['pool','spa','restaurant','bar','beach','gym','family','breakfast'] },
-  { name: "Pullman Bali Legian Beach", city: "Bali", country: "Indonésie", lat: -8.7072, lng: 115.1689, continent: "asie", amenities: ['pool','spa','restaurant','bar','beach','gym','family','breakfast'] },
+  { name: "Pullman Bali Legian Beach", city: "Bali", country: "Indonésie", lat: -8.7072, lng: 115.1689, continent: "asie", amenities: ['pool','spa','restaurant','bar','beach','gym','family','breakfast','pets'] },
   { name: "Pullman Shanghai Jing'an", city: "Shanghai", country: "Chine", lat: 31.2252, lng: 121.4491, continent: "asie", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast','meeting'] },
   { name: "Pullman Kuala Lumpur", city: "Kuala Lumpur", country: "Malaisie", lat: 3.1570, lng: 101.7117, continent: "asie", amenities: ['pool','restaurant','bar','gym','center','breakfast','parking'] },
-  { name: "Pullman New Delhi Aerocity", city: "New Delhi", country: "Inde", lat: 28.5537, lng: 77.1184, continent: "asie", amenities: ['pool','spa','restaurant','bar','gym','breakfast','meeting','parking'] },
+  { name: "Pullman New Delhi Aerocity", city: "New Delhi", country: "Inde", lat: 28.5537, lng: 77.1184, continent: "asie", amenities: ['pool','spa','restaurant','bar','gym','breakfast','meeting','parking','pets'] },
   { name: "Pullman Hanoi", city: "Hanoï", country: "Vietnam", lat: 21.0400, lng: 105.8019, continent: "asie", amenities: ['pool','restaurant','bar','gym','center','breakfast'] },
   { name: "Pullman Dubai Creek", city: "Dubaï", country: "EAU", lat: 25.2305, lng: 55.3273, continent: "moyen-orient", amenities: ['pool','spa','restaurant','bar','gym','breakfast','meeting','parking'] },
-  { name: "Pullman Dubai Downtown", city: "Dubaï", country: "EAU", lat: 25.1972, lng: 55.2744, continent: "moyen-orient", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast'] },
+  { name: "Pullman Dubai Downtown", city: "Dubaï", country: "EAU", lat: 25.1972, lng: 55.2744, continent: "moyen-orient", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast','pets'] },
   { name: "Pullman Istanbul", city: "Istanbul", country: "Turquie", lat: 41.0391, lng: 28.9877, continent: "moyen-orient", amenities: ['spa','restaurant','bar','gym','center','breakfast','parking'] },
   { name: "Pullman Marrakech Palmeraie", city: "Marrakech", country: "Maroc", lat: 31.6538, lng: -8.0260, continent: "afrique", amenities: ['pool','spa','restaurant','bar','gym','family','breakfast','parking'] },
-  { name: "Pullman Cape Town", city: "Le Cap", country: "Afrique du Sud", lat: -33.9022, lng: 18.4172, continent: "afrique", amenities: ['pool','restaurant','bar','gym','center','breakfast'] },
+  { name: "Pullman Cape Town", city: "Le Cap", country: "Afrique du Sud", lat: -33.9022, lng: 18.4172, continent: "afrique", amenities: ['pool','restaurant','bar','gym','center','breakfast','pets'] },
   { name: "Pullman Dakar Teranga", city: "Dakar", country: "Sénégal", lat: 14.7247, lng: -17.4676, continent: "afrique", amenities: ['pool','restaurant','bar','beach','gym','breakfast','meeting'] },
   { name: "Pullman Nairobi", city: "Nairobi", country: "Kenya", lat: -1.2762, lng: 36.8029, continent: "afrique", amenities: ['restaurant','bar','gym','center','breakfast','meeting','parking'] },
-  { name: "Pullman São Paulo Vila Olímpia", city: "São Paulo", country: "Brésil", lat: -23.5933, lng: -46.6753, continent: "ameriques", amenities: ['pool','restaurant','bar','gym','center','breakfast','meeting'] },
+  { name: "Pullman São Paulo Vila Olímpia", city: "São Paulo", country: "Brésil", lat: -23.5933, lng: -46.6753, continent: "ameriques", amenities: ['pool','restaurant','bar','gym','center','breakfast','meeting','pets'] },
   { name: "Pullman Lima San Isidro", city: "Lima", country: "Pérou", lat: -12.0984, lng: -77.0347, continent: "ameriques", amenities: ['restaurant','bar','gym','center','breakfast','parking'] },
   { name: "Pullman Santiago El Bosque", city: "Santiago", country: "Chili", lat: -33.4372, lng: -70.6506, continent: "ameriques", amenities: ['restaurant','bar','gym','center','breakfast','meeting','parking'] },
-  { name: "Pullman Miami Airport", city: "Miami", country: "USA", lat: 25.7953, lng: -80.2772, continent: "ameriques", amenities: ['pool','restaurant','bar','gym','breakfast','parking'] },
+  { name: "Pullman Miami Airport", city: "Miami", country: "USA", lat: 25.7953, lng: -80.2772, continent: "ameriques", amenities: ['pool','restaurant','bar','gym','breakfast','parking','pets'] },
   { name: "Pullman Sydney Hyde Park", city: "Sydney", country: "Australie", lat: -33.8715, lng: 151.2116, continent: "oceanie", amenities: ['pool','spa','restaurant','bar','gym','center','breakfast'] },
   { name: "Pullman Melbourne", city: "Melbourne", country: "Australie", lat: -37.8142, lng: 144.9632, continent: "oceanie", amenities: ['restaurant','bar','gym','center','breakfast','parking'] },
-  { name: "Pullman Auckland", city: "Auckland", country: "Nouvelle-Zélande", lat: -36.8442, lng: 174.7633, continent: "oceanie", amenities: ['restaurant','bar','gym','center','breakfast'] },
+  { name: "Pullman Auckland", city: "Auckland", country: "Nouvelle-Zélande", lat: -36.8442, lng: 174.7633, continent: "oceanie", amenities: ['restaurant','bar','gym','center','breakfast','pets'] },
   { name: "Pullman Cairns", city: "Cairns", country: "Australie", lat: -16.9203, lng: 145.7710, continent: "oceanie", amenities: ['pool','spa','restaurant','beach','gym','family','breakfast'] },
 ];
 
@@ -126,7 +126,7 @@ function initBookingMap(continentFilter) {
   _renderMarkers(continentFilter, _currentCriteria);
 }
 
-function _renderMarkers(continentFilter, criteriaSet) {
+function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   if (!_bookingMap) return;
 
   _markers.forEach(m => _bookingMap.removeLayer(m));
@@ -167,15 +167,19 @@ function _renderMarkers(continentFilter, criteriaSet) {
     _markers.push(marker);
   });
 
-  if (isFiltered) {
-    const filteredHotels = PULLMAN_HOTELS_MAP.filter(h => h.continent === continentFilter);
-    if (filteredHotels.length > 0) {
-      const bounds = L.latLngBounds(filteredHotels.map(h => [h.lat, h.lng]));
-      _bookingMap.fitBounds(bounds, { padding: [20, 20], animate: false });
+  // Recadrage uniquement quand la zone change (init / choix de continent) —
+  // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
+  if (refit) {
+    if (isFiltered) {
+      const filteredHotels = PULLMAN_HOTELS_MAP.filter(h => h.continent === continentFilter);
+      if (filteredHotels.length > 0) {
+        const bounds = L.latLngBounds(filteredHotels.map(h => [h.lat, h.lng]));
+        _bookingMap.fitBounds(bounds, { padding: [20, 20], animate: false });
+      }
+    } else {
+      const bounds = L.latLngBounds(PULLMAN_HOTELS_MAP.map(h => [h.lat, h.lng]));
+      _bookingMap.fitBounds(bounds, { padding: [10, 10], animate: false });
     }
-  } else {
-    const bounds = L.latLngBounds(PULLMAN_HOTELS_MAP.map(h => [h.lat, h.lng]));
-    _bookingMap.fitBounds(bounds, { padding: [10, 10], animate: false });
   }
 }
 
@@ -192,7 +196,7 @@ function updateBookingMapContinent(continentFilter, criteriaSet) {
 function updateBookingMapCriteria(criteriaSet) {
   _currentCriteria = criteriaSet;
   if (!_bookingMap) return;
-  _renderMarkers(_currentContinent, criteriaSet);
+  _renderMarkers(_currentContinent, criteriaSet, false); // critères seuls : la vue ne bouge pas
 }
 
 function refreshBookingMapSize() {
