@@ -800,7 +800,10 @@ wd-section-heading { display: block; }
 .wd-sh--split { display: flex; justify-content: space-between; align-items: flex-end; }
 
 /* ---------- Date Picker ---------- */
-.wd-booking__datepicker { position: absolute; left: 50%; transform: translateX(-50%); top: calc(100% - 40px); z-index: 201; background: var(--pul-bg-dark, #28332B); border-radius: 0 0 8px 8px; box-shadow: 0 20px 60px rgba(0,0,0,.4); max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s ease, opacity .2s ease; width: fit-content; }
+/* Fond #1a2220 : celui de .wd-booking et de .wd-booking__dropdown. Les trois panneaux qui
+   sortent de la barre (destinations, calendrier, voyageurs) doivent partager exactement le
+   même fond, sinon on voit la jointure en passant de l'un à l'autre. */
+.wd-booking__datepicker { position: absolute; left: 50%; transform: translateX(-50%); top: calc(100% - 40px); z-index: 201; background: #1a2220; border-radius: 0 0 8px 8px; box-shadow: 0 20px 60px rgba(0,0,0,.4); max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s ease, opacity .2s ease; width: fit-content; }
 .wd-booking__datepicker[data-state="open"] { max-height: 520px; opacity: 1; overflow: visible; }
 
 .wd-booking__dp-body { padding: 24px 32px 20px; }
@@ -836,8 +839,61 @@ wd-section-heading { display: block; }
 .wd-booking__dp-actions { display: flex; gap: 12px; align-items: center; }
 .wd-booking__dp-clear { padding: 6px 4px; background: transparent; border: none; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); cursor: pointer; transition: color .15s; text-decoration: underline; text-underline-offset: 2px; }
 .wd-booking__dp-clear:hover { color: #fff; }
-.wd-booking__dp-apply { padding: 8px 20px; border: none; border-radius: 6px; background: #5FEF91; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: #1a2a1e; cursor: pointer; transition: all .15s; }
-.wd-booking__dp-apply:hover { background: #4DD87A; transform: translateY(-1px); }
+/* Vert + texte pris sur les tokens, comme le CTA « Rechercher » : le fond était déjà identique,
+   mais le texte en dur (#1a2a1e) au lieu de --pul-bg faisait lire deux verts différents. */
+.wd-booking__dp-apply { padding: 8px 20px; border: none; border-radius: 6px; background: var(--pul-highlight, #5FEF91); font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-bg, #445047); cursor: pointer; transition: all .15s; }
+.wd-booking__dp-apply:hover { background: var(--pul-highlight-hover, #4DD87A); transform: translateY(-1px); }
+.wd-booking__dp-apply:disabled { background: rgba(255,255,255,.14); color: rgba(255,255,255,.4); cursor: not-allowed; transform: none; }
+
+/* ---------- Voyageurs / chambres ----------
+   Mêmes bornes que le moteur Pullman (7 chambres, 1-9 adultes, 0-6 enfants, âges 0-11).
+   Le panneau reprend exactement le langage visuel du datepicker : il en est le frère,
+   ancré sous la barre, et les deux ne peuvent pas être ouverts en même temps. */
+.wd-booking__guests { position: absolute; right: 0; top: calc(100% - 40px); z-index: 201; width: 380px; background: #1a2220; border-radius: 0 0 8px 8px; box-shadow: 0 20px 60px rgba(0,0,0,.4); max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s ease, opacity .2s ease; }
+.wd-booking__guests[data-state="open"] { max-height: 520px; opacity: 1; overflow-y: auto; }
+.wd-booking__gp-body { padding: 24px 32px 20px; } /* même gouttière que le datepicker */
+
+.wd-booking__gp-room + .wd-booking__gp-room { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.wd-booking__gp-room-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.wd-booking__gp-room-title { font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: rgba(255,255,255,.35); }
+.wd-booking__gp-remove { background: none; border: none; padding: 0; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; transition: color .15s; }
+.wd-booking__gp-remove:hover { color: #fff; }
+
+.wd-booking__gp-counter { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; }
+/* 13px = texte courant du datepicker (.wd-booking__dp-day). Les compteurs étaient à 14px :
+   seule taille de tout le panneau à ne correspondre à rien d'autre. */
+.wd-booking__gp-counter-label { font-family: var(--font-sans); font-size: 13px; color: #fff; }
+.wd-booking__gp-counter-ctrl { display: flex; align-items: center; gap: 4px; }
+/* Bouton rond : seule forme arrondie tolérée sur Pullman, au même titre que les pills */
+.wd-booking__gp-btn { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 100px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff; cursor: pointer; transition: border-color .15s, background .15s; }
+.wd-booking__gp-btn:hover:not(:disabled) { border-color: #fff; background: rgba(255,255,255,.08); }
+.wd-booking__gp-btn:disabled { opacity: .3; cursor: not-allowed; }
+.wd-booking__gp-btn:focus-visible { outline: 2px solid var(--pul-highlight, #5FEF91); outline-offset: 2px; }
+.wd-booking__gp-count { min-width: 26px; text-align: center; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
+
+.wd-booking__gp-ages { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.wd-booking__gp-age { display: flex; flex-direction: column; gap: 4px; }
+/* Micro-label : mêmes métriques que les jours de la semaine du datepicker */
+.wd-booking__gp-age-label { font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: .3px; color: rgba(255,255,255,.4); }
+.wd-booking__gp-age-select { appearance: none; width: 100%; padding: 7px 10px; border: 1px solid rgba(255,255,255,.2); border-radius: 0; background: rgba(255,255,255,.05); font-family: var(--font-sans); font-size: 13px; color: #fff; cursor: pointer; }
+.wd-booking__gp-age-select:focus-visible { outline: 2px solid var(--pul-highlight, #5FEF91); outline-offset: 1px; }
+/* Âge non renseigné : bordure blanche franche, pas une teinte d'alerte. La palette Pullman
+   n'a que le vert et le blanc ; le vert signifiant « valide / action », le signal d'un champ
+   à compléter passe par le contraste (.2 → .75) et non par une couleur rapportée. */
+.wd-booking__gp-age-select--empty { border-color: rgba(255,255,255,.75); }
+.wd-booking__gp-age-select option { background: #1a2220; color: #fff; } /* même fond que le panneau */
+
+.wd-booking__gp-add { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; padding: 0; background: none; border: none; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-highlight, #5FEF91); cursor: pointer; transition: opacity .15s; }
+.wd-booking__gp-add:hover:not(:disabled) { opacity: .8; }
+.wd-booking__gp-add:disabled { color: rgba(255,255,255,.3); cursor: not-allowed; }
+
+/* Résumé sur sa propre ligne : à 380px de large il se comprimait contre les boutons */
+.wd-booking__gp-footer { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
+.wd-booking__gp-hint { margin: 0; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); }
+.wd-booking__gp-hint--warn { color: #fff; }
+.wd-booking__gp-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
+
+@media (prefers-reduced-motion: reduce) { .wd-booking__guests { transition: none; } }
 
 /* ---------- Destination card ---------- */
 wd-dest-card { display: block; }

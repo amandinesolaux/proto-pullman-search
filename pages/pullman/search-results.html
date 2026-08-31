@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=258"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=269"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=258"></script>
+  <script src="../../core/components/components.js?v=269"></script>
   <script src="../../brands/pullman/pullman.js"></script>
   <script src="../../core/components/booking-map.js?v=106"></script>
 </head>
@@ -268,7 +268,17 @@ wd-booking { margin-top: 20px; }
     if (critIds.length) subParts.push(critIds.map(labelFor).join(', '));
     if (P.get('checkin') && P.get('checkout')) subParts.push(fmtDay(P.get('checkin')) + ' – ' + fmtDay(P.get('checkout')) + (P.get('flex') ? ' · ±' + P.get('flex') + 'j' : ''));
     else if (P.get('checkin')) subParts.push('dès le ' + fmtDay(P.get('checkin')));
-    subParts.push('1 personne, 1 chambre');
+    // Occupation : mêmes bornes que le panneau voyageurs (7 chambres, 1-9 adultes et 0-6 enfants
+    // par chambre). Sans ce bornage, une URL bricolée afficherait ici « 99 adultes » alors que la
+    // barre de recherche, elle, plafonne à 9 — deux chiffres différents pour la même recherche.
+    const GP = { rooms: 7, adults: 9, children: 6 };
+    const plural = (n, s) => n + ' ' + s + (n > 1 ? 's' : '');
+    const nRooms = Math.min(GP.rooms, Math.max(1, parseInt(P.get('rooms'), 10) || 1));
+    const nAdults = Math.min(nRooms * GP.adults, Math.max(nRooms, parseInt(P.get('adults'), 10) || 1));
+    const nChildren = Math.min(nRooms * GP.children, Math.max(0, parseInt(P.get('children'), 10) || 0));
+    subParts.push(((nAdults === 1 && !nChildren) ? '1 personne'
+      : [plural(nAdults, 'adulte'), nChildren ? plural(nChildren, 'enfant') : null].filter(Boolean).join(', '))
+      + ', ' + plural(nRooms, 'chambre'));
     document.getElementById('srx-title').innerHTML = '<strong>' + results.length + '</strong> hôtel' + (results.length > 1 ? 's' : '') + ' — ' + esc(scopeLabel);
     document.getElementById('srx-sub').textContent = subParts.join('  ·  ');
     document.title = results.length + ' hôtel' + (results.length > 1 ? 's' : '') + ' — ' + scopeLabel + ' — Pullman';

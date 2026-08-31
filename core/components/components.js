@@ -698,7 +698,7 @@
           <div class="wd-booking__sep"></div>
           <div class="wd-booking__field wd-booking__field--dates"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="1.5"/><path d="M3 9h18M8 3v3M16 3v3" stroke-linecap="round"/></svg><div><span class="wd-booking__label">À quelles dates ?</span><span class="wd-booking__value">01/04/2025 &nbsp;<svg width="12" height="9" viewBox="0 0 14 9" fill="none" style="vertical-align:-1px"><path d="M1 4.5h12M9 1l4 3.5L9 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>&nbsp; 02/04/2025</span></div></div>
           <div class="wd-booking__sep"></div>
-          <div class="wd-booking__field wd-booking__field--guests"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 18v-2h18v2M3 16V14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M7 12V9.5A1.5 1.5 0 0 1 8.5 8h7a1.5 1.5 0 0 1 1.5 1.5V12" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">Combien serez-vous ?</span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
+          <div class="wd-booking__field wd-booking__field--guests" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-controls="wd-guests-panel"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 18v-2h18v2M3 16V14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M7 12V9.5A1.5 1.5 0 0 1 8.5 8h7a1.5 1.5 0 0 1 1.5 1.5V12" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">Combien serez-vous ?</span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
           <a href="#" class="wd-btn wd-btn--primary wd-booking__cta">${esc(btn)}</a>
         </div>
         <div class="wd-booking__special-rates"><span class="wd-booking__special-rates-line"></span><a href="#" class="wd-booking__special-rates-link">Special rates and accessibility <svg width="14" height="8" viewBox="0 0 14 8" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="wd-booking__special-rates-line"></span></div>
@@ -772,6 +772,22 @@
               <div class="wd-booking__dp-actions">
                 <button class="wd-booking__dp-clear">Effacer</button>
                 <button class="wd-booking__dp-apply">Appliquer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wd-booking__guests" id="wd-guests-panel" data-state="closed" role="dialog" aria-label="Voyageurs et chambres">
+          <div class="wd-booking__gp-body">
+            <div class="wd-booking__gp-rooms" id="wd-gp-rooms"></div>
+            <button type="button" class="wd-booking__gp-add" id="wd-gp-add">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              Ajouter une chambre
+            </button>
+            <div class="wd-booking__gp-footer">
+              <p class="wd-booking__gp-hint" id="wd-gp-hint"></p>
+              <div class="wd-booking__gp-actions">
+                <button type="button" class="wd-booking__dp-clear wd-booking__gp-reset">Réinitialiser</button>
+                <button type="button" class="wd-booking__dp-apply wd-booking__gp-apply">Appliquer</button>
               </div>
             </div>
           </div>
@@ -2208,6 +2224,8 @@
           dropdown.dataset.state = 'closed';
           destField.classList.remove('wd-booking__field--editing');
         }
+        // le champ Dates stoppe la propagation : on referme le panneau voyageurs explicitement
+        if (guestsPanel && guestsPanel.dataset.state === 'open') closeGuests();
         datepicker.dataset.state = 'open';
         dateField.classList.add('wd-booking__field--editing');
         renderCalendars();
@@ -2309,6 +2327,168 @@
       });
       // ===== END DATE PICKER =====
 
+      // ===== VOYAGEURS / CHAMBRES =====
+      // Bornes relevées sur le moteur de réservation Pullman (pullman.accor.com) :
+      // 7 chambres max, 1 à 9 adultes et 0 à 6 enfants par chambre, âge requis de 0 à 11 ans
+      // (12 ans et plus compte comme un adulte).
+      const GP = { rooms: 7, adults: 9, children: 6, childAge: 11 };
+      const guestsPanel = this.querySelector('.wd-booking__guests');
+      const guestsField = allFields[2];
+      const gpRoomsEl = this.querySelector('#wd-gp-rooms');
+      const gpAddBtn = this.querySelector('#wd-gp-add');
+      const gpHintEl = this.querySelector('#wd-gp-hint');
+      const guestsValue = guestsField ? guestsField.querySelector('.wd-booking__value') : null;
+
+      // Un enfant sans âge vaut null : on affiche le placeholder « - » comme Pullman,
+      // et on empêche la validation tant qu'il en reste.
+      const newRoom = () => ({ adults: 1, children: [] });
+      let gpRooms = [newRoom()];
+
+      const gpTotals = () => gpRooms.reduce((a, r) => ({
+        adults: a.adults + r.adults,
+        children: a.children + r.children.length
+      }), { adults: 0, children: 0 });
+
+      const gpMissingAges = () => gpRooms.reduce((n, r) => n + r.children.filter(a => a === null).length, 0);
+
+      const plural = (n, s, p) => n + ' ' + (n > 1 ? (p || s + 's') : s);
+
+      const gpSummary = () => {
+        const { adults, children } = gpTotals();
+        // « 1 personne » reste plus naturel que « 1 adulte » quand on voyage seul
+        const who = (adults === 1 && !children) ? '1 personne'
+          : [plural(adults, 'adulte'), children ? plural(children, 'enfant') : null].filter(Boolean).join(', ');
+        return who + ', ' + plural(gpRooms.length, 'chambre');
+      };
+
+      const renderGuests = () => {
+        const multi = gpRooms.length > 1;
+        gpRoomsEl.innerHTML = gpRooms.map((room, i) => {
+          const counter = (kind, label, val, min, max) =>
+            '<div class="wd-booking__gp-counter">' +
+              '<span class="wd-booking__gp-counter-label">' + label + '</span>' +
+              '<div class="wd-booking__gp-counter-ctrl">' +
+                '<button type="button" class="wd-booking__gp-btn" data-gp="minus" data-kind="' + kind + '" data-room="' + i + '"' +
+                  (val <= min ? ' disabled' : '') + ' aria-label="Retirer un ' + label.toLowerCase().replace(/\(s\)/, '') + ' de la chambre ' + (i + 1) + '">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>' +
+                '<span class="wd-booking__gp-count" aria-live="polite">' + val + '</span>' +
+                '<button type="button" class="wd-booking__gp-btn" data-gp="plus" data-kind="' + kind + '" data-room="' + i + '"' +
+                  (val >= max ? ' disabled' : '') + ' aria-label="Ajouter un ' + label.toLowerCase().replace(/\(s\)/, '') + ' à la chambre ' + (i + 1) + '">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' +
+              '</div>' +
+            '</div>';
+
+          const ages = room.children.map((age, j) =>
+            '<label class="wd-booking__gp-age">' +
+              '<span class="wd-booking__gp-age-label">Âge enfant ' + (j + 1) + '</span>' +
+              '<select class="wd-booking__gp-age-select' + (age === null ? ' wd-booking__gp-age-select--empty' : '') + '" data-room="' + i + '" data-child="' + j + '">' +
+                '<option value="">-</option>' +
+                Array.from({ length: GP.childAge + 1 }, (_, a) =>
+                  '<option value="' + a + '"' + (age === a ? ' selected' : '') + '>' + a + (a <= 1 ? ' an' : ' ans') + '</option>').join('') +
+              '</select>' +
+            '</label>').join('');
+
+          return '<div class="wd-booking__gp-room">' +
+            '<div class="wd-booking__gp-room-head">' +
+              '<span class="wd-booking__gp-room-title">Chambre ' + (i + 1) + '</span>' +
+              (multi ? '<button type="button" class="wd-booking__gp-remove" data-gp="remove-room" data-room="' + i + '">Supprimer</button>' : '') +
+            '</div>' +
+            counter('adults', 'Adulte(s)', room.adults, 1, GP.adults) +
+            counter('children', 'Enfant(s)', room.children.length, 0, GP.children) +
+            (ages ? '<div class="wd-booking__gp-ages">' + ages + '</div>' : '') +
+          '</div>';
+        }).join('');
+
+        gpAddBtn.disabled = gpRooms.length >= GP.rooms;
+        const missing = gpMissingAges();
+        gpHintEl.textContent = missing
+          ? 'Indiquez l’âge de ' + (missing > 1 ? 'chaque enfant' : 'l’enfant') + ' pour continuer.'
+          : gpSummary();
+        gpHintEl.classList.toggle('wd-booking__gp-hint--warn', missing > 0);
+        const applyBtn = guestsPanel.querySelector('.wd-booking__gp-apply');
+        if (applyBtn) applyBtn.disabled = missing > 0;
+      };
+
+      const formatGuestsField = () => { if (guestsValue) guestsValue.textContent = gpSummary(); };
+
+      const openGuests = () => {
+        if (dropdown.dataset.state === 'open') { dropdown.dataset.state = 'closed'; destField.classList.remove('wd-booking__field--editing'); }
+        if (datepicker.dataset.state === 'open') closeDatePicker();
+        guestsPanel.dataset.state = 'open';
+        guestsField.classList.add('wd-booking__field--editing');
+        guestsField.setAttribute('aria-expanded', 'true');
+        renderGuests();
+      };
+
+      const closeGuests = () => {
+        guestsPanel.dataset.state = 'closed';
+        guestsField.classList.remove('wd-booking__field--editing');
+        guestsField.setAttribute('aria-expanded', 'false');
+        formatGuestsField();
+        scheduleRecentSave();
+      };
+
+      if (guestsField && guestsPanel) {
+        guestsField.style.cursor = 'pointer';
+        guestsField.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (guestsPanel.dataset.state === 'open') closeGuests(); else openGuests();
+        });
+        guestsField.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); guestsField.click(); }
+        });
+
+        guestsPanel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const btn = e.target.closest('[data-gp]');
+          if (!btn || btn.disabled) return;
+          const i = Number(btn.dataset.room);
+          const room = gpRooms[i];
+          if (btn.dataset.gp === 'remove-room') { gpRooms.splice(i, 1); renderGuests(); return; }
+          if (!room) return;
+          const delta = btn.dataset.gp === 'plus' ? 1 : -1;
+          if (btn.dataset.kind === 'adults') {
+            room.adults = Math.min(GP.adults, Math.max(1, room.adults + delta));
+          } else {
+            if (delta > 0 && room.children.length < GP.children) room.children.push(null);
+            else if (delta < 0) room.children.pop();
+          }
+          renderGuests();
+        });
+
+        guestsPanel.addEventListener('change', (e) => {
+          const sel = e.target.closest('.wd-booking__gp-age-select');
+          if (!sel) return;
+          const room = gpRooms[Number(sel.dataset.room)];
+          if (room) room.children[Number(sel.dataset.child)] = sel.value === '' ? null : Number(sel.value);
+          renderGuests();
+        });
+
+        gpAddBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (gpRooms.length < GP.rooms) { gpRooms.push(newRoom()); renderGuests(); }
+        });
+
+        guestsPanel.querySelector('.wd-booking__gp-reset').addEventListener('click', (e) => {
+          e.stopPropagation(); gpRooms = [newRoom()]; renderGuests();
+        });
+        guestsPanel.querySelector('.wd-booking__gp-apply').addEventListener('click', (e) => {
+          e.stopPropagation(); if (!gpMissingAges()) closeGuests();
+        });
+
+        document.addEventListener('click', (e) => {
+          if (guestsPanel.dataset.state === 'open' && !guestsPanel.contains(e.target) && !guestsField.contains(e.target)) closeGuests();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && guestsPanel.dataset.state === 'open') { closeGuests(); guestsField.focus(); }
+        });
+        formatGuestsField();
+      }
+
+      // Exposé pour la construction de l'URL de recherche
+      this._guestsState = () => ({ rooms: gpRooms, totals: gpTotals(), summary: gpSummary() });
+      // ===== FIN VOYAGEURS / CHAMBRES =====
+
       destField.addEventListener('click', () => { if (dropdown.dataset.state !== 'open') open(); });
       document.addEventListener('mousedown', e => {
         if (dropdown.dataset.state === 'open' && !e.target.closest('.wd-booking')) close();
@@ -2338,6 +2518,13 @@
           if (dpCheckIn) p.set('checkin', fmtISO(dpCheckIn));
           if (dpCheckOut) p.set('checkout', fmtISO(dpCheckOut));
           if (dpFlex > 0) p.set('flex', String(dpFlex));
+          // Occupation : on ne pousse dans l'URL que ce qui s'écarte du défaut (1 adulte, 1 chambre)
+          const g = gpTotals();
+          if (g.adults !== 1) p.set('adults', String(g.adults));
+          if (g.children) p.set('children', String(g.children));
+          if (gpRooms.length !== 1) p.set('rooms', String(gpRooms.length));
+          const ages = gpRooms.flatMap(r => r.children).filter(a => a !== null);
+          if (ages.length) p.set('ages', ages.join(','));
           const qs = p.toString();
           window.location.href = searchBase + (qs ? '?' + qs : '');
         });
@@ -2359,6 +2546,29 @@
         if (p.get('checkin')) { dpCheckIn = new Date(p.get('checkin') + 'T12:00:00'); touched = true; }
         if (p.get('checkout')) { dpCheckOut = new Date(p.get('checkout') + 'T12:00:00'); touched = true; }
         if (p.get('flex')) { dpFlex = parseInt(p.get('flex'), 10) || 0; }
+        // Occupation : on répartit les adultes puis les enfants sur les chambres demandées,
+        // en respectant les mêmes bornes que le panneau (9 adultes / 6 enfants par chambre).
+        const nRooms = Math.min(GP.rooms, Math.max(1, parseInt(p.get('rooms'), 10) || 1));
+        const nAdults = Math.max(1, parseInt(p.get('adults'), 10) || 1);
+        const nChildren = Math.max(0, parseInt(p.get('children'), 10) || 0);
+        if (nRooms > 1 || nAdults > 1 || nChildren > 0) {
+          const ages = (p.get('ages') || '').split(',').filter(s => s !== '').map(Number);
+          // Chaque chambre part avec un adulte (aucune chambre ne peut être vide), puis on
+          // répartit le reste — sinon 3 adultes sur 2 chambres en produirait 4.
+          gpRooms = Array.from({ length: nRooms }, () => ({ adults: 1, children: [] }));
+          let reste = Math.max(0, nAdults - nRooms);
+          while (reste > 0) {
+            const r = gpRooms.find(r => r.adults < GP.adults);
+            if (!r) break;
+            r.adults++; reste--;
+          }
+          for (let i = 0; i < nChildren; i++) {
+            const r = gpRooms.find(r => r.children.length < GP.children);
+            if (r) r.children.push(ages[i] === undefined ? null : ages[i]);
+          }
+          formatGuestsField();
+          touched = true;
+        }
         if (touched) { formatDateField(); renderChips(); }
       })();
 

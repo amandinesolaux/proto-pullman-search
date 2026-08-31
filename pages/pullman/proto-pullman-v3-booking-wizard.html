@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=258"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=269"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,7 +17,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/components/components.js?v=258"></script>
+  <script src="../../core/components/components.js?v=269"></script>
   <script src="../../brands/pullman/pullman.js"></script>
   <script src="../../core/components/booking-map.js?v=106"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
@@ -499,8 +499,8 @@ wd-booking[data-disclosure="full"] .wd-booking__dd-criteria-col {
 body.brand-pullman .wd-booking__tabs { padding-left: 0; }
 body.brand-pullman .wd-booking__fields { padding-left: 0; }
 
-/* ===== Calendrier : même fond que le dropdown du booking engine (#1A2220) ===== */
-body.brand-pullman .wd-booking__datepicker { background: #1A2220; }
+/* Le fond #1a2220 du calendrier (et du panneau voyageurs) est désormais porté par base.css,
+   avec celui du dropdown : la surcharge qui vivait ici n'a plus lieu d'être. */
 
 /* ===== Masquer le placeholder du champ quand des critères (chips) sont présents — toutes tabs ===== */
 body.brand-pullman .wd-booking__dest-chips:not(:empty) + .wd-booking__dest-input::placeholder {
