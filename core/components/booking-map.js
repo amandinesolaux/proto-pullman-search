@@ -118,9 +118,9 @@ function initBookingMap(continentFilter) {
 
   L.control.zoom({ position: 'topright' }).addTo(_bookingMap);
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    subdomains: 'abcd',
+  // Esri Dark Gray : gratuit sans clé (les tuiles CARTO sont désormais filigranées « API key required »)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16,
   }).addTo(_bookingMap);
 
   _renderMarkers(continentFilter, _currentCriteria);

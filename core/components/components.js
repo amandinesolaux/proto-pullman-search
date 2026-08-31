@@ -94,6 +94,29 @@
   /* ===================== MASTERS ===================== */
 
   /* ---------- wd-header ---------- */
+  /* Profil de l'utilisateur connecté — source unique partagée (header, wizard, booking) */
+  const WD_USER_PROFILE = {
+    firstName: 'Lisa',
+    lastName: 'Draper',
+    fullName: 'Lisa Draper',
+    loyaltyStatus: 'Gold',
+    loyaltyPoints: 2450,
+    // Visuels de destination évocateurs (et non des photos d'hôtel) : c'est le lieu qui donne envie
+    wishlist: [
+      { name: 'Bangkok', country: 'Thaïlande', image: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400&h=225&fit=crop' }, // Grand Palais
+      { name: 'Bali', country: 'Indonésie', image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=400&h=225&fit=crop' },   // Tanah Lot au coucher du soleil
+      { name: 'Tokyo', country: 'Japon', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=225&fit=crop' }        // ruelle néon
+    ],
+    familyMembers: [
+      { firstName: 'Léo', age: 6 },
+      { firstName: 'Emma', age: 3 }
+    ],
+    pastStays: [
+      { hotel: 'Pullman Paris Montparnasse', location: 'Paris, France', date: '2025-03' },
+      { hotel: 'Pullman Bali Legian Beach', location: 'Bali, Indonésie', date: '2024-08' }
+    ]
+  };
+
   def("wd-header", class extends WdEl {
     constructor() {
       super();
@@ -154,7 +177,7 @@
               <div class="wd-header__account-wrap">
                 <button type="button" class="wd-header__account${this.isLoggedIn ? ' wd-header__account--logged' : ''}" aria-haspopup="true" aria-expanded="false" aria-label="Compte">
                   ${this.isLoggedIn
-                    ? `<span class="wd-header__avatar">${ICON.person}<span class="wd-header__avatar-dot"></span></span><span class="wd-header__account-label">Solaux amandine</span>`
+                    ? `<span class="wd-header__avatar">${ICON.person}<span class="wd-header__avatar-dot"></span></span><span class="wd-header__account-label">${WD_USER_PROFILE.fullName}</span>`
                     : `${ICON.person} <span class="wd-header__account-label">Me connecter / m'inscrire</span>`}
                 </button>
                 ${this._renderAccountMenu()}
@@ -186,7 +209,7 @@
 
       const body = this.isLoggedIn
         ? `
-          <p class="wd-account__greeting">Bonjour Amandine 👋</p>
+          <p class="wd-account__greeting">Bonjour ${WD_USER_PROFILE.firstName} 👋</p>
           <p class="wd-account__greeting-sub">Ravi de vous revoir.</p>
           ${links}`
         : `
@@ -1436,7 +1459,7 @@
           const recents = loadRecents();
           let html = '';
           if (recents.length) {
-            html += '<div class="wd-booking__dd-dest-subtitle">Reprendre votre recherche</div>';
+            html += '<div class="wd-booking__dd-section-title">Reprendre votre recherche</div>';
             html += recents.map((r, i) => {
               // Dates (avec repli), puis services recherchés
               let datePart;
@@ -1456,6 +1479,33 @@
                 '<button type="button" class="wd-booking__dd-recent-del" data-recent-del="' + i + '" aria-label="Supprimer cette recherche récente">' + delIcon + '</button>' +
               '</div>';
             }).join('');
+          }
+          // Touchpoint wishlist — réservé au compte connecté (contenu personnel), avec le nombre
+          // d'hôtels par destination pour annoncer ce que donne le clic (pas de promesse vide).
+          // Un seul raccourci à la fois, le plus pertinent : tant qu'aucune recherche n'a été faite
+          // on propose la wishlist ; dès qu'il y a une recherche à reprendre, elle prend le relais.
+          const isConnected = !!(document.querySelector('wd-header') || {}).isLoggedIn;
+          const allH = REGION_HOTELS.flatMap(r => r.hotels);
+          const wish = (!recents.length && isConnected && WD_USER_PROFILE && WD_USER_PROFILE.wishlist ? WD_USER_PROFILE.wishlist : [])
+            .map(d => ({ ...d, count: allH.filter(h => h.loc.split(',')[0].trim() === d.name).length }))
+            .filter(d => d.count > 0); // on n'affiche jamais un raccourci qui mènerait à 0 résultat
+          if (wish.length) {
+            html += '<div class="wd-booking__dd-wish-head">' +
+              '<span class="wd-booking__dd-section-title wd-booking__dd-wish-title" id="wd-wish-label">Votre wishlist</span>' +
+              '<span class="wd-booking__dd-wish-count">' + wish.length + ' destination' + (wish.length > 1 ? 's' : '') + '</span>' +
+              '</div>';
+            html += '<ul class="wd-booking__dd-wish-row" role="list" aria-labelledby="wd-wish-label">' + wish.map(d => {
+              const label = d.count + ' hôtel' + (d.count > 1 ? 's' : '');
+              return '<li>' +
+                '<button type="button" class="wd-booking__dd-wish" data-wish-city="' + esc(d.name) + '" aria-label="' + esc(d.name) + ', ' + label + ' — voir les résultats">' +
+                  '<img class="wd-booking__dd-wish-img" src="' + d.image + '" alt="" loading="lazy" />' +
+                  '<span class="wd-booking__dd-wish-overlay"></span>' +
+                  '<span class="wd-booking__dd-wish-text">' +
+                    '<span class="wd-booking__dd-wish-name">' + esc(d.name) + '</span>' +
+                    '<span class="wd-booking__dd-wish-meta">' + label + '</span>' +
+                  '</span>' +
+                '</button></li>';
+            }).join('') + '</ul>';
           }
           // Pas de compteur global en état intermédiaire (peu pertinent tant qu'aucune zone n'est choisie)
           destListEl.innerHTML = html;
@@ -1740,6 +1790,21 @@
           list.splice(parseInt(recentDel.dataset.recentDel, 10), 1);
           storeRecents(list);
           renderPanel();
+          return;
+        }
+        // Wishlist : on part directement sur les résultats de la destination sauvegardée
+        const wishBtn = e.target.closest('[data-wish-city]');
+        if (wishBtn) {
+          e.preventDefault();
+          const base = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'search-results.html';
+          const iso = (dt) => dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+          const p = new URLSearchParams();
+          p.set('city', wishBtn.dataset.wishCity);
+          const crit = [...getActiveCriteria()];
+          if (crit.length) p.set('criteria', crit.join(','));
+          if (dpCheckIn) p.set('checkin', iso(dpCheckIn));
+          if (dpCheckOut) p.set('checkout', iso(dpCheckOut));
+          window.location.href = base + '?' + p.toString();
           return;
         }
         const recentBtn = e.target.closest('[data-recent]');
@@ -2256,20 +2321,54 @@
       const ctaBtn = this.querySelector('.wd-booking__cta');
       if (ctaBtn) {
         const searchBase = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'search-results.html';
-        const updateCTAHref = () => {
-          const chips = buildChips();
-          const labels = chips.map(c => c.label);
-          const q = destInput.value.trim() || labels.join(', ');
-          let href = searchBase + (q ? '?q=' + encodeURIComponent(q) : '');
-          const fmtISO = (dt) => dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
-          if (dpCheckIn) href += (href.includes('?') ? '&' : '?') + 'checkin=' + fmtISO(dpCheckIn);
-          if (dpCheckOut) href += '&checkout=' + fmtISO(dpCheckOut);
-          if (dpFlex > 0) href += '&flex=' + dpFlex;
-          ctaBtn.href = href;
-        };
-        updateCTAHref();
-        destInput.addEventListener('input', updateCTAHref);
+        const fmtISO = (dt) => dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        // URL structurée construite au clic : l'état exact de la recherche est restaurable à l'arrivée
+        ctaBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const p = new URLSearchParams();
+          if (searchState.selectedHotel) p.set('hotel', searchState.selectedHotel);
+          if (searchState.expandedCountry) p.set('country', searchState.expandedCountry);
+          if (searchState.city) p.set('city', searchState.city);
+          if (searchState.continent) p.set('continent', searchState.continent);
+          else if (searchState.showAll) p.set('continent', 'all');
+          const crit = [...getActiveCriteria()];
+          if (crit.length) p.set('criteria', crit.join(','));
+          const q = destInput.value.trim();
+          if (q) p.set('q', q);
+          if (dpCheckIn) p.set('checkin', fmtISO(dpCheckIn));
+          if (dpCheckOut) p.set('checkout', fmtISO(dpCheckOut));
+          if (dpFlex > 0) p.set('flex', String(dpFlex));
+          const qs = p.toString();
+          window.location.href = searchBase + (qs ? '?' + qs : '');
+        });
       }
+
+      // ===== Restauration de l'état depuis l'URL (page résultats / deep-link) =====
+      (() => {
+        const p = new URLSearchParams(window.location.search);
+        if (![...p.keys()].length) return;
+        let touched = false;
+        const cont = p.get('continent');
+        if (cont === 'all') { searchState.showAll = true; touched = true; }
+        else if (cont && REGION_HOTELS.some(r => r.id === cont)) { searchState.continent = cont; touched = true; }
+        const country = p.get('country');
+        if (country) { searchState.country = country; searchState.expandedCountry = country; touched = true; }
+        if (p.get('city')) { searchState.city = p.get('city'); touched = true; }
+        if (p.get('hotel')) { searchState.selectedHotel = p.get('hotel'); touched = true; }
+        (p.get('criteria') || '').split(',').filter(Boolean).forEach(id => { getActiveCriteria().add(id); touched = true; });
+        if (p.get('checkin')) { dpCheckIn = new Date(p.get('checkin') + 'T12:00:00'); touched = true; }
+        if (p.get('checkout')) { dpCheckOut = new Date(p.get('checkout') + 'T12:00:00'); touched = true; }
+        if (p.get('flex')) { dpFlex = parseInt(p.get('flex'), 10) || 0; }
+        if (touched) { formatDateField(); renderChips(); }
+      })();
+
+      // Données de recherche exposées pour la page de résultats (source unique : REGION_HOTELS)
+      window.WD_SEARCH_DATA = {
+        regions: REGION_HOTELS,
+        criteriaToServices: CRITERIA_TO_SERVICES,
+        criteriaGroups: CRITERIA_GROUPS,
+        imgBase: imgBase
+      };
 
     }
   });
@@ -3209,24 +3308,7 @@
 
     // Profil factice (itérations futures : wishlist, prefill Q1.5, points…).
     _mockUserProfile() {
-      return {
-        firstName: 'Amandine',
-        loyaltyStatus: 'Gold',
-        loyaltyPoints: 2450,
-        wishlist: [
-          { name: 'Bangkok', country: 'Thaïlande', image: 'https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' },
-          { name: 'Bali', country: 'Indonésie', image: 'https://m.ahstatic.com/is/image/accorhotels/6556-1:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' },
-          { name: 'Tokyo', country: 'Japon', image: 'https://m.ahstatic.com/is/image/accorhotels/PullmanEvent:9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=480&hei=853&qlt=80' }
-        ],
-        familyMembers: [
-          { firstName: 'Léo', age: 6 },
-          { firstName: 'Emma', age: 3 }
-        ],
-        pastStays: [
-          { hotel: 'Pullman Paris Montparnasse', location: 'Paris, France', date: '2025-03' },
-          { hotel: 'Pullman Bali Legian Beach', location: 'Bali, Indonésie', date: '2024-08' }
-        ]
-      };
+      return WD_USER_PROFILE; // source unique (voir en haut du fichier)
     }
 
     render() {
@@ -6081,7 +6163,7 @@
       this.isOpen = true;
       // Synchronise la dimension "connexion" avec l'état de connexion du header
       // (la connexion est connue avant le wizard). Dans ce prototype, un
-      // utilisateur connecté (ex. Amandine) dispose d'une wishlist mockée.
+      // utilisateur connecté (WD_USER_PROFILE) dispose d'une wishlist mockée.
       const header = document.querySelector('wd-header');
       const connected = !!(header && header.isLoggedIn);
       if (connected !== this.state.isConnected) {

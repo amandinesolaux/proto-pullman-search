@@ -3,648 +3,372 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Résultats de recherche — Pullman Hotels & Resorts</title>
+  <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=258"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="../../core/components/components.js?v=45"></script>
+
+  <script src="../../core/components/components.js?v=258"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, body.brand-pullman { font-family: var(--font-sans, 'Inter', sans-serif); overflow: hidden; background: #fff !important; color: #222; }
-
-    /* ── HEADER ── */
-    .sr-header { background: var(--pul-olive, #445047); padding: 0; flex-shrink: 0; }
-    .sr-header-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; }
-    .sr-logo { display: inline-flex; align-items: center; text-decoration: none; }
-    .sr-logo svg { height: 22px; width: auto; }
-    .sr-header-links { display: flex; align-items: center; gap: 16px; }
-    .sr-header-links a { color: rgba(255,255,255,.7); font-size: 12px; text-decoration: none; transition: color .15s; }
-    .sr-header-links a:hover { color: #fff; }
-
-    /* ── BOOKING BAR ── */
-    .sr-booking { display: flex; align-items: stretch; gap: 0; background: var(--pul-bg, #28332B); padding: 10px 24px; border-bottom: 1px solid rgba(255,255,255,.08); }
-    .sr-booking-field { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 16px; border-right: 1px solid rgba(255,255,255,.1); cursor: pointer; border-radius: 0; transition: background .15s; min-width: 0; }
-    .sr-booking-field:first-child { border-radius: 8px 0 0 8px; }
-    .sr-booking-field:hover { background: rgba(255,255,255,.05); }
-    .sr-booking-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.45); margin-bottom: 2px; }
-    .sr-booking-value { font-size: 13px; color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .sr-booking-value--placeholder { color: rgba(255,255,255,.35); }
-    .sr-booking-input { background: none; border: none; outline: none; font-size: 13px; color: #fff; font-weight: 500; font-family: inherit; width: 100%; }
-    .sr-booking-input::placeholder { color: rgba(255,255,255,.35); }
-    .sr-booking-cta { display: flex; align-items: center; justify-content: center; background: var(--pul-highlight, #5FEF91); color: var(--pul-olive, #445047); border: none; padding: 0 24px; border-radius: 0 8px 8px 0; font-family: inherit; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; cursor: pointer; transition: opacity .15s; white-space: nowrap; gap: 6px; }
-    .sr-booking-cta:hover { opacity: .85; }
-    .sr-booking-cta svg { width: 16px; height: 16px; }
-
-    /* ── FILTERS ── */
-    .sr-filters { display: flex; align-items: center; gap: 8px; padding: 10px 24px; border-bottom: 1px solid #ebebeb; background: #fff; flex-shrink: 0; overflow-x: auto; }
-    .sr-filter { display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-weight: 500; color: #444; background: #fff; cursor: pointer; transition: all .15s; white-space: nowrap; }
-    .sr-filter:hover { background: rgba(95,239,145,.08); border-color: rgba(95,239,145,.25); color: #222; }
-    .sr-filter--active { background: #5fef91; color: #1a2b1e; border-color: #5fef91; font-weight: 600; }
-    .sr-filter svg { width: 14px; height: 14px; }
-    .sr-filter-clear { display: none; padding: 6px 14px; border-radius: 4px; background: transparent; border: 1px dashed rgba(95,239,145,.4); font-size: 12px; font-weight: 500; color: #2a7a47; cursor: pointer; transition: all .15s; white-space: nowrap; }
-    .sr-filter-clear:hover { background: rgba(95,239,145,.08); border-color: rgba(95,239,145,.6); }
-    .sr-sort { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: #717171; cursor: pointer; white-space: nowrap; }
-    .sr-sort select { border: none; background: transparent; font-size: 12px; font-weight: 600; color: #222; font-family: inherit; cursor: pointer; outline: none; }
-
-    /* ── LAYOUT ── */
-    .sr { display: flex; flex-direction: column; height: 100vh; }
-    .sr-body { display: flex; flex: 1; min-height: 0; }
-
-    /* ── LEFT PANEL ── */
-    .sr-panel { width: 52%; display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; background: #fff; }
-    .sr-sub { display: flex; align-items: center; justify-content: space-between; padding: 10px 24px; border-bottom: 1px solid #ebebeb; flex-shrink: 0; }
-    .sr-back { display: inline-flex; align-items: center; gap: 6px; color: #717171; font-size: 13px; text-decoration: none; transition: color .15s; }
-    .sr-back:hover { color: var(--pul-olive, #445047); }
-    .sr-count { font-size: 13px; color: #222; font-weight: 600; }
-
-    .sr-list { flex: 1; overflow-y: auto; padding: 12px 24px; display: flex; flex-direction: column; gap: 0; }
-
-    /* ── HOTEL CARD (horizontal, list) ── */
-    .sr-card { display: flex; gap: 14px; cursor: pointer; padding: 16px 0; border-bottom: 1px solid #ebebeb; transition: background .15s; }
-    .sr-card:last-child { border-bottom: none; }
-    .sr-card:hover { background: #fafafa; margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 12px; }
-    .sr-card--active { background: #f5f5f0; margin: 0 -12px; padding-left: 12px; padding-right: 12px; border-radius: 12px; }
-
-    .sr-card-carousel { position: relative; width: 140px; height: 140px; flex-shrink: 0; border-radius: 12px; overflow: hidden; }
-    .sr-card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .25s ease; }
-    .sr-card-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.85); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #222; opacity: 0; transition: opacity .2s; box-shadow: 0 1px 4px rgba(0,0,0,.15); z-index: 2; }
-    .sr-card-carousel:hover .sr-card-carousel-btn { opacity: 1; }
-    .sr-card-carousel-btn:hover { background: #fff; }
-    .sr-card-carousel-btn--prev { left: 6px; }
-    .sr-card-carousel-btn--next { right: 6px; }
-    .sr-card-carousel-dots { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 2; }
-    .sr-card-carousel-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.5); transition: background .2s; }
-    .sr-card-carousel-dot--active { background: #fff; }
-    .sr-card-body { flex: 1; display: flex; flex-direction: column; min-width: 0; padding: 2px 0; }
-    .sr-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 2px; }
-    .sr-card-name { font-size: 15px; color: #222; font-weight: 600; line-height: 1.3; }
-    .sr-card-stars { color: var(--pul-olive, #445047); font-size: 11px; letter-spacing: 1px; flex-shrink: 0; }
-    .sr-card-loc { font-size: 13px; color: #717171; margin-bottom: 4px; }
-    .sr-card-badge { display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; background: var(--pul-olive, #445047); color: #fff; padding: 2px 7px; border-radius: 4px; margin-bottom: 4px; width: fit-content; }
-    .sr-card-features { font-size: 12px; color: #999; line-height: 1.5; margin-top: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .sr-card-features strong { color: var(--pul-olive, #445047); font-weight: 600; }
-    .sr-card-bottom { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; margin-top: 8px; }
-    .sr-card-price { font-size: 16px; font-weight: 700; color: #222; }
-    .sr-card-price-unit { font-size: 13px; color: #717171; font-weight: 400; }
-    .sr-card-rating { display: flex; align-items: center; gap: 4px; font-size: 12px; }
-    .sr-card-rating-score { font-weight: 700; color: #222; }
-    .sr-card-rating-label { color: #717171; }
-    .sr-card-cta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #2a7a47; text-decoration: none; margin-top: 4px; transition: color .15s; }
-    .sr-card-cta:hover { color: #1a5c32; }
-
-    /* ── MAP POPUP (Airbnb-style vertical card) ── */
-    .sr-popup { width: 260px; font-family: var(--font-sans, 'Inter', sans-serif); }
-    .sr-popup-carousel { position: relative; width: 100%; aspect-ratio: 4/3; border-radius: 10px 10px 0 0; overflow: hidden; }
-    .sr-popup-carousel img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .sr-popup-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #222; opacity: 0; transition: opacity .2s; box-shadow: 0 1px 3px rgba(0,0,0,.15); z-index: 2; }
-    .sr-popup-carousel:hover .sr-popup-carousel-btn { opacity: 1; }
-    .sr-popup-carousel-btn:hover { background: #fff; }
-    .sr-popup-carousel-btn--prev { left: 6px; }
-    .sr-popup-carousel-btn--next { right: 6px; }
-    .sr-popup-carousel-dots { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 2; }
-    .sr-popup-carousel-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,.5); }
-    .sr-popup-carousel-dot--active { background: #fff; }
-    .sr-popup-fav { position: absolute; top: 8px; right: 8px; z-index: 2; width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,.25); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .sr-popup-fav:hover { background: rgba(0,0,0,.45); }
-    .sr-popup-fav svg { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; }
-
-    /* ── MAP ── */
-    .sr-map { width: 48%; position: relative; }
-    .sr-map #sr-map { height: 100%; width: 100%; }
-
-    .sr-marker {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 4px 10px;
-      font-family: var(--font-sans, 'Inter', sans-serif);
-      font-size: 13px;
-      font-weight: 600;
-      color: #222;
-      white-space: nowrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,.12);
-      transition: all .15s;
-      cursor: pointer;
-    }
-    .sr-marker:hover,
-    .sr-marker--active {
-      background: var(--pul-olive, #445047);
-      color: #fff;
-      border-color: var(--pul-olive, #445047);
-      box-shadow: 0 4px 12px rgba(0,0,0,.2);
-      transform: scale(1.08);
-      z-index: 1000 !important;
-    }
-
-    .sr-poi { background:#fff; border-radius:20px; padding:4px 10px; font-family:var(--font-sans,'Inter',sans-serif); font-size:11px; font-weight:500; color:#445047; letter-spacing:.02em; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.14); border:1px solid rgba(68,80,71,.15); cursor:default; transition:all .15s ease; display:flex; align-items:center; gap:5px; }
-    .sr-poi-dot { width:6px; height:6px; border-radius:50%; background:var(--pul-olive,#445047); flex-shrink:0; }
-    .sr-poi:hover { transform:translateY(-2px); box-shadow:0 4px 14px rgba(0,0,0,.22); border-color:var(--pul-olive,#445047); color:#222; }
-    .leaflet-popup-content-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.12); padding: 0; }
-    .leaflet-popup-tip { background: #fff; }
-    .leaflet-popup-content { margin: 0; padding: 0; }
-    .leaflet-popup-close-button { display: none; }
-    .sr-popup-wrap .leaflet-popup-content-wrapper { padding: 0; border-radius: 12px; overflow: hidden; }
-    .sr-popup-wrap .leaflet-popup-content { margin: 0; }
-    .sr-popup { overflow: hidden; border-radius: 12px; font-family: var(--font-sans, 'Inter', sans-serif); }
-    .sr-popup-body { padding: 10px 12px 12px; }
-    .sr-popup-name { font-size: 13px; font-weight: 600; color: #222; display: block; margin-bottom: 1px; line-height: 1.3; }
-    .sr-popup-loc { font-size: 12px; color: #717171; display: block; margin-bottom: 4px; }
-    .sr-popup-price { font-size: 14px; font-weight: 700; color: #222; display: block; margin-top: 4px; }
-    .sr-popup-price span { font-weight: 400; color: #717171; font-size: 12px; }
-
-    .leaflet-container { background: #f2efe9; }
-
-    /* ── NO RESULTS ── */
-    .sr-empty { text-align: center; padding: 60px 24px; color: #717171; }
-    .sr-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
-    .sr-empty-title { font-size: 18px; font-weight: 600; color: #222; margin-bottom: 8px; }
-    .sr-empty-text { font-size: 14px; line-height: 1.5; }
-  </style>
+  <script src="../../core/components/booking-map.js?v=106"></script>
 </head>
 <body class="brand-pullman">
 
-<div class="sr">
-  <!-- HEADER -->
-  <header class="sr-header">
-    <div class="sr-header-top">
-      <a href="brand-homepage.html" class="sr-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 688.581 178.328"><path fill="#fff" d="M204.107,54.242h14.213v33.36c0,20.203-14.523,32.263-38.847,32.263s-38.841-12.06-38.841-32.263v-33.36h14.21v33.36c0,12.997,9.209,20.756,24.631,20.756s24.634-7.758,24.634-20.756v-33.36ZM245.217,118.286h14.204V27.972h-14.204v90.313ZM291.279,118.286h14.204V27.972h-14.204v90.313ZM621.762,52.661c-24.323,0-38.842,12.062-38.842,32.263v33.363h14.214v-33.363c0-13.191,8.978-20.757,24.628-20.757s24.635,7.566,24.635,20.757v65.435h14.211v-65.435c0-20.201-14.523-32.263-38.847-32.263ZM118.781,85.631c0,9.212-4.161,17.509-11.714,23.362-8.113,6.287-19.763,9.611-33.687,9.611-11.832,0-22.928-3.25-31.422-9.177v40.929h-13.985l.022-63.93c-.01-.265-.016-.53-.016-.795,0-15.209,11.89-32.97,45.401-32.97s45.401,17.761,45.401,32.97ZM104.331,85.631c0-13.293-12.149-21.882-30.951-21.882s-30.951,8.589-30.951,21.882c0,14.214,15.947,21.884,30.951,21.884,18.803,0,30.951-8.589,30.951-21.884ZM560.27,85.632l-.006,32.654h-13.977v-8.867c-8.157,5.686-19.223,9.186-31.42,9.186-29.211,0-45.404-14.763-45.404-32.973s15.345-32.97,45.404-32.97,45.403,14.761,45.403,32.97ZM545.814,85.632c0-12.085-10.458-21.882-30.947-21.882s-30.952,9.797-30.952,21.882,11.041,21.882,30.952,21.882c17.091,0,30.947-9.797,30.947-21.882ZM414.936,52.826c-10.922,0-20.459,4.194-25.65,10.453-5.104-6.259-14.473-10.453-25.209-10.453-17.64,0-31.915,12.325-31.915,27.556v37.736h13.291v-36.14c0-10.068,8.307-18.229,18.552-18.229s18.552,8.161,18.552,18.229v36.141h13.572v-36.141c0-10.068,8.452-18.229,18.88-18.229s18.878,8.161,18.878,18.229v36.14h13.527v-37.736c0-15.231-14.527-27.556-32.48-27.556Z"/></svg></a>
-      <div class="sr-header-links">
-        <a href="#">Destinations</a>
-        <a href="#">Expériences</a>
-        <a href="#">Offres</a>
-        <a href="#">Fidélité</a>
-        <a href="#">Me connecter</a>
-      </div>
-    </div>
-    <div class="sr-booking">
-      <div class="sr-booking-field">
-        <span class="sr-booking-label">Destination</span>
-        <input type="text" id="sr-query" class="sr-booking-input" placeholder="Où allez-vous ?" autocomplete="off"/>
-      </div>
-      <div class="sr-booking-field">
-        <span class="sr-booking-label">Arrivée</span>
-        <span class="sr-booking-value sr-booking-value--placeholder" id="sr-checkin">Ajouter des dates</span>
-      </div>
-      <div class="sr-booking-field">
-        <span class="sr-booking-label">Départ</span>
-        <span class="sr-booking-value sr-booking-value--placeholder" id="sr-checkout">Ajouter des dates</span>
-      </div>
-      <div class="sr-booking-field" style="border-right:none;">
-        <span class="sr-booking-label">Voyageurs</span>
-        <span class="sr-booking-value sr-booking-value--placeholder">1 adulte, 1 chambre</span>
-      </div>
-      <button class="sr-booking-cta" id="sr-search-btn">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="7" stroke="currentColor" stroke-width="2.5"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-        Rechercher
-      </button>
-    </div>
-  </header>
+<!-- ===== EN-TÊTE COMPACT « RÉSULTATS » (logo + liens, sticky) ===== -->
+<header class="srx-topbar">
+  <a href="proto-pullman-v3-booking-wizard.html" class="srx-logo" aria-label="Pullman — accueil">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 688.581 178.328" aria-hidden="true"><path fill="#fff" d="M204.107,54.242h14.213v33.36c0,20.203-14.523,32.263-38.847,32.263s-38.841-12.06-38.841-32.263v-33.36h14.21v33.36c0,12.997,9.209,20.756,24.631,20.756s24.634-7.758,24.634-20.756v-33.36ZM245.217,118.286h14.204V27.972h-14.204v90.313ZM291.279,118.286h14.204V27.972h-14.204v90.313ZM621.762,52.661c-24.323,0-38.842,12.062-38.842,32.263v33.363h14.214v-33.363c0-13.191,8.978-20.757,24.628-20.757s24.635,7.566,24.635,20.757v65.435h14.211v-65.435c0-20.201-14.523-32.263-38.847-32.263ZM118.781,85.631c0,9.212-4.161,17.509-11.714,23.362-8.113,6.287-19.763,9.611-33.687,9.611-11.832,0-22.928-3.25-31.422-9.177v40.929h-13.985l.022-63.93c-.01-.265-.016-.53-.016-.795,0-15.209,11.89-32.97,45.401-32.97s45.401,17.761,45.401,32.97ZM104.331,85.631c0-13.293-12.149-21.882-30.951-21.882s-30.951,8.589-30.951,21.882c0,14.214,15.947,21.884,30.951,21.884,18.803,0,30.951-8.589,30.951-21.884ZM560.27,85.632l-.006,32.654h-13.977v-8.867c-8.157,5.686-19.223,9.186-31.42,9.186-29.211,0-45.404-14.763-45.404-32.973s15.345-32.97,45.404-32.97,45.403,14.761,45.403,32.97ZM545.814,85.632c0-12.085-10.458-21.882-30.947-21.882s-30.952,9.797-30.952,21.882,11.041,21.882,30.952,21.882c17.091,0,30.947-9.797,30.947-21.882ZM414.936,52.826c-10.922,0-20.459,4.194-25.65,10.453-5.104-6.259-14.473-10.453-25.209-10.453-17.64,0-31.915,12.325-31.915,27.556v37.736h13.291v-36.14c0-10.068,8.307-18.229,18.552-18.229s18.552,8.161,18.552,18.229v36.141h13.572v-36.141c0-10.068,8.452-18.229,18.88-18.229s18.878,8.161,18.878,18.229v36.14h13.527v-37.736c0-15.231-14.527-27.556-32.48-27.556Z"/></svg>
+  </a>
+  <nav class="srx-topbar-links" aria-label="Navigation principale">
+    <a href="#">Destinations</a>
+    <a href="#">Expériences</a>
+    <a href="#">Offres</a>
+    <a href="#">Fidélité</a>
+    <a href="#" class="srx-topbar-account">Me connecter</a>
+  </nav>
+</header>
 
-  <!-- FILTERS -->
-  <div class="sr-filters">
-    <button class="sr-filter" data-filter="all">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      Filtres
-    </button>
-    <button class="sr-filter" data-filter="spa">Spa & Bien-être</button>
-    <button class="sr-filter" data-filter="pool">Piscine</button>
-    <button class="sr-filter" data-filter="restaurant">Restaurant</button>
-    <button class="sr-filter" data-filter="rooftop">Rooftop</button>
-    <button class="sr-filter" data-filter="beach">Bord de mer</button>
-    <button class="sr-filter" data-filter="business">Business</button>
-    <button class="sr-filter-clear" id="sr-clear-filters">Effacer</button>
-    <div class="sr-sort">
-      Trier par
-      <select id="sr-sort">
-        <option value="relevance">Pertinence</option>
-        <option value="price-asc">Prix croissant</option>
-        <option value="price-desc">Prix décroissant</option>
-        <option value="stars">Étoiles</option>
+<!-- ===== BOOKING ENGINE V3 (pré-rempli depuis l'URL, recherche modifiable sur place) ===== -->
+<wd-booking cta="Rechercher" progressive></wd-booking>
+
+<!-- ===== RÉSULTATS ===== -->
+<main class="srx">
+  <div class="srx-head">
+    <div class="srx-head-main">
+      <nav class="srx-crumb" aria-label="Fil d'Ariane">
+        <a href="proto-pullman-v3-booking-wizard.html">Accueil</a>
+        <span aria-hidden="true">›</span>
+        <span class="srx-crumb-current">Résultats de recherche</span>
+      </nav>
+      <h1 class="srx-title" id="srx-title">&nbsp;</h1>
+      <p class="srx-sub" id="srx-sub"></p>
+    </div>
+    <label class="srx-sort">
+      <span>Trier par</span>
+      <select id="srx-sort">
+        <option value="pertinence">Pertinence</option>
+        <option value="prix">Prix croissant</option>
+        <option value="note">Note</option>
       </select>
-    </div>
+    </label>
   </div>
 
-  <!-- BODY (list + map) -->
-  <div class="sr-body">
-    <div class="sr-panel">
-      <div class="sr-sub">
-        <a href="brand-homepage.html" class="sr-back">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l6-6M5 12l6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Retour
-        </a>
-        <span class="sr-count" id="sr-meta"></span>
-      </div>
-      <div class="sr-list" id="sr-list"></div>
-    </div>
+  <section class="srx-list" id="srx-list" aria-live="polite"></section>
 
-    <div class="sr-map">
-      <div id="sr-map"></div>
-    </div>
-  </div>
-</div>
+  <aside class="srx-map-col">
+    <div class="srx-map" id="srx-map"></div>
+  </aside>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<wd-footer></wd-footer>
+
+<!-- ===== DISCOVERY MODAL (CTA « Laissez-vous guider » du booking) ===== -->
+<wd-discovery-modal></wd-discovery-modal>
+
+<style>
+/* ===== Page résultats — même langage que le booking V3 (sombre, Neue Power, sans radius) ===== */
+/* Pas de hero ici : on annule la marge négative du booking (prévue pour chevaucher le hero) */
+wd-booking { margin-top: 20px; }
+
+/* --- En-tête compact « résultats » : logo + liens, plus léger que le header d'accueil --- */
+.srx-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 18px 48px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+}
+.srx-logo { display: block; flex-shrink: 0; }
+.srx-logo svg { width: 104px; height: auto; display: block; }
+.srx-topbar-links { display: flex; align-items: center; gap: 26px; }
+.srx-topbar-links a {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--pul-muted, #D9E6D0);
+  text-decoration: none;
+  transition: color .15s;
+}
+.srx-topbar-links a:hover { color: #fff; }
+.srx-topbar-account {
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 100px;
+  padding: 8px 18px;
+  color: #fff !important;
+}
+.srx-topbar-account:hover { border-color: rgba(255,255,255,.55); }
+
+/* --- Fil d'Ariane : on est sur une page de résultats --- */
+.srx-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: .3px;
+  margin-bottom: 12px;
+}
+.srx-crumb a { color: var(--pul-muted, #D9E6D0); text-decoration: none; }
+.srx-crumb a:hover { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+.srx-crumb span[aria-hidden] { color: rgba(255,255,255,.3); }
+.srx-crumb-current { color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; font-size: 11px; }
+
+@media (max-width: 760px) {
+  .srx-topbar { padding: 14px 20px; gap: 16px; }
+  .srx-topbar-links { gap: 14px; }
+  .srx-topbar-links a:not(.srx-topbar-account) { display: none; }
+}
+
+.srx {
+  max-width: 1320px;
+  margin: 40px auto 120px;
+  padding: 0 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(440px, 1.15fr);
+  gap: 16px 28px;
+  align-items: start;
+}
+.srx-head { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 8px; }
+.srx-title { font-family: var(--font-serif); font-weight: 800; font-size: 32px; line-height: 1.05; text-transform: uppercase; color: #fff; margin: 0 0 8px; }
+.srx-title strong { color: var(--pul-highlight, #5FEF91); }
+.srx-sub { font-family: var(--font-sans); font-size: 14px; color: var(--pul-muted, #D9E6D0); margin: 0; }
+.srx-sort { display: flex; align-items: center; gap: 10px; font-family: var(--font-sans); font-size: 13px; color: var(--pul-muted, #D9E6D0); white-space: nowrap; }
+.srx-sort select { background: #28332B; color: #fff; border: 1px solid rgba(255,255,255,.15); border-radius: 0; padding: 9px 12px; font-family: var(--font-sans); font-size: 13px; cursor: pointer; }
+
+/* --- Cards --- */
+.srx-list { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.srx-card { display: flex; gap: 14px; background: #28332B; border: 1px solid rgba(255,255,255,.07); border-radius: 0; padding: 12px; transition: border-color .15s, transform .15s; }
+.srx-card:hover { border-color: rgba(255,255,255,.22); }
+.srx-card-img { flex: 0 0 160px; width: 160px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #1A2220; } /* 4:3 exact */
+.srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.srx-card-name { font-family: var(--font-sans); font-weight: 600; font-size: 16.5px; color: #fff; margin: 0 0 3px; }
+.srx-card-loc { font-family: var(--font-sans); font-size: 13px; color: var(--pul-muted, #D9E6D0); margin: 0 0 10px; }
+.srx-card-rating { flex-shrink: 0; text-align: right; font-family: var(--font-sans); }
+.srx-card-rating b { display: inline-block; background: var(--pul-bg, #445047); color: #fff; font-size: 13px; font-weight: 700; padding: 5px 8px; }
+.srx-card-rating span { display: block; font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; }
+.srx-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.srx-badge { font-family: var(--font-sans); font-size: 11.5px; font-weight: 500; color: #E8F5EC; background: rgba(95,239,145,.12); border: 1px solid rgba(95,239,145,.25); padding: 3px 9px; display: inline-flex; align-items: center; gap: 5px; }
+.srx-badge svg { width: 10px; height: 10px; }
+.srx-card-bottom { margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.srx-price { font-family: var(--font-sans); color: #fff; }
+.srx-price b { font-size: 19px; font-weight: 700; }
+.srx-price span { font-size: 12px; color: rgba(255,255,255,.5); }
+.srx-cta { font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-highlight, #5FEF91); text-decoration: none; }
+.srx-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Zéro résultat --- */
+.srx-empty { background: var(--pul-bg, #445047); border: 1px solid rgba(255,255,255,.12); padding: 20px; font-family: var(--font-sans); }
+.srx-empty h2 { font-family: var(--font-serif); font-weight: 800; font-size: 16px; text-transform: uppercase; color: #fff; margin: 0 0 8px; }
+.srx-empty p { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.75); margin: 0 0 14px; }
+.srx-empty p strong { color: #fff; }
+.srx-empty-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.srx-empty-relax { font-family: var(--font-sans); font-size: 13px; font-weight: 600; padding: 10px 18px; border: none; border-radius: 100px; background: #F0EDE6; color: #28332B; cursor: pointer; }
+.srx-empty-relax:hover { background: #fff; }
+.srx-empty-reset { font-family: var(--font-sans); font-size: 13px; color: rgba(255,255,255,.75); background: none; border: none; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.srx-empty-reset:hover { color: #fff; }
+
+/* --- Carte --- */
+.srx-map-col { position: sticky; top: 24px; }
+.srx-map { height: calc(100vh - 48px); min-height: 480px; border: 1px solid rgba(255,255,255,.1); background: #1A2220; }
+.srx-map .leaflet-container { background: #1A2220; }
+.srx-pin { width: 12px; height: 12px; background: var(--pul-highlight, #5FEF91); border-radius: 50%; border: 2px solid #1A2220; box-shadow: 0 0 6px rgba(95,239,145,.5); }
+.srx-pin-label { position: absolute; left: 16px; top: -3px; font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.9); white-space: nowrap; }
+.leaflet-popup-content-wrapper { background: #28332B; color: #fff; border-radius: 0; font-family: var(--font-sans); }
+.leaflet-popup-tip { background: #28332B; }
+
+@media (max-width: 980px) {
+  .srx { grid-template-columns: 1fr; }
+  .srx-map-col { position: static; }
+  .srx-map { height: 380px; min-height: 0; }
+}
+</style>
 
 <script>
-(function() {
-  var IMG_BASE = 'https://m.ahstatic.com/is/image/accorhotels/';
-  var ALL_HOTELS = [
-    { name: "Pullman Paris Montparnasse", loc: "Paris, France", lat: 48.8422, lng: 2.3219, stars: 4, price: 189, badge: "Nouveau", features: "Rooftop bar · Spa · Restaurant gastronomique", rating: 8.7, reviews: 1243, tags: ["business", "culture", "gastro"], imgs: [IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280"], pois: [{name:"Tour Montparnasse",icon:"🏙️",lat:48.8421,lng:2.3219},{name:"Jardin du Luxembourg",icon:"🌳",lat:48.8462,lng:2.3372},{name:"Catacombes de Paris",icon:"🏛️",lat:48.8338,lng:2.3324},{name:"Fondation Cartier",icon:"🎨",lat:48.8388,lng:2.3316}] },
-    { name: "Pullman Paris Tour Eiffel", loc: "Paris, France", lat: 48.8559, lng: 2.2930, stars: 5, price: 259, badge: "Rénové", features: "Vue Tour Eiffel · Spa · Restaurant", rating: 9.1, reviews: 2187, tags: ["romance", "luxury", "culture"], imgs: [IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"PullmanHeritageImage:6by5?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280"], pois: [{name:"Tour Eiffel",icon:"🗼",lat:48.8584,lng:2.2945},{name:"Trocadéro",icon:"🏛️",lat:48.8616,lng:2.2878},{name:"Musée du Quai Branly",icon:"🎨",lat:48.8609,lng:2.2976},{name:"Champ-de-Mars",icon:"🌳",lat:48.8556,lng:2.2986},{name:"Palais de Tokyo",icon:"🎭",lat:48.8638,lng:2.2981}] },
-    { name: "Pullman Paris Bercy", loc: "Paris, France", lat: 48.8396, lng: 2.3826, stars: 4, price: 175, features: "AccorArena · Piscine · Business center", rating: 8.3, reviews: 876, tags: ["business", "meeting"], imgs: [IMG_BASE+"aja_p_7258-60:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280",IMG_BASE+"aja_p_1029-36:1by1?wid=400&hei=280",IMG_BASE+"PullmanEvent:1by1?wid=400&hei=280"], pois: [{name:"AccorArena",icon:"🎵",lat:48.8388,lng:2.3786},{name:"Parc de Bercy",icon:"🌳",lat:48.8337,lng:2.3828},{name:"Cinémathèque française",icon:"🎬",lat:48.8335,lng:2.3817},{name:"Gare de Lyon",icon:"🚄",lat:48.8443,lng:2.3735}] },
-    { name: "Pullman Lyon Part-Dieu", loc: "Lyon, France", lat: 45.7602, lng: 4.8590, stars: 4, price: 159, features: "Gare Part-Dieu · Restaurant · Fitness", rating: 8.5, reviews: 654, tags: ["business", "gastro"], imgs: [IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280"], pois: [{name:"Parc de la Tête d'Or",icon:"🌳",lat:45.7740,lng:4.8555},{name:"Les Halles de Lyon",icon:"🍽️",lat:45.7630,lng:4.8559},{name:"Musée des Beaux-Arts",icon:"🎨",lat:45.7669,lng:4.8339}] },
-    { name: "Pullman Lyon Centre", loc: "Lyon, France", lat: 45.7640, lng: 4.8357, stars: 4, price: 169, features: "Presqu'île · Bar lounge · Spa", rating: 8.8, reviews: 432, tags: ["gastro", "culture", "wellness"], imgs: [IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280"], pois: [{name:"Place Bellecour",icon:"🏛️",lat:45.7578,lng:4.8320},{name:"Vieux Lyon",icon:"🏘️",lat:45.7622,lng:4.8268},{name:"Théâtre des Célestins",icon:"🎭",lat:45.7597,lng:4.8351},{name:"Opéra de Lyon",icon:"🎵",lat:45.7677,lng:4.8368}] },
-    { name: "Pullman Marseille Provence", loc: "Marseille, France", lat: 43.4370, lng: 5.2148, stars: 4, price: 145, features: "Aéroport · Piscine extérieure · Restaurant", rating: 8.1, reviews: 398, tags: ["beach", "gastro", "family"], imgs: [IMG_BASE+"aja_p_1029-36:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280",IMG_BASE+"aja_p_7258-60:1by1?wid=400&hei=280",IMG_BASE+"PullmanEvent:1by1?wid=400&hei=280"], pois: [{name:"Calanques",icon:"🏖️",lat:43.2100,lng:5.4500},{name:"Vieux-Port",icon:"⛵",lat:43.2951,lng:5.3740},{name:"Notre-Dame de la Garde",icon:"⛪",lat:43.2838,lng:5.3714}] },
-    { name: "Pullman Marrakech Palmeraie", loc: "Marrakech, Maroc", lat: 31.6690, lng: -7.9811, stars: 5, price: 179, badge: "Populaire", features: "Golf · Piscine · Spa · Jardins", rating: 9.0, reviews: 1567, tags: ["wellness", "romance", "luxury", "meeting"], imgs: [IMG_BASE+"aja_p_0795-31:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280"], pois: [{name:"Palmeraie",icon:"🌴",lat:31.6750,lng:-7.9750},{name:"Jardin Majorelle",icon:"🌺",lat:31.6416,lng:-8.0032},{name:"Médina",icon:"🕌",lat:31.6295,lng:-7.9811},{name:"Place Jemaa el-Fna",icon:"🎪",lat:31.6258,lng:-7.9891}] },
-    { name: "Pullman London St Pancras", loc: "Londres, Royaume-Uni", lat: 51.5305, lng: -0.1240, stars: 5, price: 289, features: "King's Cross · Restaurant · Bar cocktails", rating: 9.2, reviews: 1890, tags: ["business", "culture", "luxury"], imgs: [IMG_BASE+"PullmanHeritageImage:6by5?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280"], pois: [{name:"British Museum",icon:"🏛️",lat:51.5194,lng:-0.1270},{name:"King's Cross Station",icon:"🚄",lat:51.5320,lng:-0.1240},{name:"Regent's Park",icon:"🌳",lat:51.5313,lng:-0.1570},{name:"Camden Market",icon:"🛍️",lat:51.5414,lng:-0.1469}] },
-    { name: "Pullman Barcelona Skipper", loc: "Barcelone, Espagne", lat: 41.3851, lng: 2.1994, stars: 5, price: 219, features: "Front de mer · Piscine · Rooftop", rating: 8.9, reviews: 1102, tags: ["beach", "gastro", "romance"], imgs: [IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"aja_p_0795-31:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280"], pois: [{name:"Sagrada Família",icon:"⛪",lat:41.4036,lng:2.1744},{name:"La Barceloneta",icon:"🏖️",lat:41.3785,lng:2.1892},{name:"Parc de la Ciutadella",icon:"🌳",lat:41.3879,lng:2.1860},{name:"Museu Picasso",icon:"🎨",lat:41.3851,lng:2.1808}] },
-    { name: "Pullman Dubai Creek City Centre", loc: "Dubaï, EAU", lat: 25.2532, lng: 55.3320, stars: 5, price: 199, badge: "Nouveau", features: "Creek views · Piscine · Spa · Restaurant", rating: 8.6, reviews: 743, tags: ["luxury", "business", "family"], imgs: [IMG_BASE+"6556-1:1by1?wid=400&hei=280",IMG_BASE+"aja_p_7258-60:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280"], pois: [{name:"Dubai Creek",icon:"⛵",lat:25.2560,lng:55.3290},{name:"Gold Souk",icon:"🛍️",lat:25.2867,lng:55.2969},{name:"Dubai Museum",icon:"🏛️",lat:25.2634,lng:55.2975},{name:"Burj Khalifa",icon:"🏙️",lat:25.1972,lng:55.2744}] },
-    { name: "Pullman Singapore Orchard", loc: "Singapour", lat: 1.3048, lng: 103.8318, stars: 5, price: 229, features: "Orchard Road · Piscine · Fitness 24h", rating: 8.8, reviews: 921, tags: ["business", "luxury", "culture"], imgs: [IMG_BASE+"HCM_P_4528724:1by1?wid=400&hei=280",IMG_BASE+"PullmanHeritageImage:6by5?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280"], pois: [{name:"Orchard Road",icon:"🛍️",lat:1.3048,lng:103.8320},{name:"Botanic Gardens",icon:"🌺",lat:1.3138,lng:103.8159},{name:"National Museum",icon:"🏛️",lat:1.2966,lng:103.8485},{name:"Marina Bay Sands",icon:"🏙️",lat:1.2834,lng:103.8607}] },
-    { name: "Pullman Nice Côte d'Azur", loc: "Nice, France", lat: 43.6653, lng: 7.2150, stars: 4, price: 185, features: "Promenade des Anglais · Piscine · Spa", rating: 8.4, reviews: 567, tags: ["beach", "wellness", "romance"], imgs: [IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"aja_p_1029-36:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280"], pois: [{name:"Promenade des Anglais",icon:"🌊",lat:43.6943,lng:7.2562},{name:"Vieille Ville",icon:"🏘️",lat:43.6970,lng:7.2758},{name:"Musée Matisse",icon:"🎨",lat:43.7196,lng:7.2767},{name:"Colline du Château",icon:"🏛️",lat:43.6952,lng:7.2815}] },
-    { name: "Pullman Bordeaux Lac", loc: "Bordeaux, France", lat: 44.8799, lng: -0.5640, stars: 4, price: 155, features: "Parc des expositions · Restaurant · Bar", rating: 8.2, reviews: 389, tags: ["gastro", "culture", "eco"], imgs: [IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6409-72:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280",IMG_BASE+"aja_p_7258-60:1by1?wid=400&hei=280"], pois: [{name:"Cité du Vin",icon:"🍷",lat:44.8625,lng:-0.5507},{name:"Place de la Bourse",icon:"🏛️",lat:44.8412,lng:-0.5696},{name:"Jardin Public",icon:"🌳",lat:44.8500,lng:-0.5778},{name:"Grand Théâtre",icon:"🎭",lat:44.8428,lng:-0.5740}] },
-    { name: "Pullman Bangkok Hotel G", loc: "Bangkok, Thaïlande", lat: 13.7248, lng: 100.5170, stars: 5, price: 139, features: "Silom · Rooftop pool · Sky bar", rating: 8.7, reviews: 1456, tags: ["culture", "gastro", "family"], imgs: [IMG_BASE+"aja_p_7258-60:1by1?wid=400&hei=280",IMG_BASE+"aja_p_0795-31:1by1?wid=400&hei=280",IMG_BASE+"6556-1:1by1?wid=400&hei=280",IMG_BASE+"PullmanHeritageImage:6by5?wid=400&hei=280"], pois: [{name:"Wat Pho",icon:"🕌",lat:13.7468,lng:100.4927},{name:"Grand Palace",icon:"🏛️",lat:13.7500,lng:100.4913},{name:"Chinatown",icon:"🏮",lat:13.7411,lng:100.5102},{name:"Lumphini Park",icon:"🌳",lat:13.7308,lng:100.5418}] },
-    { name: "Pullman Bali Legian Beach", loc: "Bali, Indonésie", lat: -8.7055, lng: 115.1700, stars: 5, price: 159, features: "Plage privée · Piscine · Spa balinais", rating: 9.0, reviews: 2034, tags: ["beach", "wellness", "romance", "family"], imgs: [IMG_BASE+"aja_p_6935-96:1by1?wid=400&hei=280",IMG_BASE+"aja_p_0795-31:1by1?wid=400&hei=280",IMG_BASE+"aja_p_1029-36:1by1?wid=400&hei=280",IMG_BASE+"pullman-dinner-2:1by1?wid=400&hei=280"], pois: [{name:"Legian Beach",icon:"🏖️",lat:-8.7035,lng:115.1680},{name:"Tanah Lot Temple",icon:"🕌",lat:-8.6213,lng:115.0868},{name:"Seminyak",icon:"🛍️",lat:-8.6910,lng:115.1589},{name:"Potato Head Beach Club",icon:"🍹",lat:-8.6866,lng:115.1558}] },
-    { name: "Pullman Tokyo Tamachi", loc: "Tokyo, Japon", lat: 35.6453, lng: 139.7479, stars: 5, price: 249, features: "Shinagawa · Restaurant japonais · Fitness", rating: 9.1, reviews: 876, tags: ["business", "culture", "luxury"], imgs: [IMG_BASE+"PullmanEvent:1by1?wid=400&hei=280",IMG_BASE+"HCM_P_4528724:1by1?wid=400&hei=280",IMG_BASE+"aja_p_6783-26:1by1?wid=400&hei=280",IMG_BASE+"Pullman-bar:1by1?wid=400&hei=280"], pois: [{name:"Tokyo Tower",icon:"🗼",lat:35.6586,lng:139.7454},{name:"Zojo-ji Temple",icon:"🕌",lat:35.6579,lng:139.7517},{name:"Hama-rikyu Gardens",icon:"🌳",lat:35.6596,lng:139.7636},{name:"Shinagawa Aquarium",icon:"🐠",lat:35.6089,lng:139.7332}] },
-  ];
+(function () {
+  const P = new URLSearchParams(location.search);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const hash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
 
-  var THEME_LABELS = { wellness: "Bien-être & spa", gastro: "Gastronomie", family: "En famille", business: "Business", romance: "Romantique", culture: "Culture", eco: "Éco-responsable", meeting: "Séminaire", beach: "Plage", luxury: "Luxe" };
-
-  var params = new URLSearchParams(window.location.search);
-  var query = params.get('q') || params.get('dest') || '';
-  var theme = params.get('theme') || '';
-  var inputEl = document.getElementById('sr-query');
-  inputEl.value = query;
-
-  var normalize = function(s) { return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); };
-
-  var KEYWORD_TO_TAG = {piscine:'beach',spa:'wellness',detente:'wellness',romantique:'romance',famille:'family',business:'business',gastronomie:'gastro',restaurant:'gastro',culture:'culture',plage:'beach',rooftop:'luxury',luxe:'luxury'};
-
-  var FILTER_CONFIG = {
-    spa:        { tags:['wellness'], keywords:['spa','bien-être','wellness'] },
-    pool:       { tags:['beach'],    keywords:['piscine','pool'] },
-    restaurant: { tags:['gastro'],   keywords:['restaurant','gastronomique','gastronomie'] },
-    rooftop:    { tags:['luxury'],   keywords:['rooftop','sky bar','bar'] },
-    beach:      { tags:['beach'],    keywords:['mer','plage','beach','front de mer'] },
-    business:   { tags:['business','meeting'], keywords:['business','center','séminaire','meeting'] }
+  // Coordonnées approximatives par pays (repli quand l'hôtel n'est pas dans le jeu carte)
+  const COUNTRY_COORDS = {
+    'France':[46.6,2.4],'Allemagne':[51.1,10.4],'Royaume-Uni':[52.6,-1.5],'Espagne':[40.3,-3.7],'Belgique':[50.6,4.5],
+    'Pays-Bas':[52.2,5.5],'Suisse':[46.8,8.2],'Croatie':[45.5,16],'Géorgie':[42,43.5],'Hongrie':[47.2,19.4],
+    'Lettonie':[56.9,24.6],'Roumanie':[45.9,25],'Bulgarie':[42.7,25.3],'Turquie':[39,35],
+    'Chine':[34,104],'Corée du Sud':[36.3,127.8],'Inde':[21,78.5],'Indonésie':[-2.5,118],'Japon':[36.5,138.5],
+    'Malaisie':[3.9,102],'Maldives':[3.2,73.2],'Thaïlande':[15.5,101],'Vietnam':[16,107.5],'Laos':[18,103.8],'Singapour':[1.35,103.82],
+    'EAU':[24,54.4],'Arabie Saoudite':[24,45],'Qatar':[25.3,51.2],
+    'Maroc':[31.8,-6.5],'Afrique du Sud':[-29,25],"Côte d'Ivoire":[7.5,-5.5],'Kenya':[0.2,37.9],'RD Congo':[-3,23],'Sénégal':[14.5,-14.5],
+    'Argentine':[-34.6,-64],'Brésil':[-14,-52],'Chili':[-33.5,-70.8],'Pérou':[-9.2,-75],'États-Unis':[30.5,-84],
+    'Australie':[-25.7,134],'Nouvelle-Zélande':[-41.5,172.8]
   };
-  var activeFilters = [];
 
-  function filterHotels(q, t) {
-    var results = ALL_HOTELS.slice();
-    if (t) results = results.filter(function(h) { return h.tags && h.tags.indexOf(t) >= 0; });
-    if (q && q.trim()) {
-      var ql = normalize(q);
-      var matchedTag = null;
-      Object.keys(KEYWORD_TO_TAG).forEach(function(kw) { if (ql.includes(kw)) matchedTag = KEYWORD_TO_TAG[kw]; });
-      results = results.filter(function(h) {
-        if (normalize(h.name).includes(ql) || normalize(h.loc).includes(ql)) return true;
-        if (normalize(h.features || '').includes(ql)) return true;
-        if (matchedTag && h.tags && h.tags.indexOf(matchedTag) >= 0) return true;
-        var words = ql.split(/\s+/);
-        for (var i = 0; i < words.length; i++) {
-          if (words[i].length < 3) continue;
-          if (normalize(h.features || '').includes(words[i])) return true;
-          var wTag = KEYWORD_TO_TAG[words[i]];
-          if (wTag && h.tags && h.tags.indexOf(wTag) >= 0) return true;
-        }
-        return false;
-      });
+  function ready(retries) {
+    if (!window.WD_SEARCH_DATA) { if (retries > 0) setTimeout(() => ready(retries - 1), 100); return; }
+    init(window.WD_SEARCH_DATA);
+  }
+
+  function init(D) {
+    // ---- 1. Périmètre géographique (même sémantique que le dropdown) ----
+    const cont = P.get('continent');
+    let pool, scopeLabel = '';
+    if (cont && cont !== 'all') {
+      const r = D.regions.find(r => r.id === cont);
+      pool = r ? r.hotels.slice() : [];
+      scopeLabel = r ? r.label : '';
+    } else {
+      pool = D.regions.flatMap(r => r.hotels);
+      if (cont === 'all') scopeLabel = 'Tous les continents';
     }
-    // Apply category filters
-    if (activeFilters.length) {
-      results = results.filter(function(h) {
-        return activeFilters.every(function(f) {
-          var cfg = FILTER_CONFIG[f];
-          if (!cfg) return true;
-          var hasTag = cfg.tags.some(function(tag) { return h.tags && h.tags.indexOf(tag) >= 0; });
-          var hasKw = cfg.keywords.some(function(kw) { return normalize(h.features || '').includes(kw); });
-          return hasTag || hasKw;
-        });
-      });
+    const country = P.get('country');
+    if (country) { pool = pool.filter(h => h.country === country); scopeLabel = country; }
+    const city = P.get('city');
+    if (city) { pool = pool.filter(h => h.loc.split(',')[0].trim() === city); scopeLabel = city; }
+    const hotelName = P.get('hotel');
+    if (hotelName) { pool = pool.filter(h => h.name === hotelName); scopeLabel = hotelName; }
+    const q = (P.get('q') || '').trim();
+    if (q) {
+      const lq = q.toLowerCase();
+      pool = pool.filter(h => h.name.toLowerCase().includes(lq) || h.loc.toLowerCase().includes(lq));
+      if (!scopeLabel) scopeLabel = '« ' + q + ' »';
     }
-    return results;
-  }
+    if (!scopeLabel) scopeLabel = 'Toutes nos destinations';
 
-  function highlightFeatures(featuresStr) {
-    if (!activeFilters.length || !featuresStr) return featuresStr;
-    var parts = featuresStr.split(' · ');
-    return parts.map(function(part) {
-      var norm = normalize(part);
-      var match = activeFilters.some(function(f) {
-        var cfg = FILTER_CONFIG[f];
-        return cfg && cfg.keywords.some(function(kw) { return norm.includes(normalize(kw)); });
-      });
-      return match ? '<strong>' + part + '</strong>' : part;
-    }).join(' · ');
-  }
-
-  function sortHotels(list, key) {
-    var sorted = list.slice();
-    if (key === 'price-asc') sorted.sort(function(a,b) { return a.price - b.price; });
-    else if (key === 'price-desc') sorted.sort(function(a,b) { return b.price - a.price; });
-    else if (key === 'stars') sorted.sort(function(a,b) { return b.stars - a.stars || b.rating - a.rating; });
-    return sorted;
-  }
-
-  /* ── MAP INIT ── */
-  var map = L.map('sr-map', { zoomControl: false }).setView([46.5, 2.5], 5);
-  L.control.zoom({ position: 'topright' }).addTo(map);
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-    maxZoom: 19
-  }).addTo(map);
-
-  var markers = [];
-  var activeIdx = -1;
-  var lockedIdx = -1;
-  var globalBounds = null;
-  var poiLayer = L.layerGroup().addTo(map);
-  var currentHotels = [];
-
-  function showPOIs(idx) {
-    poiLayer.clearLayers();
-    var h = currentHotels[idx];
-    if (!h || !h.pois) return;
-    h.pois.forEach(function(poi) {
-      var html = '<div class="sr-poi"><span class="sr-poi-dot"></span>' + poi.name + '</div>';
-      var icon = L.divIcon({ className:'', html:html, iconSize:null, iconAnchor:[12,12] });
-      L.marker([poi.lat, poi.lng], { icon: icon, interactive: true }).addTo(poiLayer);
+    // ---- 2. Critères (même matching que le dropdown : mapping critère -> services) ----
+    const critIds = (P.get('criteria') || '').split(',').filter(Boolean);
+    const matches = (h, ids) => ids.every(id => {
+      const svcs = D.criteriaToServices[id];
+      if (!svcs || !svcs.length) return true;
+      return h.services && svcs.some(s => h.services.includes(s));
     });
-  }
-  function hidePOIs() { poiLayer.clearLayers(); }
+    let results = pool.filter(h => matches(h, critIds));
 
-  function centerOnHotel(lat, lng) {
-    map.flyTo([lat, lng], 15, {animate: true, duration: 0.8});
-  }
+    const critList = (D.criteriaGroups.hotels || []).flatMap(g => g.items);
+    const labelFor = (id) => (critList.find(c => c.id === id) || {}).label || id;
 
-  function createMarkerIcon(price, active) {
-    return L.divIcon({
-      className: '',
-      html: '<div class="sr-marker' + (active ? ' sr-marker--active' : '') + '">' + price + ' €</div>',
-      iconSize: null,
-      iconAnchor: [30, 15],
-      popupAnchor: [0, -18]
-    });
-  }
+    // ---- 3. Enrichissement déterministe (prix / note / avis — proto) ----
+    results = results.map(h => ({
+      ...h,
+      price: 129 + hash(h.name) % 170,
+      rating: ((79 + hash(h.name) % 17) / 10).toFixed(1),
+      reviews: 150 + hash(h.name) % 1900
+    }));
 
-  function setActive(idx) {
-    if (activeIdx === idx) return;
-    if (activeIdx >= 0 && markers[activeIdx]) {
-      markers[activeIdx].setIcon(createMarkerIcon(markers[activeIdx]._price, false));
-      var prev = document.querySelector('.sr-card[data-idx="' + activeIdx + '"]');
-      if (prev) prev.classList.remove('sr-card--active');
-    }
-    activeIdx = idx;
-    if (idx >= 0 && markers[idx]) {
-      markers[idx].setIcon(createMarkerIcon(markers[idx]._price, true));
-      var card = document.querySelector('.sr-card[data-idx="' + idx + '"]');
-      if (card) { card.classList.add('sr-card--active'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-    }
-  }
+    // ---- 4. En-tête ----
+    const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
+    const subParts = [];
+    if (critIds.length) subParts.push(critIds.map(labelFor).join(', '));
+    if (P.get('checkin') && P.get('checkout')) subParts.push(fmtDay(P.get('checkin')) + ' – ' + fmtDay(P.get('checkout')) + (P.get('flex') ? ' · ±' + P.get('flex') + 'j' : ''));
+    else if (P.get('checkin')) subParts.push('dès le ' + fmtDay(P.get('checkin')));
+    subParts.push('1 personne, 1 chambre');
+    document.getElementById('srx-title').innerHTML = '<strong>' + results.length + '</strong> hôtel' + (results.length > 1 ? 's' : '') + ' — ' + esc(scopeLabel);
+    document.getElementById('srx-sub').textContent = subParts.join('  ·  ');
+    document.title = results.length + ' hôtel' + (results.length > 1 ? 's' : '') + ' — ' + scopeLabel + ' — Pullman';
 
-  function clearActive() {
-    if (activeIdx >= 0) {
-      if (markers[activeIdx]) markers[activeIdx].setIcon(createMarkerIcon(markers[activeIdx]._price, false));
-      var prev = document.querySelector('.sr-card[data-idx="' + activeIdx + '"]');
-      if (prev) prev.classList.remove('sr-card--active');
-      activeIdx = -1;
-    }
-  }
-
-  function render(hotels) {
-    var listEl = document.getElementById('sr-list');
-    var metaEl = document.getElementById('sr-meta');
-    var label = '';
-    if (theme && THEME_LABELS[theme]) label += THEME_LABELS[theme];
-    if (query) label += (label ? ' à ' : '') + query;
-    metaEl.textContent = hotels.length + ' hôtel' + (hotels.length > 1 ? 's' : '') + (label ? ' · ' + label : '');
-
-    markers.forEach(function(m) { map.removeLayer(m); });
-    markers = [];
-    activeIdx = -1;
-    lockedIdx = -1;
-    hidePOIs();
-    currentHotels = hotels;
-
-    if (!hotels.length) {
-      listEl.innerHTML = '<div class="sr-empty"><div class="sr-empty-icon">🔍</div><div class="sr-empty-title">Aucun hôtel trouvé</div><div class="sr-empty-text">Essayez une autre destination ou modifiez vos critères de recherche.</div></div>';
-      return;
-    }
-
-    listEl.innerHTML = hotels.map(function(h, i) {
-      var starsHtml = '';
-      for (var s = 0; s < h.stars; s++) starsHtml += '★';
-      var imgs = h.imgs || [h.img];
-      var dotsHtml = imgs.length > 1 ? '<div class="sr-card-carousel-dots">' + imgs.map(function(_, di) { return '<span class="sr-card-carousel-dot' + (di === 0 ? ' sr-card-carousel-dot--active' : '') + '"></span>'; }).join('') + '</div>' : '';
-      var detailHref = 'hotel-detail.html?hotel=' + encodeURIComponent(h.name);
-      var detailHref = 'hotel-detail.html?hotel=' + encodeURIComponent(h.name);
-      return '<div class="sr-card" data-idx="' + i + '">' +
-        '<div class="sr-card-carousel" data-imgs=\'' + JSON.stringify(imgs) + '\' data-ci="0">' +
-          '<img class="sr-card-img" src="' + imgs[0] + '" alt="' + h.name + '" loading="lazy"/>' +
-          (imgs.length > 1 ? '<button class="sr-card-carousel-btn sr-card-carousel-btn--prev" type="button">&lsaquo;</button><button class="sr-card-carousel-btn sr-card-carousel-btn--next" type="button">&rsaquo;</button>' : '') +
-          dotsHtml +
-        '</div>' +
-        '<div class="sr-card-body">' +
-          (h.badge ? '<span class="sr-card-badge">' + h.badge + '</span>' : '') +
-          '<div class="sr-card-top"><span class="sr-card-name">' + h.name + '</span><span class="sr-card-stars">' + starsHtml + '</span></div>' +
-          '<span class="sr-card-loc">' + h.loc + '</span>' +
-          (h.features ? '<span class="sr-card-features">' + highlightFeatures(h.features) + '</span>' : '') +
-          '<div class="sr-card-bottom">' +
-            '<div><span class="sr-card-price">' + h.price + ' €</span> <span class="sr-card-price-unit">/ nuit</span></div>' +
-            (h.rating ? '<div class="sr-card-rating"><span class="sr-card-rating-score">' + h.rating.toFixed(1) + '</span><span class="sr-card-rating-label">(' + h.reviews + ' avis)</span></div>' : '') +
-          '</div>' +
-          '<a class="sr-card-cta" href="' + detailHref + '">Voir la fiche &rarr;</a>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-
-    hotels.forEach(function(h, i) {
-      var marker = L.marker([h.lat, h.lng], { icon: createMarkerIcon(h.price, false) }).addTo(map);
-      marker._price = h.price;
-
-      var popImgs = h.imgs || [h.img];
-      var popDotsHtml = popImgs.length > 1 ? '<div class="sr-popup-carousel-dots">' + popImgs.map(function(_, di) { return '<span class="sr-popup-carousel-dot' + (di === 0 ? ' sr-popup-carousel-dot--active' : '') + '"></span>'; }).join('') + '</div>' : '';
-      marker.bindPopup(
-        '<div class="sr-popup">' +
-          '<div class="sr-popup-carousel" data-imgs=\'' + JSON.stringify(popImgs) + '\' data-ci="0">' +
-            '<img src="' + popImgs[0] + '" alt="' + h.name + '"/>' +
-            '<button class="sr-popup-fav" type="button"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>' +
-            (popImgs.length > 1 ? '<button class="sr-popup-carousel-btn sr-popup-carousel-btn--prev" type="button">&lsaquo;</button><button class="sr-popup-carousel-btn sr-popup-carousel-btn--next" type="button">&rsaquo;</button>' : '') +
-            popDotsHtml +
-          '</div>' +
-          '<div class="sr-popup-body">' +
-            '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
-              '<span class="sr-popup-name">' + h.name + '</span>' +
-              (h.rating ? '<span style="font-size:12px;font-weight:700">&#9733; ' + h.rating.toFixed(1) + ' <span style="font-weight:400;color:#717171">(' + h.reviews + ')</span></span>' : '') +
+    // ---- 5. Liste ----
+    const listEl = document.getElementById('srx-list');
+    const check = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
+    const renderList = (items) => {
+      if (!items.length) { renderEmpty(); return; }
+      listEl.innerHTML = items.map(h => {
+        const imgKey = h.img && h.img.includes(':') ? h.img : (h.img || 'aja_p_6783-26') + ':1by1';
+        const badges = critIds.map(id => '<span class="srx-badge">' + check + esc(labelFor(id)) + '</span>').join('');
+        return '<article class="srx-card" data-hotel="' + esc(h.name) + '">' +
+          '<img class="srx-card-img" src="' + D.imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=300" alt="' + esc(h.name) + '" loading="lazy"/>' +
+          '<div class="srx-card-body">' +
+            '<div class="srx-card-top"><div>' +
+              '<h3 class="srx-card-name">' + esc(h.name) + '</h3>' +
+              '<p class="srx-card-loc">' + esc(h.loc) + '</p>' +
             '</div>' +
-            '<span class="sr-popup-loc">' + h.loc + '</span>' +
-            (h.features ? '<span style="font-size:11px;color:#999;margin:2px 0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden">' + h.features + '</span>' : '') +
-            '<span class="sr-popup-price">' + h.price + ' € <span>/ nuit</span></span>' +
-          '</div>' +
-        '</div>',
-        { closeButton: false, maxWidth: 280, minWidth: 260, offset: [0, -5], className: 'sr-popup-wrap' }
-      );
+            '<div class="srx-card-rating"><b>' + h.rating + '</b><span>' + h.reviews + ' avis</span></div></div>' +
+            (badges ? '<div class="srx-badges">' + badges + '</div>' : '') +
+            '<div class="srx-card-bottom">' +
+              '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>' +
+              '<a class="srx-cta" href="' + esc(h.href || '#') + '"' + (h.href ? ' target="_blank" rel="noopener"' : '') + '>Voir l’hôtel →</a>' +
+            '</div>' +
+          '</div></article>';
+      }).join('');
+    };
 
-      marker.on('mouseover', function() {
-        setActive(i);
+    // ---- 6. Zéro résultat : suggestion de relâchement (même logique que le dropdown) ----
+    function renderEmpty() {
+      let best = null;
+      critIds.forEach(id => {
+        const reduced = critIds.filter(x => x !== id);
+        const m = pool.filter(h => matches(h, reduced));
+        if (m.length && (!best || m.length > best.count)) best = { id, label: labelFor(id), count: m.length };
       });
-      marker.on('mouseout', function() {
-        if (lockedIdx < 0) { clearActive(); }
-      });
-      marker.on('click', function() {
-        if (lockedIdx === i) { lockedIdx = -1; hidePOIs(); clearActive(); if (globalBounds) map.fitBounds(globalBounds, {animate:true, maxZoom: 13}); }
-        else { lockedIdx = i; setActive(i); centerOnHotel(h.lat, h.lng); showPOIs(i); markers[i].openPopup(); }
-      });
-      markers.push(marker);
-    });
-
-    if (hotels.length) {
-      globalBounds = L.featureGroup(markers).getBounds().pad(0.3);
-      map.fitBounds(globalBounds, { maxZoom: 13 });
-    }
-
-    listEl.querySelectorAll('.sr-card').forEach(function(card) {
-      var idx = parseInt(card.dataset.idx);
-      card.addEventListener('mouseenter', function() {
-        setActive(idx);
-      });
-      card.addEventListener('mouseleave', function() {
-        if (lockedIdx < 0) { clearActive(); }
-      });
-      card.addEventListener('click', function(e) {
-        if (e.target.closest('.sr-card-carousel-btn') || e.target.closest('.sr-card-cta')) return;
-        if (lockedIdx === idx) { lockedIdx = -1; hidePOIs(); clearActive(); if (globalBounds) map.fitBounds(globalBounds, {animate:true, maxZoom: 13}); }
-        else { lockedIdx = idx; setActive(idx); centerOnHotel(hotels[idx].lat, hotels[idx].lng); showPOIs(idx); if (markers[idx]) markers[idx].openPopup(); }
-      });
-      card.querySelectorAll('.sr-card-carousel-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          var carousel = btn.closest('.sr-card-carousel');
-          var imgs = JSON.parse(carousel.dataset.imgs);
-          var ci = parseInt(carousel.dataset.ci) || 0;
-          if (btn.classList.contains('sr-card-carousel-btn--next')) { ci = (ci + 1) % imgs.length; }
-          else { ci = (ci - 1 + imgs.length) % imgs.length; }
-          carousel.dataset.ci = ci;
-          carousel.querySelector('.sr-card-img').src = imgs[ci];
-          var dots = carousel.querySelectorAll('.sr-card-carousel-dot');
-          dots.forEach(function(d, di) { d.classList.toggle('sr-card-carousel-dot--active', di === ci); });
-        });
-      });
-    });
-  }
-
-  var currentSort = 'relevance';
-  function refresh() {
-    var filtered = filterHotels(inputEl.value, theme);
-    render(sortHotels(filtered, currentSort));
-  }
-
-  refresh();
-
-  inputEl.addEventListener('input', function() {
-    query = inputEl.value;
-    refresh();
-  });
-
-  document.getElementById('sr-sort').addEventListener('change', function(e) {
-    currentSort = e.target.value;
-    refresh();
-  });
-
-  document.getElementById('sr-search-btn').addEventListener('click', function() {
-    query = inputEl.value;
-    refresh();
-  });
-
-  /* Auto-activate filter from theme param */
-  var THEME_TO_FILTER = { wellness:'spa', gastro:'restaurant', beach:'beach', business:'business', romance:null, family:null, culture:null, luxury:'rooftop', meeting:'business' };
-  if (theme && THEME_TO_FILTER[theme]) {
-    var autoFilter = THEME_TO_FILTER[theme];
-    if (activeFilters.indexOf(autoFilter) < 0) {
-      activeFilters.push(autoFilter);
-      var autoBtn = document.querySelector('[data-filter="' + autoFilter + '"]');
-      if (autoBtn) autoBtn.classList.add('sr-filter--active');
-    }
-  }
-
-  /* Auto-activate filters from tags param (passed from booking engine) */
-  var TAG_TO_FILTER = {
-    'Spa':'spa', 'Piscine':'pool', 'Hammam':'spa', 'Massage':'spa', 'Bien-etre':'spa',
-    'Restaurant':'restaurant', 'Bar':'rooftop', 'Rooftop':'rooftop', 'Brunch':'restaurant',
-    'Cave a vins':'restaurant', 'Plage':'beach', 'Business center':'business',
-    'Coworking':'business', 'Salle de reunion':'business', 'Wi-Fi haut debit':'business',
-    'Kids club':'pool', 'Suite familiale':'spa', 'Vue panoramique':'rooftop'
-  };
-  var tagsParam = params.get('tags');
-  if (tagsParam) {
-    tagsParam.split(',').forEach(function(rawTag) {
-      var tag = decodeURIComponent(rawTag.trim());
-      var mapped = TAG_TO_FILTER[tag];
-      if (mapped && activeFilters.indexOf(mapped) < 0) {
-        activeFilters.push(mapped);
-        var btn = document.querySelector('[data-filter="' + mapped + '"]');
-        if (btn) btn.classList.add('sr-filter--active');
+      const urlWithout = (removeId) => {
+        const np = new URLSearchParams(location.search);
+        const rest = critIds.filter(x => x !== removeId);
+        if (removeId === null || !rest.length) np.delete('criteria'); else np.set('criteria', rest.join(','));
+        return location.pathname + '?' + np.toString();
+      };
+      let inner = '<h2>Aucun hôtel ne correspond à tous vos critères</h2>';
+      if (best) {
+        inner += '<p>En retirant <strong>« ' + esc(best.label) + ' »</strong>, <strong>' + best.count + ' hôtel' + (best.count > 1 ? 's' : '') + '</strong> correspond' + (best.count > 1 ? 'raient' : 'rait') + '.</p>' +
+          '<div class="srx-empty-actions">' +
+          '<button type="button" class="srx-empty-relax" onclick="location.href=\'' + urlWithout(best.id) + '\'">Retirer « ' + esc(best.label) + ' »</button>' +
+          '<button type="button" class="srx-empty-reset" onclick="location.href=\'' + urlWithout(null) + '\'">Réinitialiser les critères</button></div>';
+      } else {
+        inner += '<p>Essayez d’élargir la destination ou de modifier vos critères dans la barre de recherche ci-dessus.</p>' +
+          '<div class="srx-empty-actions"><button type="button" class="srx-empty-reset" onclick="location.href=\'' + urlWithout(null) + '\'">Réinitialiser les critères</button></div>';
       }
-    });
-  }
-
-  /* Clear button visibility */
-  var clearEl = document.getElementById('sr-clear-filters');
-  function updateClearBtn() {
-    if (clearEl) clearEl.style.display = activeFilters.length ? 'inline-flex' : 'none';
-  }
-  updateClearBtn();
-
-  /* Filter chips toggle */
-  document.querySelectorAll('.sr-filter').forEach(function(btn) {
-    var f = btn.dataset.filter;
-    if (f === 'all') {
-      btn.addEventListener('click', function() {
-        activeFilters = [];
-        document.querySelectorAll('.sr-filter--active').forEach(function(b) { b.classList.remove('sr-filter--active'); });
-        updateClearBtn();
-        refresh();
-      });
-      return;
+      listEl.innerHTML = '<div class="srx-empty" role="status">' + inner + '</div>';
     }
-    btn.addEventListener('click', function() {
-      btn.classList.toggle('sr-filter--active');
-      var idx = activeFilters.indexOf(f);
-      if (idx >= 0) activeFilters.splice(idx, 1);
-      else activeFilters.push(f);
-      updateClearBtn();
-      refresh();
-    });
-  });
 
-  /* Clear all filters button */
-  if (clearEl) {
-    clearEl.addEventListener('click', function() {
-      activeFilters = [];
-      document.querySelectorAll('.sr-filter--active').forEach(function(b) { b.classList.remove('sr-filter--active'); });
-      updateClearBtn();
-      refresh();
-    });
+    // ---- 7. Tri ----
+    const sortSel = document.getElementById('srx-sort');
+    const sorted = () => {
+      const mode = sortSel.value;
+      const arr = results.slice();
+      if (mode === 'prix') arr.sort((a, b) => a.price - b.price);
+      else if (mode === 'note') arr.sort((a, b) => b.rating - a.rating);
+      return arr;
+    };
+    sortSel.addEventListener('change', () => renderList(sorted()));
+
+    // ---- 8. Carte ----
+    const mapEl = document.getElementById('srx-map');
+    const exact = {};
+    if (typeof PULLMAN_HOTELS_MAP !== 'undefined') PULLMAN_HOTELS_MAP.forEach(h => { exact[h.name] = [h.lat, h.lng]; });
+    const coords = results.map((h, i) => {
+      if (exact[h.name]) return { h, ll: exact[h.name] };
+      const base = COUNTRY_COORDS[h.country];
+      if (!base) return null;
+      const j = hash(h.name);
+      return { h, ll: [base[0] + ((j % 100) / 100 - 0.5) * 2.4, base[1] + (((j >> 3) % 100) / 100 - 0.5) * 2.4] };
+    }).filter(Boolean);
+
+    const map = L.map(mapEl, { zoomControl: true, attributionControl: false, scrollWheelZoom: false });
+    // Esri Dark Gray : gratuit sans clé (les tuiles CARTO sont désormais filigranées « API key required »)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
+    if (coords.length) {
+      const group = L.featureGroup(coords.map(({ h, ll }) =>
+        L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
+          .bindPopup('<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc) + '<br/>' + h.price + ' € / nuit')
+      ));
+      group.addTo(map);
+      map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 8 });
+    } else {
+      map.setView([25, 10], 2);
+    }
+
+    renderList(sorted());
   }
 
-  /* Popup carousel delegation (popups are injected dynamically) */
-  document.getElementById('sr-map').addEventListener('click', function(e) {
-    var btn = e.target.closest('.sr-popup-carousel-btn');
-    if (!btn) return;
-    e.stopPropagation();
-    var carousel = btn.closest('.sr-popup-carousel');
-    var imgs = JSON.parse(carousel.dataset.imgs);
-    var ci = parseInt(carousel.dataset.ci) || 0;
-    if (btn.classList.contains('sr-popup-carousel-btn--next')) { ci = (ci + 1) % imgs.length; }
-    else { ci = (ci - 1 + imgs.length) % imgs.length; }
-    carousel.dataset.ci = ci;
-    carousel.querySelector('img').src = imgs[ci];
-    var dots = carousel.querySelectorAll('.sr-popup-carousel-dot');
-    dots.forEach(function(d, di) { d.classList.toggle('sr-popup-carousel-dot--active', di === ci); });
-  });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => ready(30));
+  else ready(30);
 })();
 </script>
+
 </body>
 </html>
