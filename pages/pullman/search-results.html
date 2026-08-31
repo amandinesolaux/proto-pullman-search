@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=269"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=271"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=269"></script>
+  <script src="../../core/components/components.js?v=271"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=106"></script>
+  <script src="../../core/components/booking-map.js?v=271"></script>
 </head>
 <body class="brand-pullman">
 
@@ -199,17 +199,7 @@ wd-booking { margin-top: 20px; }
   const hash = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
 
   // Coordonnées approximatives par pays (repli quand l'hôtel n'est pas dans le jeu carte)
-  const COUNTRY_COORDS = {
-    'France':[46.6,2.4],'Allemagne':[51.1,10.4],'Royaume-Uni':[52.6,-1.5],'Espagne':[40.3,-3.7],'Belgique':[50.6,4.5],
-    'Pays-Bas':[52.2,5.5],'Suisse':[46.8,8.2],'Croatie':[45.5,16],'Géorgie':[42,43.5],'Hongrie':[47.2,19.4],
-    'Lettonie':[56.9,24.6],'Roumanie':[45.9,25],'Bulgarie':[42.7,25.3],'Turquie':[39,35],
-    'Chine':[34,104],'Corée du Sud':[36.3,127.8],'Inde':[21,78.5],'Indonésie':[-2.5,118],'Japon':[36.5,138.5],
-    'Malaisie':[3.9,102],'Maldives':[3.2,73.2],'Thaïlande':[15.5,101],'Vietnam':[16,107.5],'Laos':[18,103.8],'Singapour':[1.35,103.82],
-    'EAU':[24,54.4],'Arabie Saoudite':[24,45],'Qatar':[25.3,51.2],
-    'Maroc':[31.8,-6.5],'Afrique du Sud':[-29,25],"Côte d'Ivoire":[7.5,-5.5],'Kenya':[0.2,37.9],'RD Congo':[-3,23],'Sénégal':[14.5,-14.5],
-    'Argentine':[-34.6,-64],'Brésil':[-14,-52],'Chili':[-33.5,-70.8],'Pérou':[-9.2,-75],'États-Unis':[30.5,-84],
-    'Australie':[-25.7,134],'Nouvelle-Zélande':[-41.5,172.8]
-  };
+  // (COUNTRY_COORDS supprimé : les coordonnées viennent désormais de WD_SEARCH_DATA.hotels)
 
   function ready(retries) {
     if (!window.WD_SEARCH_DATA) { if (retries > 0) setTimeout(() => ready(retries - 1), 100); return; }
@@ -218,14 +208,15 @@ wd-booking { margin-top: 20px; }
 
   function init(D) {
     // ---- 1. Périmètre géographique (même sémantique que le dropdown) ----
+    // D.hotels : liste canonique déjà à plat et géolocalisée (WD_HOTELS).
     const cont = P.get('continent');
     let pool, scopeLabel = '';
     if (cont && cont !== 'all') {
       const r = D.regions.find(r => r.id === cont);
-      pool = r ? r.hotels.slice() : [];
+      pool = D.hotels.filter(h => h.region === cont);
       scopeLabel = r ? r.label : '';
     } else {
-      pool = D.regions.flatMap(r => r.hotels);
+      pool = D.hotels.slice();
       if (cont === 'all') scopeLabel = 'Tous les continents';
     }
     const country = P.get('country');
@@ -348,15 +339,12 @@ wd-booking { margin-top: 20px; }
 
     // ---- 8. Carte ----
     const mapEl = document.getElementById('srx-map');
-    const exact = {};
-    if (typeof PULLMAN_HOTELS_MAP !== 'undefined') PULLMAN_HOTELS_MAP.forEach(h => { exact[h.name] = [h.lat, h.lng]; });
-    const coords = results.map((h, i) => {
-      if (exact[h.name]) return { h, ll: exact[h.name] };
-      const base = COUNTRY_COORDS[h.country];
-      if (!base) return null;
-      const j = hash(h.name);
-      return { h, ll: [base[0] + ((j % 100) / 100 - 0.5) * 2.4, base[1] + (((j >> 3) % 100) / 100 - 0.5) * 2.4] };
-    }).filter(Boolean);
+    // Les coordonnées viennent de la source unique : position réelle de l'hôtel quand elle
+    // est connue, sinon centre-ville décalé. Remplace le repli au centre du PAYS, qui
+    // déplaçait certains pins de plus de cent kilomètres.
+    const coords = results
+      .filter(h => h.lat !== null && h.lat !== undefined && h.lng !== null)
+      .map(h => ({ h, ll: [h.lat, h.lng] }));
 
     const map = L.map(mapEl, { zoomControl: true, attributionControl: false, scrollWheelZoom: false });
     // Esri Dark Gray : gratuit sans clé (les tuiles CARTO sont désormais filigranées « API key required »)
