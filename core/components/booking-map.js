@@ -214,10 +214,15 @@ const WD_DETAIL_W = 288;
 // le pin s'y situe.
 const WD_ZOOM_HOTEL = 6;
 
-function _fermerDetail() {
+// `revenir` : refaire le chemin inverse, du pin vers la vue du continent. On ne le fait
+// qu'à la fermeture volontaire — pas quand les pins sont recalculés, puisque le cadrage
+// est alors déjà refait par _renderMarkers.
+function _fermerDetail(revenir) {
   const p = document.getElementById('wd-map-detail');
+  const etaitOuvert = p && p.dataset.state === 'open';
   if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
+  if (revenir && etaitOuvert) _vueContinent(_currentContinent, true);
 }
 
 function _ouvrirDetail(hotel, criteriaSet) {
@@ -232,7 +237,7 @@ function _ouvrirDetail(hotel, criteriaSet) {
     p.setAttribute('aria-label', 'Détail de l’hôtel');
     conteneur.appendChild(p);
     p.addEventListener('click', (e) => {
-      if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(); }
+      if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); }
     });
   }
   p.innerHTML =
@@ -266,6 +271,11 @@ function initBookingMap(continentFilter) {
   const mapElement = document.getElementById('wd-booking-map');
   if (!mapElement || typeof L === 'undefined') return;
 
+  // Le continent courant n'était mémorisé que par updateBookingMapContinent : quand la
+  // carte s'ouvrait déjà filtrée, il restait nul, et la fermeture du détail renvoyait
+  // sur la vue du monde au lieu du continent affiché.
+  _currentContinent = continentFilter || null;
+
   _addStyle();
 
   if (_bookingMap) {
@@ -288,8 +298,10 @@ function initBookingMap(continentFilter) {
 
   L.control.zoom({ position: 'topright' }).addTo(_bookingMap);
 
-  // Cliquer la carte hors d'un pin referme le détail, comme on refermerait une bulle.
-  _bookingMap.on('click', _fermerDetail);
+  // Cliquer la carte hors d'un pin ferme aussi le détail : même geste, même retour.
+  // Fonction explicite et non référence directe — Leaflet passe son événement en
+  // premier argument, qui serait pris pour le drapeau « revenir ».
+  _bookingMap.on('click', () => _fermerDetail(true));
   // maxZoom porté à 12 → 14 : à 12 on voyait encore la région, pas le quartier.
   _bookingMap.setMaxZoom(14);
 
@@ -306,7 +318,8 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 
   // Le panneau montre un hôtel qui peut disparaître du jeu de pins (changement de
   // continent ou de critères) : on le referme plutôt que d'afficher un détail orphelin.
-  _fermerDetail();
+  // Sans retour animé ici : _renderMarkers refait déjà le cadrage juste après.
+  _fermerDetail(false);
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
 
@@ -336,18 +349,25 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 
   // Recadrage uniquement quand la zone change (init / choix de continent) —
   // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
-  if (refit) {
-    if (isFiltered) {
-      const filteredHotels = PULLMAN_HOTELS_MAP.filter(h => h.continent === continentFilter);
-      if (filteredHotels.length > 0) {
-        const bounds = L.latLngBounds(filteredHotels.map(h => [h.lat, h.lng]));
-        _bookingMap.fitBounds(bounds, { padding: [20, 20], animate: false });
-      }
-    } else {
-      const bounds = L.latLngBounds(PULLMAN_HOTELS_MAP.map(h => [h.lat, h.lng]));
-      _bookingMap.fitBounds(bounds, { padding: [10, 10], animate: false });
-    }
-  }
+  if (refit) _vueContinent(continentFilter, false);
+}
+
+// Cadrage de la zone courante — le continent choisi, ou le monde à défaut.
+// Extrait de _renderMarkers pour que la fermeture du panneau puisse y revenir :
+// c'est la même vue, elle ne doit pas être recalculée deux fois différemment.
+function _vueContinent(continentFilter, anime) {
+  if (!_bookingMap || typeof PULLMAN_HOTELS_MAP === 'undefined') return;
+  const cible = continentFilter
+    ? PULLMAN_HOTELS_MAP.filter(h => h.continent === continentFilter)
+    : PULLMAN_HOTELS_MAP;
+  if (!cible.length) return;
+  const bounds = L.latLngBounds(cible.map(h => [h.lat, h.lng]));
+  _bookingMap.invalidateSize({ animate: false });
+  _bookingMap.flyToBounds(bounds, {
+    padding: continentFilter ? [20, 20] : [10, 10],
+    animate: anime,
+    duration: anime ? 1.0 : 0
+  });
 }
 
 function updateBookingMapContinent(continentFilter, criteriaSet) {
