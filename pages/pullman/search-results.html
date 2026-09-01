@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=312"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=313"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=312"></script>
+  <script src="../../core/components/components.js?v=313"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=312"></script>
+  <script src="../../core/components/booking-map.js?v=313"></script>
 </head>
 <body class="brand-pullman">
 
@@ -185,7 +185,7 @@ wd-booking { margin-top: 20px; }
 /* Paire d'actions du design system Accor : bouton contour puis lien fléché.
    Pas de vert plein ici — sur une liste de 110 cards, autant de pastilles vertes
    saturaient la page ; le contour tient l'affordance sans crier. */
-.srx-actions { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.srx-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-shrink: 0; }
 .srx-cta { display: inline-flex; align-items: center; justify-content: center; padding: 9px 20px; border: 1px solid #445047; border-radius: 100px; background: transparent; font-family: var(--font-sans); font-size: 13px; font-weight: 500; color: #445047; text-decoration: none; white-space: nowrap; transition: background .15s, color .15s; }
 .srx-cta:hover { background: #445047; color: #fff; }
 .srx-link { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-sans); font-size: 13px; color: #445047; text-decoration: none; white-space: nowrap; transition: gap .15s; }
@@ -380,12 +380,12 @@ wd-booking { margin-top: 20px; }
               (showPrice
                 ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
                 : '<span class="srx-nodate">Ajoutez vos dates pour voir les tarifs</span>') +
-              // Deux destinations : la réservation sur ALL, la fiche sur le site de marque.
-              // Ordre et styles repris du design system Accor : bouton contour d'abord,
-              // lien fléché ensuite.
+              // Deux destinations : la fiche sur le site de marque, la réservation sur ALL.
+              // « Réserver » en dernier, donc à droite : l'action principale occupe la
+              // position terminale du regard. Même ordre que l'encart de la carte.
               '<span class="srx-actions">' +
-                (bookingUrl(h) ? '<a class="srx-cta" href="' + esc(bookingUrl(h)) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
                 (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
+                (bookingUrl(h) ? '<a class="srx-cta" href="' + esc(bookingUrl(h)) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
               '</span>' +
             '</div>' +
           '</div></article>';

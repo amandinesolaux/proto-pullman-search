@@ -134,7 +134,8 @@ function _addStyle() {
     // Deux actions : le prix passe sur sa propre ligne, sinon les trois éléments se
     // comprimeraient sur 236px utiles.
     '.pullman-popup__foot{display:flex;flex-direction:column;align-items:stretch;gap:9px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
-    '.pullman-popup__actions{display:flex;align-items:center;justify-content:space-between;gap:10px}' +
+    // Groupe calé à droite, 12px entre le lien et le bouton
+    '.pullman-popup__actions{display:flex;align-items:center;justify-content:flex-end;gap:12px}' +
     // Même paire que les cards de résultats : bouton contour puis lien fléché, repris
     // du design system Accor. Sélecteur à 2 classes, sinon Leaflet impose son bleu.
     '.pullman-popup-card .pullman-popup__link{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:500;color:#445047;text-decoration:none;white-space:nowrap;transition:gap .15s}' +
@@ -223,10 +224,12 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
   // réservation sur ALL. Sans href on n'affiche aucun lien plutôt qu'un lien mort.
   const bookUrl = window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null;
+  // « Réserver » en dernier, donc à droite : l'action principale occupe la position
+  // terminale du regard, et le lien de consultation la précède.
   const cta = h.href
     ? '<div class="pullman-popup__actions">' +
-        (bookUrl ? '<a class="pullman-popup__cta" href="' + esc(bookUrl) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
         '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + arrow + '</a>' +
+        (bookUrl ? '<a class="pullman-popup__cta" href="' + esc(bookUrl) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
       '</div>'
     : '';
 
