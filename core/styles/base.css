@@ -376,8 +376,10 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking { position: relative; }
 .wd-booking__dest-input { display: block; flex: 1; border: none; outline: none; background: transparent; font-family: var(--font-sans); font-size: 12px; color: #fff; min-width: 80px; font-weight: 400; padding: 0; }
 .wd-booking__dest-input::placeholder { color: rgba(255,255,255,.5); }
-.wd-booking__field--selected .wd-booking__label { font-weight: 400; color: #fff; }
-.wd-booking__field--selected .wd-booking__value { display: none; }
+/* Rien de particulier pour l'état renseigné : le champ dates affiche label + valeur
+   comme ses voisins. Deux règles vivaient ici — l'une masquait la valeur (la plage
+   prenait alors la place de l'intitulé, et le champ perdait sa question), l'autre
+   répétait simplement le poids et la couleur par défaut. */
 .wd-booking__field--editing { background: rgba(255,255,255,.06); border-radius: 4px; }
 .wd-booking__field--editing:hover { background: rgba(255,255,255,.06); }
 .wd-booking__dropdown { position: absolute; left: 0; right: 0; top: calc(100% - 40px); z-index: 200; background: #1a2220; border-radius: 0 0 6px 6px; box-shadow: 0 20px 60px rgba(0,0,0,.6); max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s ease, opacity .2s ease; }
