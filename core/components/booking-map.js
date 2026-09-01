@@ -239,6 +239,12 @@ function _ouvrirDetail(hotel, criteriaSet) {
     p.setAttribute('role', 'dialog');
     p.setAttribute('aria-label', 'Détail de l’hôtel');
     conteneur.appendChild(p);
+    // Le panneau vit DANS le conteneur de la carte : sans cela, tout clic dedans
+    // remonte jusqu'à Leaflet, qui le prend pour un clic sur la carte et referme le
+    // panneau. « Voir l'hôtel » ouvrait bien son onglet, mais fermait le détail au
+    // passage — on revenait sur une carte remise à la vue du continent.
+    L.DomEvent.disableClickPropagation(p);
+    L.DomEvent.disableScrollPropagation(p);
     p.addEventListener('click', (e) => {
       if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); }
     });
