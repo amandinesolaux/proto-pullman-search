@@ -56,9 +56,13 @@ function _addStyle() {
     // en concurrence avec les pins, eux aussi verts.
     // Carte blanche : sur surface claire, les tokens Pullman donnent #445047 pour le texte
     // (--color-on-surface-hi) et #BCCABE pour les filets (--color-outline-low).
-    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#fff;border:1px solid #BCCABE;border-radius:0;padding:0;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.35)}' +
+    // Aucune bordure : la carte blanche est posée sur une carte sombre, elle s'en
+    // détache d'elle-même. Le filet #BCCABE des tokens vaut pour une surface claire
+    // sur page claire ; ici il se lisait comme un contour blanc et laissait 1px de
+    // blanc autour de la photo. L'ombre porte seule la séparation.
+    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#fff;border:none;border-radius:0;padding:0;overflow:hidden;box-shadow:0 12px 38px rgba(0,0,0,.45)}' +
     '.pullman-popup-card .leaflet-popup-content{margin:0;width:264px!important;color:#445047}' +
-    '.pullman-popup-card .leaflet-popup-tip{background:#fff;border:1px solid #BCCABE;border-top:none;border-left:none}' +
+    '.pullman-popup-card .leaflet-popup-tip{background:#fff;border:none;box-shadow:none}' +
     // Leaflet impose « .leaflet-popup-content p { margin: 1.3em 0 } » depuis son CDN.
     // Sa spécificité (0,1,1) bat une simple classe : on la neutralise à (0,2,1), sinon
     // chaque paragraphe ajoute ~35px de vide invisible dans l'encart.
