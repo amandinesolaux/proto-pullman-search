@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=285"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=289"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=285"></script>
+  <script src="../../core/components/components.js?v=289"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=285"></script>
+  <script src="../../core/components/booking-map.js?v=289"></script>
 </head>
 <body class="brand-pullman">
 
@@ -145,47 +145,56 @@ wd-booking { margin-top: 20px; }
 
 /* --- Cards --- */
 .srx-list { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.srx-card { display: flex; gap: 14px; background: #28332B; border: 1px solid rgba(255,255,255,.07); border-radius: 0; padding: 12px; transition: border-color .15s, transform .15s; cursor: pointer; }
-.srx-card:hover { border-color: rgba(255,255,255,.22); }
+/* Cards claires : les mêmes couleurs que l'encart de la carte, prises sur les tokens
+   « surface claire » (#445047 pour le texte, #BCCABE pour les filets). Pas de bordure —
+   sur le fond sombre de la page, une card blanche se détache d'elle-même. */
+.srx-card { display: flex; gap: 14px; background: #fff; border: none; border-radius: 0; padding: 12px; transition: box-shadow .15s, transform .15s; cursor: pointer; }
+.srx-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.28); }
 .srx-card:focus-visible { outline: 2px solid var(--pul-highlight, #5FEF91); outline-offset: 2px; }
 /* Card sélectionnée : liseré vert à gauche, pour la retrouver d'un coup d'œil dans la
    liste après avoir cliqué son pin. Discret — la carte reste le point d'attention. */
-.srx-card--active { border-color: rgba(95,239,145,.55); box-shadow: inset 3px 0 0 var(--pul-highlight, #5FEF91); }
-.srx-card-img { flex: 0 0 160px; width: 160px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #1A2220; } /* 4:3 exact */
+.srx-card--active { box-shadow: inset 4px 0 0 var(--pul-highlight, #5FEF91), 0 6px 20px rgba(0,0,0,.28); }
+.srx-card-img { flex: 0 0 160px; width: 160px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #E7EDE8; } /* 4:3 exact */
 .srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.srx-card-name { font-family: var(--font-sans); font-weight: 600; font-size: 16.5px; color: #fff; margin: 0 0 3px; }
-.srx-card-loc { font-family: var(--font-sans); font-size: 13px; color: var(--pul-muted, #D9E6D0); margin: 0 0 10px; }
+.srx-card-name { font-family: var(--font-sans); font-weight: 700; font-size: 16.5px; color: #445047; margin: 0 0 3px; }
+.srx-card-loc { font-family: var(--font-sans); font-size: 13px; color: rgba(68,80,71,.78); margin: 0 0 10px; }
 .srx-card-rating { flex-shrink: 0; text-align: right; font-family: var(--font-sans); }
 .srx-card-rating b { display: inline-block; background: var(--pul-bg, #445047); color: #fff; font-size: 13px; font-weight: 700; padding: 5px 8px; }
-.srx-card-rating span { display: block; font-size: 11px; color: rgba(255,255,255,.45); margin-top: 4px; }
-.srx-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
-.srx-badge { font-family: var(--font-sans); font-size: 11.5px; font-weight: 500; color: #E8F5EC; background: rgba(95,239,145,.12); border: 1px solid rgba(95,239,145,.25); padding: 3px 9px; display: inline-flex; align-items: center; gap: 5px; }
-.srx-badge svg { width: 10px; height: 10px; }
-.srx-card-bottom { margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.srx-price { font-family: var(--font-sans); color: #fff; }
+.srx-card-rating span { display: block; font-size: 11px; color: rgba(68,80,71,.78); margin-top: 4px; }
+/* Badges : services distinctifs de l'hôtel, pas les critères filtrés. Sans coche —
+   ils n'affirment plus « ce critère est satisfait » mais « voici ce qu'il a en propre ». */
+/* Une seule ligne, hauteur réservée : sans cela les cards oscillaient entre 144 et
+   175px selon que les badges passaient à la ligne, et la liste devenait irrégulière.
+   20% des hôtels n'ont aucun service distinctif — leur card garde la même hauteur. */
+.srx-badges { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 6px; margin: 0 0 10px; min-height: 21px; }
+.srx-badge { flex-shrink: 0; }
+.srx-badge { font-family: var(--font-sans); font-size: 11.5px; font-weight: 500; color: #2F4034; background: rgba(95,239,145,.24); border: none; padding: 3px 9px; display: inline-flex; align-items: center; }
+.srx-card-bottom { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.srx-price { font-family: var(--font-sans); color: #445047; }
 .srx-price b { font-size: 19px; font-weight: 700; }
-.srx-price span { font-size: 12px; color: rgba(255,255,255,.5); }
+.srx-price span { font-size: 12px; color: rgba(68,80,71,.78); }
 /* Sans dates : on explique l'absence de tarif au lieu de laisser un blanc */
-.srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(255,255,255,.5); }
+.srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(68,80,71,.78); }
 /* Deux actions : consulter la fiche (lien discret) et réserver (bouton).
    La hiérarchie dit laquelle est l'action principale. */
 .srx-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
-.srx-link { font-family: var(--font-sans); font-size: 13px; color: var(--pul-muted, #D9E6D0); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
-.srx-link:hover { color: #fff; }
+.srx-link { font-family: var(--font-sans); font-size: 13px; color: #445047; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.srx-link:hover { color: #2F4034; }
 .srx-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; background: var(--pul-highlight, #5FEF91); font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-bg, #445047); text-decoration: none; white-space: nowrap; transition: background .15s; }
 .srx-cta:hover { background: var(--pul-highlight-hover, #4DD87A); }
 
 /* --- Zéro résultat --- */
-.srx-empty { background: var(--pul-bg, #445047); border: 1px solid rgba(255,255,255,.12); padding: 20px; font-family: var(--font-sans); }
-.srx-empty h2 { font-family: var(--font-serif); font-weight: 800; font-size: 16px; text-transform: uppercase; color: #fff; margin: 0 0 8px; }
-.srx-empty p { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.75); margin: 0 0 14px; }
-.srx-empty p strong { color: #fff; }
+/* Bloc zéro-résultat : il occupe la place des cards, il suit donc la même surface claire */
+.srx-empty { background: #fff; border: none; padding: 20px; font-family: var(--font-sans); }
+.srx-empty h2 { font-family: var(--font-serif); font-weight: 800; font-size: 16px; text-transform: uppercase; color: #445047; margin: 0 0 8px; }
+.srx-empty p { font-size: 13.5px; line-height: 1.5; color: rgba(68,80,71,.78); margin: 0 0 14px; }
+.srx-empty p strong { color: #445047; }
 .srx-empty-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.srx-empty-relax { font-family: var(--font-sans); font-size: 13px; font-weight: 600; padding: 10px 18px; border: none; border-radius: 100px; background: #F0EDE6; color: #28332B; cursor: pointer; }
-.srx-empty-relax:hover { background: #fff; }
-.srx-empty-reset { font-family: var(--font-sans); font-size: 13px; color: rgba(255,255,255,.75); background: none; border: none; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-.srx-empty-reset:hover { color: #fff; }
+.srx-empty-relax { font-family: var(--font-sans); font-size: 13px; font-weight: 600; padding: 10px 18px; border: none; border-radius: 100px; background: var(--pul-highlight, #5FEF91); color: var(--pul-bg, #445047); cursor: pointer; }
+.srx-empty-relax:hover { background: var(--pul-highlight-hover, #4DD87A); }
+.srx-empty-reset { font-family: var(--font-sans); font-size: 13px; color: #445047; background: none; border: none; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.srx-empty-reset:hover { color: #2F4034; }
 
 /* --- Carte --- */
 .srx-map-col { position: sticky; top: 24px; }
@@ -279,6 +288,32 @@ wd-booking { margin-top: 20px; }
     };
     const bookingUrl = (h) => (window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null);
 
+    const SERVICE_LABELS = {
+      pool: 'Piscine', spa: 'Spa', gym: 'Fitness', beach: 'Bord de mer',
+      breakfast: 'Petit-déjeuner', restaurant: 'Restaurant', bar: 'Bar', rooftop: 'Rooftop',
+      parking: 'Parking', pets: 'Animaux acceptés', 'kids-club': 'Kids club',
+      'meeting-rooms': 'Salles de réunion', coworking: 'Coworking', garden: 'Jardin',
+      golf: 'Golf', casino: 'Casino', 'airport-shuttle': 'Navette aéroport', wifi: 'Wi-Fi'
+    };
+    // Rareté d'un service dans le catalogue : plus il est rare, plus il distingue.
+    // Bar, petit-déjeuner, restaurant et wifi sont sur 100 % des hôtels — ils ne
+    // méritent jamais un badge.
+    const RARETE = (() => {
+      const f = {};
+      D.hotels.forEach(h => (h.services || []).forEach(s => { f[s] = (f[s] || 0) + 1; }));
+      return f;
+    })();
+    // Seuil à 70 % : au-delà, un service se retrouve sur presque toutes les cards et
+    // n'aide plus à choisir. Écarte bar, petit-déjeuner, restaurant, wifi (100 %),
+    // fitness (98 %), parking (85 %), salles de réunion (84 %) et piscine (73 %).
+    const SERVICES_UNIVERSELS = Object.keys(RARETE).filter(s => RARETE[s] / D.hotels.length > 0.7);
+    // Les services déjà filtrés sont communs à tous les résultats : on les écarte aussi.
+    const SERVICES_FILTRES = new Set(critIds.flatMap(id => D.criteriaToServices[id] || []));
+    const servicesDistinctifs = (h) => (h.services || [])
+      .filter(s => !SERVICES_UNIVERSELS.includes(s) && !SERVICES_FILTRES.has(s) && SERVICE_LABELS[s])
+      .sort((a, b) => RARETE[a] - RARETE[b])
+      .slice(0, 3);
+
     // ---- 4. En-tête ----
     const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
     const subParts = [];
@@ -302,12 +337,16 @@ wd-booking { margin-top: 20px; }
 
     // ---- 5. Liste ----
     const listEl = document.getElementById('srx-list');
-    const check = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
     const renderList = (items) => {
       if (!items.length) { renderEmpty(); return; }
       listEl.innerHTML = items.map(h => {
         const imgKey = h.img && h.img.includes(':') ? h.img : (h.img || 'aja_p_6783-26') + ':1by1';
-        const badges = critIds.map(id => '<span class="srx-badge">' + check + esc(labelFor(id)) + '</span>').join('');
+        // On n'affiche PAS les critères filtrés : en correspondance ET, tous les résultats
+        // les satisfont, donc le même badge apparaîtrait sur chaque card sans rien
+        // distinguer. On montre à la place les services les plus rares de cet hôtel —
+        // ceux qui aident réellement à comparer deux lignes de la liste.
+        const badges = servicesDistinctifs(h)
+          .map(s => '<span class="srx-badge">' + esc(SERVICE_LABELS[s] || s) + '</span>').join('');
         // tabindex + role : la card est cliquable (elle recentre la carte), elle doit
         // donc être atteignable au clavier comme n'importe quel contrôle.
         return '<article class="srx-card" data-hotel="' + esc(h.name) + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ' — voir sur la carte">' +
@@ -318,7 +357,8 @@ wd-booking { margin-top: 20px; }
               '<p class="srx-card-loc">' + esc(h.loc) + '</p>' +
             '</div>' +
             '<div class="srx-card-rating"><b>' + h.rating + '</b><span>' + h.reviews + ' avis</span></div></div>' +
-            (badges ? '<div class="srx-badges">' + badges + '</div>' : '') +
+            // Rendu même vide : c'est lui qui réserve la hauteur et aligne les cards
+            '<div class="srx-badges">' + badges + '</div>' +
             '<div class="srx-card-bottom">' +
               (showPrice
                 ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
