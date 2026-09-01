@@ -371,7 +371,7 @@ function _messageDetail(hotel, manquants, restants, continentFilter) {
       '<p class="wd-map-detail__avis-suite">' +
         (restants > 0
           ? '<strong>' + restants + ' hôtel' + (restants > 1 ? 's' : '') + '</strong>' + (zone ? ' en ' + esc(zone) : '') +
-            ' y répond' + (restants > 1 ? 'ent' : '') + ' — ' + (restants > 1 ? 'ils restent' : 'il reste') + ' en vert sur la carte.'
+            ' y répond' + (restants > 1 ? 'ent' : '') + '.'
           : 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') + ' ne réunit tous ces critères.') +
       '</p>' +
     '</div>';
