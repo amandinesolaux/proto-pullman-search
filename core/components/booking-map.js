@@ -145,7 +145,9 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
   const key = window.WD_IMG_KEY ? window.WD_IMG_KEY(h) : (h.img || 'aja_p_6783-26').split(':')[0];
-  const img = base + key + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528&hei=297';
+  // Largeur seule : imposer « hei » fait combler le cadre de blanc par le serveur quand
+  // la photo est en portrait. Le recadrage 16:9 est fait par .pullman-popup__media.
+  const img = base + key + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528';
   const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';

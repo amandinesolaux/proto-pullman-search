@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=293"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=295"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=293"></script>
+  <script src="../../core/components/components.js?v=295"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=293"></script>
+  <script src="../../core/components/booking-map.js?v=295"></script>
 </head>
 <body class="brand-pullman">
 
@@ -154,7 +154,11 @@ wd-booking { margin-top: 20px; }
 /* Card sélectionnée : liseré vert à gauche, pour la retrouver d'un coup d'œil dans la
    liste après avoir cliqué son pin. Discret — la carte reste le point d'attention. */
 .srx-card--active { box-shadow: inset 4px 0 0 var(--pul-highlight, #5FEF91), 0 6px 20px rgba(0,0,0,.28); }
-.srx-card-img { flex: 0 0 160px; width: 160px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #E7EDE8; } /* 4:3 exact */
+/* Colonne visuelle : c'est le conteneur qui prend la hauteur de la card, et l'image y est
+   en position absolue. Sans ce conteneur, un <img> en élément flex impose sa hauteur
+   intrinsèque — une photo portrait étirait sa card à 240px quand les autres en font 150. */
+.srx-card-media { flex: 0 0 160px; width: 160px; align-self: stretch; position: relative; overflow: hidden; background: #E7EDE8; min-height: 120px; }
+.srx-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .srx-card-name { font-family: var(--font-sans); font-weight: 700; font-size: 16.5px; color: #445047; margin: 0 0 3px; }
@@ -355,7 +359,12 @@ wd-booking { margin-top: 20px; }
         // tabindex + role : la card est cliquable (elle recentre la carte), elle doit
         // donc être atteignable au clavier comme n'importe quel contrôle.
         return '<article class="srx-card" data-hotel="' + esc(h.name) + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ' — voir sur la carte">' +
-          '<img class="srx-card-img" src="' + D.imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=300" alt="' + esc(h.name) + '" loading="lazy"/>' +
+          // Largeur seule, sans « hei » : beaucoup de photos Accor sont en portrait, et
+          // imposer une hauteur fait remplir le cadre de BLANC par le serveur. On récupère
+          // la photo dans son ratio d'origine et c'est object-fit qui recadre.
+          '<div class="srx-card-media">' +
+            '<img class="srx-card-img" src="' + D.imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400" alt="' + esc(h.name) + '" loading="lazy"/>' +
+          '</div>' +
           '<div class="srx-card-body">' +
             '<div class="srx-card-top"><div>' +
               '<h3 class="srx-card-name">' + esc(h.name) + '</h3>' +
@@ -416,11 +425,18 @@ wd-booking { margin-top: 20px; }
       if (optPrix) { optPrix.disabled = true; optPrix.textContent = 'Prix (dates requises)'; }
       if (sortSel.value === 'prix') sortSel.value = 'pertinence';
     }
+    // Hôtel remonté en tête après un clic sur son pin. Il ne remplace pas le tri : il
+    // s'y ajoute, pour qu'on retrouve l'hôtel désigné sans perdre l'ordre choisi.
+    let epingle = null;
     const sorted = () => {
       const mode = sortSel.value;
       const arr = results.slice();
       if (mode === 'prix') arr.sort((a, b) => a.price - b.price);
       else if (mode === 'note') arr.sort((a, b) => b.rating - a.rating);
+      if (epingle) {
+        const i = arr.findIndex(h => h.name === epingle);
+        if (i > 0) arr.unshift(arr.splice(i, 1)[0]);
+      }
       return arr;
     };
     sortSel.addEventListener('change', () => renderList(sorted()));
@@ -481,11 +497,18 @@ wd-booking { margin-top: 20px; }
       const card = e.target.closest('.srx-card');
       if (card && card.dataset.hotel) { e.preventDefault(); focusHotel(card.dataset.hotel); }
     });
-    // Réciproque : cliquer un pin met en évidence la card correspondante et l'amène à l'écran
+    // Réciproque : cliquer un pin remonte sa card en tête de liste et ramène la vue en
+    // haut. Faire défiler jusqu'à une card perdue au 80e rang aurait sorti la barre de
+    // recherche de l'écran ; la remonter en premier évite le défilement et garde le
+    // contexte de recherche visible, prêt à être ajusté.
     markerByHotel.forEach((mk, name) => mk.on('click', () => {
-      listEl.querySelectorAll('.srx-card--active').forEach(c => c.classList.remove('srx-card--active'));
+      epingle = name;
+      renderList(sorted());
       const card = listEl.querySelector('[data-hotel="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
-      if (card) { card.classList.add('srx-card--active'); card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+      if (card) card.classList.add('srx-card--active');
+      const barre = document.querySelector('wd-booking');
+      const cible = barre ? window.scrollY + barre.getBoundingClientRect().top - 12 : 0;
+      window.scrollTo({ top: Math.max(0, cible), behavior: 'smooth' });
     }));
 
     renderList(sorted());
