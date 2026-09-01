@@ -21,6 +21,25 @@ let _currentContinent = null;
 let _detailHotel = null;
 // Minuterie du message « cet hôtel ne propose pas … », pour le retirer après lecture.
 let _avisTimer = null;
+// Zone géographique courante — la carte ne connaissait que le continent, alors que la
+// liste sait descendre au pays, à la ville et à l'hôtel. Choisir « Chine » n'avait donc
+// aucun effet sur la carte, qui restait sur l'Asie entière.
+let _currentScope = {};
+
+// L'hôtel appartient-il à la zone affichée ? Du plus précis au plus large, comme la liste.
+function _dansLaZone(hotel, scope) {
+  const s = scope || {};
+  if (s.hotel) return hotel.name === s.hotel;
+  if (s.city) return hotel.city === s.city;
+  if (s.country) return hotel.country === s.country;
+  if (s.continent) return hotel.continent === s.continent;
+  return true;
+}
+// Une zone plus fine qu'un continent existe-t-elle ? Sert à savoir s'il faut recadrer.
+function _zoneDefinie(scope) {
+  const s = scope || {};
+  return !!(s.hotel || s.city || s.country || s.continent);
+}
 let _currentCriteria = null;
 
 function _makeSmallIcon(greyed) {
@@ -422,7 +441,7 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   });
 }
 
-function initBookingMap(continentFilter) {
+function initBookingMap(continentFilter, scope) {
   const mapElement = document.getElementById('wd-booking-map');
   if (!mapElement || typeof L === 'undefined') return;
 
@@ -430,6 +449,7 @@ function initBookingMap(continentFilter) {
   // carte s'ouvrait déjà filtrée, il restait nul, et la fermeture du détail renvoyait
   // sur la vue du monde au lieu du continent affiché.
   _currentContinent = continentFilter || null;
+  _currentScope = scope || { continent: _currentContinent };
 
   _addStyle();
 
@@ -479,11 +499,13 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
 
-  const isFiltered = !!continentFilter;
+  // La mise en avant suit la zone, pas seulement le continent : choisir « Chine » ne
+  // doit plus laisser toute l'Asie au premier plan.
+  const isFiltered = _zoneDefinie(_currentScope);
   const hasCriteria = criteriaSet && criteriaSet.size > 0;
 
   PULLMAN_HOTELS_MAP.forEach(hotel => {
-    const inContinent = hotel.continent === continentFilter;
+    const inContinent = _dansLaZone(hotel, _currentScope);
     const matchesCriteria = !hasCriteria || _criteresManquants(hotel, criteriaSet).length === 0;
     const greyed = hasCriteria && !matchesCriteria;
     const icon = isFiltered && inContinent
@@ -538,24 +560,30 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 // c'est la même vue, elle ne doit pas être recalculée deux fois différemment.
 function _vueContinent(continentFilter, anime) {
   if (!_bookingMap || typeof PULLMAN_HOTELS_MAP === 'undefined') return;
-  const cible = continentFilter
-    ? PULLMAN_HOTELS_MAP.filter(h => h.continent === continentFilter)
-    : PULLMAN_HOTELS_MAP;
+  // On cadre sur la zone choisie — pays ou ville comprises — et non sur le seul
+  // continent : sélectionner « Chine » cadrait jusqu'ici toute l'Asie.
+  const cible = PULLMAN_HOTELS_MAP.filter(h => _dansLaZone(h, _currentScope));
   if (!cible.length) return;
   const bounds = L.latLngBounds(cible.map(h => [h.lat, h.lng]));
   _bookingMap.invalidateSize({ animate: false });
   _bookingMap.flyToBounds(bounds, {
-    padding: continentFilter ? [20, 20] : [10, 10],
+    padding: _zoneDefinie(_currentScope) ? [20, 20] : [10, 10],
+    // Un seul hôtel dans la zone : sans plafond, flyToBounds irait au zoom maximum.
+    maxZoom: cible.length === 1 ? WD_ZOOM_HOTEL : 12,
     animate: anime,
     duration: anime ? 1.0 : 0
   });
 }
 
-function updateBookingMapContinent(continentFilter, criteriaSet) {
+// `scope` : { continent, country, city, hotel } — la zone telle que la vue liste la
+// comprend. Omis, on retombe sur le seul continent, pour ne pas casser les appels
+// existants.
+function updateBookingMapContinent(continentFilter, criteriaSet, scope) {
   _currentContinent = continentFilter;
+  _currentScope = scope || { continent: continentFilter };
   if (criteriaSet !== undefined) _currentCriteria = criteriaSet;
   if (!_bookingMap) {
-    initBookingMap(continentFilter);
+    initBookingMap(continentFilter, _currentScope);
     return;
   }
   _renderMarkers(continentFilter, _currentCriteria);

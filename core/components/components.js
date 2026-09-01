@@ -1226,6 +1226,16 @@
       const destField = this.querySelector('.wd-booking__field--dest');
       const destInput = this.querySelector('.wd-booking__dest-input');
 
+      // Zone géographique telle que la carte doit la comprendre : c'est la même que
+      // celle de la liste. Sans elle, choisir « Chine » n'avait aucun effet sur la carte,
+      // qui ne connaissait que le continent.
+      const zoneCarte = () => ({
+        continent: searchState.continent,
+        country: searchState.expandedCountry || searchState.country || null,
+        city: searchState.city || null,
+        hotel: searchState.selectedHotel || null
+      });
+
       const searchState = {
         continent: null,
         showAll: false, // « Tous les continents » choisi explicitement (mode progressif)
@@ -2189,7 +2199,7 @@
                 renderMapPanel();
                 renderChips();
                 if (typeof updateBookingMapContinent === 'function') {
-                  updateBookingMapContinent(searchState.continent, getActiveCriteria());
+                  updateBookingMapContinent(searchState.continent, getActiveCriteria(), zoneCarte());
                 } else if (typeof updateBookingMapCriteria === 'function') {
                   updateBookingMapCriteria(getActiveCriteria());
                 }
@@ -2357,7 +2367,7 @@
           renderMapPanel();
           renderChips();
           if (typeof updateBookingMapContinent === 'function') {
-            updateBookingMapContinent(searchState.continent);
+            updateBookingMapContinent(searchState.continent, undefined, zoneCarte());
           }
         });
         mapViewCriteria.addEventListener('click', (e) => {
@@ -2397,7 +2407,7 @@
           mapToggle.classList.toggle('wd-booking__map-toggle--active', !showing);
           if (!showing && typeof initBookingMap === 'function') {
             setTimeout(() => {
-              initBookingMap(searchState.continent);
+              initBookingMap(searchState.continent, zoneCarte());
               // Reporter sur la carte les critères déjà cochés en vue liste
               if (getActiveCriteria().size && typeof updateBookingMapCriteria === 'function') {
                 updateBookingMapCriteria(getActiveCriteria());
