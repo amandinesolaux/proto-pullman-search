@@ -110,6 +110,18 @@ function _addStyle() {
     '.wd-map-detail__avis-titre{margin:0 0 6px;font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;line-height:1.35;color:#445047}' +
     '.wd-map-detail__avis-suite{margin:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;line-height:1.45;color:rgba(68,80,71,.78)}' +
     '.wd-map-detail__avis-suite strong{color:#445047}' +
+    // Mêmes formes que les actions de la card hôtel : pilule pour l'action, lien pour le
+    // recours. Les boutons du bloc vert sont taillés pour un fond sombre ; ici le fond est
+    // blanc et ils y disparaîtraient.
+    '.wd-map-detail__avis-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:12px;flex-wrap:wrap}' +
+    '.wd-map-detail__avis-relax{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:500;' +
+      'padding:8px 18px;border:1px solid #445047;border-radius:100px;background:transparent;color:#445047;' +
+      'cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}' +
+    '.wd-map-detail__avis-relax:hover{background:#445047;color:#fff}' +
+    '.wd-map-detail__avis-reset{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:400;' +
+      'padding:0;border:none;background:transparent;color:rgba(68,80,71,.78);text-decoration:underline;' +
+      'text-underline-offset:2px;cursor:pointer;white-space:nowrap}' +
+    '.wd-map-detail__avis-reset:hover{color:#445047}' +
     // La croix est claire sur la photo du détail ; ici le fond est blanc, il lui faut
     // l'inverse pour rester visible.
     '.wd-map-detail--avis .wd-map-detail__close{background-color:rgba(68,80,71,.12);' +
@@ -322,7 +334,6 @@ function _fermerDetail(revenir) {
   if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
   _detailHotel = null;
   clearTimeout(_avisTimer);
-  _marquerAvis(false);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
   if (revenir && etaitOuvert) _vueContinent(true);
 }
@@ -348,7 +359,20 @@ function _panneauDetail() {
   L.DomEvent.disableClickPropagation(p);
   L.DomEvent.disableScrollPropagation(p);
   p.addEventListener('click', (e) => {
-    if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); }
+    if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); return; }
+    // Rattrapage porté par le message : on appelle la liste, seule à savoir décocher un
+    // critère et rejouer les deux vues. Le clic ne peut pas remonter jusqu'à elle depuis
+    // le conteneur Leaflet, d'où l'appel direct.
+    const relax = e.target.closest('[data-avis-relax]');
+    if (relax) {
+      e.preventDefault();
+      if (typeof window.WD_RETIRER_CRITERE === 'function') window.WD_RETIRER_CRITERE(relax.dataset.avisRelax);
+      return;
+    }
+    if (e.target.closest('[data-avis-reset]')) {
+      e.preventDefault();
+      if (typeof window.WD_REINITIALISER_CRITERES === 'function') window.WD_REINITIALISER_CRITERES();
+    }
   });
   return p;
 }
@@ -440,6 +464,8 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   const dansLarge = large ? _conformes(large, criteriaSet) : 0;
 
   let suite;
+  // Suggestion de rattrapage, quand il n'y a plus rien à montrer nulle part.
+  let reprise = null;
   // Zone de repli : la carte y remonte d'elle-même quand la zone choisie est vide mais
   // que le continent, lui, a des réponses. Sans ce mouvement le message annonçait des
   // hôtels que la carte laissait hors cadre et en gris — on lisait « 3 hôtels en Asie »
@@ -456,9 +482,21 @@ function _messageDetail(hotel, manquants, criteriaSet) {
       ', où <strong>' + dansLarge + ' hôtel' + (dansLarge > 1 ? 's' : '') + '</strong> ' +
       (dansLarge > 1 ? 'répondent' : 'répond') + ' à vos critères.';
   } else {
+    // Plus rien nulle part : ce message n'est plus une notification, c'est le rattrapage.
+    // Il en reprend donc la phrase et les boutons, et le bloc vert ne prend pas le relais
+    // derrière lui — les deux se succédaient à l'écran en disant la même chose.
+    reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
     suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') +
-      (large ? ' ni ' + esc(_enZone(large)) : '') +
-      ' ne réunit ces critères. Retirez un critère pour élargir la recherche.';
+      (large ? ' ni ' + esc(_enZone(large)) : '') + ' ne réunit ces critères.';
+    if (reprise) {
+      const pluriel = reprise.count > 1;
+      suite += ' En retirant <strong>« ' + esc(reprise.label) + ' »</strong>, <strong>' +
+        reprise.count + ' hôtel' + (pluriel ? 's' : '') + '</strong> correspondrai' +
+        (pluriel ? 'ent' : 't') +
+        (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
+    } else {
+      suite += ' Aucun de vos critères ne peut être assoupli pour trouver un hôtel ici.';
+    }
   }
 
   // L'élargissement précède l'affichage : reconstruire les pins commence par vider le
@@ -475,23 +513,35 @@ function _messageDetail(hotel, manquants, criteriaSet) {
     _renderMarkers(_currentContinent, criteriaSet, false);
   }
 
+  // Le rattrapage n'apparaît que dans le cas sans issue : ailleurs, la carte a de quoi
+  // montrer et le message n'a qu'à informer.
+  const porteLeRattrapage = dansZone === 0 && !elargir;
+  const actions = porteLeRattrapage
+    ? '<div class="wd-map-detail__avis-actions">' +
+        '<button type="button" class="wd-map-detail__avis-reset" data-avis-reset>Réinitialiser les critères</button>' +
+        (reprise ? '<button type="button" class="wd-map-detail__avis-relax" data-avis-relax="' + esc(reprise.id) + '">Retirer « ' + esc(reprise.label) + ' »</button>' : '') +
+      '</div>'
+    : '';
   p.className = 'wd-map-detail wd-map-detail--avis';
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
     '<div class="wd-map-detail__avis" role="status">' +
       '<p class="wd-map-detail__avis-titre">' + esc(hotel.name) + ' ' + quoi + '</p>' +
       '<p class="wd-map-detail__avis-suite">' + suite + '</p>' +
+      actions +
     '</div>';
   p.dataset.state = 'open';
   _marquerAvis(true);
   clearTimeout(_avisTimer);
-  // On laisse le temps de lire avant de retirer le message ; la carte, elle, repart
-  // tout de suite pour que le message et le dézoom racontent la même chose.
-  _avisTimer = setTimeout(() => {
-    const el = document.getElementById('wd-map-detail');
-    if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
-    _marquerAvis(false);
-  }, 6000);
+  // Un message qui informe s'efface après lecture. Un message qui porte les boutons de
+  // rattrapage reste : le faire disparaître seul emporterait la seule sortie offerte.
+  if (!porteLeRattrapage) {
+    _avisTimer = setTimeout(() => {
+      const el = document.getElementById('wd-map-detail');
+      if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
+      _marquerAvis(false);
+    }, 6000);
+  }
   // On recadre sur la zone géographique et non sur `_currentScope` tel quel : celui-ci
   // peut encore désigner l'hôtel qu'on vient justement d'écarter, et on repartirait
   // alors sur lui. Après élargissement, c'est le continent qu'on cadre.
@@ -589,6 +639,10 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // de filtre, y compris quand l'hôtel satisfaisait toujours les critères cochés.
   const ouvert = _detailHotel;
   _fermerDetail(false);
+  // Les pins sont recalculés : c'est une situation neuve, le bloc de rattrapage de la vue
+  // carte peut reprendre la main. On ne le relâche pas à la simple fermeture du message,
+  // sinon il apparaissait juste derrière celui qu'on vient de refermer.
+  _marquerAvis(false);
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
 

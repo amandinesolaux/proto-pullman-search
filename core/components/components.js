@@ -1575,13 +1575,16 @@
         return true;
       };
 
-      // Zero-result recovery : suggère de retirer LE critère qui débloque le plus d'hôtels
-      const renderRelaxation = () => {
+      // Zero-result recovery : quel critère, une fois retiré, débloque le plus d'hôtels ?
+      // Renvoie null quand il y a des résultats — donc rien à proposer. La carte s'en sert
+      // pour porter les mêmes actions dans son message d'écartement, plutôt que d'afficher
+      // un second bloc par-dessus le premier.
+      const chercherAssouplissement = () => {
         const active = getActiveCriteria();
-        if (!active.size) return '';
+        if (!active.size) return null;
         const { pool } = getResultsPool();
-        if (!pool.length) return '';                                   // pas de destination -> rien à suggérer
-        if (pool.filter(hotelMatchesCriteria).length > 0) return '';   // il y a des résultats -> pas de message
+        if (!pool.length) return null;                                 // pas de destination -> rien à suggérer
+        if (pool.filter(hotelMatchesCriteria).length > 0) return null; // il y a des résultats -> pas de message
         const list = getActiveCriteriaList();
         const activeIds = [...active];
         const labelFor = (id) => { const c = list.find(x => x.id === id); return c ? c.label : id; };
@@ -1595,7 +1598,12 @@
             best = { id: cId, label: labelFor(cId), count: matches.length, hotel: matches[0] };
           }
         });
-        return buildNoResultBlock(best);
+        return { best };                                               // best peut être null : aucun critère ne débloque
+      };
+
+      const renderRelaxation = () => {
+        const r = chercherAssouplissement();
+        return r ? buildNoResultBlock(r.best) : '';
       };
 
       // Markup partagé du bloc « aucun résultat » (vue liste et vue carte)
@@ -2373,6 +2381,17 @@
         // suivre le même mouvement, sinon les deux vues se contrediraient à nouveau —
         // la carte sur l'Asie, les chips encore sur la Chine. Renvoie la nouvelle zone
         // pour que la carte reparte de celle que la liste vient d'adopter.
+        // La carte affiche elle-même le rattrapage quand un critère écarte l'hôtel ouvert :
+        // elle a besoin de la suggestion et des deux actions, qui restent calculées ici,
+        // sur les données de la liste. Les faire transiter par le DOM aurait supposé que
+        // le clic remonte jusqu'ici, ce que Leaflet n'assure pas dans son conteneur.
+        window.WD_ASSOUPLISSEMENT = () => {
+          const r = chercherAssouplissement();
+          return r ? r.best : null;
+        };
+        window.WD_RETIRER_CRITERE = (id) => { getActiveCriteria().delete(id); applyMapCriteriaChange(); };
+        window.WD_REINITIALISER_CRITERES = () => { getActiveCriteria().clear(); applyMapCriteriaChange(); };
+
         window.WD_ELARGIR_AU_CONTINENT = () => {
           searchState.country = null;
           searchState.city = null;
