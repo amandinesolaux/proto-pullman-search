@@ -988,6 +988,10 @@
   // Index des préfixes ambigus, calculé une fois : la carte nommait certains hôtels
   // de façon tronquée (« Pullman Nairobi » pour « Pullman Nairobi Upper Hill »). On
   // récupère leur position réelle, mais seulement si un seul hôtel correspond.
+  // Même fonction de hachage que celle qu'utilisait la page de résultats : les prix
+  // et notes déjà affichés ne changent pas.
+  const hashName = (s) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+
   const ALL_NAMES = REGION_HOTELS.flatMap(r => r.hotels.map(h => h.name));
   const UNAMBIGUOUS_PREFIX = Object.keys(HOTEL_COORDS)
     .filter(k => ALL_NAMES.filter(n => n.startsWith(k)).length === 1);
@@ -1007,18 +1011,38 @@
         lat = CITY_COORDS[city][0] + dx; lng = CITY_COORDS[city][1] + dy;
       }
       const services = h.services || [];
+      // Prix / note / avis : valeurs de prototype, dérivées du nom pour être stables.
+      // Calculées ici et non chez chaque consommateur, sinon la carte et la liste de
+      // résultats affichent deux prix différents pour le même hôtel.
+      const n = hashName(h.name);
       return Object.assign({}, h, { city: city, region: r.id, lat: lat, lng: lng,
         exactCoords: exact,
+        price: 129 + n % 170,
+        rating: ((79 + n % 17) / 10).toFixed(1),
+        reviews: 150 + n % 1900,
         amenities: [...new Set(services.flatMap(s => SERVICES_TO_CRITERIA[s] || []))] });
     }));
   })();
 
-  // Vue carte : même contenu, forme attendue par booking-map.js.
+  // Base media Accor, exposée pour que la carte compose ses visuels sans redéclarer l'URL.
+  const IMG_BASE = 'https://m.ahstatic.com/is/image/accorhotels/';
+  window.WD_IMG_BASE = IMG_BASE;
+  // Clé image normalisée : certains enregistrements portent déjà un suffixe de ratio.
+  window.WD_IMG_KEY = (h, ratio) => {
+    const k = h.img || 'aja_p_6783-26';
+    return k.includes(':') ? k : k + ':' + (ratio || '1by1');
+  };
+
+  // Vue carte : même contenu, forme attendue par booking-map.js. On y transporte aussi
+  // l'image, le lien et le prix, pour que l'encart de la carte affiche exactement ce que
+  // montre la carte de résultats — plus de placeholder gris ni de lien mort.
   window.WD_HOTELS = WD_HOTELS;
   window.PULLMAN_HOTELS_MAP = WD_HOTELS
     .filter(h => h.lat !== null && h.lng !== null)
     .map(h => ({ name: h.name, city: h.city, country: h.country,
-      lat: h.lat, lng: h.lng, continent: h.region, amenities: h.amenities }));
+      lat: h.lat, lng: h.lng, continent: h.region, amenities: h.amenities,
+      img: h.img, href: h.href, price: h.price, rating: h.rating,
+      reviews: h.reviews, services: h.services, badge: h.badge }));
 
   def("wd-booking", class extends WdEl {
     render() {

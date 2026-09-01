@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=271"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=277"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=271"></script>
+  <script src="../../core/components/components.js?v=277"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=271"></script>
+  <script src="../../core/components/booking-map.js?v=277"></script>
 </head>
 <body class="brand-pullman">
 
@@ -245,13 +245,9 @@ wd-booking { margin-top: 20px; }
     const critList = (D.criteriaGroups.hotels || []).flatMap(g => g.items);
     const labelFor = (id) => (critList.find(c => c.id === id) || {}).label || id;
 
-    // ---- 3. Enrichissement déterministe (prix / note / avis — proto) ----
-    results = results.map(h => ({
-      ...h,
-      price: 129 + hash(h.name) % 170,
-      rating: ((79 + hash(h.name) % 17) / 10).toFixed(1),
-      reviews: 150 + hash(h.name) % 1900
-    }));
+    // ---- 3. Prix / note / avis : déjà portés par la source (WD_HOTELS) ----
+    // Ils étaient recalculés ici ; l'encart de la carte aurait alors pu afficher un
+    // autre prix que la carte de résultats pour le même hôtel.
 
     // ---- 4. En-tête ----
     const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
@@ -351,8 +347,13 @@ wd-booking { margin-top: 20px; }
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
     if (coords.length) {
       const group = L.featureGroup(coords.map(({ h, ll }) =>
+        // Même encart que la carte du dropdown (wdHotelPopupHTML) : c'est la même
+        // information, elle ne doit pas se présenter de deux façons différentes.
         L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
-          .bindPopup('<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc) + '<br/>' + h.price + ' € / nuit')
+          .bindPopup(() => (typeof wdHotelPopupHTML === 'function'
+            ? wdHotelPopupHTML(h, critIds)
+            : '<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc)),
+            { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 })
       ));
       group.addTo(map);
       map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 8 });

@@ -50,19 +50,96 @@ function _addStyle() {
     '.pullman-map-marker--greyed .pullman-label{color:rgba(255,255,255,.4)}' +
     '.pullman-label{position:absolute;left:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8),0 0 2px rgba(0,0,0,.6);pointer-events:none}' +
     '@keyframes pullman-pulse{0%,100%{box-shadow:0 0 12px rgba(95,239,145,.7),0 0 24px rgba(95,239,145,.3),0 2px 6px rgba(0,0,0,.4)}50%{box-shadow:0 0 18px rgba(95,239,145,.9),0 0 36px rgba(95,239,145,.4),0 2px 6px rgba(0,0,0,.4)}}' +
-    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#1a2220;border:1px solid rgba(95,239,145,.25);border-radius:10px;padding:0;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.5),0 0 0 1px rgba(95,239,145,.1)}' +
-    '.pullman-popup-card .leaflet-popup-content{margin:0}' +
-    '.pullman-popup-card .leaflet-popup-tip{background:#1a2220;border:1px solid rgba(95,239,145,.25);border-top:none;border-left:none}' +
-    '.pullman-popup-card .pullman-popup__row{display:flex;align-items:stretch}' +
-    '.pullman-popup-card .pullman-popup__placeholder{width:80px;flex-shrink:0;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;padding:12px}' +
-    '.pullman-popup-card .pullman-popup__body{padding:12px 16px;display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}' +
-    '.pullman-popup-card .pullman-popup__name{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:700;color:#fff;margin:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}' +
-    '.pullman-popup-card .pullman-popup__location{font-family:var(--font-sans,sans-serif);font-size:10.5px;color:rgba(255,255,255,.5);margin:0;display:flex;align-items:center;gap:4px}' +
-    '.pullman-popup-card .pullman-popup__location svg{flex-shrink:0}' +
-    '.pullman-popup-card .pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans,sans-serif);font-size:10.5px;font-weight:600;color:#5FEF91;text-decoration:none;transition:opacity .2s;margin-top:4px}' +
-    '.pullman-popup-card .pullman-popup__cta:hover{opacity:.8}';
+    // ── Encart hôtel ──────────────────────────────────────────────────────────
+    // Même langage que les cartes de la page de résultats : fond #1a2220, aucun radius,
+    // le vert réservé au prix et à l'action. La bordure verte décorative d'avant entrait
+    // en concurrence avec les pins, eux aussi verts.
+    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#1a2220;border:1px solid rgba(255,255,255,.14);border-radius:0;padding:0;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.55)}' +
+    '.pullman-popup-card .leaflet-popup-content{margin:0;width:264px!important}' +
+    '.pullman-popup-card .leaflet-popup-tip{background:#1a2220;border:1px solid rgba(255,255,255,.14);border-top:none;border-left:none}' +
+    // Leaflet impose « .leaflet-popup-content p { margin: 1.3em 0 } » depuis son CDN.
+    // Sa spécificité (0,1,1) bat une simple classe : on la neutralise à (0,2,1), sinon
+    // chaque paragraphe ajoute ~35px de vide invisible dans l'encart.
+    '.pullman-popup-card .leaflet-popup-content p{margin:0}' +
+    '.pullman-popup__media{position:relative;display:block;width:100%;aspect-ratio:16/9;background:#28332B}' +
+    '.pullman-popup__img{width:100%;height:100%;object-fit:cover;display:block}' +
+    // Badge « Nouveau » : blanc sur voile sombre, jamais vert (le vert dit « action »)
+    '.pullman-popup__badge{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(0,0,0,.62);font-family:var(--font-sans,sans-serif);font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff}' +
+    '.pullman-popup__body{padding:11px 14px 12px;display:flex;flex-direction:column;gap:5px}' +
+    '.pullman-popup__name{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;color:#fff;margin:0;line-height:1.3}' +
+    '.pullman-popup__location{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(255,255,255,.5);margin:0;display:flex;align-items:center;gap:5px;min-width:0}' +
+    '.pullman-popup__location svg{flex-shrink:0}' +
+    '.pullman-popup__location>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '.pullman-popup__score{flex-shrink:0;margin-left:auto;padding:1px 6px;background:rgba(255,255,255,.1);font-size:11px;font-weight:700;color:#fff}' +
+    // Critères satisfaits : répond à « pourquoi cet hôtel ? » quand des filtres sont actifs
+    '.pullman-popup__tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px}' +
+    '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid rgba(95,239,145,.45);font-family:var(--font-sans,sans-serif);font-size:10px;color:#5FEF91;white-space:nowrap}' +
+    // align-items:center et non baseline : le CTA est lui-même un conteneur flex, et
+    // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
+    '.pullman-popup__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1)}' +
+    '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#fff;line-height:1;margin:0}' +
+    '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(255,255,255,.45)}' +
+    '.pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#5FEF91;text-decoration:none;transition:opacity .15s;white-space:nowrap}' +
+    '.pullman-popup__cta:hover{opacity:.75}' +
+    '.pullman-popup-card .leaflet-popup-close-button{color:rgba(255,255,255,.6);padding:6px 8px 0 0}' +
+    '.pullman-popup-card .leaflet-popup-close-button:hover{color:#fff;background:transparent}';
   document.head.appendChild(style);
 }
+
+// Libellés des critères, pour nommer en clair ce qui a fait correspondre l'hôtel.
+const WD_CRITERIA_LABELS = {
+  pool: 'Piscine', spa: 'Spa', gym: 'Salle de sport', beach: 'Bord de mer',
+  breakfast: 'Petit-déjeuner', restaurant: 'Restaurant', bar: 'Bar',
+  center: 'Centre-ville', parking: 'Parking', pets: 'Animaux acceptés',
+  family: 'Famille', meeting: 'Salles de réunion'
+};
+
+// Encart hôtel, partagé par la carte du dropdown et celle de la page de résultats.
+// Un seul encart pour les deux : c'est la même information, elle doit se présenter
+// de la même façon. `active` (Set ou tableau) liste les critères cochés : on n'affiche
+// que ceux-là, pour répondre à « pourquoi cet hôtel apparaît-il ? ».
+function wdHotelPopupHTML(h, active) {
+  // La page de résultats construit sa carte elle-même et ne passe jamais par
+  // initBookingMap() : sans cet appel, l'encart y serait affiché sans ses styles.
+  _addStyle();
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
+  const key = window.WD_IMG_KEY ? window.WD_IMG_KEY(h, '16by9') : (h.img || 'aja_p_6783-26') + ':16by9';
+  const img = base + key + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528&hei=297';
+  const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+  const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
+
+  const ids = active ? [...active] : [];
+  const tags = ids.filter(id => (h.amenities || []).includes(id))
+    .map(id => '<span class="pullman-popup__tag">' + check + esc(WD_CRITERIA_LABELS[id] || id) + '</span>').join('');
+
+  // Lien réel vers la fiche Accor quand on l'a ; sinon on n'affiche pas de lien mort.
+  const cta = h.href
+    ? '<a class="pullman-popup__cta" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + arrow + '</a>'
+    : '';
+
+  return '<article class="pullman-popup">' +
+    '<div class="pullman-popup__media">' +
+      '<img class="pullman-popup__img" src="' + img + '" alt="' + esc(h.name) + '" loading="lazy"/>' +
+      (h.badge ? '<span class="pullman-popup__badge">' + esc(h.badge) + '</span>' : '') +
+    '</div>' +
+    '<div class="pullman-popup__body">' +
+      '<h3 class="pullman-popup__name">' + esc(h.name) + '</h3>' +
+      // Lieu et note sur une seule ligne : même registre (identité de l'hôtel), et
+      // l'encart gagne une rangée sur une carte où la place est comptée.
+      '<p class="pullman-popup__location">' + pin +
+        '<span>' + esc(h.city || '') + (h.country ? ', ' + esc(h.country) : '') + '</span>' +
+        (h.rating ? '<span class="pullman-popup__score">' + esc(h.rating) + '</span>' : '') +
+      '</p>' +
+      (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '') +
+      (h.price || cta ? '<div class="pullman-popup__foot">' +
+        (h.price ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>' : '<span></span>') +
+        cta + '</div>' : '') +
+    '</div>' +
+  '</article>';
+}
+window.wdHotelPopupHTML = wdHotelPopupHTML;
 
 function initBookingMap(continentFilter) {
   const mapElement = document.getElementById('wd-booking-map');
@@ -121,19 +198,9 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
       opacity: isFiltered && !inContinent ? 0.25 : greyed ? 0.5 : 1,
     }).addTo(_bookingMap);
 
-    marker.bindPopup(
-      '<div class="pullman-popup__row">' +
-        '<div class="pullman-popup__placeholder"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>' +
-        '<div class="pullman-popup__body">' +
-          '<p class="pullman-popup__name">' + hotel.name + '</p>' +
-          '<p class="pullman-popup__location">' +
-            '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>' +
-            hotel.city + ', ' + hotel.country +
-          '</p>' +
-          '<a class="pullman-popup__cta" href="#">Découvrir <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>' +
-        '</div>' +
-      '</div>',
-      { className: 'pullman-popup-card', closeButton: false, offset: [0, -6], maxWidth: 300 }
+    // Contenu construit à la demande : évite de fabriquer 110 encarts au chargement.
+    marker.bindPopup(() => wdHotelPopupHTML(hotel, criteriaSet),
+      { className: 'pullman-popup-card', closeButton: true, offset: [0, -8], maxWidth: 280, minWidth: 264 }
     );
 
     _markers.push(marker);
