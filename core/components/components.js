@@ -1226,14 +1226,15 @@
       const destField = this.querySelector('.wd-booking__field--dest');
       const destInput = this.querySelector('.wd-booking__dest-input');
 
-      // Zone géographique telle que la carte doit la comprendre : c'est la même que
-      // celle de la liste. Sans elle, choisir « Chine » n'avait aucun effet sur la carte,
-      // qui ne connaissait que le continent.
+      // Zone géographique telle que la carte doit la comprendre. Elle recopie exactement
+      // le périmètre de getResultsPool(), qui décide de la liste : pays déplié s'il y en
+      // a un, continent sinon. Ni la ville ni l'hôtel sélectionné n'en font partie — la
+      // liste ne s'y restreint pas non plus (taper « Paris » y affiche les 9 hôtels de
+      // France), et les faire entrer ici rétrécissait la carte à 3 pins pour la même
+      // recherche. Toute divergence entre les deux vues commence ici.
       const zoneCarte = () => ({
         continent: searchState.continent,
-        country: searchState.expandedCountry || searchState.country || null,
-        city: searchState.city || null,
-        hotel: searchState.selectedHotel || null
+        country: searchState.expandedCountry || null
       });
 
       const searchState = {

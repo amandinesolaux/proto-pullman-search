@@ -26,19 +26,19 @@ let _avisTimer = null;
 // aucun effet sur la carte, qui restait sur l'Asie entière.
 let _currentScope = {};
 
-// L'hôtel appartient-il à la zone affichée ? Du plus précis au plus large, comme la liste.
+// L'hôtel appartient-il à la zone affichée ? Pays puis continent — le périmètre exact de
+// getResultsPool(), qui décide de la liste. Y ajouter la ville ou l'hôtel sélectionné
+// désaccordait les deux vues : la carte écartait des hôtels que la liste affichait.
 function _dansLaZone(hotel, scope) {
   const s = scope || {};
-  if (s.hotel) return hotel.name === s.hotel;
-  if (s.city) return hotel.city === s.city;
   if (s.country) return hotel.country === s.country;
   if (s.continent) return hotel.continent === s.continent;
   return true;
 }
-// Une zone plus fine qu'un continent existe-t-elle ? Sert à savoir s'il faut recadrer.
+// Une zone est-elle définie ? Sert à savoir s'il faut mettre en avant et recadrer.
 function _zoneDefinie(scope) {
   const s = scope || {};
-  return !!(s.hotel || s.city || s.country || s.continent);
+  return !!(s.country || s.continent);
 }
 let _currentCriteria = null;
 
@@ -362,14 +362,6 @@ function _marquerPin(hotel) {
   if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
 }
 
-// La part géographique de la zone. Un hôtel sélectionné rétrécit la zone à lui seul,
-// ce qui convient au cadrage mais fausserait tout comptage : on ne compte jamais « les
-// hôtels qui restent » dans une zone d'un seul hôtel.
-function _zoneGeo(scope) {
-  const s = scope || {};
-  return { continent: s.continent, country: s.country, city: s.city };
-}
-
 // Le français ne dit pas « en » devant tout : « au Japon », « aux Pays-Bas »,
 // « à Singapour », « au Moyen-Orient ». On ne liste que les exceptions, « en » couvrant
 // le reste — pays féminins et pays à initiale vocalique.
@@ -381,13 +373,11 @@ const WD_ZONE_PREP = {
   Singapour: 'à',
 };
 
-// « en Chine », « au Japon », « à Paris » — la mention de lieu telle qu'elle s'insère
-// dans une phrase. Les villes ne prennent jamais d'article.
+// « en Chine », « au Japon » — la mention de lieu telle qu'elle s'insère dans une phrase.
 function _enZone(scope) {
   const nom = _libelleZone(scope);
   if (!nom) return null;
-  const prep = (scope && scope.city) ? 'à' : (WD_ZONE_PREP[nom] || 'en');
-  return prep + ' ' + nom;
+  return (WD_ZONE_PREP[nom] || 'en') + ' ' + nom;
 }
 
 // Destination d'un élargissement, toujours un continent : « à l'Asie », « aux Amériques ».
@@ -398,7 +388,6 @@ const WD_VERS_CONTINENT = {
 
 function _libelleZone(scope) {
   const s = scope || {};
-  if (s.city) return s.city;
   if (s.country) return s.country;
   if (s.continent && window.WD_SEARCH_DATA) {
     return ((WD_SEARCH_DATA.regions || []).find(r => r.id === s.continent) || {}).label || null;
@@ -431,7 +420,7 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // semblerait contredire ce qu'on voit. La zone est celle que l'utilisateur a choisie —
   // « Chine » et non « Asie » : lui répondre à l'échelle du continent reviendrait à
   // compter des hôtels qu'il a lui-même écartés.
-  const geo = _zoneGeo(_currentScope);
+  const geo = { continent: _currentScope.continent, country: _currentScope.country };
   const zone = _enZone(geo);
   const dansZone = _conformes(geo, criteriaSet);
   // Y a-t-il un cran au-dessus ? Seulement si la zone est plus étroite que le continent.
@@ -627,7 +616,7 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     const critereOk = !hasCriteria || (encoreLa && manquants.length === 0);
     // Appartenance jugée sur la zone géographique, comme la liste — le continent seul
     // laissait passer un hôtel chinois alors que l'utilisateur avait choisi le Japon.
-    const zoneOk = !encoreLa || _dansLaZone(encoreLa, _zoneGeo(_currentScope));
+    const zoneOk = !encoreLa || _dansLaZone(encoreLa, _currentScope);
     if (encoreLa && critereOk && zoneOk) {
       _ouvrirDetail(encoreLa, criteriaSet, true);
     } else if (encoreLa && manquants.length && zoneOk && !refit) {
