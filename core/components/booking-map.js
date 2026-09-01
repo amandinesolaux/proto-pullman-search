@@ -108,11 +108,18 @@ function _addStyle() {
     // Plus large que la card hôtel : celle-ci est calée à 288 pour que sa photo, ses badges
     // et ses boutons tiennent dans les 316 px de haut de la carte — l'élargir la ferait
     // défiler à nouveau. Le message n'a pas de photo : la place gagnée sert à respirer.
-    '.wd-map-detail--avis{width:344px;max-height:none}' +
-    '.wd-map-detail__avis{padding:22px}' +
+    // Plafond conservé, contrairement au réglage précédent qui l'annulait : sans lui un
+    // message très long n'aurait pas défilé, il aurait été coupé net par le bord de la
+    // carte, boutons compris. Le cas ne se présente pas — 295 px mesurés pour 316 — mais
+    // la troncature silencieuse est le mauvais échec à retenir.
+    '.wd-map-detail--avis{width:344px;overflow-y:auto;overscroll-behavior:contain}' +
+    // L'air se prend en hauteur : marges hautes et basses plus généreuses que les côtés,
+    // interlignes plus amples, et de vrais intervalles entre le titre, le texte et les
+    // actions. La largeur, elle, ne bouge plus.
+    '.wd-map-detail__avis{padding:26px 24px 24px}' +
     // Seul le titre s'écarte de la croix ; le reste occupe toute la largeur.
-    '.wd-map-detail__avis-titre{padding-right:30px;margin:0 0 10px;font-family:var(--font-sans,sans-serif);font-size:14px;font-weight:700;line-height:1.4;color:#445047}' +
-    '.wd-map-detail__avis-suite{margin:0;font-family:var(--font-sans,sans-serif);font-size:12.5px;line-height:1.55;color:rgba(68,80,71,.78)}' +
+    '.wd-map-detail__avis-titre{padding-right:30px;margin:0 0 14px;font-family:var(--font-sans,sans-serif);font-size:14px;font-weight:700;line-height:1.45;color:#445047}' +
+    '.wd-map-detail__avis-suite{margin:0;font-family:var(--font-sans,sans-serif);font-size:12.5px;line-height:1.7;color:rgba(68,80,71,.78)}' +
     '.wd-map-detail__avis-suite strong{color:#445047}' +
     // Mêmes formes que les actions de la card hôtel : pilule pour l'action, lien pour le
     // recours. Les boutons du bloc vert sont taillés pour un fond sombre ; ici le fond est
@@ -120,9 +127,9 @@ function _addStyle() {
     // Les deux boutons ne tiennent pas côte à côte, même élargi, et le retour à la ligne
     // les laissait flotter chacun sur son bord. On les empile donc, pleine largeur,
     // l'action d'abord.
-    '.wd-map-detail__avis-actions{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:20px}' +
+    '.wd-map-detail__avis-actions{display:flex;flex-direction:column;align-items:stretch;gap:14px;margin-top:26px}' +
     '.wd-map-detail__avis-relax{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:500;' +
-      'padding:11px 20px;border:1px solid #445047;border-radius:100px;background:transparent;color:#445047;' +
+      'padding:13px 20px;border:1px solid #445047;border-radius:100px;background:transparent;color:#445047;' +
       'cursor:pointer;text-align:center;transition:background .15s,color .15s}' +
     '.wd-map-detail__avis-relax:hover{background:#445047;color:#fff}' +
     '.wd-map-detail__avis-reset{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:400;' +
