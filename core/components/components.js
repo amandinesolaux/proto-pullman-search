@@ -1624,29 +1624,14 @@
           body + '</div>';
       };
 
-      // Variante CARTE : calculée sur WD_HOTELS, filtré comme la carte l'affiche (seuls les
-      // hôtels géolocalisés donnent un pin). Auparavant ce calcul portait sur un second jeu
-      // de données : c'est ce qui faisait diverger le rattrapage entre la liste et la carte.
-      const renderMapRelaxation = () => {
-        const active = [...getActiveCriteria()];
-        if (!active.length) return '';
-        const geo = WD_HOTELS.filter(h => h.lat !== null && h.lng !== null);
-        const pool = searchState.continent
-          ? geo.filter(h => h.region === searchState.continent)
-          : geo.slice();
-        if (!pool.length) return '';
-        const matches = (h, ids) => ids.every(c => h.amenities && h.amenities.includes(c));
-        if (pool.some(h => matches(h, active))) return ''; // des pins correspondent encore
-        const list = getActiveCriteriaList();
-        const labelFor = (id) => { const c = list.find(x => x.id === id); return c ? c.label : id; };
-        let best = null;
-        active.forEach(cId => {
-          const reduced = active.filter(x => x !== cId);
-          const m = pool.filter(h => matches(h, reduced));
-          if (m.length && (!best || m.length > best.count)) best = { id: cId, label: labelFor(cId), count: m.length, hotel: m[0] };
-        });
-        return buildNoResultBlock(best);
-      };
+      // La vue carte affiche le même rattrapage que la liste, parce qu'elle affiche
+      // désormais les mêmes hôtels : même périmètre (getResultsPool) et même lecture des
+      // critères (via les services). Elle avait sa propre version, qui testait les
+      // critères directement contre `amenities` et ignorait le pays choisi. « Centre-ville »
+      // n'étant dans les amenities d'aucun hôtel, elle déclarait la carte vide quand la
+      // liste annonçait 9 hôtels en Chine — et proposait de retirer ce critère au nom des
+      // 39 hôtels de l'Asie entière.
+      const renderMapRelaxation = renderRelaxation;
 
       // Divulgation progressive : y a-t-il un périmètre de recherche actif (continent, pays, hôtel, ville, saisie) ?
       const hasSearchScope = () => !!(
