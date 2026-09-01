@@ -2325,12 +2325,9 @@
         // Actions du bloc de récupération (délégué sur la vue carte)
         const applyMapCriteriaChange = () => {
           renderMapPanel();
-          renderChips();
+          renderPanel();
           if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
         };
-        ddMapview.addEventListener('click', (e) => {
-        });
-
         mapViewContinents.addEventListener('click', (e) => {
           const btn = e.target.closest('.wd-booking__dd-continent');
           if (!btn) return;
@@ -2342,10 +2339,21 @@
             searchState.continent = searchState.continent === id ? null : id;
             searchState.showAll = false;
           }
+          // Les quatre échelons de la destination tombent ensemble, comme en vue liste.
+          // Seuls `country` et `city` étaient remis à zéro : `expandedCountry` survivait,
+          // et c'est lui qui définit la zone. Choisir l'Océanie laissait donc la carte et
+          // la liste sur la France, chip comprise.
           searchState.country = null;
           searchState.city = null;
+          searchState.expandedCountry = null;
+          searchState.selectedHotel = null;
+          // renderPanel() et non renderChips() seul : le panneau liste se régénère aussi.
+          // Il restait sinon figé sur la destination précédente — « 1 hôtel … — France »
+          // affiché sous une carte déjà passée à l'Océanie.
           renderMapPanel();
-          renderChips();
+          renderPanel();
+          // `undefined` pour les critères : ils ne sont pas touchés par un changement de
+          // destination, la carte garde ceux qu'elle a.
           if (typeof updateBookingMapContinent === 'function') {
             updateBookingMapContinent(searchState.continent, undefined, zoneCarte());
           }
@@ -2358,7 +2366,7 @@
           if (ac.has(id)) ac.delete(id);
           else ac.add(id);
           renderMapPanel();
-          renderChips();
+          renderPanel();
           if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(ac);
         });
 
