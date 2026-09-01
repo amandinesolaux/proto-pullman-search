@@ -1041,6 +1041,12 @@
     return 'https://all.accor.com/booking/fr/pullman/hotel/' + m[1] + (qs ? '?' + qs : '');
   };
 
+  // Critères qu'aucun service ne peut satisfaire — « Centre-ville » n'a pas d'équivalent
+  // dans les données. La liste les ignore ; la carte doit faire pareil, sans quoi cocher
+  // « Centre-ville » grisait tous les pins alors que la liste affichait tout.
+  window.WD_CRITERIA_SANS_SERVICE = Object.keys(CRITERIA_TO_SERVICES)
+    .filter(id => !(CRITERIA_TO_SERVICES[id] || []).length);
+
   // Base media Accor, exposée pour que la carte compose ses visuels sans redéclarer l'URL.
   const IMG_BASE = 'https://m.ahstatic.com/is/image/accorhotels/';
   window.WD_IMG_BASE = IMG_BASE;

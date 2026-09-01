@@ -19,6 +19,8 @@ let _markers = [];
 let _currentContinent = null;
 // Hôtel dont le détail est ouvert, pour pouvoir le réafficher après un recalcul des pins.
 let _detailHotel = null;
+// Minuterie du message « cet hôtel ne propose pas … », pour le retirer après lecture.
+let _avisTimer = null;
 let _currentCriteria = null;
 
 function _makeSmallIcon(greyed) {
@@ -82,6 +84,18 @@ function _addStyle() {
     '.wd-map-detail__scroll::-webkit-scrollbar-thumb{background:rgba(68,80,71,.35);border-radius:100px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-track{background:transparent}' +
     '.wd-map-detail[data-state="open"]{opacity:1;transform:none;pointer-events:auto}' +
+    // Message d'écartement : même emplacement et même surface que le détail, mais sans
+    // photo — il informe, il ne présente pas un hôtel. Il s'efface seul après lecture.
+    '.wd-map-detail--avis{max-height:none}' +
+    '.wd-map-detail__avis{padding:16px 40px 16px 16px}' +
+    '.wd-map-detail__avis-titre{margin:0 0 6px;font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;line-height:1.35;color:#445047}' +
+    '.wd-map-detail__avis-suite{margin:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;line-height:1.45;color:rgba(68,80,71,.78)}' +
+    '.wd-map-detail__avis-suite strong{color:#445047}' +
+    // La croix est claire sur la photo du détail ; ici le fond est blanc, il lui faut
+    // l'inverse pour rester visible.
+    '.wd-map-detail--avis .wd-map-detail__close{background-color:rgba(68,80,71,.12);' +
+      'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23445047%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E")}' +
+    '.wd-map-detail--avis .wd-map-detail__close:hover{background-color:rgba(68,80,71,.24)}' +
     '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;padding:0;' +
       'border:none;border-radius:100px;background-color:rgba(0,0,0,.55);cursor:pointer;' +
       'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E");' +
@@ -277,8 +291,45 @@ function _fermerDetail(revenir) {
   const etaitOuvert = p && p.dataset.state === 'open';
   if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
   _detailHotel = null;
+  clearTimeout(_avisTimer);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
   if (revenir && etaitOuvert) _vueContinent(_currentContinent, true);
+}
+
+// Conteneur du panneau, créé une fois. Détail et message le partagent : ils occupent la
+// même place et doivent tous deux être isolés des événements de la carte.
+function _panneauDetail() {
+  const conteneur = document.getElementById('wd-booking-map');
+  if (!conteneur || !_bookingMap) return null;
+  let p = document.getElementById('wd-map-detail');
+  if (p) return p;
+  p = document.createElement('aside');
+  p.id = 'wd-map-detail';
+  // On reprend la classe que Leaflet posait sur ses bulles : tous les styles de l'encart
+  // y sont accrochés (.pullman-popup-card .pullman-popup__cta, etc.). Sans elle, le
+  // panneau perdait les CTA et retombait sur les liens bleus de Leaflet.
+  p.className = 'wd-map-detail pullman-popup-card';
+  p.setAttribute('role', 'dialog');
+  p.setAttribute('aria-label', 'Détail de l’hôtel');
+  conteneur.appendChild(p);
+  // Le panneau vit DANS le conteneur de la carte : sans cela, tout clic dedans remonte
+  // jusqu'à Leaflet, qui le prend pour un clic sur la carte et referme le panneau.
+  L.DomEvent.disableClickPropagation(p);
+  L.DomEvent.disableScrollPropagation(p);
+  p.addEventListener('click', (e) => {
+    if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); }
+  });
+  return p;
+}
+
+// Critères que l'hôtel ne satisfait pas. Les critères sans service associé sont écartés
+// du calcul, exactement comme le fait la vue liste : « Centre-ville » n'a pas
+// d'équivalent dans les données, le cocher grisait donc tous les pins de la carte
+// pendant que la liste, elle, continuait d'afficher tout le catalogue.
+function _criteresManquants(hotel, criteriaSet) {
+  if (!criteriaSet || !criteriaSet.size) return [];
+  const ignores = window.WD_CRITERIA_SANS_SERVICE || [];
+  return [...criteriaSet].filter(c => !ignores.includes(c) && !(hotel.amenities || []).includes(c));
 }
 
 // Marque le pin de l'hôtel ouvert. Les marqueurs sont détruits et recréés à chaque
@@ -292,34 +343,59 @@ function _marquerPin(hotel) {
   if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
 }
 
+// Message affiché quand un critère vient d'écarter l'hôtel ouvert. Il nomme l'hôtel et
+// ce qui lui manque, annonce combien d'établissements restent, puis la carte revient
+// d'elle-même au continent — les pins verts sont ceux qui satisfont les critères.
+function _messageDetail(hotel, manquants, restants, continentFilter) {
+  const p = _panneauDetail();
+  if (!p) return;
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Les libellés sont des noms de critères (« Animaux acceptés », « Salles de réunion ») :
+  // on les cite entre guillemets plutôt que de les coudre dans la phrase, où ils se
+  // liraient mal — « ne propose pas Animaux acceptés ».
+  const libelles = manquants.map(id => '« ' + esc(WD_CRITERIA_LABELS[id] || id) + ' »');
+  const quoi = libelles.length > 1
+    ? 'ne répond pas aux critères ' + libelles.slice(0, -1).join(', ') + ' et ' + libelles[libelles.length - 1]
+    : 'ne répond pas au critère ' + libelles[0];
+  // On nomme le continent : le compte porte sur lui, alors que des pins verts d'autres
+  // zones restent visibles en arrière-plan. Sans cette précision, le chiffre annoncé
+  // semblerait contredire ce qu'on voit.
+  const zone = (window.WD_SEARCH_DATA && continentFilter)
+    ? (WD_SEARCH_DATA.regions.find(r => r.id === continentFilter) || {}).label
+    : null;
+  p.className = 'wd-map-detail wd-map-detail--avis';
+  p.innerHTML =
+    '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
+    '<div class="wd-map-detail__avis" role="status">' +
+      '<p class="wd-map-detail__avis-titre">' + esc(hotel.name) + ' ' + quoi + '</p>' +
+      '<p class="wd-map-detail__avis-suite">' +
+        (restants > 0
+          ? '<strong>' + restants + ' hôtel' + (restants > 1 ? 's' : '') + '</strong>' + (zone ? ' en ' + esc(zone) : '') +
+            ' y répond' + (restants > 1 ? 'ent' : '') + ' — ' + (restants > 1 ? 'ils restent' : 'il reste') + ' en vert sur la carte.'
+          : 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') + ' ne réunit tous ces critères.') +
+      '</p>' +
+    '</div>';
+  p.dataset.state = 'open';
+  _detailHotel = null;
+  clearTimeout(_avisTimer);
+  // On laisse le temps de lire avant de retirer le message ; la carte, elle, repart
+  // tout de suite pour que le message et le dézoom racontent la même chose.
+  _avisTimer = setTimeout(() => {
+    const el = document.getElementById('wd-map-detail');
+    if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
+  }, 6000);
+  _vueContinent(continentFilter, true);
+}
+
 // `sansVol` : rafraîchir le contenu sans redéplacer la carte. Sert au réaffichage après
 // un changement de filtres — on met à jour les critères satisfaits, sans bouger la vue
 // que l'utilisateur est en train de regarder.
 function _ouvrirDetail(hotel, criteriaSet, sansVol) {
-  const conteneur = document.getElementById('wd-booking-map');
-  if (!conteneur || !_bookingMap) return;
+  const p = _panneauDetail();
+  if (!p) return;
   _detailHotel = hotel;
-  let p = document.getElementById('wd-map-detail');
-  if (!p) {
-    p = document.createElement('aside');
-    p.id = 'wd-map-detail';
-    // On reprend la classe que Leaflet posait sur ses bulles : tous les styles de
-    // l'encart y sont accrochés (.pullman-popup-card .pullman-popup__cta, etc.). Sans
-    // elle, le panneau perdait les CTA et retombait sur les liens bleus de Leaflet.
-    p.className = 'wd-map-detail pullman-popup-card';
-    p.setAttribute('role', 'dialog');
-    p.setAttribute('aria-label', 'Détail de l’hôtel');
-    conteneur.appendChild(p);
-    // Le panneau vit DANS le conteneur de la carte : sans cela, tout clic dedans
-    // remonte jusqu'à Leaflet, qui le prend pour un clic sur la carte et referme le
-    // panneau. « Voir l'hôtel » ouvrait bien son onglet, mais fermait le détail au
-    // passage — on revenait sur une carte remise à la vue du continent.
-    L.DomEvent.disableClickPropagation(p);
-    L.DomEvent.disableScrollPropagation(p);
-    p.addEventListener('click', (e) => {
-      if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(true); }
-    });
-  }
+  clearTimeout(_avisTimer);
+  p.className = 'wd-map-detail pullman-popup-card';
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
     '<div class="wd-map-detail__scroll">' + wdHotelPopupHTML(hotel, criteriaSet) + '</div>';
@@ -408,7 +484,7 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 
   PULLMAN_HOTELS_MAP.forEach(hotel => {
     const inContinent = hotel.continent === continentFilter;
-    const matchesCriteria = !hasCriteria || [...criteriaSet].every(c => hotel.amenities && hotel.amenities.includes(c));
+    const matchesCriteria = !hasCriteria || _criteresManquants(hotel, criteriaSet).length === 0;
     const greyed = hasCriteria && !matchesCriteria;
     const icon = isFiltered && inContinent
       ? _makeLargeIcon(hotel.city, greyed)
@@ -434,9 +510,22 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // les nouveaux critères.
   if (ouvert) {
     const encoreLa = PULLMAN_HOTELS_MAP.find(h => h.name === ouvert.name);
-    const critereOk = !hasCriteria || (encoreLa && [...criteriaSet].every(c => encoreLa.amenities && encoreLa.amenities.includes(c)));
+    const manquants = (hasCriteria && encoreLa)
+      ? _criteresManquants(encoreLa, criteriaSet)
+      : [];
+    const critereOk = !hasCriteria || (encoreLa && manquants.length === 0);
     const continentOk = !continentFilter || (encoreLa && encoreLa.continent === continentFilter);
-    if (encoreLa && critereOk && continentOk) _ouvrirDetail(encoreLa, criteriaSet, true);
+    if (encoreLa && critereOk && continentOk) {
+      _ouvrirDetail(encoreLa, criteriaSet, true);
+    } else if (encoreLa && manquants.length && continentOk && !refit) {
+      // L'hôtel vient d'être écarté par un critère : on le dit avant de partir. Sans
+      // message, la card disparaissait sans raison visible et la carte restait zoomée
+      // sur un hôtel qui ne correspondait plus.
+      const restants = PULLMAN_HOTELS_MAP.filter(h =>
+        (!continentFilter || h.continent === continentFilter) &&
+        _criteresManquants(h, criteriaSet).length === 0).length;
+      _messageDetail(encoreLa, manquants, restants, continentFilter);
+    }
   }
 
   // Recadrage uniquement quand la zone change (init / choix de continent) —
