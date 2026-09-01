@@ -64,13 +64,20 @@ function _addStyle() {
       'max-height:calc(100% - 24px);display:flex;flex-direction:column;overflow:hidden;' +
       'background:#fff;box-shadow:0 12px 38px rgba(0,0,0,.45);' +
       'opacity:0;transform:translateX(-12px);pointer-events:none;transition:opacity .2s,transform .2s}' +
-    '.wd-map-detail__scroll{overflow-y:auto;overscroll-behavior:contain;' +
+    '.wd-map-detail__scroll{display:flex;flex-direction:column;min-height:0;' +
+      'overflow-y:auto;overscroll-behavior:contain;' +
       'scrollbar-width:thin;scrollbar-color:rgba(68,80,71,.35) transparent}' +
+    // Photo en 21:9 dans le panneau, contre 16:9 ailleurs. La carte du dropdown est figée
+    // à 340px : le panneau doit tenir dans 316 sans jamais faire défiler. Le plafond de
+    // badges est un COMPTE, mais la contrainte est une LARGEUR — quatre libellés longs
+    // (« Salles de réunion », « Petit-déjeuner ») passent sur deux lignes. On dimensionne
+    // donc pour ce pire cas, et c'est la photo qui cède, jamais le prix ni les boutons.
+    '.wd-map-detail .pullman-popup__media{flex:0 0 auto;aspect-ratio:21/9}' +
+    '.wd-map-detail .pullman-popup__body{flex:0 0 auto}' +
     '.wd-map-detail__scroll::-webkit-scrollbar{width:6px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-thumb{background:rgba(68,80,71,.35);border-radius:100px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-track{background:transparent}' +
     '.wd-map-detail[data-state="open"]{opacity:1;transform:none;pointer-events:auto}' +
-    '.wd-map-detail .pullman-popup__media{aspect-ratio:16/9}' +
     '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;padding:0;' +
       'border:none;border-radius:100px;background-color:rgba(0,0,0,.55);cursor:pointer;' +
       'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E");' +
@@ -115,6 +122,9 @@ function _addStyle() {
     '.pullman-popup__tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px}' +
     '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(68,80,71,.08);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:500;color:#445047;white-space:nowrap}' +
     '.pullman-popup__tag--match{background:rgba(95,239,145,.32);font-weight:600;color:#2F4034}' +
+    // « +N » : un compte, pas un service — fond transparent et filet, pour qu'il ne se
+    // lise pas comme un équipement de plus. Le survol révèle lesquels.
+    '.pullman-popup__tag--plus{background:transparent;border:1px solid rgba(68,80,71,.28);color:rgba(68,80,71,.78);cursor:default}' +
     // align-items:center et non baseline : le CTA est lui-même un conteneur flex, et
     // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
     // Deux actions : le prix passe sur sa propre ligne, sinon les trois éléments se
@@ -191,10 +201,19 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const services = (h.amenities || []).filter(id => WD_CRITERIA_LABELS[id]);
   const retenus = services.filter(id => ids.includes(id));
   const autres = services.filter(id => !ids.includes(id));
-  const tags = retenus.map(id =>
-      '<span class="pullman-popup__tag pullman-popup__tag--match">' + check + esc(WD_CRITERIA_LABELS[id]) + '</span>')
-    .concat(autres.map(id =>
-      '<span class="pullman-popup__tag">' + esc(WD_CRITERIA_LABELS[id]) + '</span>'))
+  // Les services cochés passent toujours : ils répondent à la demande. C'est le surplus
+  // qui est plafonné, et le reste annoncé par un « +N » — le panneau ne doit jamais
+  // obliger à faire défiler pour atteindre le prix ou les boutons.
+  const ordonnes = retenus.concat(autres);
+  const visibles = ordonnes.slice(0, Math.max(WD_TAGS_MAX, retenus.length));
+  const restants = ordonnes.length - visibles.length;
+  const tags = visibles.map(id =>
+      ids.includes(id)
+        ? '<span class="pullman-popup__tag pullman-popup__tag--match">' + check + esc(WD_CRITERIA_LABELS[id]) + '</span>'
+        : '<span class="pullman-popup__tag">' + esc(WD_CRITERIA_LABELS[id]) + '</span>')
+    .concat(restants > 0
+      ? ['<span class="pullman-popup__tag pullman-popup__tag--plus" title="' + esc(ordonnes.slice(visibles.length).map(i => WD_CRITERIA_LABELS[i]).join(', ')) + '">+' + restants + '</span>']
+      : [])
     .join('');
 
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
@@ -238,6 +257,10 @@ const WD_DETAIL_W = 288;
 // savait plus où l'on se trouvait dans le pays. À 6 la forme du pays reste lisible et
 // le pin s'y situe.
 const WD_ZOOM_HOTEL = 6;
+// Nombre de services affichés dans l'encart. Au-delà, un « +N » prend le relais.
+// 3 et non 4 : avec le « +N », quatre badges débordaient sur une seconde ligne, et
+// c'est cette ligne supplémentaire qui obligeait à faire défiler le panneau.
+const WD_TAGS_MAX = 3;
 
 // `revenir` : refaire le chemin inverse, du pin vers la vue du continent. On ne le fait
 // qu'à la fermeture volontaire — pas quand les pins sont recalculés, puisque le cadrage
