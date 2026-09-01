@@ -96,8 +96,18 @@ function _addStyle() {
     // en (0,1,1), qui battait une classe seule — le CTA ressortait en bleu Leaflet.
     '.pullman-popup-card .pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;background:#5FEF91;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#445047;text-decoration:none;transition:background .15s;white-space:nowrap}' +
     '.pullman-popup-card .pullman-popup__cta:hover{background:#4DD87A;color:#445047}' +
-    '.pullman-popup-card .leaflet-popup-close-button{color:rgba(68,80,71,.55);padding:6px 8px 0 0}' +
-    '.pullman-popup-card .leaflet-popup-close-button:hover{color:#445047;background:transparent}';
+    // Fermeture : elle est posée sur la photo, donc aucune couleur de texte seule ne peut
+    // être fiable — selon le cliché elle disparaît. On lui donne un voile sombre, comme
+    // le badge. Sélecteur à 3 classes : Leaflet applique « .leaflet-container
+    // a.leaflet-popup-close-button » en (0,2,1), qui l'emportait et la laissait en gris
+    // Tahoma sur fond transparent.
+    '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button{' +
+      'top:8px;right:8px;width:26px;height:26px;padding:0;border-radius:100px;' +
+      'background:rgba(0,0,0,.55);color:#fff;' +
+      'font:400 17px/26px var(--font-sans,sans-serif);text-align:center;' +
+      'transition:background .15s}' +
+    '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button:hover{background:rgba(0,0,0,.8);color:#fff}' +
+    '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button:focus-visible{outline:2px solid #fff;outline-offset:2px}';
   document.head.appendChild(style);
 }
 
