@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=338"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=341"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=338"></script>
+  <script src="../../core/components/components.js?v=341"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=338"></script>
+  <script src="../../core/components/booking-map.js?v=341"></script>
 </head>
 <body class="brand-pullman">
 
@@ -158,7 +158,13 @@ wd-booking { margin-top: 20px; }
    en position absolue. Sans ce conteneur, un <img> en élément flex impose sa hauteur
    intrinsèque — une photo portrait étirait sa card à 240px quand les autres en font 150. */
 .srx-card-media { flex: 0 0 160px; width: 160px; align-self: stretch; position: relative; overflow: hidden; background: #E7EDE8; min-height: 120px; }
-.srx-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Les photos se superposent, une seule visible : la card ne change pas de hauteur d'une
+   photo à l'autre. */
+.srx-card-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .25s; }
+.srx-card-img[data-on] { opacity: 1; }
+/* Bande de 160px : les chevrons de la card de la carte y prendraient 42% de la largeur. */
+.srx-card-media .pullman-popup__nav { width: 24px; }
+.srx-card-media:hover .pullman-popup__nav { opacity: 1; }
 .srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .srx-card-name { font-family: var(--font-sans); font-weight: 700; font-size: 16.5px; color: #445047; margin: 0 0 3px; }
@@ -357,6 +363,10 @@ wd-booking { margin-top: 20px; }
         // Clé nue, sans suffixe de ratio : toutes les photos n'ont pas de rendu « :1by1 »
         // côté Accor. Le cadrage 4:3 est porté par .srx-card-img (aspect-ratio + cover).
         const imgKey = window.WD_IMG_KEY ? window.WD_IMG_KEY(h) : (h.img || 'aja_p_6783-26').split(':')[0];
+        // Les photos de l'hôtel, relevées sur sa fiche. La principale reste en tête, donc
+        // la liste s'ouvre exactement comme avant ; les suivantes se découvrent au clic.
+        const cles = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [imgKey];
+        const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
         // On n'affiche PAS les critères filtrés : en correspondance ET, tous les résultats
         // les satisfont, donc le même badge apparaîtrait sur chaque card sans rien
         // distinguer. On montre à la place les services les plus rares de cet hôtel —
@@ -369,8 +379,18 @@ wd-booking { margin-top: 20px; }
           // Largeur seule, sans « hei » : beaucoup de photos Accor sont en portrait, et
           // imposer une hauteur fait remplir le cadre de BLANC par le serveur. On récupère
           // la photo dans son ratio d'origine et c'est object-fit qui recadre.
-          '<div class="srx-card-media">' +
-            '<img class="srx-card-img" src="' + D.imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400" alt="' + esc(h.name) + '" loading="lazy"/>' +
+          '<div class="srx-card-media"' + (cles.length > 1 ? ' data-galerie' : '') + '>' +
+            cles.map((k, i) =>
+              '<img class="srx-card-img" src="' + photo(k) + '" alt="' + esc(h.name) + '"' +
+              (i === 0 ? ' data-on' : ' loading="lazy"') + '/>').join('') +
+            (cles.length > 1
+              ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
+                '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +
+                '<div class="pullman-popup__points">' +
+                  cles.map((k, i) => '<button type="button" class="pullman-popup__point" data-point="' + i + '"' +
+                    (i === 0 ? ' data-on' : '') + ' aria-label="Photo ' + (i + 1) + ' sur ' + cles.length + '"></button>').join('') +
+                '</div>'
+              : '') +
           '</div>' +
           '<div class="srx-card-body">' +
             '<div class="srx-card-top"><div>' +

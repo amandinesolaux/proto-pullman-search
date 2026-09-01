@@ -61,7 +61,44 @@ function _makeLargeIcon(cityName, greyed) {
   });
 }
 
+// Défilement des photos, posé une seule fois sur le document. Délégué plutôt qu'attaché
+// à chaque card : la card de la carte est reconstruite à chaque changement de critère, et
+// la page de résultats fabrique les siennes de son côté — un seul gestionnaire les sert
+// toutes, sans avoir à être réinstallé.
+function _installerGalerie() {
+  if (document.documentElement.dataset.wdGalerie) return;
+  document.documentElement.dataset.wdGalerie = '1';
+  document.addEventListener('click', (e) => {
+    const bouton = e.target.closest('[data-photo],[data-point]');
+    if (!bouton) return;
+    // On repère le conteneur par son marqueur, pas par une classe : la card de la carte
+    // et celle de la page de résultats n'ont pas la même mise en page, mais toutes deux
+    // portent `data-galerie` et se pilotent pareil.
+    const media = bouton.closest('[data-galerie]');
+    if (!media) return;
+    e.preventDefault();
+    const photos = [...media.querySelectorAll('img')];
+    const points = [...media.querySelectorAll('.pullman-popup__point')];
+    if (photos.length < 2) return;
+    const courant = Math.max(0, photos.findIndex(i => i.hasAttribute('data-on')));
+    const cible = bouton.dataset.point !== undefined
+      ? Number(bouton.dataset.point)
+      : (courant + Number(bouton.dataset.photo) + photos.length) % photos.length;
+    photos.forEach((im, i) => {
+      if (i === cible) { im.removeAttribute('loading'); im.setAttribute('data-on', ''); }
+      else im.removeAttribute('data-on');
+    });
+    points.forEach((pt, i) => i === cible ? pt.setAttribute('data-on', '') : pt.removeAttribute('data-on'));
+  });
+}
+
+// Posé dès le chargement, et non à la première ouverture d'une card : la page de
+// résultats affiche ses cards avant d'avoir touché la carte, et leurs galeries restaient
+// muettes.
+_installerGalerie();
+
 function _addStyle() {
+  _installerGalerie();
   if (document.getElementById('pullman-map-style')) return;
   const style = document.createElement('style');
   style.id = 'pullman-map-style';
@@ -168,7 +205,27 @@ function _addStyle() {
     // chaque paragraphe ajoute ~35px de vide invisible dans l'encart.
     '.pullman-popup-card .leaflet-popup-content p{margin:0}' +
     '.pullman-popup__media{position:relative;display:block;width:100%;aspect-ratio:16/9;background:#E7EDE8}' +
-    '.pullman-popup__img{width:100%;height:100%;object-fit:cover;display:block}' +
+    // Les photos se superposent : la card garde exactement la même hauteur, quelle qu'en
+    // soit la photo affichée — c'est la contrainte qui gouverne ce panneau.
+    '.pullman-popup__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;' +
+      'opacity:0;transition:opacity .25s}' +
+    '.pullman-popup__img[data-on]{opacity:1}' +
+    '.pullman-popup__points{position:absolute;left:0;right:0;bottom:7px;z-index:2;' +
+      'display:flex;justify-content:center;gap:5px;pointer-events:auto}' +
+    '.pullman-popup__point{width:5px;height:5px;padding:0;border:none;border-radius:50%;cursor:pointer;' +
+      'background:rgba(255,255,255,.5);box-shadow:0 1px 2px rgba(0,0,0,.45);transition:background .2s,width .2s}' +
+    '.pullman-popup__point[data-on]{background:#fff;width:14px;border-radius:100px}' +
+    // Chevrons discrets, révélés au survol : ils ne doivent pas concurrencer la photo.
+    '.pullman-popup__nav{position:absolute;top:0;bottom:0;width:34px;z-index:2;padding:0;border:none;' +
+      'background:transparent;cursor:pointer;opacity:0;transition:opacity .2s}' +
+    '.pullman-popup__media:hover .pullman-popup__nav{opacity:1}' +
+    '.pullman-popup__nav:focus-visible{opacity:1;outline:2px solid #fff;outline-offset:-4px}' +
+    '.pullman-popup__nav::before{content:"";position:absolute;top:50%;left:50%;width:8px;height:8px;' +
+      'border-left:1.8px solid #fff;border-bottom:1.8px solid #fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}' +
+    '.pullman-popup__nav--prev{left:0}' +
+    '.pullman-popup__nav--prev::before{transform:translate(-40%,-50%) rotate(45deg)}' +
+    '.pullman-popup__nav--next{right:0}' +
+    '.pullman-popup__nav--next::before{transform:translate(-60%,-50%) rotate(-135deg)}' +
     // Badge « Nouveau » posé sur la photo : voile sombre, seul endroit où le blanc reste lisible
     '.pullman-popup__badge{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(0,0,0,.62);font-family:var(--font-sans,sans-serif);font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff}' +
     '.pullman-popup__body{padding:11px 14px 12px;display:flex;flex-direction:column;gap:5px}' +
@@ -254,6 +311,10 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // Largeur seule : imposer « hei » fait combler le cadre de blanc par le serveur quand
   // la photo est en portrait. Le recadrage 16:9 est fait par .pullman-popup__media.
   const img = base + key + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528';
+  // Toutes les photos de l'hôtel, la principale en tête. Un seul visuel donnait une card
+  // muette sur ce qu'on vient voir : l'établissement.
+  const cles = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [key];
+  const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
   const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
@@ -294,8 +355,21 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     : '';
 
   return '<article class="pullman-popup">' +
-    '<div class="pullman-popup__media">' +
-      '<img class="pullman-popup__img" src="' + img + '" alt="' + esc(h.name) + '" loading="lazy"/>' +
+    '<div class="pullman-popup__media"' + (photos.length > 1 ? ' data-galerie' : '') + '>' +
+      photos.map((u, i) =>
+        // Seule la première est chargée d'emblée : les suivantes ne servent qu'à qui
+        // fait défiler, et la card s'ouvre au clic sur un pin — on ne fait pas payer
+        // trois photos à chaque ouverture.
+        '<img class="pullman-popup__img" src="' + u + '" alt="' + esc(h.name) + '"' +
+        (i === 0 ? ' data-on' : '') + (i === 0 ? '' : ' loading="lazy"') + '/>').join('') +
+      (photos.length > 1
+        ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
+          '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +
+          '<div class="pullman-popup__points">' +
+            photos.map((u, i) => '<button type="button" class="pullman-popup__point" data-point="' + i + '"' +
+              (i === 0 ? ' data-on' : '') + ' aria-label="Photo ' + (i + 1) + ' sur ' + photos.length + '"></button>').join('') +
+          '</div>'
+        : '') +
       (h.badge ? '<span class="pullman-popup__badge">' + esc(h.badge) + '</span>' : '') +
     '</div>' +
     '<div class="pullman-popup__body">' +
