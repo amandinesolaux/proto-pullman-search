@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=284"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=285"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=284"></script>
+  <script src="../../core/components/components.js?v=285"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=284"></script>
+  <script src="../../core/components/booking-map.js?v=285"></script>
 </head>
 <body class="brand-pullman">
 
@@ -168,8 +168,13 @@ wd-booking { margin-top: 20px; }
 .srx-price span { font-size: 12px; color: rgba(255,255,255,.5); }
 /* Sans dates : on explique l'absence de tarif au lieu de laisser un blanc */
 .srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(255,255,255,.5); }
-.srx-cta { font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-highlight, #5FEF91); text-decoration: none; }
-.srx-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Deux actions : consulter la fiche (lien discret) et réserver (bouton).
+   La hiérarchie dit laquelle est l'action principale. */
+.srx-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.srx-link { font-family: var(--font-sans); font-size: 13px; color: var(--pul-muted, #D9E6D0); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.srx-link:hover { color: #fff; }
+.srx-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; background: var(--pul-highlight, #5FEF91); font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-bg, #445047); text-decoration: none; white-space: nowrap; transition: background .15s; }
+.srx-cta:hover { background: var(--pul-highlight-hover, #4DD87A); }
 
 /* --- Zéro résultat --- */
 .srx-empty { background: var(--pul-bg, #445047); border: 1px solid rgba(255,255,255,.12); padding: 20px; font-family: var(--font-sans); }
@@ -262,6 +267,18 @@ wd-booking { margin-top: 20px; }
     // l'ajouter ici de la même façon.
     const showPrice = !!(P.get('checkin') && P.get('checkout'));
 
+    // Séjour recherché, transmis au lien de réservation ALL pour que l'utilisateur
+    // n'ait pas à ressaisir ses dates en arrivant sur le moteur.
+    const nuits = (P.get('checkin') && P.get('checkout'))
+      ? Math.max(1, Math.round((new Date(P.get('checkout')) - new Date(P.get('checkin'))) / 86400000))
+      : 0;
+    const stay = {
+      checkin: P.get('checkin') || null,
+      nights: nuits,
+      guests: Math.max(1, parseInt(P.get('adults'), 10) || 1) + Math.max(0, parseInt(P.get('children'), 10) || 0)
+    };
+    const bookingUrl = (h) => (window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null);
+
     // ---- 4. En-tête ----
     const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
     const subParts = [];
@@ -306,7 +323,11 @@ wd-booking { margin-top: 20px; }
               (showPrice
                 ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
                 : '<span class="srx-nodate">Ajoutez vos dates pour voir les tarifs</span>') +
-              '<a class="srx-cta" href="' + esc(h.href || '#') + '"' + (h.href ? ' target="_blank" rel="noopener"' : '') + '>Voir l’hôtel →</a>' +
+              // Deux destinations : la fiche sur le site de marque, la réservation sur ALL.
+              '<span class="srx-actions">' +
+                (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel</a>' : '') +
+                (bookingUrl(h) ? '<a class="srx-cta" href="' + esc(bookingUrl(h)) + '" target="_blank" rel="noopener">Réserver →</a>' : '') +
+              '</span>' +
             '</div>' +
           '</div></article>';
       }).join('');
@@ -377,7 +398,7 @@ wd-booking { margin-top: 20px; }
         // information, elle ne doit pas se présenter de deux façons différentes.
         const mk = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
           .bindPopup(() => (typeof wdHotelPopupHTML === 'function'
-            ? wdHotelPopupHTML(h, critIds, showPrice)
+            ? wdHotelPopupHTML(h, critIds, showPrice, stay)
             : '<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc)),
             { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 });
         markerByHotel.set(h.name, mk);

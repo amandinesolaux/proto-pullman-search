@@ -1024,6 +1024,23 @@
     }));
   })();
 
+  // Lien de réservation ALL, relevé sur all.accor.com et vérifié :
+  //   .../booking/fr/pullman/hotel/<code>?dateIn=AAAA-MM-JJ&nights=N&compositions=P
+  // dateIn et nights sont bien repris ; compositions vaut le nombre total de VOYAGEURS
+  // (compositions=2 affiche « 2 personnes »), pas le nombre de chambres. « adults » est
+  // ignoré. Le redirecteur lien_externe.svlt du site Pullman jette ces paramètres : on
+  // vise donc directement la fiche booking.
+  window.WD_ALL_BOOKING_URL = (hotel, opts) => {
+    const m = (hotel && hotel.href || '').match(/\/([A-Za-z0-9]{4})\.html?$/);
+    if (!m) return null;
+    const o = opts || {};
+    const p = new URLSearchParams();
+    if (o.checkin && o.nights > 0) { p.set('dateIn', o.checkin); p.set('nights', String(o.nights)); }
+    if (o.guests > 0) p.set('compositions', String(o.guests));
+    const qs = p.toString();
+    return 'https://all.accor.com/booking/fr/pullman/hotel/' + m[1] + (qs ? '?' + qs : '');
+  };
+
   // Base media Accor, exposée pour que la carte compose ses visuels sans redéclarer l'URL.
   const IMG_BASE = 'https://m.ahstatic.com/is/image/accorhotels/';
   window.WD_IMG_BASE = IMG_BASE;

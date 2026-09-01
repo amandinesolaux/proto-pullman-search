@@ -85,7 +85,14 @@ function _addStyle() {
     '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(95,239,145,.24);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:600;color:#2F4034;white-space:nowrap}' +
     // align-items:center et non baseline : le CTA est lui-même un conteneur flex, et
     // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
-    '.pullman-popup__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
+    // Deux actions : le prix passe sur sa propre ligne, sinon les trois éléments se
+    // comprimeraient sur 236px utiles.
+    '.pullman-popup__foot{display:flex;flex-direction:column;align-items:stretch;gap:9px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
+    '.pullman-popup__actions{display:flex;align-items:center;justify-content:space-between;gap:10px}' +
+    // « Voir l\'hôtel » en lien discret, « Réserver » en bouton : la réservation est
+    // l\'action principale, la fiche hôtel une consultation.
+    '.pullman-popup-card .pullman-popup__link{font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#445047;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}' +
+    '.pullman-popup-card .pullman-popup__link:hover{color:#2F4034}' +
     '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#445047;line-height:1;margin:0}' +
     '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(68,80,71,.78)}' +
     // Sans dates, on dit pourquoi il n'y a pas de prix plutôt que de laisser un vide
@@ -129,7 +136,9 @@ const WD_CRITERIA_LABELS = {
 // que ceux-là, pour répondre à « pourquoi cet hôtel apparaît-il ? ».
 // showPrice est faux par défaut : un tarif n'a de sens qu'une fois les dates et
 // l'occupation connues. Sur la carte d'exploration (dropdown), on n'en affiche jamais.
-function wdHotelPopupHTML(h, active, showPrice) {
+// `stay` porte le séjour recherché ({checkin, nights, guests}) : il alimente le lien de
+// réservation ALL pour que l'utilisateur n'ait pas à ressaisir ses dates.
+function wdHotelPopupHTML(h, active, showPrice, stay) {
   // La page de résultats construit sa carte elle-même et ne passe jamais par
   // initBookingMap() : sans cet appel, l'encart y serait affiché sans ses styles.
   _addStyle();
@@ -145,9 +154,14 @@ function wdHotelPopupHTML(h, active, showPrice) {
   const tags = ids.filter(id => (h.amenities || []).includes(id))
     .map(id => '<span class="pullman-popup__tag">' + check + esc(WD_CRITERIA_LABELS[id] || id) + '</span>').join('');
 
-  // Lien réel vers la fiche Accor quand on l'a ; sinon on n'affiche pas de lien mort.
+  // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
+  // réservation sur ALL. Sans href on n'affiche aucun lien plutôt qu'un lien mort.
+  const bookUrl = window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null;
   const cta = h.href
-    ? '<a class="pullman-popup__cta" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + arrow + '</a>'
+    ? '<div class="pullman-popup__actions">' +
+        '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel</a>' +
+        (bookUrl ? '<a class="pullman-popup__cta" href="' + esc(bookUrl) + '" target="_blank" rel="noopener">Réserver ' + arrow + '</a>' : '') +
+      '</div>'
     : '';
 
   return '<article class="pullman-popup">' +
