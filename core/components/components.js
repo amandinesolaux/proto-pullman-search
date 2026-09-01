@@ -2416,8 +2416,12 @@
       const today = new Date(); today.setHours(0,0,0,0);
       let dpMonth = today.getMonth();
       let dpYear = today.getFullYear();
-      let dpCheckIn = null;
-      let dpCheckOut = null;
+      // Séjour par défaut : ce soir → demain. Une recherche part ainsi toujours de dates
+      // réelles, et le tarif affiché correspond à quelque chose. La restauration depuis
+      // l'URL les remplace si la page en porte.
+      const demain = new Date(today); demain.setDate(demain.getDate() + 1);
+      let dpCheckIn = new Date(today);
+      let dpCheckOut = demain;
       let dpHover = null;
       let dpFlex = 0;
 
@@ -2467,15 +2471,19 @@
           if (dateValue) dateValue.textContent = 'JJ/MM/AAAA → JJ/MM/AAAA';
           return;
         }
+        // L'intitulé reste dans le label et la plage passe dans la valeur, comme le champ
+        // voyageurs. Depuis que le séjour a une valeur par défaut, l'état « sélectionné »
+        // est permanent : mettre la plage dans le label aurait supprimé pour de bon la
+        // question « À quelles dates ? » et désaligné ce champ de ses voisins.
         dateField.classList.add('wd-booking__field--selected');
         const fmtD = (dt) => dt.getDate() + ' ' + MONTH_SHORT[dt.getMonth()];
+        if (dateLabel) dateLabel.textContent = 'À quelles dates ?';
         if (dpCheckIn && dpCheckOut) {
           const sameYear = dpCheckIn.getFullYear() === dpCheckOut.getFullYear();
-          if (dateLabel) dateLabel.textContent = fmtD(dpCheckIn) + ' → ' + fmtD(dpCheckOut) + (sameYear ? ' ' + dpCheckOut.getFullYear() : '');
-          if (dateValue) dateValue.textContent = dpFlex > 0 ? '+/- ' + dpFlex + ' jour' + (dpFlex > 1 ? 's' : '') : '';
+          const plage = fmtD(dpCheckIn) + ' → ' + fmtD(dpCheckOut) + (sameYear ? ' ' + dpCheckOut.getFullYear() : '');
+          if (dateValue) dateValue.textContent = plage + (dpFlex > 0 ? '  ·  ±' + dpFlex + 'j' : '');
         } else {
-          if (dateLabel) dateLabel.textContent = fmtD(dpCheckIn) + ' → ...';
-          if (dateValue) dateValue.textContent = 'Sélectionnez le check-out';
+          if (dateValue) dateValue.textContent = fmtD(dpCheckIn) + ' → sélectionnez le départ';
         }
       };
 
@@ -2552,7 +2560,12 @@
           return;
         }
         if (e.target.closest('.wd-booking__dp-clear')) {
-          dpCheckIn = null; dpCheckOut = null; dpHover = null; dpFlex = 0;
+          // « Effacer » revient au séjour par défaut plutôt que de vider : une recherche
+          // porte toujours des dates, sinon le tarif redeviendrait inaffichable et la
+          // page de résultats afficherait autre chose que la barre.
+          dpCheckIn = new Date(today);
+          dpCheckOut = new Date(today); dpCheckOut.setDate(dpCheckOut.getDate() + 1);
+          dpHover = null; dpFlex = 0;
           datepicker.querySelectorAll('.wd-booking__dp-flex-chip').forEach(c => c.classList.remove('wd-booking__dp-flex-chip--active'));
           datepicker.querySelector('[data-flex="0"]').classList.add('wd-booking__dp-flex-chip--active');
           renderCalendars();
@@ -2585,6 +2598,10 @@
           closeDatePicker();
         }
       });
+
+      // La barre affiche les dates dès le chargement : sans cet appel elle gardait le
+      // « 01/04/2025 → 02/04/2025 » figé dans le gabarit, sans rapport avec la recherche.
+      formatDateField();
       // ===== END DATE PICKER =====
 
       // ===== VOYAGEURS / CHAMBRES =====

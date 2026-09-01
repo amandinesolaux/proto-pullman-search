@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=313"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=316"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=313"></script>
+  <script src="../../core/components/components.js?v=316"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=313"></script>
+  <script src="../../core/components/booking-map.js?v=316"></script>
 </head>
 <body class="brand-pullman">
 
@@ -178,8 +178,6 @@ wd-booking { margin-top: 20px; }
 .srx-price { font-family: var(--font-sans); color: #445047; }
 .srx-price b { font-size: 19px; font-weight: 700; }
 .srx-price span { font-size: 12px; color: rgba(68,80,71,.78); }
-/* Sans dates : on explique l'absence de tarif au lieu de laisser un blanc */
-.srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(68,80,71,.78); }
 /* Deux actions : consulter la fiche (lien discret) et réserver (bouton).
    La hiérarchie dit laquelle est l'action principale. */
 /* Paire d'actions du design system Accor : bouton contour puis lien fléché.
@@ -284,15 +282,21 @@ wd-booking { margin-top: 20px; }
     // (1 personne, 1 chambre par défaut, toujours visible dans la barre) : ce sont donc
     // les dates qui décident. Si l'occupation devenait facultative, il faudrait
     // l'ajouter ici de la même façon.
-    const showPrice = !!(P.get('checkin') && P.get('checkout'));
+    // Séjour par défaut si l'URL n'en porte pas : ce soir → demain, exactement comme la
+    // barre de recherche. Sans ce repli, une URL sans dates affichait « Ajoutez vos
+    // dates » alors que la barre juste au-dessus montrait déjà celles du jour.
+    const iso = (d) => d.toISOString().slice(0, 10);
+    const aujourdhui = new Date(); aujourdhui.setHours(12, 0, 0, 0);
+    const lendemain = new Date(aujourdhui); lendemain.setDate(lendemain.getDate() + 1);
+    const arrivee = P.get('checkin') || iso(aujourdhui);
+    const depart = P.get('checkout') || iso(lendemain);
+    const showPrice = true; // il y a toujours des dates, donc toujours un tarif à montrer
 
     // Séjour recherché, transmis au lien de réservation ALL pour que l'utilisateur
     // n'ait pas à ressaisir ses dates en arrivant sur le moteur.
-    const nuits = (P.get('checkin') && P.get('checkout'))
-      ? Math.max(1, Math.round((new Date(P.get('checkout')) - new Date(P.get('checkin'))) / 86400000))
-      : 0;
+    const nuits = Math.max(1, Math.round((new Date(depart) - new Date(arrivee)) / 86400000));
     const stay = {
-      checkin: P.get('checkin') || null,
+      checkin: arrivee,
       nights: nuits,
       guests: Math.max(1, parseInt(P.get('adults'), 10) || 1) + Math.max(0, parseInt(P.get('children'), 10) || 0)
     };
@@ -328,8 +332,8 @@ wd-booking { margin-top: 20px; }
     const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
     const subParts = [];
     if (critIds.length) subParts.push(critIds.map(labelFor).join(', '));
-    if (P.get('checkin') && P.get('checkout')) subParts.push(fmtDay(P.get('checkin')) + ' – ' + fmtDay(P.get('checkout')) + (P.get('flex') ? ' · ±' + P.get('flex') + 'j' : ''));
-    else if (P.get('checkin')) subParts.push('dès le ' + fmtDay(P.get('checkin')));
+    // On affiche le séjour effectif, celui de l'URL ou celui par défaut — jamais rien.
+    subParts.push(fmtDay(arrivee) + ' – ' + fmtDay(depart) + (P.get('flex') ? ' · ±' + P.get('flex') + 'j' : ''));
     // Occupation : mêmes bornes que le panneau voyageurs (7 chambres, 1-9 adultes et 0-6 enfants
     // par chambre). Sans ce bornage, une URL bricolée afficherait ici « 99 adultes » alors que la
     // barre de recherche, elle, plafonne à 9 — deux chiffres différents pour la même recherche.
@@ -377,9 +381,7 @@ wd-booking { margin-top: 20px; }
             // Rendu même vide : c'est lui qui réserve la hauteur et aligne les cards
             '<div class="srx-badges">' + badges + '</div>' +
             '<div class="srx-card-bottom">' +
-              (showPrice
-                ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
-                : '<span class="srx-nodate">Ajoutez vos dates pour voir les tarifs</span>') +
+              '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>' +
               // Deux destinations : la fiche sur le site de marque, la réservation sur ALL.
               // « Réserver » en dernier, donc à droite : l'action principale occupe la
               // position terminale du regard. Même ordre que l'encart de la carte.
@@ -421,13 +423,8 @@ wd-booking { margin-top: 20px; }
 
     // ---- 7. Tri ----
     const sortSel = document.getElementById('srx-sort');
-    // Trier par un prix qu'on n'affiche pas est incompréhensible : sans dates, l'option
-    // est désactivée plutôt que laissée active sans effet visible.
-    if (!showPrice) {
-      const optPrix = sortSel.querySelector('option[value="prix"]');
-      if (optPrix) { optPrix.disabled = true; optPrix.textContent = 'Prix (dates requises)'; }
-      if (sortSel.value === 'prix') sortSel.value = 'pertinence';
-    }
+    // Le tri par prix reste toujours actif : depuis que le séjour a une valeur par
+    // défaut, il y a toujours un tarif affiché.
     // Hôtel remonté en tête après un clic sur son pin. Il ne remplace pas le tri : il
     // s'y ajoute, pour qu'on retrouve l'hôtel désigné sans perdre l'ordre choisi.
     let epingle = null;
