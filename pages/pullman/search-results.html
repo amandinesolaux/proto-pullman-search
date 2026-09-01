@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=280"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=281"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=280"></script>
+  <script src="../../core/components/components.js?v=281"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=280"></script>
+  <script src="../../core/components/booking-map.js?v=281"></script>
 </head>
 <body class="brand-pullman">
 
@@ -166,6 +166,8 @@ wd-booking { margin-top: 20px; }
 .srx-price { font-family: var(--font-sans); color: #fff; }
 .srx-price b { font-size: 19px; font-weight: 700; }
 .srx-price span { font-size: 12px; color: rgba(255,255,255,.5); }
+/* Sans dates : on explique l'absence de tarif au lieu de laisser un blanc */
+.srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(255,255,255,.5); }
 .srx-cta { font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-highlight, #5FEF91); text-decoration: none; }
 .srx-cta:hover { text-decoration: underline; text-underline-offset: 3px; }
 
@@ -253,6 +255,13 @@ wd-booking { margin-top: 20px; }
     // Ils étaient recalculés ici ; l'encart de la carte aurait alors pu afficher un
     // autre prix que la carte de résultats pour le même hôtel.
 
+    // Un tarif n'a de sens qu'avec des dates ET une occupation : sans elles, le prix
+    // affiché serait une promesse invérifiable. L'occupation a toujours une valeur
+    // (1 personne, 1 chambre par défaut, toujours visible dans la barre) : ce sont donc
+    // les dates qui décident. Si l'occupation devenait facultative, il faudrait
+    // l'ajouter ici de la même façon.
+    const showPrice = !!(P.get('checkin') && P.get('checkout'));
+
     // ---- 4. En-tête ----
     const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
     const subParts = [];
@@ -294,7 +303,9 @@ wd-booking { margin-top: 20px; }
             '<div class="srx-card-rating"><b>' + h.rating + '</b><span>' + h.reviews + ' avis</span></div></div>' +
             (badges ? '<div class="srx-badges">' + badges + '</div>' : '') +
             '<div class="srx-card-bottom">' +
-              '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>' +
+              (showPrice
+                ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
+                : '<span class="srx-nodate">Ajoutez vos dates pour voir les tarifs</span>') +
               '<a class="srx-cta" href="' + esc(h.href || '#') + '"' + (h.href ? ' target="_blank" rel="noopener"' : '') + '>Voir l’hôtel →</a>' +
             '</div>' +
           '</div></article>';
@@ -330,6 +341,13 @@ wd-booking { margin-top: 20px; }
 
     // ---- 7. Tri ----
     const sortSel = document.getElementById('srx-sort');
+    // Trier par un prix qu'on n'affiche pas est incompréhensible : sans dates, l'option
+    // est désactivée plutôt que laissée active sans effet visible.
+    if (!showPrice) {
+      const optPrix = sortSel.querySelector('option[value="prix"]');
+      if (optPrix) { optPrix.disabled = true; optPrix.textContent = 'Prix (dates requises)'; }
+      if (sortSel.value === 'prix') sortSel.value = 'pertinence';
+    }
     const sorted = () => {
       const mode = sortSel.value;
       const arr = results.slice();
@@ -359,7 +377,7 @@ wd-booking { margin-top: 20px; }
         // information, elle ne doit pas se présenter de deux façons différentes.
         const mk = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
           .bindPopup(() => (typeof wdHotelPopupHTML === 'function'
-            ? wdHotelPopupHTML(h, critIds)
+            ? wdHotelPopupHTML(h, critIds, showPrice)
             : '<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc)),
             { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 });
         markerByHotel.set(h.name, mk);

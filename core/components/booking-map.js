@@ -83,7 +83,9 @@ function _addStyle() {
     // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
     '.pullman-popup__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
     '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#445047;line-height:1;margin:0}' +
-    '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(68,80,71,.55)}' +
+    '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(68,80,71,.78)}' +
+    // Sans dates, on dit pourquoi il n'y a pas de prix plutôt que de laisser un vide
+    '.pullman-popup__nodate{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78)}' +
     // Bouton plein plutôt que lien : c'est la paire du CTA primaire (fond #5FEF91,
     // texte #445047), la seule façon d'employer le vert de marque sur fond blanc.
     // Sélecteur à 2 classes : Leaflet impose « .leaflet-container a { color:#0078A8 } »
@@ -107,7 +109,9 @@ const WD_CRITERIA_LABELS = {
 // Un seul encart pour les deux : c'est la même information, elle doit se présenter
 // de la même façon. `active` (Set ou tableau) liste les critères cochés : on n'affiche
 // que ceux-là, pour répondre à « pourquoi cet hôtel apparaît-il ? ».
-function wdHotelPopupHTML(h, active) {
+// showPrice est faux par défaut : un tarif n'a de sens qu'une fois les dates et
+// l'occupation connues. Sur la carte d'exploration (dropdown), on n'en affiche jamais.
+function wdHotelPopupHTML(h, active, showPrice) {
   // La page de résultats construit sa carte elle-même et ne passe jamais par
   // initBookingMap() : sans cet appel, l'encart y serait affiché sans ses styles.
   _addStyle();
@@ -142,9 +146,11 @@ function wdHotelPopupHTML(h, active) {
         (h.rating ? '<span class="pullman-popup__score">' + esc(h.rating) + '</span>' : '') +
       '</p>' +
       (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '') +
-      (h.price || cta ? '<div class="pullman-popup__foot">' +
-        (h.price ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>' : '<span></span>') +
-        cta + '</div>' : '') +
+      '<div class="pullman-popup__foot">' +
+        (showPrice && h.price
+          ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>'
+          : '<span class="pullman-popup__nodate">Tarifs selon vos dates</span>') +
+        cta + '</div>' +
     '</div>' +
   '</article>';
 }
