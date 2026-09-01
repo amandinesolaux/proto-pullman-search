@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=296"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=297"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=296"></script>
+  <script src="../../core/components/components.js?v=297"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=296"></script>
+  <script src="../../core/components/booking-map.js?v=297"></script>
 </head>
 <body class="brand-pullman">
 
@@ -207,7 +207,10 @@ wd-booking { margin-top: 20px; }
 .srx-map-col { position: sticky; top: 24px; }
 .srx-map { height: calc(100vh - 48px); min-height: 480px; border: 1px solid rgba(255,255,255,.1); background: #1A2220; }
 .srx-map .leaflet-container { background: #1A2220; }
-.srx-pin { width: 12px; height: 12px; background: var(--pul-highlight, #5FEF91); border-radius: 50%; border: 2px solid #1A2220; box-shadow: 0 0 6px rgba(95,239,145,.5); }
+.srx-pin { width: 12px; height: 12px; background: var(--pul-highlight, #5FEF91); border-radius: 50%; border: 2px solid #1A2220; box-shadow: 0 0 6px rgba(95,239,145,.5); transition: all .2s; }
+/* Pin sélectionné : sans bulle, c'est lui seul qui dit quel hôtel on regarde.
+   Même marque que sur la carte du dropdown — point blanc cerclé de vert. */
+.srx-pin-wrap--active .srx-pin { width: 16px; height: 16px; margin: -2px 0 0 -2px; background: #fff; border-color: var(--pul-highlight, #5FEF91); box-shadow: 0 0 0 4px rgba(95,239,145,.35), 0 2px 8px rgba(0,0,0,.5); }
 .srx-pin-label { position: absolute; left: 16px; top: -3px; font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.9); white-space: nowrap; }
 .leaflet-popup-content-wrapper { background: #28332B; color: #fff; border-radius: 0; font-family: var(--font-sans); }
 .leaflet-popup-tip { background: #28332B; }
@@ -456,14 +459,11 @@ wd-booking { margin-top: 20px; }
     // Marqueurs indexés par nom : c'est ce qui permet de relier une card à son pin.
     const markerByHotel = new Map();
     if (coords.length) {
+      // Pas de bulle sur cette carte : cliquer un pin remonte déjà la card en tête de
+      // liste, à gauche. Une bulle répéterait la même information tout en masquant le
+      // pin. Ici la liste est le support de lecture, la carte sert à situer.
       const group = L.featureGroup(coords.map(({ h, ll }) => {
-        // Même encart que la carte du dropdown (wdHotelPopupHTML) : c'est la même
-        // information, elle ne doit pas se présenter de deux façons différentes.
-        const mk = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
-          .bindPopup(() => (typeof wdHotelPopupHTML === 'function'
-            ? wdHotelPopupHTML(h, critIds, showPrice, stay)
-            : '<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc)),
-            { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 });
+        const mk = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) });
         markerByHotel.set(h.name, mk);
         return mk;
       }));
@@ -474,16 +474,22 @@ wd-booking { margin-top: 20px; }
     }
 
     // ---- 9. Liaison liste ↔ carte ----
-    // Cliquer une card recentre la carte sur l'hôtel et ouvre son encart. Le zoom n'est
-    // relevé que s'il est faible : quelqu'un qui a déjà zoomé garde son échelle.
+    // Sans bulle, c'est le pin lui-même qui doit dire lequel on regarde.
+    const marquerPin = (name) => {
+      markerByHotel.forEach((m) => m._icon && m._icon.classList.remove('srx-pin-wrap--active'));
+      const mk = markerByHotel.get(name);
+      if (mk && mk._icon) mk._icon.classList.add('srx-pin-wrap--active');
+    };
+    // Cliquer une card recentre la carte sur l'hôtel. Le zoom n'est relevé que s'il est
+    // faible : quelqu'un qui a déjà zoomé garde son échelle.
     const focusHotel = (name) => {
       const mk = markerByHotel.get(name);
       if (!mk) return;
       listEl.querySelectorAll('.srx-card--active').forEach(c => c.classList.remove('srx-card--active'));
       const card = listEl.querySelector('[data-hotel="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
       if (card) card.classList.add('srx-card--active');
+      marquerPin(name);
       map.flyTo(mk.getLatLng(), Math.max(map.getZoom(), 11), { duration: .6 });
-      mk.openPopup();
     };
     listEl.addEventListener('click', (e) => {
       // On ne détourne pas les liens de la card (« Voir l'hôtel »)
@@ -506,6 +512,7 @@ wd-booking { margin-top: 20px; }
       renderList(sorted());
       const card = listEl.querySelector('[data-hotel="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
       if (card) card.classList.add('srx-card--active');
+      marquerPin(name);
       const barre = document.querySelector('wd-booking');
       const cible = barre ? window.scrollY + barre.getBoundingClientRect().top - 12 : 0;
       window.scrollTo({ top: Math.max(0, cible), behavior: 'smooth' });
