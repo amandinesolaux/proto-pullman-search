@@ -232,7 +232,10 @@ function _ouvrirDetail(hotel, criteriaSet) {
   if (!p) {
     p = document.createElement('aside');
     p.id = 'wd-map-detail';
-    p.className = 'wd-map-detail';
+    // On reprend la classe que Leaflet posait sur ses bulles : tous les styles de
+    // l'encart y sont accrochés (.pullman-popup-card .pullman-popup__cta, etc.). Sans
+    // elle, le panneau perdait les CTA et retombait sur les liens bleus de Leaflet.
+    p.className = 'wd-map-detail pullman-popup-card';
     p.setAttribute('role', 'dialog');
     p.setAttribute('aria-label', 'Détail de l’hôtel');
     conteneur.appendChild(p);
