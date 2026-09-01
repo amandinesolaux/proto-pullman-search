@@ -2382,6 +2382,21 @@
           if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(ac);
         });
 
+        // La carte élargit d'elle-même quand un critère vide le pays choisi : elle
+        // remonte au continent pour montrer les hôtels qui répondent. La liste doit
+        // suivre le même mouvement, sinon les deux vues se contrediraient à nouveau —
+        // la carte sur l'Asie, les chips encore sur la Chine. Renvoie la nouvelle zone
+        // pour que la carte reparte de celle que la liste vient d'adopter.
+        window.WD_ELARGIR_AU_CONTINENT = () => {
+          searchState.country = null;
+          searchState.city = null;
+          searchState.expandedCountry = null;
+          searchState.selectedHotel = null;
+          renderMapPanel();
+          renderChips();
+          return zoneCarte();
+        };
+
         const clearFiltersBtn = this.querySelector('#wd-clear-map-filters');
         if (clearFiltersBtn) {
           clearFiltersBtn.addEventListener('click', () => {

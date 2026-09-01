@@ -370,6 +370,32 @@ function _zoneGeo(scope) {
   return { continent: s.continent, country: s.country, city: s.city };
 }
 
+// Le français ne dit pas « en » devant tout : « au Japon », « aux Pays-Bas »,
+// « à Singapour », « au Moyen-Orient ». On ne liste que les exceptions, « en » couvrant
+// le reste — pays féminins et pays à initiale vocalique.
+const WD_ZONE_PREP = {
+  Japon: 'au', Brésil: 'au', Maroc: 'au', Qatar: 'au', Vietnam: 'au', Sénégal: 'au',
+  Laos: 'au', Chili: 'au', Pérou: 'au', Kenya: 'au', 'Royaume-Uni': 'au',
+  'Moyen-Orient': 'au',
+  'Pays-Bas': 'aux', 'États-Unis': 'aux', Maldives: 'aux', EAU: 'aux', Amériques: 'aux',
+  Singapour: 'à',
+};
+
+// « en Chine », « au Japon », « à Paris » — la mention de lieu telle qu'elle s'insère
+// dans une phrase. Les villes ne prennent jamais d'article.
+function _enZone(scope) {
+  const nom = _libelleZone(scope);
+  if (!nom) return null;
+  const prep = (scope && scope.city) ? 'à' : (WD_ZONE_PREP[nom] || 'en');
+  return prep + ' ' + nom;
+}
+
+// Destination d'un élargissement, toujours un continent : « à l'Asie », « aux Amériques ».
+const WD_VERS_CONTINENT = {
+  Europe: "à l'Europe", Asie: "à l'Asie", Afrique: "à l'Afrique",
+  'Océanie': "à l'Océanie", 'Amériques': 'aux Amériques', 'Moyen-Orient': 'au Moyen-Orient',
+};
+
 function _libelleZone(scope) {
   const s = scope || {};
   if (s.city) return s.city;
@@ -406,27 +432,46 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // « Chine » et non « Asie » : lui répondre à l'échelle du continent reviendrait à
   // compter des hôtels qu'il a lui-même écartés.
   const geo = _zoneGeo(_currentScope);
-  const zone = _libelleZone(geo);
+  const zone = _enZone(geo);
   const dansZone = _conformes(geo, criteriaSet);
   // Y a-t-il un cran au-dessus ? Seulement si la zone est plus étroite que le continent.
   const large = (geo.country || geo.city) && geo.continent ? { continent: geo.continent } : null;
   const dansLarge = large ? _conformes(large, criteriaSet) : 0;
 
   let suite;
+  // Zone de repli : la carte y remonte d'elle-même quand la zone choisie est vide mais
+  // que le continent, lui, a des réponses. Sans ce mouvement le message annonçait des
+  // hôtels que la carte laissait hors cadre et en gris — on lisait « 3 hôtels en Asie »
+  // devant une Chine entièrement grise.
+  const elargir = dansZone === 0 && dansLarge > 0 ? large : null;
+
   if (dansZone > 0) {
     suite = '<strong>' + dansZone + ' hôtel' + (dansZone > 1 ? 's' : '') + '</strong>' +
-      (zone ? ' en ' + esc(zone) : '') + ' y répond' + (dansZone > 1 ? 'ent' : '') + '.';
-  } else if (dansLarge > 0) {
-    // La zone est vide, mais le continent ne l'est pas : on chiffre l'alternative plutôt
-    // que de laisser l'utilisateur deviner si élargir servirait à quelque chose.
-    suite = 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') + ' ne réunit ces critères. ' +
-      '<strong>' + dansLarge + ' hôtel' + (dansLarge > 1 ? 's' : '') + '</strong> en ' +
-      esc(_libelleZone(large)) + ' y répond' + (dansLarge > 1 ? 'ent' : '') +
-      ' : élargissez la zone, ou retirez un critère.';
+      (zone ? ' ' + esc(zone) : '') + ' y répond' + (dansZone > 1 ? 'ent' : '') + '.';
+  } else if (elargir) {
+    const nomLarge = _libelleZone(large);
+    suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères. ' +
+      'La carte s\'élargit ' + esc(WD_VERS_CONTINENT[nomLarge] || 'à ' + nomLarge) +
+      ', où <strong>' + dansLarge + ' hôtel' + (dansLarge > 1 ? 's' : '') + '</strong> ' +
+      (dansLarge > 1 ? 'répondent' : 'répond') + ' à vos critères.';
   } else {
-    suite = 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') +
-      (large ? ' ni en ' + esc(_libelleZone(large)) : '') +
+    suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') +
+      (large ? ' ni ' + esc(_enZone(large)) : '') +
       ' ne réunit ces critères. Retirez un critère pour élargir la recherche.';
+  }
+
+  // L'élargissement précède l'affichage : reconstruire les pins commence par vider le
+  // panneau, ce qui effacerait un message déjà posé. On remet `_detailHotel` à zéro
+  // avant, pour que ce passage ne se croie pas devant un hôtel encore ouvert.
+  _detailHotel = null;
+  if (elargir) {
+    // La liste adopte la même zone et nous rend la sienne : les chips, le compteur et la
+    // carte doivent raconter la même chose une fois le mouvement terminé.
+    const adoptee = typeof window.WD_ELARGIR_AU_CONTINENT === 'function'
+      ? window.WD_ELARGIR_AU_CONTINENT() : null;
+    _currentScope = adoptee || { continent: large.continent, country: null, city: null, hotel: null };
+    // `false` : on ne recadre pas ici, le vol animé de fin s'en charge.
+    _renderMarkers(_currentContinent, criteriaSet, false);
   }
 
   p.className = 'wd-map-detail wd-map-detail--avis';
@@ -437,7 +482,6 @@ function _messageDetail(hotel, manquants, criteriaSet) {
       '<p class="wd-map-detail__avis-suite">' + suite + '</p>' +
     '</div>';
   p.dataset.state = 'open';
-  _detailHotel = null;
   clearTimeout(_avisTimer);
   // On laisse le temps de lire avant de retirer le message ; la carte, elle, repart
   // tout de suite pour que le message et le dézoom racontent la même chose.
@@ -447,8 +491,8 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   }, 6000);
   // On recadre sur la zone géographique et non sur `_currentScope` tel quel : celui-ci
   // peut encore désigner l'hôtel qu'on vient justement d'écarter, et on repartirait
-  // alors sur lui.
-  _vueContinent(true, geo);
+  // alors sur lui. Après élargissement, c'est le continent qu'on cadre.
+  _vueContinent(true, elargir || geo);
 }
 
 // `sansVol` : rafraîchir le contenu sans redéplacer la carte. Sert au réaffichage après
