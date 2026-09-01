@@ -239,11 +239,12 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const services = (h.amenities || []).filter(id => WD_CRITERIA_LABELS[id]);
   const retenus = services.filter(id => ids.includes(id));
   const autres = services.filter(id => !ids.includes(id));
-  // Les services cochés passent toujours : ils répondent à la demande. C'est le surplus
-  // qui est plafonné, et le reste annoncé par un « +N » — le panneau ne doit jamais
-  // obliger à faire défiler pour atteindre le prix ou les boutons.
+  // Les services cochés passent devant, mais le plafond vaut pour eux aussi : le laisser
+  // céder quand ils étaient nombreux (huit critères cochés) donnait trois rangées de
+  // badges, et il fallait faire défiler la card pour atteindre le prix et les boutons.
+  // Le surplus est annoncé par un « +N », qui les liste au survol.
   const ordonnes = retenus.concat(autres);
-  const visibles = ordonnes.slice(0, Math.max(WD_TAGS_MAX, retenus.length));
+  const visibles = ordonnes.slice(0, WD_TAGS_MAX);
   const restants = ordonnes.length - visibles.length;
   const tags = visibles.map(id =>
       ids.includes(id)
