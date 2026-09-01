@@ -89,10 +89,10 @@ function _addStyle() {
     // comprimeraient sur 236px utiles.
     '.pullman-popup__foot{display:flex;flex-direction:column;align-items:stretch;gap:9px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
     '.pullman-popup__actions{display:flex;align-items:center;justify-content:space-between;gap:10px}' +
-    // « Voir l\'hôtel » en lien discret, « Réserver » en bouton : la réservation est
-    // l\'action principale, la fiche hôtel une consultation.
-    '.pullman-popup-card .pullman-popup__link{font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#445047;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}' +
-    '.pullman-popup-card .pullman-popup__link:hover{color:#2F4034}' +
+    // Même paire que les cards de résultats : bouton contour puis lien fléché, repris
+    // du design system Accor. Sélecteur à 2 classes, sinon Leaflet impose son bleu.
+    '.pullman-popup-card .pullman-popup__link{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:500;color:#445047;text-decoration:none;white-space:nowrap;transition:gap .15s}' +
+    '.pullman-popup-card .pullman-popup__link:hover{gap:9px;color:#445047}' +
     '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#445047;line-height:1;margin:0}' +
     '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(68,80,71,.78)}' +
     // Sans dates, on dit pourquoi il n'y a pas de prix plutôt que de laisser un vide
@@ -101,8 +101,8 @@ function _addStyle() {
     // texte #445047), la seule façon d'employer le vert de marque sur fond blanc.
     // Sélecteur à 2 classes : Leaflet impose « .leaflet-container a { color:#0078A8 } »
     // en (0,1,1), qui battait une classe seule — le CTA ressortait en bleu Leaflet.
-    '.pullman-popup-card .pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;background:#5FEF91;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#445047;text-decoration:none;transition:background .15s;white-space:nowrap}' +
-    '.pullman-popup-card .pullman-popup__cta:hover{background:#4DD87A;color:#445047}' +
+    '.pullman-popup-card .pullman-popup__cta{display:inline-flex;align-items:center;justify-content:center;padding:7px 16px;border:1px solid #445047;border-radius:100px;background:transparent;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:500;color:#445047;text-decoration:none;transition:background .15s,color .15s;white-space:nowrap}' +
+    '.pullman-popup-card .pullman-popup__cta:hover{background:#445047;color:#fff}' +
     // Fermeture : elle est posée sur la photo, donc aucune couleur de texte seule ne peut
     // être fiable — selon le cliché elle disparaît. On lui donne un voile sombre, comme
     // le badge. Sélecteur à 3 classes : Leaflet applique « .leaflet-container
@@ -159,8 +159,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const bookUrl = window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null;
   const cta = h.href
     ? '<div class="pullman-popup__actions">' +
-        '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel</a>' +
-        (bookUrl ? '<a class="pullman-popup__cta" href="' + esc(bookUrl) + '" target="_blank" rel="noopener">Réserver ' + arrow + '</a>' : '') +
+        (bookUrl ? '<a class="pullman-popup__cta" href="' + esc(bookUrl) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
+        '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + arrow + '</a>' +
       '</div>'
     : '';
 

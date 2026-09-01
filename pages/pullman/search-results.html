@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=289"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=290"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=289"></script>
+  <script src="../../core/components/components.js?v=290"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=289"></script>
+  <script src="../../core/components/booking-map.js?v=290"></script>
 </head>
 <body class="brand-pullman">
 
@@ -178,11 +178,14 @@ wd-booking { margin-top: 20px; }
 .srx-nodate { font-family: var(--font-sans); font-size: 12.5px; color: rgba(68,80,71,.78); }
 /* Deux actions : consulter la fiche (lien discret) et réserver (bouton).
    La hiérarchie dit laquelle est l'action principale. */
-.srx-actions { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
-.srx-link { font-family: var(--font-sans); font-size: 13px; color: #445047; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
-.srx-link:hover { color: #2F4034; }
-.srx-cta { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 100px; background: var(--pul-highlight, #5FEF91); font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-bg, #445047); text-decoration: none; white-space: nowrap; transition: background .15s; }
-.srx-cta:hover { background: var(--pul-highlight-hover, #4DD87A); }
+/* Paire d'actions du design system Accor : bouton contour puis lien fléché.
+   Pas de vert plein ici — sur une liste de 110 cards, autant de pastilles vertes
+   saturaient la page ; le contour tient l'affordance sans crier. */
+.srx-actions { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+.srx-cta { display: inline-flex; align-items: center; justify-content: center; padding: 9px 20px; border: 1px solid #445047; border-radius: 100px; background: transparent; font-family: var(--font-sans); font-size: 13px; font-weight: 500; color: #445047; text-decoration: none; white-space: nowrap; transition: background .15s, color .15s; }
+.srx-cta:hover { background: #445047; color: #fff; }
+.srx-link { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-sans); font-size: 13px; color: #445047; text-decoration: none; white-space: nowrap; transition: gap .15s; }
+.srx-link:hover { gap: 11px; }
 
 /* --- Zéro résultat --- */
 /* Bloc zéro-résultat : il occupe la place des cards, il suit donc la même surface claire */
@@ -363,10 +366,12 @@ wd-booking { margin-top: 20px; }
               (showPrice
                 ? '<span class="srx-price"><b>' + h.price + ' €</b> <span>/ nuit</span></span>'
                 : '<span class="srx-nodate">Ajoutez vos dates pour voir les tarifs</span>') +
-              // Deux destinations : la fiche sur le site de marque, la réservation sur ALL.
+              // Deux destinations : la réservation sur ALL, la fiche sur le site de marque.
+              // Ordre et styles repris du design system Accor : bouton contour d'abord,
+              // lien fléché ensuite.
               '<span class="srx-actions">' +
-                (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel</a>' : '') +
-                (bookingUrl(h) ? '<a class="srx-cta" href="' + esc(bookingUrl(h)) + '" target="_blank" rel="noopener">Réserver →</a>' : '') +
+                (bookingUrl(h) ? '<a class="srx-cta" href="' + esc(bookingUrl(h)) + '" target="_blank" rel="noopener">Réserver</a>' : '') +
+                (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
               '</span>' +
             '</div>' +
           '</div></article>';
