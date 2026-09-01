@@ -106,21 +106,25 @@ function _addStyle() {
     // Message d'écartement : même emplacement et même surface que le détail, mais sans
     // photo — il informe, il ne présente pas un hôtel. Il s'efface seul après lecture.
     '.wd-map-detail--avis{max-height:none}' +
-    '.wd-map-detail__avis{padding:16px 40px 16px 16px}' +
-    '.wd-map-detail__avis-titre{margin:0 0 6px;font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;line-height:1.35;color:#445047}' +
+    '.wd-map-detail__avis{padding:16px}' +
+    // Seul le titre s'écarte de la croix ; le reste occupe toute la largeur.
+    '.wd-map-detail__avis-titre{padding-right:26px;margin:0 0 6px;font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;line-height:1.35;color:#445047}' +
     '.wd-map-detail__avis-suite{margin:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;line-height:1.45;color:rgba(68,80,71,.78)}' +
     '.wd-map-detail__avis-suite strong{color:#445047}' +
     // Mêmes formes que les actions de la card hôtel : pilule pour l'action, lien pour le
     // recours. Les boutons du bloc vert sont taillés pour un fond sombre ; ici le fond est
     // blanc et ils y disparaîtraient.
-    '.wd-map-detail__avis-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:12px;flex-wrap:wrap}' +
+    // 232 px utiles dans le panneau : les deux boutons n'y tiennent jamais côte à côte, et
+    // le retour à la ligne les laissait flotter chacun sur son bord. On les empile donc,
+    // pleine largeur, l'action d'abord.
+    '.wd-map-detail__avis-actions{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:14px}' +
     '.wd-map-detail__avis-relax{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:500;' +
       'padding:8px 18px;border:1px solid #445047;border-radius:100px;background:transparent;color:#445047;' +
-      'cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}' +
+      'cursor:pointer;text-align:center;transition:background .15s,color .15s}' +
     '.wd-map-detail__avis-relax:hover{background:#445047;color:#fff}' +
     '.wd-map-detail__avis-reset{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:400;' +
       'padding:0;border:none;background:transparent;color:rgba(68,80,71,.78);text-decoration:underline;' +
-      'text-underline-offset:2px;cursor:pointer;white-space:nowrap}' +
+      'text-underline-offset:2px;cursor:pointer;text-align:center}' +
     '.wd-map-detail__avis-reset:hover{color:#445047}' +
     // La croix est claire sur la photo du détail ; ici le fond est blanc, il lui faut
     // l'inverse pour rester visible.
@@ -318,13 +322,6 @@ const WD_TAGS_MAX = 3;
 // Signale qu'un message d'écartement occupe la carte. Le bloc « aucun résultat » de la
 // vue carte s'efface alors : il dit la même chose, au même instant, et les deux se
 // superposaient. Il reprend sa place dès que l'avis s'en va.
-function _marquerAvis(actif) {
-  const wrap = document.querySelector('.wd-booking__dd-mapview-wrap');
-  if (!wrap) return;
-  if (actif) wrap.dataset.avis = '1';
-  else delete wrap.dataset.avis;
-}
-
 // `revenir` : refaire le chemin inverse, du pin vers la vue du continent. On ne le fait
 // qu'à la fermeture volontaire — pas quand les pins sont recalculés, puisque le cadrage
 // est alors déjà refait par _renderMarkers.
@@ -437,6 +434,53 @@ function _conformes(scope, criteriaSet) {
     _dansLaZone(h, scope) && _criteresManquants(h, criteriaSet).length === 0).length;
 }
 
+// Peinture du panneau d'avis. Les deux messages de la carte — celui qui écarte l'hôtel
+// ouvert et celui du rattrapage général — passent par ici : la carte ne doit avoir qu'une
+// seule façon de parler, et elle remplace le bloc en surimpression qui existait à côté.
+// `reprise` : suggestion d'assouplissement ; sa présence fait apparaître les actions.
+function _peindreAvis(titreHTML, suiteHTML, reprise) {
+  const p = _panneauDetail();
+  if (!p) return null;
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const actions = reprise !== null
+    ? '<div class="wd-map-detail__avis-actions">' +
+        (reprise ? '<button type="button" class="wd-map-detail__avis-relax" data-avis-relax="' + esc(reprise.id) + '">Retirer « ' + esc(reprise.label) + ' »</button>' : '') +
+        '<button type="button" class="wd-map-detail__avis-reset" data-avis-reset>Réinitialiser les critères</button>' +
+      '</div>'
+    : '';
+  p.className = 'wd-map-detail wd-map-detail--avis';
+  p.innerHTML =
+    '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
+    '<div class="wd-map-detail__avis" role="status">' +
+      '<p class="wd-map-detail__avis-titre">' + titreHTML + '</p>' +
+      '<p class="wd-map-detail__avis-suite">' + suiteHTML + '</p>' +
+      actions +
+    '</div>';
+  p.dataset.state = 'open';
+  return p;
+}
+
+// Rattrapage général : plus aucun hôtel ne répond, et aucune card n'était ouverte pour
+// porter le message. Même panneau, au même endroit — c'est ce qui remplace le bloc vert
+// qui s'affichait en surimpression au centre de la carte.
+function _avisRattrapage(criteriaSet) {
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const geo = { continent: _currentScope.continent, country: _currentScope.country };
+  const zone = _enZone(geo);
+  const reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
+  let suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères.';
+  if (reprise) {
+    const pluriel = reprise.count > 1;
+    suite += ' En retirant <strong>« ' + esc(reprise.label) + ' »</strong>, <strong>' +
+      reprise.count + ' hôtel' + (pluriel ? 's' : '') + '</strong> correspondrai' + (pluriel ? 'ent' : 't') +
+      (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
+  } else {
+    suite += ' Aucun de vos critères ne peut être assoupli pour trouver un hôtel ici.';
+  }
+  clearTimeout(_avisTimer);
+  _peindreAvis('Aucun hôtel ne correspond à tous vos critères', suite, reprise);
+}
+
 // Message affiché quand un critère vient d'écarter l'hôtel ouvert. Il nomme l'hôtel et
 // ce qui lui manque, puis situe ce qui reste dans la zone choisie — et, quand cette zone
 // est vide, donne la sortie : retirer un critère, ou remonter au continent.
@@ -516,22 +560,7 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // Le rattrapage n'apparaît que dans le cas sans issue : ailleurs, la carte a de quoi
   // montrer et le message n'a qu'à informer.
   const porteLeRattrapage = dansZone === 0 && !elargir;
-  const actions = porteLeRattrapage
-    ? '<div class="wd-map-detail__avis-actions">' +
-        '<button type="button" class="wd-map-detail__avis-reset" data-avis-reset>Réinitialiser les critères</button>' +
-        (reprise ? '<button type="button" class="wd-map-detail__avis-relax" data-avis-relax="' + esc(reprise.id) + '">Retirer « ' + esc(reprise.label) + ' »</button>' : '') +
-      '</div>'
-    : '';
-  p.className = 'wd-map-detail wd-map-detail--avis';
-  p.innerHTML =
-    '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
-    '<div class="wd-map-detail__avis" role="status">' +
-      '<p class="wd-map-detail__avis-titre">' + esc(hotel.name) + ' ' + quoi + '</p>' +
-      '<p class="wd-map-detail__avis-suite">' + suite + '</p>' +
-      actions +
-    '</div>';
-  p.dataset.state = 'open';
-  _marquerAvis(true);
+  _peindreAvis(esc(hotel.name) + ' ' + quoi, suite, porteLeRattrapage ? reprise : null);
   clearTimeout(_avisTimer);
   // Un message qui informe s'efface après lecture. Un message qui porte les boutons de
   // rattrapage reste : le faire disparaître seul emporterait la seule sortie offerte.
@@ -539,7 +568,6 @@ function _messageDetail(hotel, manquants, criteriaSet) {
     _avisTimer = setTimeout(() => {
       const el = document.getElementById('wd-map-detail');
       if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
-      _marquerAvis(false);
     }, 6000);
   }
   // On recadre sur la zone géographique et non sur `_currentScope` tel quel : celui-ci
@@ -556,7 +584,6 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   if (!p) return;
   _detailHotel = hotel;
   clearTimeout(_avisTimer);
-  _marquerAvis(false);
   p.className = 'wd-map-detail pullman-popup-card';
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
@@ -639,10 +666,6 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // de filtre, y compris quand l'hôtel satisfaisait toujours les critères cochés.
   const ouvert = _detailHotel;
   _fermerDetail(false);
-  // Les pins sont recalculés : c'est une situation neuve, le bloc de rattrapage de la vue
-  // carte peut reprendre la main. On ne le relâche pas à la simple fermeture du message,
-  // sinon il apparaissait juste derrière celui qu'on vient de refermer.
-  _marquerAvis(false);
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
 
@@ -694,6 +717,16 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
       // sur un hôtel qui ne correspondait plus.
       _messageDetail(encoreLa, manquants, criteriaSet);
     }
+  }
+
+  // Plus rien à montrer et rien d'affiché pour le dire : le panneau prend le relais. Un
+  // second bloc s'en chargeait auparavant, en surimpression au centre de la carte — deux
+  // manières de dire la même chose, qui finissaient par se succéder à l'écran.
+  const panneau = document.getElementById('wd-map-detail');
+  const rienAffiche = !panneau || panneau.dataset.state !== 'open';
+  if (rienAffiche && hasCriteria &&
+      _conformes({ continent: _currentScope.continent, country: _currentScope.country }, criteriaSet) === 0) {
+    _avisRattrapage(criteriaSet);
   }
 
   // Recadrage uniquement quand la zone change (init / choix de continent) —

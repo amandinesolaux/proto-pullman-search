@@ -1639,7 +1639,6 @@
       // n'étant dans les amenities d'aucun hôtel, elle déclarait la carte vide quand la
       // liste annonçait 9 hôtels en Chine — et proposait de retirer ce critère au nom des
       // 39 hôtels de l'Asie entière.
-      const renderMapRelaxation = renderRelaxation;
 
       // Divulgation progressive : y a-t-il un périmètre de recherche actif (continent, pays, hôtel, ville, saisie) ?
       const hasSearchScope = () => !!(
@@ -2317,19 +2316,10 @@
             }).join('');
             return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
           }).join('');
-          // Zero-result recovery sur la carte : même bloc que la vue liste, calculé sur les données de la carte
-          const mapWrap = this.querySelector('.wd-booking__dd-mapview-wrap');
-          if (mapWrap) {
-            let overlay = mapWrap.querySelector('.wd-booking__dd-map-noresult');
-            const relaxHtml = renderMapRelaxation();
-            if (relaxHtml) {
-              if (!overlay) { overlay = document.createElement('div'); overlay.className = 'wd-booking__dd-map-noresult'; mapWrap.appendChild(overlay); }
-              overlay.innerHTML = relaxHtml;
-              overlay.style.display = '';
-            } else if (overlay) {
-              overlay.style.display = 'none';
-            }
-          }
+          // Le rattrapage de la vue carte est désormais rendu par la carte elle-même, dans
+          // son panneau blanc — le même que celui qui annonce l'écartement d'un hôtel.
+          // Le bloc en surimpression qui vivait ici faisait une seconde voix, qui finissait
+          // par se superposer puis se succéder à la première.
         };
 
         // Actions du bloc de récupération (délégué sur la vue carte)
@@ -2339,10 +2329,6 @@
           if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
         };
         ddMapview.addEventListener('click', (e) => {
-          const relax = e.target.closest('.wd-booking__dd-noresult-relax');
-          if (relax) { e.preventDefault(); getActiveCriteria().delete(relax.dataset.criteria); applyMapCriteriaChange(); return; }
-          const reset = e.target.closest('.wd-booking__dd-noresult-reset');
-          if (reset) { e.preventDefault(); getActiveCriteria().clear(); applyMapCriteriaChange(); return; }
         });
 
         mapViewContinents.addEventListener('click', (e) => {

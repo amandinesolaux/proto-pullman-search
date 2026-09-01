@@ -423,13 +423,9 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
    radius. Les deux règles blanches qui vivaient ici dataient d'avant et entraient en
    concurrence à spécificité égale — le rendu dépendait de l'ordre d'injection. */
 /* Zero-result recovery en overlay sur la carte (même bloc que la vue liste) */
-.wd-booking__dd-map-noresult { position: absolute; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(20,30,28,.72); backdrop-filter: blur(2px); }
-.wd-booking__dd-map-noresult .wd-booking__dd-noresult { max-width: 440px; width: 100%; margin: 0; box-shadow: 0 12px 40px rgba(0,0,0,.45); }
-/* Le message d'écartement d'un hôtel (panneau blanc, en haut à gauche) dit déjà ce que
-   dit ce bloc, et au même instant : les deux se superposaient sur la carte. Tant que
-   l'avis est là, il parle seul ; le bloc reprend sa place quand l'avis s'efface, avec
-   son bouton de retrait de critère. L'attribut est posé par booking-map.js. */
-.wd-booking__dd-mapview-wrap[data-avis] .wd-booking__dd-map-noresult { display: none; }
+/* Le bloc « aucun résultat » en surimpression sur la carte a été retiré : la carte porte
+   maintenant ce message dans son propre panneau blanc, celui qui sert déjà à annoncer
+   l'écartement d'un hôtel. Une seule voix, un seul emplacement. */
 .wd-booking__dd-section-title { display: flex; align-items: center; gap: 8px; font-family: var(--font-sans); font-weight: 600; font-size: 12px; letter-spacing: .4px; text-transform: uppercase; color: rgba(255,255,255,.45); margin: 0 0 14px; }
 .wd-booking__dd-section-title svg { color: rgba(255,255,255,.3); }
 .wd-booking__dd-see-all { margin-left: auto; font-size: 11px; font-weight: 500; color: var(--pul-highlight, #5FEF91); text-decoration: none; text-transform: none; letter-spacing: 0; }
