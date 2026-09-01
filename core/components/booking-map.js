@@ -144,7 +144,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   _addStyle();
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
-  const key = window.WD_IMG_KEY ? window.WD_IMG_KEY(h, '16by9') : (h.img || 'aja_p_6783-26') + ':16by9';
+  const key = window.WD_IMG_KEY ? window.WD_IMG_KEY(h) : (h.img || 'aja_p_6783-26').split(':')[0];
   const img = base + key + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528&hei=297';
   const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
