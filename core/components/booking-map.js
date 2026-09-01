@@ -209,6 +209,10 @@ window.wdHotelPopupHTML = wdHotelPopupHTML;
 // ── Panneau de détail latéral (carte du dropdown) ────────────────────────────────
 // Largeur du panneau, reprise telle quelle par le décalage de centrage.
 const WD_DETAIL_W = 288;
+// Zoom au clic sur un hôtel. À 11 on tombait dans le quartier, sans repère : on ne
+// savait plus où l'on se trouvait dans le pays. À 6 la forme du pays reste lisible et
+// le pin s'y situe.
+const WD_ZOOM_HOTEL = 6;
 
 function _fermerDetail() {
   const p = document.getElementById('wd-map-detail');
@@ -244,12 +248,18 @@ function _ouvrirDetail(hotel, criteriaSet) {
   });
   if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
 
-  // Zoom sur l'hôtel, avec le centre décalé pour que le pin tombe dans la moitié
-  // libre à droite du panneau plutôt que derrière lui.
-  const zoom = Math.max(_bookingMap.getZoom(), 11);
-  const pt = _bookingMap.project([hotel.lat, hotel.lng], zoom);
-  pt.x -= WD_DETAIL_W / 2;
-  _bookingMap.flyTo(_bookingMap.unproject(pt, zoom), zoom, { duration: .6 });
+  // Le conteneur de cette carte change de taille (ouverture du panneau, bascule de vue) :
+  // sans invalidateSize, Leaflet centre d'après une taille périmée et le pin part sur le
+  // bord. On laisse ensuite Leaflet faire le décalage lui-même via le padding, plutôt que
+  // de projeter à la main — il connaît la taille réelle, pas nous.
+  _bookingMap.invalidateSize({ animate: false });
+  const ll = L.latLng(hotel.lat, hotel.lng);
+  _bookingMap.flyToBounds(L.latLngBounds(ll, ll), {
+    paddingTopLeft: [WD_DETAIL_W + 24, 24],
+    paddingBottomRight: [24, 24],
+    maxZoom: WD_ZOOM_HOTEL,
+    duration: .6
+  });
 }
 
 function initBookingMap(continentFilter) {
