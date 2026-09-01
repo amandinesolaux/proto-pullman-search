@@ -17,6 +17,8 @@ const CONTINENT_BOUNDS = {
 let _bookingMap = null;
 let _markers = [];
 let _currentContinent = null;
+// Hôtel dont le détail est ouvert, pour pouvoir le réafficher après un recalcul des pins.
+let _detailHotel = null;
 let _currentCriteria = null;
 
 function _makeSmallIcon(greyed) {
@@ -221,13 +223,29 @@ function _fermerDetail(revenir) {
   const p = document.getElementById('wd-map-detail');
   const etaitOuvert = p && p.dataset.state === 'open';
   if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
+  _detailHotel = null;
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
   if (revenir && etaitOuvert) _vueContinent(_currentContinent, true);
 }
 
-function _ouvrirDetail(hotel, criteriaSet) {
+// Marque le pin de l'hôtel ouvert. Les marqueurs sont détruits et recréés à chaque
+// recalcul, donc la classe doit être reposée à ce moment-là.
+function _marquerPin(hotel) {
+  _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
+  const mk = _markers.find(m => {
+    const ll = m.getLatLng();
+    return Math.abs(ll.lat - hotel.lat) < 1e-9 && Math.abs(ll.lng - hotel.lng) < 1e-9;
+  });
+  if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
+}
+
+// `sansVol` : rafraîchir le contenu sans redéplacer la carte. Sert au réaffichage après
+// un changement de filtres — on met à jour les critères satisfaits, sans bouger la vue
+// que l'utilisateur est en train de regarder.
+function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   const conteneur = document.getElementById('wd-booking-map');
   if (!conteneur || !_bookingMap) return;
+  _detailHotel = hotel;
   let p = document.getElementById('wd-map-detail');
   if (!p) {
     p = document.createElement('aside');
@@ -255,12 +273,8 @@ function _ouvrirDetail(hotel, criteriaSet) {
   p.dataset.state = 'open';
 
   // Le pin sélectionné se distingue, puisqu'il n'a plus de bulle au-dessus de lui.
-  _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
-  const mk = _markers.find(m => {
-    const ll = m.getLatLng();
-    return Math.abs(ll.lat - hotel.lat) < 1e-9 && Math.abs(ll.lng - hotel.lng) < 1e-9;
-  });
-  if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
+  _marquerPin(hotel);
+  if (sansVol) return;
 
   // Le conteneur de cette carte change de taille (ouverture du panneau, bascule de vue) :
   // sans invalidateSize, Leaflet centre d'après une taille périmée et le pin part sur le
@@ -325,9 +339,10 @@ function initBookingMap(continentFilter) {
 function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   if (!_bookingMap) return;
 
-  // Le panneau montre un hôtel qui peut disparaître du jeu de pins (changement de
-  // continent ou de critères) : on le referme plutôt que d'afficher un détail orphelin.
-  // Sans retour animé ici : _renderMarkers refait déjà le cadrage juste après.
+  // L'hôtel ouvert est retenu le temps de reconstruire les pins : on décide APRÈS s'il
+  // a sa place. Le fermer d'office faisait disparaître le détail au moindre changement
+  // de filtre, y compris quand l'hôtel satisfaisait toujours les critères cochés.
+  const ouvert = _detailHotel;
   _fermerDetail(false);
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
@@ -355,6 +370,18 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 
     _markers.push(marker);
   });
+
+  // Le détail survit au changement de filtres tant que son hôtel reste pertinent :
+  // toujours présent, dans le continent affiché, et satisfaisant les critères cochés.
+  // Il est réaffiché sans vol, pour ne pas déplacer la vue sous les yeux de qui règle
+  // ses filtres — mais son contenu est reconstruit, de sorte que les badges reflètent
+  // les nouveaux critères.
+  if (ouvert) {
+    const encoreLa = PULLMAN_HOTELS_MAP.find(h => h.name === ouvert.name);
+    const critereOk = !hasCriteria || (encoreLa && [...criteriaSet].every(c => encoreLa.amenities && encoreLa.amenities.includes(c)));
+    const continentOk = !continentFilter || (encoreLa && encoreLa.continent === continentFilter);
+    if (encoreLa && critereOk && continentOk) _ouvrirDetail(encoreLa, criteriaSet, true);
+  }
 
   // Recadrage uniquement quand la zone change (init / choix de continent) —
   // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
