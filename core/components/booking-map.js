@@ -54,35 +54,44 @@ function _addStyle() {
     // Même langage que les cartes de la page de résultats : fond #1a2220, aucun radius,
     // le vert réservé au prix et à l'action. La bordure verte décorative d'avant entrait
     // en concurrence avec les pins, eux aussi verts.
-    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#1a2220;border:1px solid rgba(255,255,255,.14);border-radius:0;padding:0;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.55)}' +
-    '.pullman-popup-card .leaflet-popup-content{margin:0;width:264px!important}' +
-    '.pullman-popup-card .leaflet-popup-tip{background:#1a2220;border:1px solid rgba(255,255,255,.14);border-top:none;border-left:none}' +
+    // Carte blanche : sur surface claire, les tokens Pullman donnent #445047 pour le texte
+    // (--color-on-surface-hi) et #BCCABE pour les filets (--color-outline-low).
+    '.pullman-popup-card .leaflet-popup-content-wrapper{background:#fff;border:1px solid #BCCABE;border-radius:0;padding:0;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,.35)}' +
+    '.pullman-popup-card .leaflet-popup-content{margin:0;width:264px!important;color:#445047}' +
+    '.pullman-popup-card .leaflet-popup-tip{background:#fff;border:1px solid #BCCABE;border-top:none;border-left:none}' +
     // Leaflet impose « .leaflet-popup-content p { margin: 1.3em 0 } » depuis son CDN.
     // Sa spécificité (0,1,1) bat une simple classe : on la neutralise à (0,2,1), sinon
     // chaque paragraphe ajoute ~35px de vide invisible dans l'encart.
     '.pullman-popup-card .leaflet-popup-content p{margin:0}' +
-    '.pullman-popup__media{position:relative;display:block;width:100%;aspect-ratio:16/9;background:#28332B}' +
+    '.pullman-popup__media{position:relative;display:block;width:100%;aspect-ratio:16/9;background:#E7EDE8}' +
     '.pullman-popup__img{width:100%;height:100%;object-fit:cover;display:block}' +
-    // Badge « Nouveau » : blanc sur voile sombre, jamais vert (le vert dit « action »)
+    // Badge « Nouveau » posé sur la photo : voile sombre, seul endroit où le blanc reste lisible
     '.pullman-popup__badge{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(0,0,0,.62);font-family:var(--font-sans,sans-serif);font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff}' +
     '.pullman-popup__body{padding:11px 14px 12px;display:flex;flex-direction:column;gap:5px}' +
-    '.pullman-popup__name{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;color:#fff;margin:0;line-height:1.3}' +
-    '.pullman-popup__location{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(255,255,255,.5);margin:0;display:flex;align-items:center;gap:5px;min-width:0}' +
+    '.pullman-popup__name{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;color:#445047;margin:0;line-height:1.3}' +
+    // Opacité .78 et non .62 : sur blanc, .62 tombait à 3,16:1, sous le seuil AA de
+    // 4,5:1 pour ce corps de 11px. À .78 on est à 4,7:1.
+    '.pullman-popup__location{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78);margin:0;display:flex;align-items:center;gap:5px;min-width:0}' +
     '.pullman-popup__location svg{flex-shrink:0}' +
     '.pullman-popup__location>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    '.pullman-popup__score{flex-shrink:0;margin-left:auto;padding:1px 6px;background:rgba(255,255,255,.1);font-size:11px;font-weight:700;color:#fff}' +
-    // Critères satisfaits : répond à « pourquoi cet hôtel ? » quand des filtres sont actifs
+    '.pullman-popup__score{flex-shrink:0;margin-left:auto;padding:1px 6px;background:#445047;font-size:11px;font-weight:700;color:#fff}' +
+    // Critères satisfaits : le vert de marque reste, mais en fond léger avec le texte
+    // #445047 par-dessus — #5FEF91 en couleur de texte sur blanc est illisible.
     '.pullman-popup__tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px}' +
-    '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid rgba(95,239,145,.45);font-family:var(--font-sans,sans-serif);font-size:10px;color:#5FEF91;white-space:nowrap}' +
+    '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(95,239,145,.24);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:600;color:#2F4034;white-space:nowrap}' +
     // align-items:center et non baseline : le CTA est lui-même un conteneur flex, et
     // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
-    '.pullman-popup__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding-top:9px;border-top:1px solid rgba(255,255,255,.1)}' +
-    '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#fff;line-height:1;margin:0}' +
-    '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(255,255,255,.45)}' +
-    '.pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#5FEF91;text-decoration:none;transition:opacity .15s;white-space:nowrap}' +
-    '.pullman-popup__cta:hover{opacity:.75}' +
-    '.pullman-popup-card .leaflet-popup-close-button{color:rgba(255,255,255,.6);padding:6px 8px 0 0}' +
-    '.pullman-popup-card .leaflet-popup-close-button:hover{color:#fff;background:transparent}';
+    '.pullman-popup__foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;padding-top:9px;border-top:1px solid #BCCABE}' +
+    '.pullman-popup__price{font-family:var(--font-sans,sans-serif);font-size:15px;font-weight:700;color:#445047;line-height:1;margin:0}' +
+    '.pullman-popup__price span{font-size:10.5px;font-weight:400;color:rgba(68,80,71,.55)}' +
+    // Bouton plein plutôt que lien : c'est la paire du CTA primaire (fond #5FEF91,
+    // texte #445047), la seule façon d'employer le vert de marque sur fond blanc.
+    // Sélecteur à 2 classes : Leaflet impose « .leaflet-container a { color:#0078A8 } »
+    // en (0,1,1), qui battait une classe seule — le CTA ressortait en bleu Leaflet.
+    '.pullman-popup-card .pullman-popup__cta{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:100px;background:#5FEF91;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#445047;text-decoration:none;transition:background .15s;white-space:nowrap}' +
+    '.pullman-popup-card .pullman-popup__cta:hover{background:#4DD87A;color:#445047}' +
+    '.pullman-popup-card .leaflet-popup-close-button{color:rgba(68,80,71,.55);padding:6px 8px 0 0}' +
+    '.pullman-popup-card .leaflet-popup-close-button:hover{color:#445047;background:transparent}';
   document.head.appendChild(style);
 }
 

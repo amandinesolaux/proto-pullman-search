@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=277"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=280"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,9 +13,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/components/components.js?v=277"></script>
+  <script src="../../core/components/components.js?v=280"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=277"></script>
+  <script src="../../core/components/booking-map.js?v=280"></script>
 </head>
 <body class="brand-pullman">
 
@@ -145,8 +145,12 @@ wd-booking { margin-top: 20px; }
 
 /* --- Cards --- */
 .srx-list { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.srx-card { display: flex; gap: 14px; background: #28332B; border: 1px solid rgba(255,255,255,.07); border-radius: 0; padding: 12px; transition: border-color .15s, transform .15s; }
+.srx-card { display: flex; gap: 14px; background: #28332B; border: 1px solid rgba(255,255,255,.07); border-radius: 0; padding: 12px; transition: border-color .15s, transform .15s; cursor: pointer; }
 .srx-card:hover { border-color: rgba(255,255,255,.22); }
+.srx-card:focus-visible { outline: 2px solid var(--pul-highlight, #5FEF91); outline-offset: 2px; }
+/* Card sélectionnée : liseré vert à gauche, pour la retrouver d'un coup d'œil dans la
+   liste après avoir cliqué son pin. Discret — la carte reste le point d'attention. */
+.srx-card--active { border-color: rgba(95,239,145,.55); box-shadow: inset 3px 0 0 var(--pul-highlight, #5FEF91); }
 .srx-card-img { flex: 0 0 160px; width: 160px; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: #1A2220; } /* 4:3 exact */
 .srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -278,7 +282,9 @@ wd-booking { margin-top: 20px; }
       listEl.innerHTML = items.map(h => {
         const imgKey = h.img && h.img.includes(':') ? h.img : (h.img || 'aja_p_6783-26') + ':1by1';
         const badges = critIds.map(id => '<span class="srx-badge">' + check + esc(labelFor(id)) + '</span>').join('');
-        return '<article class="srx-card" data-hotel="' + esc(h.name) + '">' +
+        // tabindex + role : la card est cliquable (elle recentre la carte), elle doit
+        // donc être atteignable au clavier comme n'importe quel contrôle.
+        return '<article class="srx-card" data-hotel="' + esc(h.name) + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ' — voir sur la carte">' +
           '<img class="srx-card-img" src="' + D.imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=300" alt="' + esc(h.name) + '" loading="lazy"/>' +
           '<div class="srx-card-body">' +
             '<div class="srx-card-top"><div>' +
@@ -345,21 +351,56 @@ wd-booking { margin-top: 20px; }
     const map = L.map(mapEl, { zoomControl: true, attributionControl: false, scrollWheelZoom: false });
     // Esri Dark Gray : gratuit sans clé (les tuiles CARTO sont désormais filigranées « API key required »)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
+    // Marqueurs indexés par nom : c'est ce qui permet de relier une card à son pin.
+    const markerByHotel = new Map();
     if (coords.length) {
-      const group = L.featureGroup(coords.map(({ h, ll }) =>
+      const group = L.featureGroup(coords.map(({ h, ll }) => {
         // Même encart que la carte du dropdown (wdHotelPopupHTML) : c'est la même
         // information, elle ne doit pas se présenter de deux façons différentes.
-        L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
+        const mk = L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) })
           .bindPopup(() => (typeof wdHotelPopupHTML === 'function'
             ? wdHotelPopupHTML(h, critIds)
             : '<strong>' + esc(h.name) + '</strong><br/>' + esc(h.loc)),
-            { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 })
-      ));
+            { className: 'pullman-popup-card', closeButton: true, offset: [0, -6], maxWidth: 280, minWidth: 264 });
+        markerByHotel.set(h.name, mk);
+        return mk;
+      }));
       group.addTo(map);
       map.fitBounds(group.getBounds().pad(0.25), { maxZoom: 8 });
     } else {
       map.setView([25, 10], 2);
     }
+
+    // ---- 9. Liaison liste ↔ carte ----
+    // Cliquer une card recentre la carte sur l'hôtel et ouvre son encart. Le zoom n'est
+    // relevé que s'il est faible : quelqu'un qui a déjà zoomé garde son échelle.
+    const focusHotel = (name) => {
+      const mk = markerByHotel.get(name);
+      if (!mk) return;
+      listEl.querySelectorAll('.srx-card--active').forEach(c => c.classList.remove('srx-card--active'));
+      const card = listEl.querySelector('[data-hotel="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
+      if (card) card.classList.add('srx-card--active');
+      map.flyTo(mk.getLatLng(), Math.max(map.getZoom(), 11), { duration: .6 });
+      mk.openPopup();
+    };
+    listEl.addEventListener('click', (e) => {
+      // On ne détourne pas les liens de la card (« Voir l'hôtel »)
+      if (e.target.closest('a')) return;
+      const card = e.target.closest('.srx-card');
+      if (card && card.dataset.hotel) focusHotel(card.dataset.hotel);
+    });
+    // Clavier : les cards sont focusables, Entrée/Espace déclenche le même recentrage
+    listEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const card = e.target.closest('.srx-card');
+      if (card && card.dataset.hotel) { e.preventDefault(); focusHotel(card.dataset.hotel); }
+    });
+    // Réciproque : cliquer un pin met en évidence la card correspondante et l'amène à l'écran
+    markerByHotel.forEach((mk, name) => mk.on('click', () => {
+      listEl.querySelectorAll('.srx-card--active').forEach(c => c.classList.remove('srx-card--active'));
+      const card = listEl.querySelector('[data-hotel="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
+      if (card) { card.classList.add('srx-card--active'); card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    }));
 
     renderList(sorted());
   }
