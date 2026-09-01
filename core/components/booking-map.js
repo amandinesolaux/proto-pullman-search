@@ -303,6 +303,16 @@ const WD_ZOOM_HOTEL = 6;
 // c'est cette ligne supplémentaire qui obligeait à faire défiler le panneau.
 const WD_TAGS_MAX = 3;
 
+// Signale qu'un message d'écartement occupe la carte. Le bloc « aucun résultat » de la
+// vue carte s'efface alors : il dit la même chose, au même instant, et les deux se
+// superposaient. Il reprend sa place dès que l'avis s'en va.
+function _marquerAvis(actif) {
+  const wrap = document.querySelector('.wd-booking__dd-mapview-wrap');
+  if (!wrap) return;
+  if (actif) wrap.dataset.avis = '1';
+  else delete wrap.dataset.avis;
+}
+
 // `revenir` : refaire le chemin inverse, du pin vers la vue du continent. On ne le fait
 // qu'à la fermeture volontaire — pas quand les pins sont recalculés, puisque le cadrage
 // est alors déjà refait par _renderMarkers.
@@ -312,6 +322,7 @@ function _fermerDetail(revenir) {
   if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
   _detailHotel = null;
   clearTimeout(_avisTimer);
+  _marquerAvis(false);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
   if (revenir && etaitOuvert) _vueContinent(true);
 }
@@ -472,12 +483,14 @@ function _messageDetail(hotel, manquants, criteriaSet) {
       '<p class="wd-map-detail__avis-suite">' + suite + '</p>' +
     '</div>';
   p.dataset.state = 'open';
+  _marquerAvis(true);
   clearTimeout(_avisTimer);
   // On laisse le temps de lire avant de retirer le message ; la carte, elle, repart
   // tout de suite pour que le message et le dézoom racontent la même chose.
   _avisTimer = setTimeout(() => {
     const el = document.getElementById('wd-map-detail');
     if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
+    _marquerAvis(false);
   }, 6000);
   // On recadre sur la zone géographique et non sur `_currentScope` tel quel : celui-ci
   // peut encore désigner l'hôtel qu'on vient justement d'écarter, et on repartirait
@@ -493,6 +506,7 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   if (!p) return;
   _detailHotel = hotel;
   clearTimeout(_avisTimer);
+  _marquerAvis(false);
   p.className = 'wd-map-detail pullman-popup-card';
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
