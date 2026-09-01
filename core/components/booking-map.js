@@ -48,6 +48,22 @@ function _addStyle() {
     '.pullman-dot--greyed{background:#666;box-shadow:0 0 4px rgba(100,100,100,.3),0 1px 2px rgba(0,0,0,.3)}' +
     '.pullman-dot--large.pullman-dot--greyed{background:#666;box-shadow:0 0 6px rgba(100,100,100,.3),0 1px 3px rgba(0,0,0,.3);animation:none}' +
     '.pullman-map-marker--greyed .pullman-label{color:rgba(255,255,255,.4)}' +
+    // Pin sélectionné : sans bulle au-dessus de lui, il lui faut sa propre marque
+    '.pullman-map-marker--selected .pullman-dot{width:16px;height:16px;background:#fff;border-color:#5FEF91;box-shadow:0 0 0 4px rgba(95,239,145,.35),0 2px 8px rgba(0,0,0,.5)}' +
+    // ── Panneau de détail, ancré à gauche de la carte ──────────────────────────
+    // Il ne masque plus le pin : la carte est recentrée pour que l'hôtel tombe à droite.
+    '.wd-map-detail{position:absolute;top:12px;left:12px;width:' + WD_DETAIL_W + 'px;z-index:800;' +
+      'background:#fff;box-shadow:0 12px 38px rgba(0,0,0,.45);' +
+      'opacity:0;transform:translateX(-12px);pointer-events:none;transition:opacity .2s,transform .2s}' +
+    '.wd-map-detail[data-state="open"]{opacity:1;transform:none;pointer-events:auto}' +
+    '.wd-map-detail .pullman-popup__media{aspect-ratio:16/9}' +
+    '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;padding:0;' +
+      'border:none;border-radius:100px;background-color:rgba(0,0,0,.55);cursor:pointer;' +
+      'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E");' +
+      'background-repeat:no-repeat;background-position:center;background-size:11px 11px;transition:background-color .15s}' +
+    '.wd-map-detail__close:hover{background-color:rgba(0,0,0,.8)}' +
+    '.wd-map-detail__close:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
+    '@media (prefers-reduced-motion: reduce){.wd-map-detail{transition:none}}' +
     '.pullman-label{position:absolute;left:18px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--font-sans,sans-serif);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8),0 0 2px rgba(0,0,0,.6);pointer-events:none}' +
     '@keyframes pullman-pulse{0%,100%{box-shadow:0 0 12px rgba(95,239,145,.7),0 0 24px rgba(95,239,145,.3),0 2px 6px rgba(0,0,0,.4)}50%{box-shadow:0 0 18px rgba(95,239,145,.9),0 0 36px rgba(95,239,145,.4),0 2px 6px rgba(0,0,0,.4)}}' +
     // ── Encart hôtel ──────────────────────────────────────────────────────────
@@ -190,6 +206,52 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
 }
 window.wdHotelPopupHTML = wdHotelPopupHTML;
 
+// ── Panneau de détail latéral (carte du dropdown) ────────────────────────────────
+// Largeur du panneau, reprise telle quelle par le décalage de centrage.
+const WD_DETAIL_W = 288;
+
+function _fermerDetail() {
+  const p = document.getElementById('wd-map-detail');
+  if (p) { p.dataset.state = 'closed'; p.innerHTML = ''; }
+  _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
+}
+
+function _ouvrirDetail(hotel, criteriaSet) {
+  const conteneur = document.getElementById('wd-booking-map');
+  if (!conteneur || !_bookingMap) return;
+  let p = document.getElementById('wd-map-detail');
+  if (!p) {
+    p = document.createElement('aside');
+    p.id = 'wd-map-detail';
+    p.className = 'wd-map-detail';
+    p.setAttribute('role', 'dialog');
+    p.setAttribute('aria-label', 'Détail de l’hôtel');
+    conteneur.appendChild(p);
+    p.addEventListener('click', (e) => {
+      if (e.target.closest('[data-detail-close]')) { e.preventDefault(); _fermerDetail(); }
+    });
+  }
+  p.innerHTML =
+    '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
+    wdHotelPopupHTML(hotel, criteriaSet);
+  p.dataset.state = 'open';
+
+  // Le pin sélectionné se distingue, puisqu'il n'a plus de bulle au-dessus de lui.
+  _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
+  const mk = _markers.find(m => {
+    const ll = m.getLatLng();
+    return Math.abs(ll.lat - hotel.lat) < 1e-9 && Math.abs(ll.lng - hotel.lng) < 1e-9;
+  });
+  if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
+
+  // Zoom sur l'hôtel, avec le centre décalé pour que le pin tombe dans la moitié
+  // libre à droite du panneau plutôt que derrière lui.
+  const zoom = Math.max(_bookingMap.getZoom(), 11);
+  const pt = _bookingMap.project([hotel.lat, hotel.lng], zoom);
+  pt.x -= WD_DETAIL_W / 2;
+  _bookingMap.flyTo(_bookingMap.unproject(pt, zoom), zoom, { duration: .6 });
+}
+
 function initBookingMap(continentFilter) {
   const mapElement = document.getElementById('wd-booking-map');
   if (!mapElement || typeof L === 'undefined') return;
@@ -216,6 +278,11 @@ function initBookingMap(continentFilter) {
 
   L.control.zoom({ position: 'topright' }).addTo(_bookingMap);
 
+  // Cliquer la carte hors d'un pin referme le détail, comme on refermerait une bulle.
+  _bookingMap.on('click', _fermerDetail);
+  // maxZoom porté à 12 → 14 : à 12 on voyait encore la région, pas le quartier.
+  _bookingMap.setMaxZoom(14);
+
   // Esri Dark Gray : gratuit sans clé (les tuiles CARTO sont désormais filigranées « API key required »)
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 16,
@@ -227,6 +294,9 @@ function initBookingMap(continentFilter) {
 function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   if (!_bookingMap) return;
 
+  // Le panneau montre un hôtel qui peut disparaître du jeu de pins (changement de
+  // continent ou de critères) : on le referme plutôt que d'afficher un détail orphelin.
+  _fermerDetail();
   _markers.forEach(m => _bookingMap.removeLayer(m));
   _markers = [];
 
@@ -247,10 +317,9 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
       opacity: isFiltered && !inContinent ? 0.25 : greyed ? 0.5 : 1,
     }).addTo(_bookingMap);
 
-    // Contenu construit à la demande : évite de fabriquer 110 encarts au chargement.
-    marker.bindPopup(() => wdHotelPopupHTML(hotel, criteriaSet),
-      { className: 'pullman-popup-card', closeButton: true, offset: [0, -8], maxWidth: 280, minWidth: 264 }
-    );
+    // Panneau latéral plutôt qu'une bulle ancrée : posée sur le pin, elle masquait
+    // justement ce qu'on cherche à voir — où se trouve l'hôtel et ce qu'il y a autour.
+    marker.on('click', () => _ouvrirDetail(hotel, criteriaSet));
 
     _markers.push(marker);
   });
