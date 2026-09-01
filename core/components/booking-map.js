@@ -312,7 +312,7 @@ function _fermerDetail(revenir) {
   _detailHotel = null;
   clearTimeout(_avisTimer);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
-  if (revenir && etaitOuvert) _vueContinent(_currentContinent, true);
+  if (revenir && etaitOuvert) _vueContinent(true);
 }
 
 // Conteneur du panneau, créé une fois. Détail et message le partagent : ils occupent la
@@ -362,10 +362,34 @@ function _marquerPin(hotel) {
   if (mk && mk._icon) mk._icon.classList.add('pullman-map-marker--selected');
 }
 
+// La part géographique de la zone. Un hôtel sélectionné rétrécit la zone à lui seul,
+// ce qui convient au cadrage mais fausserait tout comptage : on ne compte jamais « les
+// hôtels qui restent » dans une zone d'un seul hôtel.
+function _zoneGeo(scope) {
+  const s = scope || {};
+  return { continent: s.continent, country: s.country, city: s.city };
+}
+
+function _libelleZone(scope) {
+  const s = scope || {};
+  if (s.city) return s.city;
+  if (s.country) return s.country;
+  if (s.continent && window.WD_SEARCH_DATA) {
+    return ((WD_SEARCH_DATA.regions || []).find(r => r.id === s.continent) || {}).label || null;
+  }
+  return null;
+}
+
+// Combien d'hôtels d'une zone satisfont les critères cochés.
+function _conformes(scope, criteriaSet) {
+  return PULLMAN_HOTELS_MAP.filter(h =>
+    _dansLaZone(h, scope) && _criteresManquants(h, criteriaSet).length === 0).length;
+}
+
 // Message affiché quand un critère vient d'écarter l'hôtel ouvert. Il nomme l'hôtel et
-// ce qui lui manque, annonce combien d'établissements restent, puis la carte revient
-// d'elle-même au continent — les pins verts sont ceux qui satisfont les critères.
-function _messageDetail(hotel, manquants, restants, continentFilter) {
+// ce qui lui manque, puis situe ce qui reste dans la zone choisie — et, quand cette zone
+// est vide, donne la sortie : retirer un critère, ou remonter au continent.
+function _messageDetail(hotel, manquants, criteriaSet) {
   const p = _panneauDetail();
   if (!p) return;
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -376,23 +400,41 @@ function _messageDetail(hotel, manquants, restants, continentFilter) {
   const quoi = libelles.length > 1
     ? 'ne répond pas aux critères ' + libelles.slice(0, -1).join(', ') + ' et ' + libelles[libelles.length - 1]
     : 'ne répond pas au critère ' + libelles[0];
-  // On nomme le continent : le compte porte sur lui, alors que des pins verts d'autres
-  // zones restent visibles en arrière-plan. Sans cette précision, le chiffre annoncé
-  // semblerait contredire ce qu'on voit.
-  const zone = (window.WD_SEARCH_DATA && continentFilter)
-    ? (WD_SEARCH_DATA.regions.find(r => r.id === continentFilter) || {}).label
-    : null;
+  // On nomme la zone : le compte porte sur elle, alors que des pins verts d'ailleurs
+  // restent visibles en arrière-plan. Sans cette précision, le chiffre annoncé
+  // semblerait contredire ce qu'on voit. La zone est celle que l'utilisateur a choisie —
+  // « Chine » et non « Asie » : lui répondre à l'échelle du continent reviendrait à
+  // compter des hôtels qu'il a lui-même écartés.
+  const geo = _zoneGeo(_currentScope);
+  const zone = _libelleZone(geo);
+  const dansZone = _conformes(geo, criteriaSet);
+  // Y a-t-il un cran au-dessus ? Seulement si la zone est plus étroite que le continent.
+  const large = (geo.country || geo.city) && geo.continent ? { continent: geo.continent } : null;
+  const dansLarge = large ? _conformes(large, criteriaSet) : 0;
+
+  let suite;
+  if (dansZone > 0) {
+    suite = '<strong>' + dansZone + ' hôtel' + (dansZone > 1 ? 's' : '') + '</strong>' +
+      (zone ? ' en ' + esc(zone) : '') + ' y répond' + (dansZone > 1 ? 'ent' : '') + '.';
+  } else if (dansLarge > 0) {
+    // La zone est vide, mais le continent ne l'est pas : on chiffre l'alternative plutôt
+    // que de laisser l'utilisateur deviner si élargir servirait à quelque chose.
+    suite = 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') + ' ne réunit ces critères. ' +
+      '<strong>' + dansLarge + ' hôtel' + (dansLarge > 1 ? 's' : '') + '</strong> en ' +
+      esc(_libelleZone(large)) + ' y répond' + (dansLarge > 1 ? 'ent' : '') +
+      ' : élargissez la zone, ou retirez un critère.';
+  } else {
+    suite = 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') +
+      (large ? ' ni en ' + esc(_libelleZone(large)) : '') +
+      ' ne réunit ces critères. Retirez un critère pour élargir la recherche.';
+  }
+
   p.className = 'wd-map-detail wd-map-detail--avis';
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
     '<div class="wd-map-detail__avis" role="status">' +
       '<p class="wd-map-detail__avis-titre">' + esc(hotel.name) + ' ' + quoi + '</p>' +
-      '<p class="wd-map-detail__avis-suite">' +
-        (restants > 0
-          ? '<strong>' + restants + ' hôtel' + (restants > 1 ? 's' : '') + '</strong>' + (zone ? ' en ' + esc(zone) : '') +
-            ' y répond' + (restants > 1 ? 'ent' : '') + '.'
-          : 'Aucun hôtel' + (zone ? ' en ' + esc(zone) : '') + ' ne réunit tous ces critères.') +
-      '</p>' +
+      '<p class="wd-map-detail__avis-suite">' + suite + '</p>' +
     '</div>';
   p.dataset.state = 'open';
   _detailHotel = null;
@@ -403,7 +445,10 @@ function _messageDetail(hotel, manquants, restants, continentFilter) {
     const el = document.getElementById('wd-map-detail');
     if (el && el.classList.contains('wd-map-detail--avis')) { el.dataset.state = 'closed'; el.innerHTML = ''; }
   }, 6000);
-  _vueContinent(continentFilter, true);
+  // On recadre sur la zone géographique et non sur `_currentScope` tel quel : celui-ci
+  // peut encore désigner l'hôtel qu'on vient justement d'écarter, et on repartirait
+  // alors sur lui.
+  _vueContinent(true, geo);
 }
 
 // `sansVol` : rafraîchir le contenu sans redéplacer la carte. Sert au réaffichage après
@@ -536,38 +581,40 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
       ? _criteresManquants(encoreLa, criteriaSet)
       : [];
     const critereOk = !hasCriteria || (encoreLa && manquants.length === 0);
-    const continentOk = !continentFilter || (encoreLa && encoreLa.continent === continentFilter);
-    if (encoreLa && critereOk && continentOk) {
+    // Appartenance jugée sur la zone géographique, comme la liste — le continent seul
+    // laissait passer un hôtel chinois alors que l'utilisateur avait choisi le Japon.
+    const zoneOk = !encoreLa || _dansLaZone(encoreLa, _zoneGeo(_currentScope));
+    if (encoreLa && critereOk && zoneOk) {
       _ouvrirDetail(encoreLa, criteriaSet, true);
-    } else if (encoreLa && manquants.length && continentOk && !refit) {
+    } else if (encoreLa && manquants.length && zoneOk && !refit) {
       // L'hôtel vient d'être écarté par un critère : on le dit avant de partir. Sans
       // message, la card disparaissait sans raison visible et la carte restait zoomée
       // sur un hôtel qui ne correspondait plus.
-      const restants = PULLMAN_HOTELS_MAP.filter(h =>
-        (!continentFilter || h.continent === continentFilter) &&
-        _criteresManquants(h, criteriaSet).length === 0).length;
-      _messageDetail(encoreLa, manquants, restants, continentFilter);
+      _messageDetail(encoreLa, manquants, criteriaSet);
     }
   }
 
   // Recadrage uniquement quand la zone change (init / choix de continent) —
   // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
-  if (refit) _vueContinent(continentFilter, false);
+  if (refit) _vueContinent(false);
 }
 
 // Cadrage de la zone courante — le continent choisi, ou le monde à défaut.
 // Extrait de _renderMarkers pour que la fermeture du panneau puisse y revenir :
 // c'est la même vue, elle ne doit pas être recalculée deux fois différemment.
-function _vueContinent(continentFilter, anime) {
+// `scope` : cadrer sur une zone autre que la zone courante. Sert au retour après
+// exclusion, où la zone courante désigne encore l'hôtel écarté.
+function _vueContinent(anime, scope) {
   if (!_bookingMap || typeof PULLMAN_HOTELS_MAP === 'undefined') return;
   // On cadre sur la zone choisie — pays ou ville comprises — et non sur le seul
   // continent : sélectionner « Chine » cadrait jusqu'ici toute l'Asie.
-  const cible = PULLMAN_HOTELS_MAP.filter(h => _dansLaZone(h, _currentScope));
+  const zone = scope || _currentScope;
+  const cible = PULLMAN_HOTELS_MAP.filter(h => _dansLaZone(h, zone));
   if (!cible.length) return;
   const bounds = L.latLngBounds(cible.map(h => [h.lat, h.lng]));
   _bookingMap.invalidateSize({ animate: false });
   _bookingMap.flyToBounds(bounds, {
-    padding: _zoneDefinie(_currentScope) ? [20, 20] : [10, 10],
+    padding: _zoneDefinie(zone) ? [20, 20] : [10, 10],
     // Un seul hôtel dans la zone : sans plafond, flyToBounds irait au zoom maximum.
     maxZoom: cible.length === 1 ? WD_ZOOM_HOTEL : 12,
     animate: anime,
