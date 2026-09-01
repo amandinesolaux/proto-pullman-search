@@ -54,9 +54,21 @@ function _addStyle() {
     '.pullman-map-marker--selected .pullman-dot{width:16px;height:16px;background:#fff;border-color:#5FEF91;box-shadow:0 0 0 4px rgba(95,239,145,.35),0 2px 8px rgba(0,0,0,.5)}' +
     // ── Panneau de détail, ancré à gauche de la carte ──────────────────────────
     // Il ne masque plus le pin : la carte est recentrée pour que l'hôtel tombe à droite.
+    // Hauteur plafonnée à celle de la carte : avec tous les services affichés, le panneau
+    // dépassait le cadre (371px pour 340). Il défile plutôt que de déborder —
+    // disableScrollPropagation empêche ce défilement de zoomer la carte.
+    // Cadre fixe, contenu défilant à l'intérieur : avec tous les services affichés, le
+    // panneau dépassait la carte (371px pour 340). Le bouton de fermeture reste sur le
+    // cadre, sinon il partirait avec le défilement.
     '.wd-map-detail{position:absolute;top:12px;left:12px;width:' + WD_DETAIL_W + 'px;z-index:800;' +
+      'max-height:calc(100% - 24px);display:flex;flex-direction:column;overflow:hidden;' +
       'background:#fff;box-shadow:0 12px 38px rgba(0,0,0,.45);' +
       'opacity:0;transform:translateX(-12px);pointer-events:none;transition:opacity .2s,transform .2s}' +
+    '.wd-map-detail__scroll{overflow-y:auto;overscroll-behavior:contain;' +
+      'scrollbar-width:thin;scrollbar-color:rgba(68,80,71,.35) transparent}' +
+    '.wd-map-detail__scroll::-webkit-scrollbar{width:6px}' +
+    '.wd-map-detail__scroll::-webkit-scrollbar-thumb{background:rgba(68,80,71,.35);border-radius:100px}' +
+    '.wd-map-detail__scroll::-webkit-scrollbar-track{background:transparent}' +
     '.wd-map-detail[data-state="open"]{opacity:1;transform:none;pointer-events:auto}' +
     '.wd-map-detail .pullman-popup__media{aspect-ratio:16/9}' +
     '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;padding:0;' +
@@ -97,10 +109,12 @@ function _addStyle() {
     '.pullman-popup__location svg{flex-shrink:0}' +
     '.pullman-popup__location>span:first-of-type{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
     '.pullman-popup__score{flex-shrink:0;margin-left:auto;padding:1px 6px;background:#445047;font-size:11px;font-weight:700;color:#fff}' +
-    // Critères satisfaits : le vert de marque reste, mais en fond léger avec le texte
-    // #445047 par-dessus — #5FEF91 en couleur de texte sur blanc est illisible.
+    // Services de l'hôtel. Par défaut en gris-vert discret : c'est de l'information, pas
+    // une réponse à une demande. Ceux que l'utilisateur a cochés passent au vert de
+    // marque — en fond, jamais en texte, #5FEF91 étant illisible sur blanc.
     '.pullman-popup__tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px}' +
-    '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(95,239,145,.24);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:600;color:#2F4034;white-space:nowrap}' +
+    '.pullman-popup__tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(68,80,71,.08);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:500;color:#445047;white-space:nowrap}' +
+    '.pullman-popup__tag--match{background:rgba(95,239,145,.32);font-weight:600;color:#2F4034}' +
     // align-items:center et non baseline : le CTA est lui-même un conteneur flex, et
     // l'alignement sur la ligne de base d'un flex imbriqué ajoutait ~40px de vide.
     // Deux actions : le prix passe sur sa propre ligne, sinon les trois éléments se
@@ -170,9 +184,18 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
 
+  // Tous les services de l'hôtel, pas seulement ceux qu'on a filtrés : la card dit ce
+  // qu'il offre. Ceux que l'utilisateur a cochés passent en vert et en tête, marqués
+  // d'une coche — on voit d'un coup ce qui répond à sa demande et ce qu'il y a en plus.
   const ids = active ? [...active] : [];
-  const tags = ids.filter(id => (h.amenities || []).includes(id))
-    .map(id => '<span class="pullman-popup__tag">' + check + esc(WD_CRITERIA_LABELS[id] || id) + '</span>').join('');
+  const services = (h.amenities || []).filter(id => WD_CRITERIA_LABELS[id]);
+  const retenus = services.filter(id => ids.includes(id));
+  const autres = services.filter(id => !ids.includes(id));
+  const tags = retenus.map(id =>
+      '<span class="pullman-popup__tag pullman-popup__tag--match">' + check + esc(WD_CRITERIA_LABELS[id]) + '</span>')
+    .concat(autres.map(id =>
+      '<span class="pullman-popup__tag">' + esc(WD_CRITERIA_LABELS[id]) + '</span>'))
+    .join('');
 
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
   // réservation sur ALL. Sans href on n'affiche aucun lien plutôt qu'un lien mort.
@@ -269,8 +292,11 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   }
   p.innerHTML =
     '<button type="button" class="wd-map-detail__close" data-detail-close aria-label="Fermer"></button>' +
-    wdHotelPopupHTML(hotel, criteriaSet);
+    '<div class="wd-map-detail__scroll">' + wdHotelPopupHTML(hotel, criteriaSet) + '</div>';
   p.dataset.state = 'open';
+  // Le contenu change de hauteur selon le nombre de services : on repart du haut.
+  const zone = p.querySelector('.wd-map-detail__scroll');
+  if (zone) zone.scrollTop = 0;
 
   // Le pin sélectionné se distingue, puisqu'il n'a plus de bulle au-dessus de lui.
   _marquerPin(hotel);
