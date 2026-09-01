@@ -101,12 +101,16 @@ function _addStyle() {
     // le badge. Sélecteur à 3 classes : Leaflet applique « .leaflet-container
     // a.leaflet-popup-close-button » en (0,2,1), qui l'emportait et la laissait en gris
     // Tahoma sur fond transparent.
+    // La croix est un tracé SVG, pas le caractère « × » : ce glyphe s'aligne sur l'axe
+    // mathématique de la police et tombait 1,7px sous le centre du cercle. Un tracé est
+    // centré par construction, et ne dépend pas des métriques de la police.
     '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button{' +
-      'top:8px;right:8px;width:26px;height:26px;padding:0;border-radius:100px;' +
-      'background:rgba(0,0,0,.55);color:#fff;' +
-      'font:400 17px/26px var(--font-sans,sans-serif);text-align:center;' +
-      'transition:background .15s}' +
-    '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button:hover{background:rgba(0,0,0,.8);color:#fff}' +
+      'top:8px;right:8px;width:26px;height:26px;padding:0;border-radius:100px;font-size:0;' +
+      'background-color:rgba(0,0,0,.55);' +
+      'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E");' +
+      'background-repeat:no-repeat;background-position:center;background-size:11px 11px;' +
+      'transition:background-color .15s}' +
+    '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button:hover{background-color:rgba(0,0,0,.8)}' +
     '.leaflet-container .pullman-popup-card a.leaflet-popup-close-button:focus-visible{outline:2px solid #fff;outline-offset:2px}';
   document.head.appendChild(style);
 }
