@@ -74,6 +74,10 @@ function _addStyle() {
     // donc pour ce pire cas, et c'est la photo qui cède, jamais le prix ni les boutons.
     '.wd-map-detail .pullman-popup__media{flex:0 0 auto;aspect-ratio:21/9}' +
     '.wd-map-detail .pullman-popup__body{flex:0 0 auto}' +
+    // Place réservée pour deux lignes de badges, qu'il y en ait une ou deux : sans elle
+    // la card changeait de hauteur au gré des libellés cochés, et le panneau sautait
+    // sous le curseur pendant qu'on règle ses filtres.
+    '.wd-map-detail .pullman-popup__tags{min-height:44px;align-content:flex-start}' +
     '.wd-map-detail__scroll::-webkit-scrollbar{width:6px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-thumb{background:rgba(68,80,71,.35);border-radius:100px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-track{background:transparent}' +

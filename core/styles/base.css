@@ -597,7 +597,11 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__dd-criteria-item--checked { color: #fff; }
 
 /* Chips in search field */
-.wd-booking__field--dest { height: auto; min-height: 56px; padding: 10px 16px; }
+/* min-width:0 : sans lui le champ hérite de min-width:auto et refuse de descendre sous
+   la largeur de ses chips. Chaque critère ajouté l'élargissait donc, poussant le CTA
+   « Rechercher » hors de la barre. La largeur du champ ne doit dépendre que de la place
+   disponible, jamais de son contenu. */
+.wd-booking__field--dest { height: auto; min-height: 56px; padding: 10px 16px; min-width: 0; }
 .wd-booking__dest-wrap { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
 .wd-booking__dest-input-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
 .wd-booking__dest-chips { display: contents; }
