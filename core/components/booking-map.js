@@ -35,6 +35,7 @@ let _vueAvantDetail = null;
 // désaccordait les deux vues : la carte écartait des hôtels que la liste affichait.
 function _dansLaZone(hotel, scope) {
   const s = scope || {};
+  if (s.city) return hotel.city === s.city;
   if (s.country) return hotel.country === s.country;
   if (s.continent) return hotel.continent === s.continent;
   return true;
@@ -42,7 +43,7 @@ function _dansLaZone(hotel, scope) {
 // Une zone est-elle définie ? Sert à savoir s'il faut mettre en avant et recadrer.
 function _zoneDefinie(scope) {
   const s = scope || {};
-  return !!(s.country || s.continent);
+  return !!(s.city || s.country || s.continent);
 }
 let _currentCriteria = null;
 
@@ -634,7 +635,9 @@ const WD_ZONE_PREP = {
 function _enZone(scope) {
   const nom = _libelleZone(scope);
   if (!nom) return null;
-  return (WD_ZONE_PREP[nom] || 'en') + ' ' + nom;
+  // Une ville ne prend pas d'article : « à Shanghai », jamais « en Shanghai ».
+  const prep = (scope && scope.city) ? 'à' : (WD_ZONE_PREP[nom] || 'en');
+  return prep + ' ' + nom;
 }
 
 // Destination d'un élargissement, toujours un continent : « à l'Asie », « aux Amériques ».
@@ -645,6 +648,7 @@ const WD_VERS_CONTINENT = {
 
 function _libelleZone(scope) {
   const s = scope || {};
+  if (s.city) return s.city;
   if (s.country) return s.country;
   if (s.continent && window.WD_SEARCH_DATA) {
     return ((WD_SEARCH_DATA.regions || []).find(r => r.id === s.continent) || {}).label || null;
@@ -996,6 +1000,10 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     // Une ville à plusieurs hôtels n'ouvre rien : elle s'approche, et les pins se
     // séparent d'eux-mêmes.
     marker.on('click', () => {
+      // Cliquer un pin porte sa ville dans le champ de recherche : la carte et le champ
+      // disent alors la même chose. La liste connaît ce périmètre, elle s'y restreint
+      // aussi — c'est ce qui manquait la première fois qu'on a mis la ville dans la zone.
+      _choisirVille(tete);
       if (lot.length > 1) {
         // On cadre sur les hôtels eux-mêmes, et non à un zoom fixe : les deux Pullman de
         // Singapour sont à 9 km, qui ne font que quelques pixels au zoom 6 — on croyait
@@ -1056,6 +1064,30 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
   if (refit) _vueContinent(false);
 }
+
+// Porte la ville d'un pin dans le champ de recherche. La liste, en se redessinant,
+// repassera la nouvelle zone à la carte par WD_SYNC_ZONE — on ne la met pas à jour ici.
+function _choisirVille(hotel) {
+  if (typeof window.WD_CHOISIR_VILLE !== 'function') return;
+  if (_currentScope && _currentScope.city === hotel.city) return;
+  window.WD_CHOISIR_VILLE(hotel.city, hotel.country, hotel.continent);
+}
+
+// La liste appelle ceci chaque fois qu'elle se redessine. La carte s'aligne sur sa zone
+// sans recadrer : elle n'a pas à déplacer la vue, seulement à ne plus la contredire.
+//
+// Une quinzaine d'endroits changent la destination — retirer une chip, déplier un pays,
+// choisir un hôtel, saisir du texte — et deux seulement prévenaient la carte. D'où cette
+// famille d'écarts qu'on a corrigés un par un : la Chine ignorée, l'onglet qui gardait
+// les critères de l'autre, la chip retirée sans effet sur les pins. Une seule couture
+// vaut mieux que treize rattrapages.
+window.WD_SYNC_ZONE = (zone) => {
+  if (!_bookingMap || !zone) return;
+  const a = _currentScope || {}, b = zone;
+  if (a.continent === b.continent && a.country === b.country && a.city === b.city) return;
+  _currentScope = b;
+  _renderMarkers(_currentContinent, _currentCriteria, false);
+};
 
 // N'affiche que les étiquettes qui tiennent sans se recouvrir. À l'échelle d'un
 // continent, 39 noms de villes se marchaient dessus en Asie du Sud-Est : on en gardait

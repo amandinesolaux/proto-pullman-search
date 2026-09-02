@@ -1248,7 +1248,10 @@
       // recherche. Toute divergence entre les deux vues commence ici.
       const zoneCarte = () => ({
         continent: searchState.continent,
-        country: searchState.expandedCountry || null
+        country: searchState.expandedCountry || null,
+        // La ville revient dans la zone, mais cette fois la liste la connaît aussi : c'est
+        // ce qui manquait la première fois, et faisait diverger les deux vues.
+        city: searchState.city || null
       });
 
       const searchState = {
@@ -1392,6 +1395,8 @@
         const chips = [];
         if (searchState.selectedHotel) {
           chips.push({ type: 'hotel', id: searchState.selectedHotel, label: searchState.selectedHotel, icon: '<svg viewBox="0 0 14 14" class="wd-booking__chip-icon"><path d="M2 11V5.5L7 2l5 3.5V11H9V8H5v3H2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>' });
+        } else if (searchState.city) {
+          chips.push({ type: 'city', id: searchState.city, label: searchState.city });
         } else if (searchState.expandedCountry) {
           chips.push({ type: 'country', id: searchState.expandedCountry, label: searchState.expandedCountry });
         } else if (searchState.continent) {
@@ -1411,7 +1416,8 @@
       };
       const removeChip = (type, id) => {
         if (type === 'continent') { searchState.continent = null; searchState.expandedCountry = null; searchState.selectedHotel = null; }
-        else if (type === 'country') { searchState.expandedCountry = null; searchState.selectedHotel = null; }
+        else if (type === 'country') { searchState.expandedCountry = null; searchState.city = null; searchState.selectedHotel = null; }
+        else if (type === 'city') { searchState.city = null; searchState.selectedHotel = null; }
         else if (type === 'hotel') { searchState.selectedHotel = null; }
         else if (type === 'resto') { searchState.selectedResto = null; }
         else if (type === 'criteria') { getActiveCriteria().delete(id); }
@@ -1579,6 +1585,12 @@
           const country = searchState.expandedCountry || '';
           const region = getRegion();
           return { pool: region ? region.hotels.filter(h => h.country === country) : [], label: country };
+        } else if (searchState.city) {
+          // La ville est un périmètre à part entière depuis qu'on peut la choisir sur la
+          // carte. Elle passe avant le pays : c'est le choix le plus précis.
+          const region = getRegion();
+          const base = region ? region.hotels : allHotels;
+          return { pool: base.filter(h => h.loc.split(',')[0].trim() === searchState.city), label: searchState.city };
         } else if (searchState.expandedCountry) {
           const region = getRegion();
           return { pool: region ? region.hotels.filter(h => h.country === searchState.expandedCountry) : [], label: searchState.expandedCountry };
@@ -1774,6 +1786,7 @@
         const tous = searchState.selectedResto
           ? (window.WD_RESTAURANTS || []).filter(v => v.nom === searchState.selectedResto)
           : (window.WD_RESTAURANTS || []);
+        if (searchState.city) return tous.filter(v => v.ville === searchState.city);
         if (searchState.expandedCountry) return tous.filter(v => v.pays === searchState.expandedCountry);
         if (searchState.continent) return tous.filter(v => v.region === searchState.continent);
         return tous;
@@ -2177,6 +2190,10 @@
         renderDestList();
         renderCriteria();
         renderChips();
+        // La carte s'aligne sur la zone de la liste à chaque redessin. C'est le seul
+        // endroit qui voit passer tous les changements de destination — les rattraper un
+        // par un nous a coûté quatre correctifs.
+        if (typeof window.WD_SYNC_ZONE === 'function') window.WD_SYNC_ZONE(zoneCarte());
         // État de divulgation porté par le composant (robuste aux re-rendus du panneau)
         if (progressiveMode) this.dataset.disclosure = isIntermediate() ? 'intermediate' : 'full';
         scheduleRecentSave(); // capture continue de la recherche en cours (même sans clic sur « Rechercher »)
@@ -2567,6 +2584,20 @@
           .filter(restoMatchesCriteria).length;
         window.WD_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || [])
           .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
+
+        // Cliquer une ville sur la carte la porte dans le champ de recherche. On ne
+        // recadre pas au passage : l'utilisateur vient d'y arriver, déplacer la vue sous
+        // ses yeux serait lui reprendre ce qu'il a demandé.
+        window.WD_CHOISIR_VILLE = (ville, pays, continent) => {
+          searchState.city = ville;
+          if (continent && !searchState.continent) searchState.continent = continent;
+          if (pays) { searchState.country = pays; searchState.expandedCountry = pays; }
+          searchState.selectedHotel = null;
+          renderPanel();
+          if (renderMapPanel) renderMapPanel();
+          scheduleRecentSave();
+          return zoneCarte();
+        };
 
         window.WD_ELARGIR_AU_CONTINENT = () => {
           searchState.country = null;
