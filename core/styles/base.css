@@ -1187,3 +1187,105 @@ wd-footer { display: block; }
 .wd-world-map__stat { text-align: center; }
 .wd-world-map__stat-num { font-family: var(--font-serif); font-size: 32px; color: var(--pul-highlight, #5FEF91); display: block; }
 .wd-world-map__stat-label { font-family: var(--font-sans); font-size: 13px; color: rgba(255,255,255,.5); }
+
+/* ══ Mobile ═══════════════════════════════════════════════════════════════════════
+   Le prototype était pensé pour le desktop : la rangée de champs imposait une largeur
+   fixe de 1152 px, ce qui donnait un document de 1200 px dans un écran de 375 et un
+   défilement horizontal sur toutes les pages. Le reste était déjà fluide.
+
+   Modèle retenu : chercher est une tâche à part entière sur mobile. Le panneau prend
+   tout l'écran, les champs s'empilent au-dessus et restent atteignables pendant qu'on
+   affine. Les cibles tactiles ne descendent pas sous 44 px. */
+@media (max-width: 767px) {
+  /* La cause du débordement, et elle seule. */
+  .wd-booking__fields { min-width: 0; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px; }
+  /* Les 48 px de marge latérale du desktop retiraient 96 px sur 375 : le panneau n'en
+     gardait que 279, et la carte 168. */
+  .wd-booking { padding: 0; max-width: none; }
+  /* Quatre onglets ne tiennent pas sur 375 px : « Célébrations » était coupé. Ils
+     défilent horizontalement, sans barre visible. */
+  .wd-booking__tabs { padding: 12px 12px 8px; overflow-x: auto; scrollbar-width: none; }
+  .wd-booking__tabs::-webkit-scrollbar { display: none; }
+  .wd-booking__tab { flex: 0 0 auto; }
+  /* Trois champs empilés prenaient 382 px de haut, laissant 331 px au panneau sur un
+     écran de 812. Réduits à l'essentiel, ils en prennent moins de la moitié. */
+  .wd-booking__field { height: auto; min-height: 48px; padding: 8px 12px; gap: 10px; border-radius: 4px; background: rgba(255,255,255,.04); }
+  .wd-booking__label { font-size: 11px; }
+  /* Les séparateurs verticaux entre les champs devenaient, une fois la rangée empilée,
+     deux blocs vides de 56 px — 112 px pris au panneau. Les champs ont leur propre fond,
+     ils se distinguent sans eux. */
+  .wd-booking__sep { display: none; }
+  .wd-booking__field + .wd-booking__field { border-left: none; }
+  .wd-booking__cta { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; }
+
+  /* Le composant entier passe en plein écran pendant la recherche. */
+  wd-booking[data-plein-ecran] { position: fixed; inset: 0; z-index: 1000; margin: 0;
+    display: flex; flex-direction: column; background: #1a2220; overflow: hidden; }
+  wd-booking[data-plein-ecran] .wd-booking { margin: 0; border-radius: 0; height: 100%;
+    display: flex; flex-direction: column; }
+  wd-booking[data-plein-ecran] .wd-booking__tabs { flex: 0 0 auto; overflow-x: auto; scrollbar-width: none; }
+  wd-booking[data-plein-ecran] .wd-booking__tabs::-webkit-scrollbar { display: none; }
+  wd-booking[data-plein-ecran] .wd-booking__fields { flex: 0 0 auto; }
+  /* Le panneau n'est plus un dropdown posé sous la barre : il occupe la place restante
+     et défile pour lui-même. */
+  wd-booking[data-plein-ecran] .wd-booking__dropdown { position: static; max-height: none;
+    flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    border-radius: 0; box-shadow: none; }
+  /* En plein écran, « Rechercher » quitte la rangée des champs pour se poser en bas :
+     c'est l'action terminale, elle doit rester sous le pouce pendant qu'on affine, et non
+     s'intercaler entre les champs et le panneau qu'on parcourt. */
+  wd-booking[data-plein-ecran] .wd-booking__cta { position: fixed; left: 12px; right: 12px;
+    bottom: 12px; z-index: 2; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
+
+  /* Destinations et critères ne cohabitent pas à 375 px : ils s'empilent. */
+  .wd-booking__dd-two-cols { display: flex; flex-direction: column; gap: 20px; }
+  .wd-booking__dd-criteria-col { border-left: none; border-right: none; padding-left: 0;
+    max-height: none; border-top: 1px solid rgba(255,255,255,.1); padding-top: 16px; }
+  .wd-booking__dd-mapview .wd-booking__dd-two-cols { flex-direction: column; }
+  .wd-booking__dd-mapview .wd-booking__dd-criteria-col { padding-left: 0; max-height: none; }
+  /* Le panneau et ses vues occupent toute la largeur disponible : sans cela, chaque
+     niveau d'imbrication reprenait une marge pensée pour 1340 px. */
+  .wd-booking__panel, .wd-booking__dd-mapview, .wd-booking__dd-two-cols,
+  .wd-booking__dd-dest-col, .wd-booking__dd-criteria-col { width: auto; max-width: none; }
+  .wd-booking__dropdown > * { padding-left: 14px; padding-right: 14px; }
+  .wd-booking__dd-mapview-wrap { height: 300px; width: auto; }
+
+  /* Le calendrier montre deux mois côte à côte : 446 px de large, pensés pour la barre
+     desktop. Sur mobile il occupe la largeur de l'écran et n'affiche qu'un mois — le
+     second se rejoint par la flèche suivante. */
+  .wd-booking__datepicker { position: fixed; left: 0; right: 0; transform: none; top: auto;
+    bottom: 0; width: auto; border-radius: 8px 8px 0 0; }
+  .wd-booking__datepicker[data-state="open"] { max-height: 78vh; overflow-y: auto; }
+  .wd-booking__dp-body { padding: 16px 14px 14px; }
+  .wd-booking__dp-months { flex-direction: column; gap: 20px; }
+  .wd-booking__dp-months-title { gap: 0; }
+  .wd-booking__dp-month-label { min-width: 0; }
+  /* Le second mois se rejoint par la navigation : deux grilles côte à côte tiennent mal
+     sur 375 px, et les jours y deviennent des cibles de 30 px. */
+  .wd-booking__dp-month:nth-child(2) { display: none; }
+  .wd-booking__dp-month-label:nth-child(2) { display: none; }
+
+  /* Cibles tactiles : 44 px est le minimum pour un doigt, contre 28 à 32 au clavier. */
+  .wd-booking__dd-criteria-item { min-height: 44px; }
+  .wd-booking__dd-dest-item { min-height: 48px; }
+  .wd-booking__dd-hotel-row { min-height: 56px; }
+  .wd-booking__dd-continent { min-width: 96px; }
+  .wd-booking__tab { min-height: 44px; }
+  .wd-booking__dd-noresult-relax, .wd-booking__dd-noresult-reset { min-height: 44px; }
+  .wd-booking__dp-day { min-height: 40px; }
+  /* Les petites croix restent visuellement discrètes, mais leur zone sensible est
+     étendue au-delà de leur dessin : un doigt vise 44 px, une croix de chip en fait 12.
+     Le pseudo-élément déborde sans déplacer quoi que ce soit. */
+  .wd-booking__dest-chip-close, .wd-booking__dest-clear, .wd-booking__map-toggle,
+  .wd-booking__dp-nav, .wd-booking__special-rates-link { position: relative; }
+  .wd-booking__dest-chip-close::after, .wd-booking__dest-clear::after,
+  .wd-booking__map-toggle::after, .wd-booking__dp-nav::after,
+  .wd-booking__special-rates-link::after { content: ''; position: absolute;
+    left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+  .wd-booking__dd-recent, .wd-booking__dd-recent-del { min-height: 44px; }
+  /* Les actions du calendrier et les +/- du panneau voyageurs : ce sont les commandes
+     qu'on répète le plus, elles doivent être les plus sûres à viser. */
+  .wd-booking__dp-clear, .wd-booking__dp-apply { min-height: 44px; }
+  .wd-booking__gp-add, .wd-booking__gp-btn, .wd-booking__gp-remove { min-width: 44px; min-height: 44px; }
+}

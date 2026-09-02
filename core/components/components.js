@@ -2257,18 +2257,39 @@
         scheduleRecentSave(); // capture continue de la recherche en cours (même sans clic sur « Rechercher »)
       };
 
+      // Sur mobile, chercher est une tâche à part entière : le panneau prend tout l'écran
+      // au lieu de se glisser sous une barre de 56 px. C'est le composant entier qui
+      // bascule, pas seulement le panneau — les trois champs restent ainsi atteignables
+      // au pouce pendant qu'on affine, au lieu d'être repoussés hors du cadre.
+      const surMobile = () => window.matchMedia('(max-width: 767px)').matches;
+      const basculerPleinEcran = (actif) => {
+        if (actif && surMobile()) {
+          this.dataset.pleinEcran = '1';
+          // On bloque le défilement de la page derrière : sans cela, faire défiler la
+          // liste des destinations entraîne la page et on perd le panneau de vue.
+          document.body.style.overflow = 'hidden';
+        } else {
+          delete this.dataset.pleinEcran;
+          document.body.style.overflow = '';
+        }
+      };
+
       const open = () => {
         dropdown.dataset.state = 'open';
+        basculerPleinEcran(true);
         destField.classList.add('wd-booking__field--editing');
         suggestionsEl.style.display = 'none';
         if (!(ddMapview && ddMapview.style.display !== 'none')) {
           searchPanelEl.style.display = '';
         }
         renderPanel();
-        setTimeout(() => { destInput.focus(); }, 50);
+        // On ne prend pas le focus sur mobile : cela ferait surgir le clavier par-dessus
+        // le panneau qu'on vient d'ouvrir, avant même d'avoir vu les destinations.
+        if (!surMobile()) setTimeout(() => { destInput.focus(); }, 50);
       };
       const close = () => {
         dropdown.dataset.state = 'closed';
+        basculerPleinEcran(false);
         destField.classList.remove('wd-booking__field--editing');
         renderChips();
         saveRecentNow(); // flush immédiat : la recherche est retenue même si l'utilisateur part sans chercher
