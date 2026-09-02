@@ -139,6 +139,31 @@ function _addStyle() {
     // la card changeait de hauteur au gré des libellés cochés, et le panneau sautait
     // sous le curseur pendant qu'on règle ses filtres.
     '.wd-map-detail .pullman-popup__tags{min-height:44px;align-content:flex-start}' +
+    // Liste des tables, onglet Restaurants. Hauteur réservée pour trois lignes, comme les
+    // badges ailleurs : la card ne doit pas changer de taille selon l'hôtel cliqué.
+    '.pullman-popup__tables{display:flex;flex-direction:column;gap:8px;margin:10px 0 0}' +
+    // Deux lignes de table plus la mention du reste, réservées qu'elles servent ou non :
+    // la card ne doit pas changer de taille selon l'hôtel cliqué.
+    '.wd-map-detail .pullman-popup__tables{min-height:72px;justify-content:flex-start}' +
+    // Photo un peu plus basse que sur la card hôtel : ici c'est la liste des tables qui
+    // porte l'information, et la hauteur disponible est la même.
+    '.wd-map-detail .pullman-popup--restos .pullman-popup__media{aspect-ratio:32/9}' +
+    // Nom sur sa ligne, qualification sous lui. Les mettre côte à côte les tronquait tous
+    // les deux — « Blue Lemon » lui-même n'y tenait pas. La hauteur que cela coûte est
+    // reprise sur la photo, qui n'est que celle de l'hôtel.
+    '.pullman-popup__table{display:flex;flex-direction:column;gap:0;min-width:0}' +
+    // Le nom prend la place libre et la qualification cède la première : l'inverse
+    // tronquait « LE VERTIGO ROOFTOP BAR » en « LE VERTIGO ROO… » pour laisser voir
+    // « Bar · Rooftop & vue · Bor… », deux moitiés illisibles au lieu d'un nom entier.
+    '.pullman-popup__table-nom{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:600;' +
+      'color:#445047;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    'a.pullman-popup__table-nom:hover{text-decoration:underline}' +
+    // Une seule ligne, comme le nom : « Restaurant · Végétarienne & healthy · Bord de
+    // piscine » passait sur deux et faisait déborder la card de 23 px.
+    '.pullman-popup__table-type{font-family:var(--font-sans,sans-serif);font-size:11px;' +
+      'color:rgba(68,80,71,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
+    '.pullman-popup__tables-reste{margin:2px 0 0;font-family:var(--font-sans,sans-serif);font-size:11px;' +
+      'font-style:italic;color:rgba(68,80,71,.6)}' +
     // Dans le panneau seulement, les chevrons démarrent sous la croix : viser à côté d'elle
     // ne doit pas faire défiler les photos alors qu'on cherchait à fermer. Ailleurs — la
     // bande de 150 px des cards de résultats — ce retrait mangerait un tiers de la hauteur.
@@ -352,11 +377,46 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       : [])
     .join('');
 
+  // Onglet Restaurants : la card présente les tables de l'hôtel, et non ses services.
+  // Deux au plus : à trois, mesure faite, le panneau réclamait 27 px de défilement pour
+  // atteindre le bas, ce qu'on s'interdit ici. Le reste est annoncé, jamais escamoté.
+  const surRestos = _surRestos();
+  let tables = '';
+  if (surRestos) {
+    const lieux = _lieuxDe(h.name);
+    const vus = lieux.slice(0, 2);
+    const reste = lieux.length - vus.length;
+    tables = '<div class="pullman-popup__tables">' +
+      (lieux.length
+        ? vus.map(v => {
+            // Ce qui qualifie la table : sa cuisine si elle est déclarée, son cadre sinon.
+            // Les bars n'ont jamais de cuisine renseignée chez Accor.
+            const dits = v.cuisines.concat(v.tags).slice(0, 2).map(_libelleResto);
+            const ligne = [v.type === 'bar' ? 'Bar' : 'Restaurant'].concat(dits).join(' · ');
+            const nom = esc(v.nom);
+            return '<div class="pullman-popup__table">' +
+              (v.url
+                ? '<a class="pullman-popup__table-nom" href="' + esc(v.url) + '" target="_blank" rel="noopener">' + nom + '</a>'
+                : '<span class="pullman-popup__table-nom">' + nom + '</span>') +
+              '<span class="pullman-popup__table-type">' + esc(ligne) + '</span>' +
+            '</div>';
+          }).join('') +
+          (reste > 0 ? '<p class="pullman-popup__tables-reste">et ' + reste + ' autre' + (reste > 1 ? 's' : '') + ' table' + (reste > 1 ? 's' : '') + '</p>' : '')
+        : '<p class="pullman-popup__tables-reste">Aucune table ne répond à vos critères.</p>') +
+    '</div>';
+  }
+
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
   // réservation sur ALL. Sans href on n'affiche aucun lien plutôt qu'un lien mort.
   const bookUrl = window.WD_ALL_BOOKING_URL ? window.WD_ALL_BOOKING_URL(h, stay) : null;
   // « Réserver » en dernier, donc à droite : l'action principale occupe la position
   // terminale du regard, et le lien de consultation la précède.
+  // Sur l'onglet Restaurants, une seule sortie : la fiche de l'hôtel qui héberge la table.
+  const ctaResto = h.href
+    ? '<div class="pullman-popup__actions">' +
+        '<a class="pullman-popup__cta" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l\u2019hôtel</a>' +
+      '</div>'
+    : '';
   const cta = h.href
     ? '<div class="pullman-popup__actions">' +
         '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + arrow + '</a>' +
@@ -364,7 +424,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       '</div>'
     : '';
 
-  return '<article class="pullman-popup">' +
+  return '<article class="pullman-popup' + (surRestos ? ' pullman-popup--restos' : '') + '">' +
     '<div class="pullman-popup__media"' + (photos.length > 1 ? ' data-galerie' : '') + '>' +
       photos.map((u, i) =>
         // Seule la première est chargée d'emblée : les suivantes ne servent qu'à qui
@@ -390,12 +450,16 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
         '<span>' + esc(h.city || '') + (h.country ? ', ' + esc(h.country) : '') + '</span>' +
         (h.rating ? '<span class="pullman-popup__score">' + esc(h.rating) + '</span>' : '') +
       '</p>' +
-      (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '') +
+      (surRestos ? tables : (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '')) +
+      // Pied de card : un prix par nuit n'a rien à faire là quand on cherche une table,
+      // ni un bouton de réservation de chambre. Reste le lien vers l'hôtel, qui situe.
       '<div class="pullman-popup__foot">' +
-        (showPrice && h.price
-          ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>'
-          : '<span class="pullman-popup__nodate">Tarifs selon vos dates</span>') +
-        cta + '</div>' +
+        (surRestos
+          ? ''
+          : (showPrice && h.price
+              ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>'
+              : '<span class="pullman-popup__nodate">Tarifs selon vos dates</span>')) +
+        (surRestos ? ctaResto : cta) + '</div>' +
     '</div>' +
   '</article>';
 }
@@ -466,6 +530,28 @@ function _panneauDetail() {
     }
   });
   return p;
+}
+
+// Sommes-nous sur l'onglet Restaurants ? La carte y montre les mêmes pins — un lieu de
+// restauration n'a pas d'adresse propre, il est à l'hôtel — mais ce qu'elle met en avant
+// et ce qu'elle raconte dans sa card changent.
+function _surRestos() {
+  return typeof window.WD_ONGLET === 'function' && window.WD_ONGLET() === 'restaurants';
+}
+// Les tables d'un hôtel qui répondent aux critères cochés. Le calcul est fait par la
+// liste, seule à connaître la sémantique de ses filtres.
+function _lieuxDe(nomHotel) {
+  return typeof window.WD_LIEUX_HOTEL === 'function' ? (window.WD_LIEUX_HOTEL(nomHotel) || []) : [];
+}
+// Libellés des critères de restauration, repris du vocabulaire de la liste plutôt que
+// redéclarés : un libellé qui diverge est un libellé qui vieillit mal.
+function _libelleResto(id) {
+  const groupes = window.WD_RESTO_CRITERIA || [];
+  for (const g of groupes) {
+    const it = g.items.find(x => x.id === id);
+    if (it) return it.label;
+  }
+  return id;
 }
 
 // Critères que l'hôtel ne satisfait pas. Les critères sans service associé sont écartés
@@ -770,7 +856,12 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
 
   PULLMAN_HOTELS_MAP.forEach(hotel => {
     const inContinent = _dansLaZone(hotel, _currentScope);
-    const matchesCriteria = !hasCriteria || _criteresManquants(hotel, criteriaSet).length === 0;
+    // Sur l'onglet Restaurants, un hôtel est conforme s'il a au moins une table qui
+    // répond. Ses propres services — piscine, parking — n'ont rien à dire ici, et les
+    // tester contre des critères de restauration grisait toute la carte.
+    const matchesCriteria = !hasCriteria || (_surRestos()
+      ? _lieuxDe(hotel.name).length > 0
+      : _criteresManquants(hotel, criteriaSet).length === 0);
     const greyed = hasCriteria && !matchesCriteria;
     const icon = isFiltered && inContinent
       ? _makeLargeIcon(hotel.city, greyed)

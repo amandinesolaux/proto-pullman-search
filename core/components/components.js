@@ -2393,7 +2393,9 @@
               '<span class="wd-booking__dd-continent-label">' + esc(r.label) + '</span>' +
               '</button>';
           }).join('');
-          mapViewCriteria.innerHTML = CRITERIA_GROUPS.hotels.map(g => {
+          // Les critères de l'onglet courant, et non ceux des hôtels en dur : passer sur
+          // Restaurants puis sur la carte faisait réapparaître piscine, spa et parking.
+          mapViewCriteria.innerHTML = getActiveCriteriaGroups().map(g => {
             const groupItems = g.items.map(c => {
               const checked = getActiveCriteria().has(c.id);
               return '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
@@ -2470,6 +2472,13 @@
         };
         window.WD_RETIRER_CRITERE = (id) => { getActiveCriteria().delete(id); applyMapCriteriaChange(); };
         window.WD_REINITIALISER_CRITERES = () => { getActiveCriteria().clear(); applyMapCriteriaChange(); };
+
+        // La carte doit savoir sur quel onglet on se trouve, et ce qu'un hôtel propose à
+        // manger : ses critères de restauration ne se lisent pas sur les services de
+        // l'établissement. Elle interroge la liste plutôt que de refaire le calcul.
+        window.WD_ONGLET = () => searchState.activeTab;
+        window.WD_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || [])
+          .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
 
         window.WD_ELARGIR_AU_CONTINENT = () => {
           searchState.country = null;
