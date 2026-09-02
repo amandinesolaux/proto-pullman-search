@@ -25,6 +25,10 @@ let _avisTimer = null;
 // liste sait descendre au pays, à la ville et à l'hôtel. Choisir « Chine » n'avait donc
 // aucun effet sur la carte, qui restait sur l'Asie entière.
 let _currentScope = {};
+// Vue d'où l'on a ouvert une card, pour y revenir en la fermant. Sans elle, fermer
+// renvoyait toujours au continent : après s'être approché d'une ville à deux hôtels, on
+// perdait la vue qui permettait justement de les distinguer.
+let _vueAvantDetail = null;
 
 // L'hôtel appartient-il à la zone affichée ? Pays puis continent — le périmètre exact de
 // getResultsPool(), qui décide de la liste. Y ajouter la ville ou l'hôtel sélectionné
@@ -523,7 +527,14 @@ function _fermerDetail(revenir) {
   _detailHotel = null;
   clearTimeout(_avisTimer);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
-  if (revenir && etaitOuvert) _vueContinent(true);
+  if (revenir && etaitOuvert) {
+    // On rend la vue telle qu'elle était avant l'ouverture : la ville si l'on s'y était
+    // approché, le continent si l'on venait de là. Y revenir toujours par le continent
+    // faisait perdre le cadrage qu'on venait d'obtenir.
+    if (_vueAvantDetail) _bookingMap.flyTo(_vueAvantDetail.centre, _vueAvantDetail.zoom, { duration: .7 });
+    else _vueContinent(true);
+  }
+  _vueAvantDetail = null;
 }
 
 // Conteneur du panneau, créé une fois. Détail et message le partagent : ils occupent la
@@ -840,11 +851,16 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   // bord. On laisse ensuite Leaflet faire le décalage lui-même via le padding, plutôt que
   // de projeter à la main — il connaît la taille réelle, pas nous.
   _bookingMap.invalidateSize({ animate: false });
+  // On retient d'où l'on vient, pour y revenir à la fermeture.
+  _vueAvantDetail = { centre: _bookingMap.getCenter(), zoom: _bookingMap.getZoom() };
   const ll = L.latLng(hotel.lat, hotel.lng);
+  // Jamais en deçà du zoom courant : venant d'une ville où l'on distinguait ses deux
+  // hôtels, revenir au zoom 6 les recollait l'un sur l'autre et on ne savait plus lequel
+  // on regardait. On se contente alors de recadrer sur celui qu'on ouvre.
   _bookingMap.flyToBounds(L.latLngBounds(ll, ll), {
     paddingTopLeft: [WD_DETAIL_W + 24, 24],
     paddingBottomRight: [24, 24],
-    maxZoom: WD_ZOOM_HOTEL,
+    maxZoom: Math.max(WD_ZOOM_HOTEL, _bookingMap.getZoom()),
     duration: .6
   });
 }
