@@ -92,10 +92,13 @@ function _installerGalerie() {
   });
 }
 
-// Posé dès le chargement, et non à la première ouverture d'une card : la page de
-// résultats affiche ses cards avant d'avoir touché la carte, et leurs galeries restaient
-// muettes.
+// Posés dès le chargement, et non à la première ouverture d'une card. La page de
+// résultats affiche ses cards sans jamais passer par wdHotelPopupHTML : son gestionnaire
+// de galerie manquait, et les styles des points et des chevrons avec — ils s'y affichaient
+// en blocs bruts, hors de la photo.
 _installerGalerie();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _addStyle);
+else _addStyle();
 
 function _addStyle() {
   _installerGalerie();
@@ -136,6 +139,10 @@ function _addStyle() {
     // la card changeait de hauteur au gré des libellés cochés, et le panneau sautait
     // sous le curseur pendant qu'on règle ses filtres.
     '.wd-map-detail .pullman-popup__tags{min-height:44px;align-content:flex-start}' +
+    // Dans le panneau seulement, les chevrons démarrent sous la croix : viser à côté d'elle
+    // ne doit pas faire défiler les photos alors qu'on cherchait à fermer. Ailleurs — la
+    // bande de 150 px des cards de résultats — ce retrait mangerait un tiers de la hauteur.
+    '.wd-map-detail .pullman-popup__nav{top:42px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar{width:6px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-thumb{background:rgba(68,80,71,.35);border-radius:100px}' +
     '.wd-map-detail__scroll::-webkit-scrollbar-track{background:transparent}' +
@@ -178,7 +185,10 @@ function _addStyle() {
     '.wd-map-detail--avis .wd-map-detail__close{background-color:rgba(68,80,71,.12);' +
       'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23445047%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E")}' +
     '.wd-map-detail--avis .wd-map-detail__close:hover{background-color:rgba(68,80,71,.24)}' +
-    '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:2;width:26px;height:26px;padding:0;' +
+    // z-index 5 et non 2 : le chevron « photo suivante » couvre toute la hauteur du bord
+    // droit, croix comprise. À z-index égal c'est lui qui l'emportait, étant plus bas dans
+    // le document — cliquer la croix faisait défiler les photos au lieu de fermer.
+    '.wd-map-detail__close{position:absolute;top:8px;right:8px;z-index:5;width:26px;height:26px;padding:0;' +
       'border:none;border-radius:100px;background-color:rgba(0,0,0,.55);cursor:pointer;' +
       'background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 12 12%27 fill=%27none%27 stroke=%27%23ffffff%27 stroke-width=%271.8%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M3 3 L9 9 M9 3 L3 9%27/%3E%3C/svg%3E");' +
       'background-repeat:no-repeat;background-position:center;background-size:11px 11px;transition:background-color .15s}' +
