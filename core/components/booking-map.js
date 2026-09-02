@@ -144,10 +144,11 @@ function _addStyle() {
     '.pullman-popup__tables{display:flex;flex-direction:column;gap:8px;margin:10px 0 0}' +
     // Deux lignes de table plus la mention du reste, réservées qu'elles servent ou non :
     // la card ne doit pas changer de taille selon l'hôtel cliqué.
-    '.wd-map-detail .pullman-popup__tables{min-height:72px;justify-content:flex-start}' +
-    // Photo un peu plus basse que sur la card hôtel : ici c'est la liste des tables qui
-    // porte l'information, et la hauteur disponible est la même.
-    '.wd-map-detail .pullman-popup--restos .pullman-popup__media{aspect-ratio:32/9}' +
+    // Une rangée plus la mention du reste, réservées qu'elles servent ou non.
+    '.wd-map-detail .pullman-popup__tables{min-height:62px;justify-content:flex-start}' +
+    // Même 21:9 que la card hôtel : à 32:9 la photo de la table était une bande où l'on
+    // ne distinguait rien. Les 42 px que cela coûte sont repris sur le pied de card, dont
+    // le bouton devient un lien.
     // Nom sur sa ligne, qualification sous lui. Les mettre côte à côte les tronquait tous
     // les deux — « Blue Lemon » lui-même n'y tenait pas. La hauteur que cela coûte est
     // reprise sur la photo, qui n'est que celle de l'hôtel.
@@ -378,8 +379,10 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     .join('');
 
   // Onglet Restaurants : la card présente les tables de l'hôtel, et non ses services.
-  // Deux au plus : à trois, mesure faite, le panneau réclamait 27 px de défilement pour
-  // atteindre le bas, ce qu'on s'interdit ici. Le reste est annoncé, jamais escamoté.
+  // Une seule mise en avant depuis que la photo est revenue en 21:9 : elle prend 42 px,
+  // et une rangée de table en coûte 43. Mesure faite, deux rangées réclamaient 20 px de
+  // défilement. Le reste est annoncé, jamais escamoté, et la liste entière est à un clic
+  // sur la page de résultats.
   const surRestos = _surRestos();
   let tables = '';
   if (surRestos) {
@@ -392,7 +395,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       photos.length = 0;
       melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
     }
-    const vus = lieux.slice(0, 2);
+    const vus = lieux.slice(0, 1);
     const reste = lieux.length - vus.length;
     tables = '<div class="pullman-popup__tables">' +
       (lieux.length
@@ -420,9 +423,11 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // « Réserver » en dernier, donc à droite : l'action principale occupe la position
   // terminale du regard, et le lien de consultation la précède.
   // Sur l'onglet Restaurants, une seule sortie : la fiche de l'hôtel qui héberge la table.
+  // En lien et non en pilule : les noms des tables sont déjà des liens, et la pilule
+  // coûtait 23 px de haut qui manquaient à la photo.
   const ctaResto = h.href
     ? '<div class="pullman-popup__actions">' +
-        '<a class="pullman-popup__cta" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l\u2019hôtel</a>' +
+        '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l\u2019hôtel ' + arrow + '</a>' +
       '</div>'
     : '';
   const cta = h.href
