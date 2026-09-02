@@ -722,6 +722,13 @@ function _conformes(scope, criteriaSet) {
     const s = scope || {};
     return window.WD_TABLES_ZONE(s.continent, s.country);
   }
+  // Sur l'onglet Réunions, on compte les hôtels dont les espaces répondent. Les tester
+  // sur leurs services donnait zéro partout — aucun hôtel ne déclare « 100 à 300
+  // personnes » comme un équipement — et la carte annonçait qu'aucun ne convenait alors
+  // qu'elle en montrait de verts.
+  if (_surReunions()) {
+    return PULLMAN_HOTELS_MAP.filter(h => _dansLaZone(h, scope) && _reunionDe(h.name) !== null).length;
+  }
   return PULLMAN_HOTELS_MAP.filter(h =>
     _dansLaZone(h, scope) && _criteresManquants(h, criteriaSet).length === 0).length;
 }
@@ -871,7 +878,12 @@ function _messageDetail(hotel, manquants, criteriaSet) {
     // On ne dit pas « l'hôtel ne répond pas au critère » : ce sont ses tables qui ne
     // répondent pas, et le critère coché est une cuisine ou un cadre, pas un service.
     ? 'Aucune table du ' + esc(hotel.name) + ' ne répond à vos critères'
-    : esc(hotel.name) + ' ' + quoi;
+    : _surReunions()
+      // Idem pour les réunions : ce sont ses espaces. Et il n'y a pas de « critère
+      // manquant » à nommer — une capacité n'est pas un service absent — d'où le
+      // « critère undefined » que produisait la formulation des hôtels.
+      ? 'Les espaces du ' + esc(hotel.name) + ' ne répondent pas à vos critères'
+      : esc(hotel.name) + ' ' + quoi;
   _peindreAvis(titre, suite, porteLeRattrapage ? reprise : null);
   clearTimeout(_avisTimer);
   // Un message qui informe s'efface après lecture. Un message qui porte les boutons de
@@ -1096,12 +1108,18 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     // d'un hôtel qui avait pourtant les tables demandées — ses services, eux, ne
     // satisfaisaient évidemment aucun critère de cuisine.
     const surRestos = _surRestos();
-    const manquants = (hasCriteria && encoreLa && !surRestos)
+    const surReunions = _surReunions();
+    const manquants = (hasCriteria && encoreLa && !surRestos && !surReunions)
       ? _criteresManquants(encoreLa, criteriaSet)
       : [];
-    const ecarte = hasCriteria && encoreLa && (surRestos
-      ? _lieuxDe(encoreLa.name).length === 0
-      : manquants.length > 0);
+    // Chaque onglet juge selon ce qu'il montre : les tables pour Restaurants, les espaces
+    // pour Réunions, les services pour Hôtels. Les confondre remplaçait la card d'un
+    // hôtel pourtant conforme par un message d'erreur.
+    const ecarte = encoreLa && (surReunions
+      ? _reunionDe(encoreLa.name) === null
+      : hasCriteria && (surRestos
+        ? _lieuxDe(encoreLa.name).length === 0
+        : manquants.length > 0));
     const critereOk = !hasCriteria || (encoreLa && !ecarte);
     // Appartenance jugée sur la zone géographique, comme la liste — le continent seul
     // laissait passer un hôtel chinois alors que l'utilisateur avait choisi le Japon.
