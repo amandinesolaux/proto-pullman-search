@@ -384,6 +384,14 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   let tables = '';
   if (surRestos) {
     const lieux = _lieuxDe(h.name);
+    // La card montre les tables : ce sont leurs photos qu'on met en tête, celles de
+    // l'hôtel derrière. Sans cela on présentait un lobby pour parler d'un rooftop.
+    const clesTables = lieux.map(v => v.img).filter(Boolean);
+    if (clesTables.length) {
+      const melange = clesTables.concat(cles.filter(k => clesTables.indexOf(k) < 0)).slice(0, 4);
+      photos.length = 0;
+      melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
+    }
     const vus = lieux.slice(0, 2);
     const reste = lieux.length - vus.length;
     tables = '<div class="pullman-popup__tables">' +

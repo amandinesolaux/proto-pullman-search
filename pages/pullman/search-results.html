@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=354"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=355"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,10 +13,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=354"></script>
-  <script src="../../core/components/components.js?v=354"></script>
+  <script src="../../core/data/restaurants.js?v=355"></script>
+  <script src="../../core/components/components.js?v=355"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=354"></script>
+  <script src="../../core/components/booking-map.js?v=355"></script>
 </head>
 <body class="brand-pullman">
 
@@ -332,7 +332,11 @@ wd-booking { margin-top: 20px; }
       if (!items.length) { vide(); return; }
       listEl.innerHTML = items.map(v => {
         const h = parNom.get(v.hotel) || {};
-        const cles = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [(h.img || 'aja_p_6783-26').split(':')[0]];
+        // La photo de la table d'abord — c'est elle qu'on vient voir. Les visuels de
+        // l'hôtel suivent dans la galerie, pour situer le lieu. Quinze tables sur 360
+        // n'ont pas de photo propre : elles montrent celles de leur hôtel, comme avant.
+        const duLieu = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [(h.img || 'aja_p_6783-26').split(':')[0]];
+        const cles = (v.img ? [v.img] : []).concat(duLieu.filter(k => k !== v.img)).slice(0, 4);
         const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
         const badges = [v.type === 'bar' ? 'Bar' : 'Restaurant']
           .concat(v.cuisines.concat(v.tags).map(libelle)).slice(0, 4);
