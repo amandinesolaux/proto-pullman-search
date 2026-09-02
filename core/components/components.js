@@ -1227,6 +1227,12 @@
           if (chips) chips.style.display = '';
           const dropdown = this.querySelector('.wd-booking__dropdown');
           if (dropdown && dropdown.dataset.state === 'open') renderPanel();
+          // La vue carte a son propre panneau de critères et sa propre lecture des pins :
+          // seule la vue liste était rafraîchie, si bien qu'après un passage sur
+          // Restaurants la carte proposait encore piscine, spa et parking, gardait « Spa »
+          // coché et mettait en avant les hôtels qui en ont un.
+          if (renderMapPanel) renderMapPanel();
+          if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
         });
       });
 
