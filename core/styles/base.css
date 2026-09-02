@@ -1191,7 +1191,7 @@ wd-footer { display: block; }
 /* Le bouton de filtres et le pied de la feuille n'existent que sur mobile : au-dessus,
    les critères sont une colonne toujours visible, qui n'a besoin ni d'être ouverte ni
    d'être appliquée. */
-.wd-booking__filtres-btn, .wd-booking__filtres-pied { display: none; }
+.wd-booking__filtres-btn, .wd-booking__filtres-pied, .wd-booking__filtres-fermer { display: none; }
 
 /* ══ Mobile ═══════════════════════════════════════════════════════════════════════
    Le prototype était pensé pour le desktop : la rangée de champs imposait une largeur
@@ -1215,7 +1215,6 @@ wd-footer { display: block; }
   /* Trois champs empilés prenaient 382 px de haut, laissant 331 px au panneau sur un
      écran de 812. Réduits à l'essentiel, ils en prennent moins de la moitié. */
   .wd-booking__field { height: auto; min-height: 48px; padding: 8px 12px; gap: 10px; border-radius: 4px; background: rgba(255,255,255,.04); }
-  .wd-booking__label { font-size: 11px; }
   /* Les séparateurs verticaux entre les champs devenaient, une fois la rangée empilée,
      deux blocs vides de 56 px — 112 px pris au panneau. Les champs ont leur propre fond,
      ils se distinguent sans eux. */
@@ -1239,8 +1238,11 @@ wd-footer { display: block; }
   /* En plein écran, « Rechercher » quitte la rangée des champs pour se poser en bas :
      c'est l'action terminale, elle doit rester sous le pouce pendant qu'on affine, et non
      s'intercaler entre les champs et le panneau qu'on parcourt. */
+  /* z-index 2 suffisait tant que rien ne se posait sur la carte ; la pastille des filtres
+     y monte à 500 et passait devant l'action principale. 1050 la remet au-dessus de la
+     carte, sous la feuille de filtres (1100) qui doit tout recouvrir. */
   wd-booking[data-plein-ecran] .wd-booking__cta { position: fixed; left: 12px; right: 12px;
-    bottom: 12px; z-index: 2; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+    bottom: 12px; z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
   wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
 
   /* Destinations et critères ne cohabitent pas à 375 px : ils s'empilent. */
@@ -1254,7 +1256,58 @@ wd-footer { display: block; }
   .wd-booking__panel, .wd-booking__dd-mapview, .wd-booking__dd-two-cols,
   .wd-booking__dd-dest-col, .wd-booking__dd-criteria-col { width: auto; max-width: none; }
   .wd-booking__dropdown > * { padding-left: 14px; padding-right: 14px; }
-  .wd-booking__dd-mapview-wrap { height: 300px; width: auto; }
+  /* 300 px de carte sur un écran de 812, c'était une vignette : on y voyait trois pins
+     et jamais le pays autour.
+
+     L'agrandir ne suffisait pas : la carte vivait dans une colonne qui défile, donc une
+     carte de 625 px dans une fenêtre de 512 restait une carte qu'on parcourt au doigt
+     sans jamais la voir entière. En vue carte, c'est tout le reste qui s'efface — dates,
+     voyageurs, tarifs spéciaux, vignettes de continents : on choisit un lieu, la carte
+     le dit mieux qu'eux. Il reste le champ de destination, les filtres posés sur la
+     carte, et la carte prend les trois quarts de l'écran. */
+  .wd-booking__dd-mapview-wrap { width: auto; height: 74vh; height: 74svh; min-height: 320px; }
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__field--dates,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__field--guests,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__special-rates,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview .wd-booking__dd-col-title,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview-continents,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__wizard-cta { display: none; }
+  /* La colonne ne défile plus : elle se répartit, et la carte prend ce qui reste. */
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dropdown { overflow: hidden; padding-bottom: 0; }
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dropdown,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-body,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview .wd-booking__dd-two-cols,
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col {
+    display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-body { padding-top: 12px; }
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview-wrap {
+    flex: 1 1 auto; height: auto; min-height: 0; margin: 0 -14px; }
+  /* Le bouton Filtres se pose sur la carte, en bas à gauche : le haut est pris par le
+     message d'exclusion et par les commandes de zoom. */
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col { position: relative; }
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col .wd-booking__filtres-btn {
+    position: absolute; left: 12px; bottom: 76px; z-index: 500; margin: 0;
+    background: #1a2220; border-color: rgba(255,255,255,.3);
+    box-shadow: 0 4px 16px rgba(0,0,0,.45); }
+
+  /* ── En-tête ──────────────────────────────────────────────────────────────────
+     La barre de navigation portait 64 px de marge de chaque côté et six liens en
+     white-space: nowrap : à eux seuls ils imposaient un document de 761 px dans un
+     écran de 390. C'est ce débordement qu'on voyait, la page entière dessinée trop
+     large puis réduite. Les liens défilent maintenant à l'horizontale, comme les
+     onglets du moteur de recherche. */
+  .wd-header__top-inner { padding: 0 14px; height: 60px; gap: 12px; }
+  .wd-header__bottom-inner { padding: 12px 14px; gap: 20px; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .wd-header__bottom-inner::-webkit-scrollbar { display: none; }
+  .wd-header__link { flex: 0 0 auto; font-size: 15px; }
+  .wd-header__top-right { gap: 12px; }
+  /* Langue et devise sont des réglages qu'on touche une fois : sur 390 px ils prenaient
+     la place du seul lien qui compte au premier coup d'œil, celui du compte. */
+  .wd-header__params { display: none; }
+  .wd-header__account { padding: 0 14px; font-size: 13px; }
+  .wd-header__logo .wd-wordmark { height: 26px; }
 
   /* Le calendrier montre deux mois côte à côte : 446 px de large, pensés pour la barre
      desktop. Sur mobile il occupe la largeur de l'écran et n'affiche qu'un mois — le
@@ -1286,15 +1339,39 @@ wd-footer { display: block; }
 
   /* La colonne des critères devient la feuille elle-même : même contenu, mêmes
      gestionnaires, une seule source de rendu. Elle est simplement sortie du fil. */
-  .wd-booking__dd-criteria-col { display: none; }
-  wd-booking[data-filtres] .wd-booking__dd-criteria-col { display: flex; flex-direction: column;
-    position: fixed; left: 0; right: 0; bottom: 0; top: 15vh; z-index: 1100;
-    background: #1a2220; border-top: none; border-radius: 12px 12px 0 0; padding: 0;
-    box-shadow: 0 -12px 40px rgba(0,0,0,.5); }
+  /* La règle de la vue carte porte deux classes (0,2,0) et l'emportait sur celle-ci :
+     en vue carte, les critères s'affichaient sans qu'on ait ouvert la feuille. Il faut
+     la même portée des deux côtés, sinon la moitié du travail ne prend pas. */
+  .wd-booking__dd-criteria-col,
+  .wd-booking__dd-mapview .wd-booking__dd-criteria-col { display: none; }
+  /* Ouverte, la feuille prend tout l'écran : à 15vh du haut, la liste des critères
+     n'en montrait que six sur vingt et le reste se cherchait au pouce. */
+  /* [data-disclosure] ne sert qu'à peser : la page V3 masque cette colonne en état
+     intermédiaire avec une règle de même poids, déclarée après base.css. Le panneau
+     repasse en intermédiaire dès que le champ perd le focus — c'est-à-dire au moment
+     précis où on touche « Filtres » — et la feuille ne s'ouvrait plus. */
+  wd-booking[data-filtres][data-disclosure] .wd-booking__dd-criteria-col,
+  wd-booking[data-filtres][data-disclosure] .wd-booking__dd-mapview .wd-booking__dd-criteria-col {
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; right: 0; bottom: 0; top: 0; z-index: 1100;
+    background: #1a2220; border-top: none; border-radius: 0; padding: 0;
+    padding-top: env(safe-area-inset-top); max-height: none;
+    box-shadow: none; }
+  /* On sort de la feuille sans avoir à valider : « Appliquer » confirme un choix,
+     la croix dit qu'on ne veut rien changer. Les deux ferment, seule l'intention diffère. */
+  wd-booking[data-filtres][data-disclosure] .wd-booking__filtres-fermer { display: inline-flex;
+    align-items: center; justify-content: center; position: absolute;
+    top: calc(env(safe-area-inset-top) + 6px); right: 8px; z-index: 2;
+    width: 44px; height: 44px; padding: 0; border: none; border-radius: 100px;
+    background: transparent; color: #fff; cursor: pointer; }
+  wd-booking[data-filtres] .wd-booking__filtres-fermer:hover { background: rgba(255,255,255,.08); }
   /* Seule la vue affichée ouvre sa feuille : sans cela, la colonne de la vue carte et
      celle de la vue liste se superposaient. */
   wd-booking[data-filtres] .wd-booking__dd-mapview[style*="display:none"] .wd-booking__dd-criteria-col,
   wd-booking[data-filtres] .wd-booking__dd-mapview[style*="display: none"] .wd-booking__dd-criteria-col { display: none; }
+  /* Le titre laisse la place à la croix. */
+  wd-booking[data-filtres] .wd-booking__dd-col-title,
+  wd-booking[data-filtres] .wd-booking__dd-criteria-header { padding-right: 56px; }
   wd-booking[data-filtres] .wd-booking__dd-col-title { position: sticky; top: 0; z-index: 1;
     margin: 0; padding: 18px 18px 12px; background: #1a2220; font-size: 15px; }
   wd-booking[data-filtres] .wd-booking__dd-criteria-header { padding: 18px 18px 12px; }
@@ -1313,6 +1390,73 @@ wd-footer { display: block; }
   /* Le CTA de recherche passe derrière la feuille : deux boutons verts empilés au même
      endroit, on ne saurait plus lequel valide quoi. */
   wd-booking[data-filtres] .wd-booking__cta { display: none; }
+
+  /* ── Typographie ──────────────────────────────────────────────────────────────
+     Les tailles venaient d'une barre desktop lue à 50 cm sur un écran net : 11 à 13 px
+     y passent, sur un téléphone tenu à bout de bras ils se devinent. Tout ce qui porte
+     du sens remonte d'un cran, et rien de lisible ne descend sous 13.
+
+     Les champs de saisie sont à 16 px pour une autre raison : en dessous, iOS zoome
+     l'écran à la mise au point et ne dézoome jamais — le reste de la page se retrouve
+     décadré dès qu'on tape une destination. */
+  .wd-booking__label { font-size: 13px; line-height: 18px; }
+  .wd-booking__value { font-size: 16px; line-height: 22px; margin-top: 2px; }
+  .wd-booking__dest-input, .wd-booking__gp-age-select { font-size: 16px; }
+  .wd-booking__dest-chip { font-size: 13px; padding: 4px 9px; max-width: 200px; }
+  .wd-booking__field { min-height: 56px; }
+  .wd-booking__tab { font-size: 16px; }
+  .wd-booking__special-rates-link { font-size: 15px; }
+  .wd-booking__cta { font-size: 16px; }
+
+  .wd-booking__dd-col-title { font-size: 13px; }
+  .wd-booking__dd-section-title { font-size: 12px; }
+  .wd-booking__dd-dest-item { font-size: 15px; }
+  .wd-booking__dd-dest-item-count { font-size: 13px; }
+  .wd-booking__dd-criteria-item { font-size: 15px; }
+  .wd-booking__dd-hotel-name { font-size: 15px; }
+  .wd-booking__dd-hotel-loc { font-size: 13px; }
+  .wd-booking__dd-hotel-badge { font-size: 10px; }
+  .wd-booking__dd-recent-dest, .wd-booking__dd-recent-title { font-size: 15px; }
+  .wd-booking__dd-recent-meta, .wd-booking__dd-recent-sub { font-size: 13px; }
+  .wd-booking__dd-noresult-title { font-size: 15px; }
+  .wd-booking__dd-noresult-text { font-size: 14px; }
+  .wd-booking__dd-noresult-relax, .wd-booking__dd-noresult-reset { font-size: 14px; }
+  .wd-booking__filtres-btn { font-size: 15px; }
+  .wd-booking__filtres-compte { font-size: 12px; min-width: 22px; height: 22px; }
+  .wd-booking__filtres-effacer { font-size: 15px; }
+  .wd-booking__filtres-appliquer { font-size: 16px; }
+  .wd-booking__dp-month-label { font-size: 16px; }
+  .wd-booking__dp-day { font-size: 15px; }
+  .wd-booking__dp-clear, .wd-booking__dp-apply { font-size: 15px; }
+  .wd-booking__gp-counter-label, .wd-booking__gp-count { font-size: 15px; }
+  .wd-booking__gp-add, .wd-booking__gp-remove { font-size: 15px; }
+  .wd-booking__gp-hint, .wd-booking__gp-age-label { font-size: 13px; }
+  .wd-booking__gp-room-title { font-size: 12px; }
+  wd-booking[data-filtres] .wd-booking__dd-col-title { font-size: 17px; }
+
+  /* ── Le reste de la page ──────────────────────────────────────────────────────
+     Même cause partout : 64 px de marge de chaque côté et des grilles à deux colonnes,
+     dessinées pour 1340 px. Sur 390 il restait 262 px de contenu, où ni un titre de
+     40 px ni deux colonnes ne tiennent — chacun poussait le document plus loin.
+     Les marges tombent à 20, les grilles s'empilent, les rangées d'onglets défilent. */
+  .wd-content { padding: 64px 20px; }
+  .wd-hero { height: 88svh; }
+  .wd-hero__content { padding: 0 20px 120px; }
+  .wd-hero__caption { left: 20px; gap: 12px; }
+  .wd-hero__pager { right: 20px; }
+  .wd-hero__sub { font-size: 17px; line-height: 26px; }
+  .t-serif-lg { font-size: 28px; line-height: 34px; }
+  .wd-sh--split { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .wd-editorial { grid-template-columns: 1fr; }
+  .wd-marketing__content { grid-template-columns: 1fr; min-height: 0; }
+  .wd-marketing__body { padding: 24px 20px; }
+  .wd-marketing__tabs { gap: 20px; overflow-x: auto; scrollbar-width: none; }
+  .wd-marketing__tabs::-webkit-scrollbar { display: none; }
+  .wd-marketing__tab { flex: 0 0 auto; }
+  .wd-footer { padding: 32px 20px 24px; }
+  .wd-footer__newsletter { grid-template-columns: 1fr; gap: 20px; }
+  .wd-footer__links { grid-template-columns: repeat(2, 1fr); gap: 24px; padding: 28px 0; }
+  .wd-marketing__header { flex-direction: column; gap: 10px; }
 
   /* Cibles tactiles : 44 px est le minimum pour un doigt, contre 28 à 32 au clavier. */
   .wd-booking__dd-criteria-item { min-height: 44px; }

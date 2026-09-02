@@ -1118,6 +1118,7 @@
                   <div class="wd-booking__dd-dest-list" id="wd-dest-list"></div>
                 </div>
                 <div class="wd-booking__dd-criteria-col">
+                  <button class="wd-booking__filtres-fermer" type="button" data-ferme-filtres aria-label="Fermer les filtres"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
                   <h3 class="wd-booking__dd-col-title">Critères</h3>
                   <div class="wd-booking__dd-criteria-list" id="wd-criteria-list"></div>\n                  <div class="wd-booking__filtres-pied"><button type="button" class="wd-booking__filtres-effacer" data-filtres-effacer>Tout effacer</button><button type="button" class="wd-booking__filtres-appliquer" data-ferme-filtres>Appliquer</button></div>
                 </div>
@@ -1133,6 +1134,7 @@
                   </div>
                 </div>
                 <div class="wd-booking__dd-criteria-col">
+                  <button class="wd-booking__filtres-fermer" type="button" data-ferme-filtres aria-label="Fermer les filtres"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
                   <div class="wd-booking__dd-criteria-header">
                     <h3 class="wd-booking__dd-col-title">Critères</h3>
                     <button class="wd-booking__dd-clear-filters" id="wd-clear-map-filters" type="button">Retirer tout</button>
@@ -2301,7 +2303,7 @@
         const compteur = this.querySelector('.wd-booking__dd-results-count-number');
         const total = compteur ? compteur.textContent.trim() : null;
         this.querySelectorAll('.wd-booking__filtres-appliquer').forEach(e => {
-          e.textContent = total ? 'Voir les ' + total + ' résultats' : 'Appliquer';
+          e.textContent = total ? (total > 1 ? 'Voir les ' + total + ' résultats' : 'Voir le résultat') : 'Appliquer';
         });
       };
 
@@ -2796,6 +2798,10 @@
             renderMapPanel();
           }
           mapToggle.classList.toggle('wd-booking__map-toggle--active', !showing);
+          // Sur mobile la carte prend toute la place restante : le CSS a besoin de savoir
+          // quelle vue est ouverte, et Leaflet de réapprendre sa taille après le basculement.
+          if (showing) delete this.dataset.vueCarte; else this.dataset.vueCarte = '1';
+          if (window.WD_MAP_RESIZE) setTimeout(window.WD_MAP_RESIZE, 260);
           if (!showing && typeof initBookingMap === 'function') {
             setTimeout(() => {
               initBookingMap(searchState.continent, zoneCarte());

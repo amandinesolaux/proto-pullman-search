@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=385"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=393"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,11 +13,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=385"></script>
-  <script src="../../core/data/reunions.js?v=385"></script>
-  <script src="../../core/components/components.js?v=385"></script>
+  <script src="../../core/data/restaurants.js?v=393"></script>
+  <script src="../../core/data/reunions.js?v=393"></script>
+  <script src="../../core/components/components.js?v=393"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=385"></script>
+  <script src="../../core/components/booking-map.js?v=393"></script>
 </head>
 <body class="brand-pullman">
 
@@ -231,6 +231,30 @@ wd-booking { margin-top: 20px; }
   .srx { grid-template-columns: 1fr; }
   .srx-map-col { position: static; }
   .srx-map { height: 380px; min-height: 0; }
+}
+
+/* Mobile : la page gardait les 48 px de marge du desktop, ce qui ne laissait que 294 px
+   de contenu à une card dont la seule bande photo en réclame 160. Elle débordait, et le
+   document avec elle. Les marges tombent à 14, la photo à 116, et le bandeau de tête
+   s'empile au lieu de tenir le titre et le tri sur une ligne.
+
+   Les tailles de texte suivent celles du moteur de recherche : rien de porteur de sens
+   sous 13 px, et 16 sur les <select>, faute de quoi iOS zoome à la mise au point. */
+@media (max-width: 767px) {
+  .srx { padding: 0 14px; gap: 14px; }
+  .srx-head { flex-direction: column; align-items: stretch; gap: 12px; }
+  .srx-title { font-size: 24px; }
+  .srx-sub { font-size: 14px; }
+  .srx-sort { justify-content: space-between; font-size: 14px; }
+  .srx-sort select { font-size: 16px; min-height: 44px; flex: 1 1 auto; }
+  .srx-card { padding: 10px; gap: 12px; }
+  .srx-card-media { flex: 0 0 116px; width: 116px; min-height: 104px; }
+  .srx-card-name { font-size: 16px; }
+  .srx-card-loc { font-size: 13px; }
+  .srx-crumb-current { font-size: 12px; }
+  /* La carte est ce qu'on vient lire ici aussi : 380 px de haut n'en montraient qu'un
+     morceau. Elle prend les trois quarts de l'écran, comme dans le moteur de recherche. */
+  .srx-map { height: 74svh; }
 }
 </style>
 

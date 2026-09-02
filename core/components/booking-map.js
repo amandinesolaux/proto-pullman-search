@@ -1271,6 +1271,7 @@ function updateBookingMapCriteria(criteriaSet) {
 function refreshBookingMapSize() {
   if (_bookingMap) _bookingMap.invalidateSize();
 }
+window.WD_MAP_RESIZE = refreshBookingMapSize;
 
 // Synchronise la sélection d'un pays avec le booking engine
 function syncCountryToBooking(countryName) {
