@@ -2621,6 +2621,23 @@
           return zoneCarte();
         };
 
+        // Élargissement demandé par la carte quand on dézoome au-delà du périmètre courant.
+        // `niveau` : 'country' ou 'continent'.
+        window.WD_ELARGIR_A = (niveau) => {
+          if (niveau === 'continent') {
+            searchState.city = null;
+            searchState.country = null;
+            searchState.expandedCountry = null;
+          } else {
+            searchState.city = null;
+          }
+          searchState.selectedHotel = null;
+          renderPanel();
+          if (renderMapPanel) renderMapPanel();
+          scheduleRecentSave();
+          return zoneCarte();
+        };
+
         window.WD_ELARGIR_AU_CONTINENT = () => {
           searchState.country = null;
           searchState.city = null;

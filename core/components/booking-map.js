@@ -538,8 +538,11 @@ function _fermerDetail(revenir) {
     // faisait perdre le cadrage qu'on venait d'obtenir.
     if (_vueAvantDetail) _bookingMap.flyTo(_vueAvantDetail.centre, _vueAvantDetail.zoom, { duration: .7 });
     else _vueContinent(true);
+    // Oubliée seulement à la fermeture voulue. Un recalcul des pins passe aussi par ici,
+    // avec `revenir` à faux, et effaçait la vue mémorisée avant qu'on s'en serve : le
+    // retour se faisait alors sur la zone courante au lieu de l'endroit d'où l'on venait.
+    _vueAvantDetail = null;
   }
-  _vueAvantDetail = null;
 }
 
 // Conteneur du panneau, créé une fois. Détail et message le partagent : ils occupent la
@@ -920,6 +923,7 @@ function initBookingMap(continentFilter, scope) {
     _zoomPrecedent = _bookingMap.getZoom();
     if (_zoomPrecedent !== null && groupeAvant !== groupeApres) _renderMarkers(_currentContinent, _currentCriteria, false);
     else _ajusterEtiquettes();
+    _elargirSelonLaVue();
   });
 
   // Cliquer la carte hors d'un pin ferme aussi le détail : même geste, même retour.
@@ -1080,6 +1084,28 @@ function _choisirVille(hotel) {
   if (typeof window.WD_CHOISIR_VILLE !== 'function') return;
   if (_currentScope && _currentScope.city === hotel.city) return;
   window.WD_CHOISIR_VILLE(hotel.city, hotel.country, hotel.continent);
+}
+
+// Dézoomer au-delà de son périmètre le desserre. On ne se fonde pas sur un seuil de zoom
+// — il ne veut rien dire, une ville chinoise et une île des Maldives ne tiennent pas à la
+// même échelle — mais sur ce que la vue contient : dès qu'on voit d'autres villes, la
+// ville n'est plus le bon périmètre ; dès qu'on voit d'autres pays, le pays non plus.
+// Les pins de la nouvelle zone repassent alors en avant d'eux-mêmes.
+function _elargirSelonLaVue() {
+  if (!_bookingMap || !_currentScope) return;
+  // Une card ouverte est un choix explicite : on ne le défait pas dans son dos.
+  if (_currentScope.hotel) return;
+  if (!_currentScope.city && !_currentScope.country) return;
+  const bornes = _bookingMap.getBounds();
+  const vus = PULLMAN_HOTELS_MAP.filter(h => bornes.contains([h.lat, h.lng]));
+  if (vus.length < 2) return;
+  const pays = new Set(vus.map(h => h.country));
+  const villes = new Set(vus.map(h => h.city));
+  let niveau = null;
+  if (pays.size > 1 && _currentScope.country) niveau = 'continent';
+  else if (villes.size > 1 && _currentScope.city) niveau = 'country';
+  if (!niveau) return;
+  if (typeof window.WD_ELARGIR_A === 'function') window.WD_ELARGIR_A(niveau);
 }
 
 // La liste appelle ceci chaque fois qu'elle se redessine. La carte s'aligne sur sa zone
