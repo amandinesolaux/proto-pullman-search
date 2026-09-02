@@ -406,8 +406,51 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // et une rangée de table en coûte 43. Mesure faite, deux rangées réclamaient 20 px de
   // défilement. Le reste est annoncé, jamais escamoté, et la liste entière est à un clic
   // sur la page de résultats.
-  const surRestos = _surRestos();
+  // Onglet Réunions : la card présente les espaces de l'hôtel — les deux plus grands,
+  // avec leur surface et ce qu'ils accueillent en théâtre. Le reste est annoncé.
   let tables = '';
+  const surReunions = _surReunions();
+  if (surReunions) {
+    const r = _reunionDe(h.name);
+    if (r) {
+      const cles = (r.imgs || []).filter(Boolean);
+      if (cles.length) {
+        const melange = cles.concat(photos.length ? [] : []).slice(0, 4);
+        photos.length = 0;
+        melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
+        // On complète avec les visuels de l'hôtel si les espaces n'en ont pas quatre.
+        (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : []).forEach(k => {
+          if (photos.length < 4 && melange.indexOf(k) < 0) photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
+        });
+      }
+      // Les salles sont triées par surface : la plus grande dit le mieux ce que le lieu
+      // permet. À égalité, on garde l'ordre publié par Pullman.
+      const rangees = (r.salles || []).slice().sort((a, b2) => (b2[1] || 0) - (a[1] || 0));
+      // Une seule, comme les cards restaurants : la hauteur réservée est la même, et les
+      // noms de salles sont longs — « MONTAIGNE AB / ROHAN ABC » tient rarement sur une
+      // ligne. À deux, mesure faite, 99 cards sur 110 réclamaient de faire défiler.
+      const vus = rangees.slice(0, 1);
+      const reste = rangees.length - vus.length;
+      tables = '<div class="pullman-popup__tables">' +
+        vus.map(sa => {
+          const bouts = [];
+          if (sa[1]) bouts.push(sa[1] + ' m²');
+          if (sa[3]) bouts.push('jusqu\u2019à ' + sa[3] + ' en théâtre');
+          else if (sa[7]) bouts.push('jusqu\u2019à ' + sa[7] + ' en banquet');
+          return '<div class="pullman-popup__table">' +
+            '<span class="pullman-popup__table-nom">' + esc(sa[0]) + '</span>' +
+            '<span class="pullman-popup__table-type">' + esc(bouts.join(' · ') || 'capacité non publiée') + '</span>' +
+          '</div>';
+        }).join('') +
+        (reste > 0 ? '<p class="pullman-popup__tables-reste">et ' + reste + ' autre' + (reste > 1 ? 's' : '') + ' salle' + (reste > 1 ? 's' : '') + '</p>' : '') +
+      '</div>';
+    } else {
+      tables = '<div class="pullman-popup__tables"><p class="pullman-popup__tables-reste">' +
+        'Aucun espace ne répond à vos critères.</p></div>';
+    }
+  }
+
+  const surRestos = _surRestos();
   if (surRestos) {
     const lieux = _lieuxDe(h.name);
     // La card montre les tables : ce sont leurs photos qu'on met en tête, celles de
@@ -460,7 +503,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       '</div>'
     : '';
 
-  return '<article class="pullman-popup' + (surRestos ? ' pullman-popup--restos' : '') + '">' +
+  return '<article class="pullman-popup' + ((surRestos || surReunions) ? ' pullman-popup--restos' : '') + '">' +
     '<div class="pullman-popup__media"' + (photos.length > 1 ? ' data-galerie' : '') + '>' +
       photos.map((u, i) =>
         // Seule la première est chargée d'emblée : les suivantes ne servent qu'à qui
@@ -486,16 +529,16 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
         '<span>' + esc(h.city || '') + (h.country ? ', ' + esc(h.country) : '') + '</span>' +
         (h.rating ? '<span class="pullman-popup__score">' + esc(h.rating) + '</span>' : '') +
       '</p>' +
-      (surRestos ? tables : (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '')) +
+      ((surRestos || surReunions) ? tables : (tags ? '<div class="pullman-popup__tags">' + tags + '</div>' : '')) +
       // Pied de card : un prix par nuit n'a rien à faire là quand on cherche une table,
       // ni un bouton de réservation de chambre. Reste le lien vers l'hôtel, qui situe.
       '<div class="pullman-popup__foot">' +
-        (surRestos
+        ((surRestos || surReunions)
           ? ''
           : (showPrice && h.price
               ? '<p class="pullman-popup__price">' + esc(h.price) + ' € <span>/ nuit</span></p>'
               : '<span class="pullman-popup__nodate">Tarifs selon vos dates</span>')) +
-        (surRestos ? ctaResto : cta) + '</div>' +
+        ((surRestos || surReunions) ? ctaResto : cta) + '</div>' +
     '</div>' +
   '</article>';
 }
@@ -589,6 +632,14 @@ function _panneauDetail() {
 // et ce qu'elle raconte dans sa card changent.
 function _surRestos() {
   return typeof window.WD_ONGLET === 'function' && window.WD_ONGLET() === 'restaurants';
+}
+function _surReunions() {
+  return typeof window.WD_ONGLET === 'function' && window.WD_ONGLET() === 'reunions';
+}
+// Espaces de réunion d'un hôtel, tels que la liste les retient.
+function _reunionDe(nomHotel) {
+  const r = typeof window.WD_REUNION_HOTEL === 'function' ? (window.WD_REUNION_HOTEL(nomHotel) || []) : [];
+  return r.length ? r[0] : null;
 }
 // Les tables d'un hôtel qui répondent aux critères cochés. Le calcul est fait par la
 // liste, seule à connaître la sémantique de ses filtres.
@@ -957,12 +1008,17 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   const isFiltered = _zoneDefinie(_currentScope);
   const hasCriteria = criteriaSet && criteriaSet.size > 0;
 
-  const conforme = (hotel) => !hasCriteria || (_surRestos()
-    // Sur l'onglet Restaurants, un hôtel est conforme s'il a au moins une table qui
-    // répond. Ses propres services — piscine, parking — n'ont rien à dire ici, et les
-    // tester contre des critères de restauration grisait toute la carte.
-    ? _lieuxDe(hotel.name).length > 0
-    : _criteresManquants(hotel, criteriaSet).length === 0);
+  // Sur l'onglet Réunions, un hôtel n'est candidat que s'il publie des espaces — et
+  // qu'ils répondent. Ceux qui n'en publient pas sortent même sans critère coché : on ne
+  // propose pas un hôtel sans salle à qui en cherche une.
+  const conforme = (hotel) => _surReunions()
+    ? _reunionDe(hotel.name) !== null
+    : !hasCriteria || (_surRestos()
+      // Sur l'onglet Restaurants, un hôtel est conforme s'il a au moins une table qui
+      // répond. Ses propres services — piscine, parking — n'ont rien à dire ici, et les
+      // tester contre des critères de restauration grisait toute la carte.
+      ? _lieuxDe(hotel.name).length > 0
+      : _criteresManquants(hotel, criteriaSet).length === 0);
 
   // À l'échelle d'un continent, deux Pullman d'une même ville posent deux pins au même
   // endroit et écrivent son nom deux fois — « Bangkok » par-dessus « Bangkok ». On les
@@ -989,7 +1045,7 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     // Un groupe répond si l'un des siens répond : le masquer parce que l'autre hôtel de
     // la ville ne correspond pas effacerait un résultat valable.
     const matchesCriteria = lot.some(conforme);
-    const greyed = hasCriteria && !matchesCriteria;
+    const greyed = (hasCriteria || _surReunions()) && !matchesCriteria;
     const lat = lot.reduce((n, h) => n + h.lat, 0) / lot.length;
     const lng = lot.reduce((n, h) => n + h.lng, 0) / lot.length;
     // Groupé : le nom de la ville. Séparé dans une ville qui en compte plusieurs : le nom

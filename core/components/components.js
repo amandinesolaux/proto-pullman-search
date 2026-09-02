@@ -1274,6 +1274,7 @@
           hotels: new Set(),
           restaurants: new Set(),
           reunions: new Set(),
+
           celebrations: new Set(),
         },
       };
@@ -1305,24 +1306,11 @@
             { id: 'meeting', label: 'Salles de réunion' },
           ]},
         ],
-        reunions: [
-          { group: 'Type d\'espace', items: [
-            { id: 'r-room', label: 'Salle de réunion' },
-            { id: 'r-large', label: 'Espace modulable grande envergure' },
-            { id: 'r-studio', label: 'Studio (petit recoin)' },
-            { id: 'r-cowork', label: 'Tiers & coworking' },
-          ]},
-          { group: 'Équipements', items: [
-            { id: 'r-screen', label: 'Écran & projection' },
-            { id: 'r-wifi', label: 'Wifi haut débit' },
-            { id: 'r-catering', label: 'Restauration traiteur' },
-            { id: 'r-terrace', label: 'Terrasse / extérieur' },
-          ]},
-          { group: 'Format', items: [
-            { id: 'r-day', label: 'Journée' },
-            { id: 'r-residential', label: 'Résidentiel avec hébergement' },
-          ]},
-        ],
+        // Onglet Réunions : le vocabulaire vient de core/data/reunions.js, relevé dans les
+        // tableaux de capacités publiés par Pullman. Les critères précédents — écran,
+        // wifi, traiteur, coworking — étaient inventés : aucune donnée ne permettait de
+        // les vérifier, et ils auraient filtré au hasard.
+        reunions: window.WD_REUNION_CRITERIA || [],
         celebrations: [
           { group: 'Type de célébration', items: [
             { id: 'c-wedding', label: 'Mariage' },
@@ -1784,6 +1772,43 @@
         renderPanel();
       };
 
+      // Hôtels du périmètre courant, du point de vue des réunions : ce sont des hôtels
+      // qu'on compte ici, un espace de réunion n'ayant pas d'existence hors du sien.
+      const reunionsDuPerimetre = () => {
+        const tous = window.WD_REUNIONS || [];
+        if (searchState.selectedHotel) return tous.filter(r => r.hotel === searchState.selectedHotel);
+        if (searchState.city) return tous.filter(r => r.ville === searchState.city);
+        if (searchState.expandedCountry) return tous.filter(r => r.pays === searchState.expandedCountry);
+        if (searchState.continent) return tous.filter(r => r.region === searchState.continent);
+        return tous;
+      };
+
+      // ET entre les groupes, OU à l'intérieur — même règle que les restaurants. Les
+      // tranches de capacité ou de nombre de salles s'additionnent donc au lieu de
+      // s'annuler quand on en coche deux.
+      const reunionMatchesCriteria = (r) => {
+        const actifs = getActiveCriteria();
+        if (!actifs.size) return true;
+        const teste = (id) => {
+          switch (id) {
+            case 'cap-100':  return r.capaciteMax > 0 && r.capaciteMax < 100;
+            case 'cap-300':  return r.capaciteMax >= 100 && r.capaciteMax < 300;
+            case 'cap-800':  return r.capaciteMax >= 300 && r.capaciteMax < 800;
+            case 'cap-plus': return r.capaciteMax >= 800;
+            case 'salles-3':    return r.nbSalles <= 3;
+            case 'salles-9':    return r.nbSalles >= 4 && r.nbSalles <= 9;
+            case 'salles-plus': return r.nbSalles >= 10;
+            case 'grande-salle': return r.surfaceMax >= 1000;
+            default: return false;
+          }
+        };
+        return getActiveCriteriaGroups().every(g => {
+          const coches = g.items.map(it => it.id).filter(id => actifs.has(id));
+          if (!coches.length) return true;
+          return coches.some(teste);
+        });
+      };
+
       // Lieux de restauration du périmètre courant. Même géographie que la liste d'hôtels
       // — pays déplié s'il y en a un, continent sinon — pour que les deux onglets ne se
       // contredisent pas quand on passe de l'un à l'autre.
@@ -1822,6 +1847,27 @@
       };
 
       const renderResultsCount = () => {
+        if (searchState.activeTab === 'reunions') {
+          const r = reunionsDuPerimetre().filter(reunionMatchesCriteria);
+          const n = r.length;
+          const salles = r.reduce((t, x) => t + x.nbSalles, 0);
+          const { label } = getResultsPool();
+          let d = '<span class="wd-booking__dd-results-count-number">' + n + '</span> hôtel' + (n > 1 ? 's' : '');
+          // On dit aussi le nombre d'espaces : c'est ce qu'on cherche, l'hôtel n'est que
+          // l'endroit où ils se trouvent.
+          if (salles) d += ' · ' + salles + ' salle' + (salles > 1 ? 's' : '');
+          const actifs = getActiveCriteria();
+          if (actifs.size) {
+            const liste = getActiveCriteriaList();
+            const dits = [...actifs].map(id => (liste.find(x => x.id === id) || {}).label).filter(Boolean);
+            if (dits.length) d += ' ' + dits.join(', ').toLowerCase();
+          }
+          if (label) {
+            d += '<span class="wd-booking__dd-results-count-sep">—</span>' +
+              '<span class="wd-booking__dd-results-count-label">' + esc(label) + '</span>';
+          }
+          return '<div class="wd-booking__dd-results-count">' + d + '</div>';
+        }
         if (searchState.activeTab === 'restaurants') {
           const lieux = restosDuPerimetre().filter(restoMatchesCriteria);
           const n = lieux.length;
@@ -2026,13 +2072,19 @@
         // appliquer donnait des comptes qui ne voulaient rien dire, et cachait des pays
         // qui ont pourtant des tables.
         const surRestos = searchState.activeTab === 'restaurants';
+        const surReunions = searchState.activeTab === 'reunions';
         const lieuxDe = (nomHotel) => (window.WD_RESTAURANTS || [])
           .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
+        // Un hôtel répond côté réunions s'il a des espaces et qu'ils satisfont les
+        // critères. Ceux qui n'en publient pas ne sont pas des candidats.
+        const reunionDe = (nomHotel) => (window.WD_REUNIONS || [])
+          .filter(r => r.hotel === nomHotel && reunionMatchesCriteria(r));
         const countryListHtml = countries.map(c => {
           const allInCountry = region.hotels.filter(h => h.country === c);
-          const hotelsInCountry = hasCriteria
-            ? allInCountry.filter(h => surRestos ? lieuxDe(h.name).length > 0 : hotelMatchesCriteria(h))
-            : allInCountry;
+          const pertinent = (h) => surRestos ? lieuxDe(h.name).length > 0
+            : surReunions ? reunionDe(h.name).length > 0
+            : hotelMatchesCriteria(h);
+          const hotelsInCountry = (hasCriteria || surReunions) ? allInCountry.filter(pertinent) : allInCountry;
           const count = surRestos
             ? allInCountry.reduce((n, h) => n + lieuxDe(h.name).length, 0)
             : hotelsInCountry.length;
@@ -2078,7 +2130,7 @@
                 const isSelected = searchState.selectedHotel === h.name;
                 // Sur l'onglet Restaurants, un hôtel est pertinent s'il a au moins un lieu
                 // qui répond ; ses services propres n'ont rien à dire ici.
-                const dimmed = hasCriteria && (surRestos ? lieuxDe(h.name).length === 0 : !hotelMatchesCriteria(h));
+                const dimmed = (hasCriteria || surReunions) && !pertinent(h);
                 return '<button type="button" class="wd-booking__dd-hotel-row' + (isSelected ? ' wd-booking__dd-hotel-row--selected' : '') + (dimmed ? ' wd-booking__dd-hotel-row--dimmed' : '') + '" data-dest-type="hotel" data-hotel-name="' + esc(h.name) + '" data-hotel-href="' + esc(h.href || '') + '">' +
                   '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
                   '<div class="wd-booking__dd-hotel-info">' +
@@ -2590,6 +2642,9 @@
           .filter(restoMatchesCriteria).length;
         window.WD_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || [])
           .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
+        // Espaces de réunion d'un hôtel, s'ils répondent aux critères cochés.
+        window.WD_REUNION_HOTEL = (nomHotel) => (window.WD_REUNIONS || [])
+          .filter(r => r.hotel === nomHotel && reunionMatchesCriteria(r));
 
         // Cliquer une ville sur la carte la porte dans le champ de recherche. On ne
         // recadre pas au passage : l'utilisateur vient d'y arriver, déplacer la vue sous

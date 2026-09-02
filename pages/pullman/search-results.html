@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=368"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=372"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,10 +13,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=368"></script>
-  <script src="../../core/components/components.js?v=368"></script>
+  <script src="../../core/data/restaurants.js?v=372"></script>
+  <script src="../../core/data/reunions.js?v=372"></script>
+  <script src="../../core/components/components.js?v=372"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=368"></script>
+  <script src="../../core/components/booking-map.js?v=372"></script>
 </head>
 <body class="brand-pullman">
 
@@ -181,6 +182,12 @@ wd-booking { margin-top: 20px; }
 .srx-badges { display: flex; flex-wrap: nowrap; overflow: hidden; gap: 6px; margin: 0 0 10px; min-height: 21px; }
 .srx-badge { flex-shrink: 0; }
 .srx-badge { font-family: var(--font-sans); font-size: 11.5px; font-weight: 500; color: #2F4034; background: rgba(95,239,145,.24); border: none; padding: 3px 9px; display: inline-flex; align-items: center; }
+/* Liste des salles sur une card réunions : trois lignes sobres, surface et capacité en
+   second rang. */
+.srx-salles { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.srx-salles li { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-family: var(--font-sans); font-size: 12px; }
+.srx-salle-nom { font-weight: 600; color: #445047; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.srx-salle-info { color: rgba(68,80,71,.7); white-space: nowrap; }
 .srx-card-bottom { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .srx-price { font-family: var(--font-sans); color: #445047; }
 .srx-price b { font-size: 19px; font-weight: 700; }
@@ -240,7 +247,190 @@ wd-booking { margin-top: 20px; }
     if (!window.WD_SEARCH_DATA) { if (retries > 0) setTimeout(() => ready(retries - 1), 100); return; }
     // L'onglet vient de la barre de recherche : il décide de ce que cette page liste.
     if (P.get('tab') === 'restaurants') initRestaurants(window.WD_SEARCH_DATA);
+    else if (P.get('tab') === 'reunions') initReunions(window.WD_SEARCH_DATA);
     else init(window.WD_SEARCH_DATA);
+  }
+
+  // ══ Mode Réunions ══════════════════════════════════════════════════════════════
+  // La page liste des hôtels, mais sous l'angle de leurs espaces : ce qui compte est le
+  // nombre de salles, la capacité et la surface, pas le prix d'une chambre.
+  function initReunions(D) {
+    const tous = window.WD_REUNIONS || [];
+    const groupes = window.WD_REUNION_CRITERIA || [];
+    const parNom = new Map(D.hotels.map(h => [h.name, h]));
+
+    let pool = tous.slice(), scopeLabel = '';
+    const cont = P.get('continent');
+    if (cont && cont !== 'all') {
+      const r = D.regions.find(x => x.id === cont);
+      pool = pool.filter(x => x.region === cont); scopeLabel = r ? r.label : '';
+    } else if (cont === 'all') scopeLabel = 'Tous les continents';
+    const country = P.get('country');
+    if (country) { pool = pool.filter(x => x.pays === country); scopeLabel = country; }
+    const city = P.get('city');
+    if (city) { pool = pool.filter(x => x.ville === city); scopeLabel = city; }
+    const hotelName = P.get('hotel');
+    if (hotelName) { pool = pool.filter(x => x.hotel === hotelName); scopeLabel = hotelName; }
+    const q = (P.get('q') || '').trim();
+    if (q) {
+      const lq = q.toLowerCase();
+      pool = pool.filter(x => (x.hotel + ' ' + x.ville).toLowerCase().includes(lq));
+      if (!scopeLabel) scopeLabel = '« ' + q + ' »';
+    }
+    if (!scopeLabel) scopeLabel = 'Toutes nos destinations';
+
+    const critIds = (P.get('criteria') || '').split(',').filter(Boolean);
+    const libelle = (id) => {
+      for (const g of groupes) { const it = g.items.find(x => x.id === id); if (it) return it.label; }
+      return id;
+    };
+    const teste = (r, id) => {
+      switch (id) {
+        case 'cap-100':  return r.capaciteMax > 0 && r.capaciteMax < 100;
+        case 'cap-300':  return r.capaciteMax >= 100 && r.capaciteMax < 300;
+        case 'cap-800':  return r.capaciteMax >= 300 && r.capaciteMax < 800;
+        case 'cap-plus': return r.capaciteMax >= 800;
+        case 'salles-3':    return r.nbSalles <= 3;
+        case 'salles-9':    return r.nbSalles >= 4 && r.nbSalles <= 9;
+        case 'salles-plus': return r.nbSalles >= 10;
+        case 'grande-salle': return r.surfaceMax >= 1000;
+        default: return false;
+      }
+    };
+    const repond = (r, ids) => groupes.every(g => {
+      const coches = g.items.map(it => it.id).filter(id => ids.indexOf(id) >= 0);
+      if (!coches.length) return true;
+      return coches.some(id => teste(r, id));
+    });
+    const results = pool.filter(r => repond(r, critIds));
+
+    const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
+    const sub = [];
+    if (critIds.length) sub.push(critIds.map(libelle).join(', '));
+    const arr = P.get('checkin'), dep = P.get('checkout');
+    if (arr && dep) sub.push(fmtDay(arr) + ' – ' + fmtDay(dep));
+    const nP = Math.max(1, parseInt(P.get('adults'), 10) || 1) + Math.max(0, parseInt(P.get('children'), 10) || 0);
+    sub.push(nP + ' participant' + (nP > 1 ? 's' : ''));
+    const salles = results.reduce((n, r) => n + r.nbSalles, 0);
+    document.getElementById('srx-title').innerHTML =
+      '<strong>' + results.length + '</strong> hôtel' + (results.length > 1 ? 's' : '') +
+      (salles ? ' · ' + salles + ' salle' + (salles > 1 ? 's' : '') : '') + ' — ' + esc(scopeLabel);
+    document.getElementById('srx-sub').textContent = sub.join('  ·  ');
+    document.title = results.length + ' hôtel' + (results.length > 1 ? 's' : '') + ' pour vos réunions — ' + scopeLabel + ' — Pullman';
+
+    const sortSel = document.getElementById('srx-sort');
+    sortSel.innerHTML = '<option value="capacite">Capacité</option><option value="salles">Nombre de salles</option><option value="nom">Nom</option>';
+
+    const listEl = document.getElementById('srx-list');
+    let epingle = null;
+    const trie = () => {
+      const a2 = results.slice();
+      if (sortSel.value === 'salles') a2.sort((x, y) => y.nbSalles - x.nbSalles || x.hotel.localeCompare(y.hotel));
+      else if (sortSel.value === 'nom') a2.sort((x, y) => x.hotel.localeCompare(y.hotel));
+      else a2.sort((x, y) => y.capaciteMax - x.capaciteMax || x.hotel.localeCompare(y.hotel));
+      if (epingle) { const i = a2.findIndex(x => x.hotel === epingle); if (i > 0) a2.unshift(a2.splice(i, 1)[0]); }
+      return a2;
+    };
+    const rendre = (items) => {
+      if (!items.length) { vide(); return; }
+      listEl.innerHTML = items.map(r => {
+        const h = parNom.get(r.hotel) || {};
+        // Les visuels des espaces d'abord ; ceux de l'hôtel complètent.
+        const duLieu = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [];
+        const cles = (r.imgs || []).concat(duLieu.filter(k => (r.imgs || []).indexOf(k) < 0)).slice(0, 4);
+        const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
+        // Les trois plus grandes salles : c'est ce qui décide d'un lieu de réunion.
+        const top = (r.salles || []).slice().sort((a3, b3) => (b3[1] || 0) - (a3[1] || 0)).slice(0, 3);
+        const badges = [r.nbSalles + ' salle' + (r.nbSalles > 1 ? 's' : '')];
+        if (r.capaciteMax) badges.push('jusqu’à ' + r.capaciteMax + ' en théâtre');
+        if (r.surfaceMax) badges.push('plus grande : ' + r.surfaceMax + ' m²');
+        return '<article class="srx-card" data-hotel="' + esc(r.hotel) + '">' +
+          '<div class="srx-card-media"' + (cles.length > 1 ? ' data-galerie' : '') + '>' +
+            cles.map((k, i) => '<img class="srx-card-img" src="' + photo(k) + '" alt="' + esc(r.hotel) + '"' +
+              (i === 0 ? ' data-on' : ' loading="lazy"') + '/>').join('') +
+            (cles.length > 1
+              ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
+                '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +
+                '<div class="pullman-popup__points">' +
+                  cles.map((k, i) => '<button type="button" class="pullman-popup__point" data-point="' + i + '"' +
+                    (i === 0 ? ' data-on' : '') + ' aria-label="Photo ' + (i + 1) + ' sur ' + cles.length + '"></button>').join('') +
+                '</div>'
+              : '') +
+          '</div>' +
+          '<div class="srx-card-body">' +
+            '<div class="srx-card-top"><div>' +
+              '<h2 class="srx-card-name">' + esc(r.hotel) + '</h2>' +
+              '<p class="srx-card-loc">' + esc(r.ville) + ' · ' + esc(r.pays) + '</p>' +
+            '</div></div>' +
+            '<div class="srx-badges">' + badges.map(b => '<span class="srx-badge">' + esc(b) + '</span>').join('') + '</div>' +
+            '<ul class="srx-salles">' + top.map(sa =>
+              '<li><span class="srx-salle-nom">' + esc(sa[0]) + '</span>' +
+              '<span class="srx-salle-info">' + (sa[1] ? sa[1] + ' m²' : '') +
+              (sa[3] ? ' · ' + sa[3] + ' en théâtre' : (sa[7] ? ' · ' + sa[7] + ' en banquet' : '')) + '</span></li>').join('') +
+            '</ul>' +
+            '<div class="srx-card-bottom"><span class="srx-actions">' +
+              (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
+              (h.href ? '<a class="srx-cta" href="' + esc(h.href.replace(/\.html$/, '/meetings.html')) + '" target="_blank" rel="noopener">Voir les espaces</a>' : '') +
+            '</span></div>' +
+          '</div></article>';
+      }).join('');
+    };
+
+    function vide() {
+      let best = null;
+      critIds.forEach(id => {
+        const reduits = critIds.filter(x => x !== id);
+        const m = pool.filter(r => repond(r, reduits));
+        if (m.length && (!best || m.length > best.count)) best = { id, label: libelle(id), count: m.length };
+      });
+      const sans = (id) => {
+        const np = new URLSearchParams(location.search);
+        const reste = critIds.filter(x => x !== id);
+        if (id === null || !reste.length) np.delete('criteria'); else np.set('criteria', reste.join(','));
+        return location.pathname + '?' + np.toString();
+      };
+      let inner = '<h2>Aucun hôtel ne correspond à tous vos critères</h2>';
+      if (best) {
+        inner += '<p>En retirant <strong>« ' + esc(best.label) + ' »</strong>, <strong>' + best.count + ' hôtel' +
+          (best.count > 1 ? 's' : '') + '</strong> correspondrai' + (best.count > 1 ? 'ent' : 't') + '.</p>' +
+          '<div class="srx-empty-actions">' +
+          '<button type="button" class="srx-empty-relax" onclick="location.href=\'' + sans(best.id) + '\'">Retirer « ' + esc(best.label) + ' »</button>' +
+          '<button type="button" class="srx-empty-reset" onclick="location.href=\'' + sans(null) + '\'">Réinitialiser les critères</button></div>';
+      } else {
+        inner += '<p>Essayez d’élargir la destination ou de modifier vos critères dans la barre de recherche ci-dessus.</p>' +
+          '<div class="srx-empty-actions"><button type="button" class="srx-empty-reset" onclick="location.href=\'' + sans(null) + '\'">Réinitialiser les critères</button></div>';
+      }
+      listEl.innerHTML = '<div class="srx-empty" role="status">' + inner + '</div>';
+    }
+
+    rendre(trie());
+    sortSel.addEventListener('change', () => rendre(trie()));
+
+    const hotels = results.map(r => parNom.get(r.hotel)).filter(Boolean)
+      .filter(h => h.lat !== null && h.lat !== undefined && h.lng !== null);
+    const map = L.map(document.getElementById('srx-map'), { zoomControl: true, attributionControl: false, scrollWheelZoom: false });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
+    const pinParHotel = new Map();
+    const marquer = (nom) => {
+      pinParHotel.forEach(m => m._icon && m._icon.classList.remove('srx-pin-wrap--active'));
+      const mk = pinParHotel.get(nom);
+      if (mk && mk._icon) mk._icon.classList.add('srx-pin-wrap--active');
+    };
+    if (hotels.length) {
+      const groupe = L.featureGroup(hotels.map(h => {
+        const mk = L.marker([h.lat, h.lng], { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) });
+        pinParHotel.set(h.name, mk);
+        mk.on('click', () => { epingle = h.name; rendre(trie()); marquer(h.name);
+          const c = listEl.querySelector('.srx-card'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+        return mk;
+      }));
+      groupe.addTo(map);
+      map.fitBounds(groupe.getBounds().pad(0.25), { maxZoom: 8 });
+    } else { map.setView([25, 10], 2); }
+    listEl.addEventListener('mouseover', (e) => {
+      const c = e.target.closest('.srx-card');
+      if (c) marquer(c.dataset.hotel);
+    });
   }
 
   // ══ Mode Restaurants ═══════════════════════════════════════════════════════════
