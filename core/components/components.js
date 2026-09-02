@@ -1112,21 +1112,21 @@
             <div class="wd-booking__dd-search-panel" id="wd-search-panel">
               <div class="wd-booking__dd-two-cols">
                 <div class="wd-booking__dd-dest-col">
-                  <h3 class="wd-booking__dd-col-title">Destination</h3>
+                  <h3 class="wd-booking__dd-col-title">Destination</h3>\n                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>
                   <div class="wd-booking__dd-continents" id="wd-continents"></div>
                   <nav class="wd-booking__dd-breadcrumb" id="wd-breadcrumb" aria-label="Navigation destination"></nav>
                   <div class="wd-booking__dd-dest-list" id="wd-dest-list"></div>
                 </div>
                 <div class="wd-booking__dd-criteria-col">
                   <h3 class="wd-booking__dd-col-title">Critères</h3>
-                  <div class="wd-booking__dd-criteria-list" id="wd-criteria-list"></div>
+                  <div class="wd-booking__dd-criteria-list" id="wd-criteria-list"></div>\n                  <div class="wd-booking__filtres-pied"><button type="button" class="wd-booking__filtres-effacer" data-filtres-effacer>Tout effacer</button><button type="button" class="wd-booking__filtres-appliquer" data-ferme-filtres>Appliquer</button></div>
                 </div>
               </div>
             </div>
             <div class="wd-booking__dd-mapview" style="display:none">
               <div class="wd-booking__dd-two-cols">
                 <div class="wd-booking__dd-map-col">
-                  <h3 class="wd-booking__dd-col-title">Carte</h3>
+                  <h3 class="wd-booking__dd-col-title">Carte</h3>\n                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>
                   <div class="wd-booking__dd-mapview-continents" id="wd-mapview-continents"></div>
                   <div class="wd-booking__dd-mapview-wrap">
                     <div id="wd-booking-map" class="wd-booking__dd-map"></div>
@@ -1137,7 +1137,7 @@
                     <h3 class="wd-booking__dd-col-title">Critères</h3>
                     <button class="wd-booking__dd-clear-filters" id="wd-clear-map-filters" type="button">Retirer tout</button>
                   </div>
-                  <div class="wd-booking__dd-mapview-criteria" id="wd-mapview-criteria"></div>
+                  <div class="wd-booking__dd-mapview-criteria" id="wd-mapview-criteria"></div>\n                  <div class="wd-booking__filtres-pied"><button type="button" class="wd-booking__filtres-effacer" data-filtres-effacer>Tout effacer</button><button type="button" class="wd-booking__filtres-appliquer" data-ferme-filtres>Appliquer</button></div>
                 </div>
               </div>
             </div>
@@ -2252,6 +2252,7 @@
         // endroit qui voit passer tous les changements de destination — les rattraper un
         // par un nous a coûté quatre correctifs.
         if (typeof window.WD_SYNC_ZONE === 'function') window.WD_SYNC_ZONE(zoneCarte());
+        if (typeof majFiltres === 'function') majFiltres();
         // État de divulgation porté par le composant (robuste aux re-rendus du panneau)
         if (progressiveMode) this.dataset.disclosure = isIntermediate() ? 'intermediate' : 'full';
         scheduleRecentSave(); // capture continue de la recherche en cours (même sans clic sur « Rechercher »)
@@ -2274,6 +2275,53 @@
         }
       };
 
+      // ── Feuille de filtres, sur mobile ────────────────────────────────────────────
+      // Les critères quittent le fil du panneau : ils y allongeaient la page sans qu'on
+      // les cherche, alors qu'on vient d'abord choisir une destination. Ils s'ouvrent
+      // maintenant par un bouton dédié, dans une feuille qu'on applique.
+      const feuilleFiltres = (ouverte) => {
+        if (ouverte) {
+          this.dataset.filtres = '1';
+          document.body.style.overflow = 'hidden';
+        } else {
+          delete this.dataset.filtres;
+          // On ne relâche le défilement que si le panneau plein écran ne l'exige plus.
+          if (!this.dataset.pleinEcran) document.body.style.overflow = '';
+        }
+      };
+
+      // Le nombre de critères cochés se lit sur le bouton, et le pied de feuille annonce
+      // ce qu'on obtiendra : appliquer sans savoir combien de résultats attendent oblige
+      // à fermer pour vérifier.
+      const majFiltres = () => {
+        const n = getActiveCriteria().size;
+        this.querySelectorAll('.wd-booking__filtres-compte').forEach(e => {
+          e.textContent = n; e.hidden = n === 0;
+        });
+        const compteur = this.querySelector('.wd-booking__dd-results-count-number');
+        const total = compteur ? compteur.textContent.trim() : null;
+        this.querySelectorAll('.wd-booking__filtres-appliquer').forEach(e => {
+          e.textContent = total ? 'Voir les ' + total + ' résultats' : 'Appliquer';
+        });
+      };
+
+      this.addEventListener('click', (e) => {
+        if (e.target.closest('[data-ouvre-filtres]')) { e.preventDefault(); feuilleFiltres(true); majFiltres(); return; }
+        if (e.target.closest('[data-ferme-filtres]')) { e.preventDefault(); feuilleFiltres(false); return; }
+        if (e.target.closest('[data-filtres-effacer]')) {
+          e.preventDefault();
+          getActiveCriteria().clear();
+          renderPanel();
+          if (renderMapPanel) renderMapPanel();
+          if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
+          majFiltres();
+        }
+      });
+      // Échap ferme la feuille avant le panneau : c'est la couche la plus haute.
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.dataset.filtres) { e.stopPropagation(); feuilleFiltres(false); }
+      });
+
       const open = () => {
         dropdown.dataset.state = 'open';
         basculerPleinEcran(true);
@@ -2289,6 +2337,7 @@
       };
       const close = () => {
         dropdown.dataset.state = 'closed';
+        feuilleFiltres(false);
         basculerPleinEcran(false);
         destField.classList.remove('wd-booking__field--editing');
         renderChips();
