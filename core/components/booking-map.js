@@ -51,11 +51,13 @@ function _makeSmallIcon(greyed) {
   });
 }
 
-function _makeLargeIcon(cityName, greyed) {
+// `nombre` : plus de un quand le pin réunit les hôtels d'une même ville.
+function _makeLargeIcon(cityName, greyed, nombre) {
   return L.divIcon({
     className: 'pullman-map-marker pullman-map-marker--labeled' + (greyed ? ' pullman-map-marker--greyed' : ''),
     html: '<div class="pullman-dot pullman-dot--large' + (greyed ? ' pullman-dot--greyed' : '') + '"></div>' +
-          '<span class="pullman-label">' + cityName + '</span>',
+          '<span class="pullman-label">' + cityName +
+          (nombre > 1 ? '<span class="pullman-label__compte">' + nombre + '</span>' : '') + '</span>',
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   });
@@ -111,6 +113,16 @@ function _addStyle() {
     '.pullman-dot--greyed{background:#666;box-shadow:0 0 4px rgba(100,100,100,.3),0 1px 2px rgba(0,0,0,.3)}' +
     '.pullman-dot--large.pullman-dot--greyed{background:#666;box-shadow:0 0 6px rgba(100,100,100,.3),0 1px 3px rgba(0,0,0,.3);animation:none}' +
     '.pullman-map-marker--greyed .pullman-label{color:rgba(255,255,255,.4)}' +
+    // Masquée, pas supprimée : le pin reste cliquable et le nom revient au survol.
+    '.pullman-label{transition:opacity .15s}' +
+    '.pullman-label--masquee{opacity:0;pointer-events:none}' +
+    '.pullman-map-marker:hover .pullman-label--masquee{opacity:1}' +
+    // Le pin survolé passe devant, sinon son nom réapparaît sous ceux des voisins.
+    '.pullman-map-marker:hover{z-index:10000 !important}' +
+    '.pullman-label__compte{display:inline-flex;align-items:center;justify-content:center;' +
+      'min-width:14px;height:14px;margin-left:5px;padding:0 3px;border-radius:100px;' +
+      'background:rgba(255,255,255,.92);color:#28332B;font-size:9px;font-weight:700;vertical-align:middle}' +
+    '.pullman-map-marker--greyed .pullman-label__compte{background:rgba(255,255,255,.35);color:#28332B}' +
     // Pin sélectionné : sans bulle au-dessus de lui, il lui faut sa propre marque
     '.pullman-map-marker--selected .pullman-dot{width:16px;height:16px;background:#fff;border-color:#5FEF91;box-shadow:0 0 0 4px rgba(95,239,145,.35),0 2px 8px rgba(0,0,0,.5)}' +
     // ── Panneau de détail, ancré à gauche de la carte ──────────────────────────
@@ -491,6 +503,9 @@ const WD_DETAIL_W = 288;
 // savait plus où l'on se trouvait dans le pays. À 6 la forme du pays reste lisible et
 // le pin s'y situe.
 const WD_ZOOM_HOTEL = 6;
+// En dessous de ce zoom, les hôtels d'une même ville ne font qu'un pin. Au-dessus, ils se
+// séparent : à 6 on voit la forme du pays, c'est assez fin pour les distinguer.
+const WD_ZOOM_VILLES = 6;
 // Nombre de services affichés dans l'encart. Au-delà, un « +N » prend le relais.
 // 3 et non 4 : avec le « +N », quatre badges débordaient sur une seconde ligne, et
 // c'est cette ligne supplémentaire qui obligeait à faire défiler le panneau.
@@ -867,6 +882,18 @@ function initBookingMap(continentFilter, scope) {
 
   L.control.zoom({ position: 'topright' }).addTo(_bookingMap);
 
+  // Les étiquettes se recalculent à chaque déplacement : ce qui se chevauchait à un
+  // endroit tient ailleurs. Et franchir le seuil de regroupement refait les pins, pour
+  // que les villes à plusieurs hôtels se séparent en approchant.
+  let _zoomPrecedent = null;
+  _bookingMap.on('moveend', () => {
+    const groupeAvant = _zoomPrecedent !== null && _zoomPrecedent < WD_ZOOM_VILLES;
+    const groupeApres = _bookingMap.getZoom() < WD_ZOOM_VILLES;
+    _zoomPrecedent = _bookingMap.getZoom();
+    if (_zoomPrecedent !== null && groupeAvant !== groupeApres) _renderMarkers(_currentContinent, _currentCriteria, false);
+    else _ajusterEtiquettes();
+  });
+
   // Cliquer la carte hors d'un pin ferme aussi le détail : même geste, même retour.
   // Fonction explicite et non référence directe — Leaflet passe son événement en
   // premier argument, qui serait pris pour le drapeau « revenir ».
@@ -898,28 +925,53 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   const isFiltered = _zoneDefinie(_currentScope);
   const hasCriteria = criteriaSet && criteriaSet.size > 0;
 
-  PULLMAN_HOTELS_MAP.forEach(hotel => {
-    const inContinent = _dansLaZone(hotel, _currentScope);
+  const conforme = (hotel) => !hasCriteria || (_surRestos()
     // Sur l'onglet Restaurants, un hôtel est conforme s'il a au moins une table qui
     // répond. Ses propres services — piscine, parking — n'ont rien à dire ici, et les
     // tester contre des critères de restauration grisait toute la carte.
-    const matchesCriteria = !hasCriteria || (_surRestos()
-      ? _lieuxDe(hotel.name).length > 0
-      : _criteresManquants(hotel, criteriaSet).length === 0);
+    ? _lieuxDe(hotel.name).length > 0
+    : _criteresManquants(hotel, criteriaSet).length === 0);
+
+  // À l'échelle d'un continent, deux Pullman d'une même ville posent deux pins au même
+  // endroit et écrivent son nom deux fois — « Bangkok » par-dessus « Bangkok ». On les
+  // réunit tant qu'on est dézoomé, et on les sépare dès qu'on entre dans le pays.
+  const grouper = _bookingMap.getZoom() < WD_ZOOM_VILLES;
+  const groupes = new Map();
+  PULLMAN_HOTELS_MAP.forEach(hotel => {
+    const cle = grouper ? (hotel.country + '|' + hotel.city) : hotel.name;
+    if (!groupes.has(cle)) groupes.set(cle, []);
+    groupes.get(cle).push(hotel);
+  });
+
+  groupes.forEach(lot => {
+    const tete = lot[0];
+    const inContinent = _dansLaZone(tete, _currentScope);
+    // Un groupe répond si l'un des siens répond : le masquer parce que l'autre hôtel de
+    // la ville ne correspond pas effacerait un résultat valable.
+    const matchesCriteria = lot.some(conforme);
     const greyed = hasCriteria && !matchesCriteria;
+    const lat = lot.reduce((n, h) => n + h.lat, 0) / lot.length;
+    const lng = lot.reduce((n, h) => n + h.lng, 0) / lot.length;
     const icon = isFiltered && inContinent
-      ? _makeLargeIcon(hotel.city, greyed)
+      ? _makeLargeIcon(tete.city, greyed, lot.length > 1 ? lot.length : 0)
       : _makeSmallIcon(greyed);
 
-    const marker = L.marker([hotel.lat, hotel.lng], {
+    const marker = L.marker([lat, lng], {
       icon: icon,
       zIndexOffset: isFiltered && inContinent && !greyed ? 1000 : greyed ? -1000 : 0,
       opacity: isFiltered && !inContinent ? 0.25 : greyed ? 0.5 : 1,
+      // Nombre d'hôtels réunis : sert à décider quel nom garder quand la place manque.
+      wdTaille: lot.length,
     }).addTo(_bookingMap);
 
     // Panneau latéral plutôt qu'une bulle ancrée : posée sur le pin, elle masquait
     // justement ce qu'on cherche à voir — où se trouve l'hôtel et ce qu'il y a autour.
-    marker.on('click', () => _ouvrirDetail(hotel, criteriaSet));
+    // Une ville à plusieurs hôtels n'ouvre rien : elle s'approche, et les pins se
+    // séparent d'eux-mêmes.
+    marker.on('click', () => {
+      if (lot.length > 1) _bookingMap.flyTo([lat, lng], WD_ZOOM_VILLES, { duration: 0.8 });
+      else _ouvrirDetail(tete, criteriaSet);
+    });
 
     _markers.push(marker);
   });
@@ -966,9 +1018,39 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     _avisRattrapage(criteriaSet);
   }
 
+  _ajusterEtiquettes();
+
   // Recadrage uniquement quand la zone change (init / choix de continent) —
   // jamais sur un simple changement de critères : on respecte la vue de l'utilisateur.
   if (refit) _vueContinent(false);
+}
+
+// N'affiche que les étiquettes qui tiennent sans se recouvrir. À l'échelle d'un
+// continent, 39 noms de villes se marchaient dessus en Asie du Sud-Est : on en gardait
+// tous les pins mais plus aucun nom lisible. Les autres se révèlent au survol, et
+// reparaissent d'elles-mêmes dès que le zoom leur fait de la place.
+function _ajusterEtiquettes() {
+  const gardees = [];
+  // Priorité aux pins mis en avant : si un nom doit céder, que ce soit celui d'un hôtel
+  // qui ne répond pas aux critères. À égalité, les villes qui comptent le plus d'hôtels
+  // gardent leur nom — ce sont les destinations qu'on cherche d'abord, et laisser
+  // l'ordre d'insertion trancher revenait à tirer au sort.
+  const ordonnes = _markers.slice().sort((a, b) =>
+    (b.options.opacity || 0) - (a.options.opacity || 0) ||
+    (b.options.wdTaille || 1) - (a.options.wdTaille || 1));
+  ordonnes.forEach(m => {
+    const el = m._icon && m._icon.querySelector('.pullman-label');
+    if (!el) return;
+    el.classList.remove('pullman-label--masquee');
+    const r = el.getBoundingClientRect();
+    if (!r.width) return;
+    // Deux pixels de marge : deux noms qui se frôlent se lisent aussi mal que deux noms
+    // qui se chevauchent.
+    const b = { l: r.left - 2, t: r.top - 2, r: r.right + 2, b: r.bottom + 2 };
+    const heurte = gardees.some(g => b.l < g.r && g.l < b.r && b.t < g.b && g.t < b.b);
+    if (heurte) el.classList.add('pullman-label--masquee');
+    else gardees.push(b);
+  });
 }
 
 // Cadrage de la zone courante — le continent choisi, ou le monde à défaut.
