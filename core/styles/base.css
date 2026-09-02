@@ -1275,7 +1275,7 @@ wd-footer { display: block; }
      Les critères sortent du fil du panneau : ils l'allongeaient sans qu'on les cherche,
      alors qu'on vient d'abord choisir une destination. */
   .wd-booking__filtres-btn { display: inline-flex; align-items: center; gap: 8px;
-    min-height: 44px; margin: 4px 0 12px; padding: 0 16px; border: 1px solid rgba(255,255,255,.22);
+    min-height: 44px; margin: 0 0 16px; padding: 0 16px; border: 1px solid rgba(255,255,255,.22);
     border-radius: 100px; background: transparent; color: #fff;
     font-family: var(--font-sans); font-size: 13px; font-weight: 500; cursor: pointer; }
   .wd-booking__filtres-btn:hover { background: rgba(255,255,255,.06); }

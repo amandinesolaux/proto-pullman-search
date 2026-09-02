@@ -1112,7 +1112,7 @@
             <div class="wd-booking__dd-search-panel" id="wd-search-panel">
               <div class="wd-booking__dd-two-cols">
                 <div class="wd-booking__dd-dest-col">
-                  <h3 class="wd-booking__dd-col-title">Destination</h3>\n                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>
+                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>\n                  <h3 class="wd-booking__dd-col-title">Destination</h3>
                   <div class="wd-booking__dd-continents" id="wd-continents"></div>
                   <nav class="wd-booking__dd-breadcrumb" id="wd-breadcrumb" aria-label="Navigation destination"></nav>
                   <div class="wd-booking__dd-dest-list" id="wd-dest-list"></div>
@@ -1126,7 +1126,7 @@
             <div class="wd-booking__dd-mapview" style="display:none">
               <div class="wd-booking__dd-two-cols">
                 <div class="wd-booking__dd-map-col">
-                  <h3 class="wd-booking__dd-col-title">Carte</h3>\n                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>
+                  <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>\n                  <h3 class="wd-booking__dd-col-title">Carte</h3>
                   <div class="wd-booking__dd-mapview-continents" id="wd-mapview-continents"></div>
                   <div class="wd-booking__dd-mapview-wrap">
                     <div id="wd-booking-map" class="wd-booking__dd-map"></div>
