@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=353"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=354"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,10 +13,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=353"></script>
-  <script src="../../core/components/components.js?v=353"></script>
+  <script src="../../core/data/restaurants.js?v=354"></script>
+  <script src="../../core/components/components.js?v=354"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=353"></script>
+  <script src="../../core/components/booking-map.js?v=354"></script>
 </head>
 <body class="brand-pullman">
 
@@ -238,7 +238,194 @@ wd-booking { margin-top: 20px; }
 
   function ready(retries) {
     if (!window.WD_SEARCH_DATA) { if (retries > 0) setTimeout(() => ready(retries - 1), 100); return; }
-    init(window.WD_SEARCH_DATA);
+    // L'onglet vient de la barre de recherche : il décide de ce que cette page liste.
+    if (P.get('tab') === 'restaurants') initRestaurants(window.WD_SEARCH_DATA);
+    else init(window.WD_SEARCH_DATA);
+  }
+
+  // ══ Mode Restaurants ═══════════════════════════════════════════════════════════
+  // La page liste des tables et non des hôtels. Même mise en page, mêmes conteneurs :
+  // ce qui change est ce qu'on compte, ce qu'on montre dans les cards, et ce que la
+  // carte situe — un lieu de restauration n'a pas d'adresse propre, il est à son hôtel.
+  function initRestaurants(D) {
+    const tous = window.WD_RESTAURANTS || [];
+    const groupes = window.WD_RESTO_CRITERIA || [];
+    const parNom = new Map(D.hotels.map(h => [h.name, h]));
+
+    // ---- Périmètre : même sémantique que le panneau ----
+    let lieux = tous.slice(), scopeLabel = '';
+    const cont = P.get('continent');
+    if (cont && cont !== 'all') {
+      const r = D.regions.find(x => x.id === cont);
+      lieux = lieux.filter(v => v.region === cont);
+      scopeLabel = r ? r.label : '';
+    } else if (cont === 'all') scopeLabel = 'Tous les continents';
+    const country = P.get('country');
+    if (country) { lieux = lieux.filter(v => v.pays === country); scopeLabel = country; }
+    const city = P.get('city');
+    if (city) { lieux = lieux.filter(v => v.ville === city); scopeLabel = city; }
+    const hotelName = P.get('hotel');
+    if (hotelName) { lieux = lieux.filter(v => v.hotel === hotelName); scopeLabel = hotelName; }
+    const restoName = P.get('resto');
+    if (restoName) { lieux = lieux.filter(v => v.nom === restoName); scopeLabel = restoName; }
+    const q = (P.get('q') || '').trim();
+    if (q) {
+      const lq = q.toLowerCase();
+      lieux = lieux.filter(v => (v.nom + ' ' + v.hotel + ' ' + v.ville).toLowerCase().includes(lq));
+      if (!scopeLabel) scopeLabel = '« ' + q + ' »';
+    }
+    if (!scopeLabel) scopeLabel = 'Toutes nos destinations';
+
+    // ---- Critères : ET entre les groupes, OU à l'intérieur, comme le panneau ----
+    const critIds = (P.get('criteria') || '').split(',').filter(Boolean);
+    const libelle = (id) => {
+      for (const g of groupes) { const it = g.items.find(x => x.id === id); if (it) return it.label; }
+      return id;
+    };
+    const repond = (v, ids) => groupes.every(g => {
+      const coches = g.items.map(it => it.id).filter(id => ids.indexOf(id) >= 0);
+      if (!coches.length) return true;
+      return coches.some(id => id === v.type || v.cuisines.indexOf(id) >= 0 || v.tags.indexOf(id) >= 0);
+    });
+    const results = lieux.filter(v => repond(v, critIds));
+
+    // ---- Le mot qui nomme ce qu'on compte ----
+    const resto = critIds.indexOf('restaurant') >= 0, bar = critIds.indexOf('bar') >= 0;
+    const mot = (n) => (resto && !bar) ? 'restaurant' + (n > 1 ? 's' : '')
+      : (bar && !resto) ? 'bar' + (n > 1 ? 's' : '')
+      : (n > 1 ? 'restaurants et bars' : 'restaurant ou bar');
+
+    // ---- En-tête ----
+    const fmtDay = (iso) => new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' }).format(new Date(iso + 'T12:00:00'));
+    const sub = [];
+    if (critIds.length) sub.push(critIds.map(libelle).join(', '));
+    const arr = P.get('checkin'), dep = P.get('checkout');
+    if (arr && dep) sub.push(fmtDay(arr) + ' – ' + fmtDay(dep));
+    // Un couvert, pas une chambre : on ne parle pas d'occupation d'hôtel ici.
+    const nAdultes = Math.max(1, parseInt(P.get('adults'), 10) || 1);
+    const nEnfants = Math.max(0, parseInt(P.get('children'), 10) || 0);
+    sub.push((nAdultes + nEnfants) + ' personne' + (nAdultes + nEnfants > 1 ? 's' : ''));
+    document.getElementById('srx-title').innerHTML =
+      '<strong>' + results.length + '</strong> ' + mot(results.length) + ' — ' + esc(scopeLabel);
+    document.getElementById('srx-sub').textContent = sub.join('  ·  ');
+    document.title = results.length + ' ' + mot(results.length) + ' — ' + scopeLabel + ' — Pullman';
+
+    // ---- Tri : ni prix ni note pour une table, on trie par nom ou par hôtel ----
+    const sortSel = document.getElementById('srx-sort');
+    sortSel.innerHTML = '<option value="nom">Nom</option><option value="hotel">Hôtel</option>';
+
+    // ---- Liste ----
+    const listEl = document.getElementById('srx-list');
+    let epingle = null;
+    const trie = () => {
+      const a = results.slice();
+      if (sortSel.value === 'hotel') a.sort((x, y) => x.hotel.localeCompare(y.hotel) || x.nom.localeCompare(y.nom));
+      else a.sort((x, y) => x.nom.localeCompare(y.nom));
+      if (epingle) {
+        // Les tables de l'hôtel désigné remontent ensemble : c'est lui qu'on a pointé.
+        const dessus = a.filter(v => v.hotel === epingle), reste = a.filter(v => v.hotel !== epingle);
+        return dessus.concat(reste);
+      }
+      return a;
+    };
+    const rendre = (items) => {
+      if (!items.length) { vide(); return; }
+      listEl.innerHTML = items.map(v => {
+        const h = parNom.get(v.hotel) || {};
+        const cles = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [(h.img || 'aja_p_6783-26').split(':')[0]];
+        const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
+        const badges = [v.type === 'bar' ? 'Bar' : 'Restaurant']
+          .concat(v.cuisines.concat(v.tags).map(libelle)).slice(0, 4);
+        return '<article class="srx-card" data-resto="' + esc(v.nom) + '" data-hotel="' + esc(v.hotel) + '">' +
+          '<div class="srx-card-media"' + (cles.length > 1 ? ' data-galerie' : '') + '>' +
+            cles.map((k, i) => '<img class="srx-card-img" src="' + photo(k) + '" alt="' + esc(v.nom) + '"' +
+              (i === 0 ? ' data-on' : ' loading="lazy"') + '/>').join('') +
+            (cles.length > 1
+              ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
+                '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +
+                '<div class="pullman-popup__points">' +
+                  cles.map((k, i) => '<button type="button" class="pullman-popup__point" data-point="' + i + '"' +
+                    (i === 0 ? ' data-on' : '') + ' aria-label="Photo ' + (i + 1) + ' sur ' + cles.length + '"></button>').join('') +
+                '</div>'
+              : '') +
+          '</div>' +
+          '<div class="srx-card-body">' +
+            '<div class="srx-card-top"><div>' +
+              '<h2 class="srx-card-name">' + esc(v.nom) + '</h2>' +
+              '<p class="srx-card-loc">' + esc(v.hotel) + ' · ' + esc(v.ville) + '</p>' +
+            '</div></div>' +
+            '<div class="srx-badges">' + badges.map(b => '<span class="srx-badge">' + esc(b) + '</span>').join('') + '</div>' +
+            '<div class="srx-card-bottom">' +
+              '<span class="srx-actions">' +
+                (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
+                (v.url ? '<a class="srx-cta" href="' + esc(v.url) + '" target="_blank" rel="noopener">Voir la table</a>' : '') +
+              '</span>' +
+            '</div>' +
+          '</div></article>';
+      }).join('');
+    };
+
+    // ---- Zéro résultat : quel critère, retiré, débloque le plus de tables ? ----
+    function vide() {
+      let best = null;
+      critIds.forEach(id => {
+        const reduits = critIds.filter(x => x !== id);
+        const m = lieux.filter(v => repond(v, reduits));
+        if (m.length && (!best || m.length > best.count)) best = { id, label: libelle(id), count: m.length };
+      });
+      const sans = (id) => {
+        const np = new URLSearchParams(location.search);
+        const reste = critIds.filter(x => x !== id);
+        if (id === null || !reste.length) np.delete('criteria'); else np.set('criteria', reste.join(','));
+        return location.pathname + '?' + np.toString();
+      };
+      let inner = '<h2>Aucune table ne correspond à tous vos critères</h2>';
+      if (best) {
+        inner += '<p>En retirant <strong>« ' + esc(best.label) + ' »</strong>, <strong>' + best.count + ' ' + mot(best.count) +
+          '</strong> correspondrai' + (best.count > 1 ? 'ent' : 't') + '.</p>' +
+          '<div class="srx-empty-actions">' +
+          '<button type="button" class="srx-empty-relax" onclick="location.href=\'' + sans(best.id) + '\'">Retirer « ' + esc(best.label) + ' »</button>' +
+          '<button type="button" class="srx-empty-reset" onclick="location.href=\'' + sans(null) + '\'">Réinitialiser les critères</button></div>';
+      } else {
+        inner += '<p>Essayez d’élargir la destination ou de modifier vos critères dans la barre de recherche ci-dessus.</p>' +
+          '<div class="srx-empty-actions"><button type="button" class="srx-empty-reset" onclick="location.href=\'' + sans(null) + '\'">Réinitialiser les critères</button></div>';
+      }
+      listEl.innerHTML = '<div class="srx-empty" role="status">' + inner + '</div>';
+    }
+
+    rendre(trie());
+    sortSel.addEventListener('change', () => rendre(trie()));
+
+    // ---- Carte : un pin par hôtel qui héberge une table retenue ----
+    const hotels = [...new Set(results.map(v => v.hotel))].map(n => parNom.get(n)).filter(Boolean)
+      .filter(h => h.lat !== null && h.lat !== undefined && h.lng !== null);
+    const map = L.map(document.getElementById('srx-map'), { zoomControl: true, attributionControl: false, scrollWheelZoom: false });
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(map);
+    const pinParHotel = new Map();
+    if (hotels.length) {
+      const groupe = L.featureGroup(hotels.map(h => {
+        const mk = L.marker([h.lat, h.lng], { icon: L.divIcon({ className: '', html: '<div class="srx-pin"></div>', iconSize: [12, 12], iconAnchor: [6, 6] }) });
+        pinParHotel.set(h.name, mk);
+        // Cliquer un pin remonte les tables de cet hôtel en tête de liste.
+        mk.on('click', () => { epingle = h.name; rendre(trie()); marquer(h.name);
+          const c = listEl.querySelector('.srx-card'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+        return mk;
+      }));
+      groupe.addTo(map);
+      map.fitBounds(groupe.getBounds().pad(0.25), { maxZoom: 8 });
+    } else {
+      map.setView([25, 10], 2);
+    }
+    const marquer = (nom) => {
+      pinParHotel.forEach(m => m._icon && m._icon.classList.remove('srx-pin-wrap--active'));
+      const mk = pinParHotel.get(nom);
+      if (mk && mk._icon) mk._icon.classList.add('srx-pin-wrap--active');
+    };
+    // Réciproque : survoler une card désigne son hôtel sur la carte.
+    listEl.addEventListener('mouseover', (e) => {
+      const c = e.target.closest('.srx-card');
+      if (c) marquer(c.dataset.hotel);
+    });
   }
 
   function init(D) {

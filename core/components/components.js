@@ -1255,6 +1255,9 @@
         expandedCountry: null,
         selectedHotel: null,
         activeTab: 'hotels',
+        // Table choisie dans la liste, sur l'onglet Restaurants. Distincte de l'hôtel :
+        // on cherche un lieu où manger, pas où dormir.
+        selectedResto: null,
         tabCriteria: {
           hotels: new Set(),
           restaurants: new Set(),
@@ -1389,6 +1392,9 @@
           const r = getRegion();
           if (r) chips.push({ type: 'continent', id: searchState.continent, label: r.label });
         }
+        if (searchState.activeTab === 'restaurants' && searchState.selectedResto) {
+          chips.push({ type: 'resto', id: searchState.selectedResto, label: searchState.selectedResto });
+        }
         const activeCriteria = getActiveCriteria();
         const activeCriteriaList = getActiveCriteriaList();
         activeCriteria.forEach(cId => {
@@ -1401,6 +1407,7 @@
         if (type === 'continent') { searchState.continent = null; searchState.expandedCountry = null; searchState.selectedHotel = null; }
         else if (type === 'country') { searchState.expandedCountry = null; searchState.selectedHotel = null; }
         else if (type === 'hotel') { searchState.selectedHotel = null; }
+        else if (type === 'resto') { searchState.selectedResto = null; }
         else if (type === 'criteria') { getActiveCriteria().delete(id); }
         renderPanel();
       };
@@ -1758,7 +1765,9 @@
       // — pays déplié s'il y en a un, continent sinon — pour que les deux onglets ne se
       // contredisent pas quand on passe de l'un à l'autre.
       const restosDuPerimetre = () => {
-        const tous = window.WD_RESTAURANTS || [];
+        const tous = searchState.selectedResto
+          ? (window.WD_RESTAURANTS || []).filter(v => v.nom === searchState.selectedResto)
+          : (window.WD_RESTAURANTS || []);
         if (searchState.expandedCountry) return tous.filter(v => v.pays === searchState.expandedCountry);
         if (searchState.continent) return tous.filter(v => v.region === searchState.continent);
         return tous;
@@ -2010,7 +2019,33 @@
               (surRestos ? motLieux(count) : 'hôtel' + (count > 1 ? 's' : '')) + '</span>' +
             '<span class="wd-booking__dd-dest-item-arrow"><svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg></span>' +
             '</button>';
-          if (isExpanded) {
+          if (isExpanded && surRestos) {
+            // On propose des tables, pas des hôtels : c'est ce qu'on cherche ici. L'hôtel
+            // n'est plus le résultat, il devient le lieu où la table se trouve.
+            const tables = allInCountry.flatMap(hh => lieuxDe(hh.name).map(v => ({ v, hh })));
+            html += '<div class="wd-booking__dd-country-hotels">' +
+              (tables.length
+                ? tables.map(({ v, hh }) => {
+                    const cle = window.WD_IMG_KEY ? window.WD_IMG_KEY(hh) : (hh.img || '').split(':')[0];
+                    const choisie = searchState.selectedResto === v.nom;
+                    const dits = [v.type === 'bar' ? 'Bar' : 'Restaurant']
+                      .concat(v.cuisines.concat(v.tags).slice(0, 2).map(id => {
+                        const c = getActiveCriteriaList().find(x => x.id === id);
+                        return c ? c.label : id;
+                      })).join(' · ');
+                    return '<button type="button" class="wd-booking__dd-hotel-row' +
+                      (choisie ? ' wd-booking__dd-hotel-row--selected' : '') +
+                      '" data-dest-type="resto" data-resto-name="' + esc(v.nom) + '">' +
+                      '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="" loading="lazy" />' +
+                      '<div class="wd-booking__dd-hotel-info">' +
+                        '<span class="wd-booking__dd-hotel-name">' + esc(v.nom) + '</span>' +
+                        '<span class="wd-booking__dd-hotel-loc">' + esc(dits) +
+                          '<span class="wd-booking__dd-hotel-country">' + esc(hh.name) + '</span></span>' +
+                      '</div></button>';
+                  }).join('')
+                : '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères dans ce pays.</p>') +
+            '</div>';
+          } else if (isExpanded) {
             const displayHotels = hasCriteria ? hotelsInCountry : allInCountry;
             html += '<div class="wd-booking__dd-country-hotels">' +
               (displayHotels.length ? displayHotels : allInCountry).map(h => {
@@ -2225,6 +2260,16 @@
           e.preventDefault();
           getActiveCriteria().clear();
           renderPanel();
+          return;
+        }
+        const restoRow = e.target.closest('[data-dest-type="resto"]');
+        if (restoRow) {
+          e.preventDefault();
+          const nom = restoRow.dataset.restoName;
+          searchState.selectedResto = searchState.selectedResto === nom ? null : nom;
+          renderDestList();
+          renderChips();
+          scheduleRecentSave();
           return;
         }
         const hotelRow = e.target.closest('.wd-booking__dd-hotel-row');
@@ -2944,6 +2989,10 @@
         ctaBtn.addEventListener('click', (e) => {
           e.preventDefault();
           const p = new URLSearchParams();
+          // L'onglet fait partie de la recherche : la page de résultats en dépend pour
+          // savoir si elle liste des hôtels ou des tables.
+          if (searchState.activeTab !== 'hotels') p.set('tab', searchState.activeTab);
+          if (searchState.activeTab === 'restaurants' && searchState.selectedResto) p.set('resto', searchState.selectedResto);
           if (searchState.selectedHotel) p.set('hotel', searchState.selectedHotel);
           if (searchState.expandedCountry) p.set('country', searchState.expandedCountry);
           if (searchState.city) p.set('city', searchState.city);
