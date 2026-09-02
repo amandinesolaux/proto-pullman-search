@@ -1221,9 +1221,10 @@
           const inp = this.querySelector('.wd-booking__dest-input');
           if (cfg && inp) inp.placeholder = cfg.placeholder;
           if (cfg && guestsLabel) guestsLabel.textContent = cfg.guests;
-          const hasCriteria = tab.dataset.tab !== 'restaurants';
+          // L'onglet Restaurants a maintenant ses propres critères : ses chips s'affichent
+          // comme les autres. Elles étaient masquées du temps où il n'en avait aucun.
           const chips = this.querySelector('#wd-dest-chips');
-          if (chips) chips.style.display = hasCriteria ? '' : 'none';
+          if (chips) chips.style.display = '';
           const dropdown = this.querySelector('.wd-booking__dropdown');
           if (dropdown && dropdown.dataset.state === 'open') renderPanel();
         });
@@ -1256,12 +1257,17 @@
         activeTab: 'hotels',
         tabCriteria: {
           hotels: new Set(),
+          restaurants: new Set(),
           reunions: new Set(),
           celebrations: new Set(),
         },
       };
 
       const CRITERIA_GROUPS = {
+        // Onglet Restaurants : le vocabulaire vient de core/data/restaurants.js, relevé
+        // sur les fiches Pullman. Il est défini là-bas et non ici, parce qu'il ne vaut que
+        // par les données qui le portent — chaque libellé correspond à un champ renseigné.
+        restaurants: window.WD_RESTO_CRITERIA || [],
         hotels: [
           { group: 'Bien-être & Loisirs', items: [
             { id: 'pool', label: 'Piscine' },
@@ -1587,6 +1593,9 @@
       // pour porter les mêmes actions dans son message d'écartement, plutôt que d'afficher
       // un second bloc par-dessus le premier.
       const chercherAssouplissement = () => {
+        // Les critères des autres onglets ne se lisent pas sur les services d'un hôtel :
+        // les leur appliquer donnerait un rattrapage qui ne veut rien dire.
+        if (searchState.activeTab !== 'hotels') return null;
         const active = getActiveCriteria();
         if (!active.size) return null;
         const { pool } = getResultsPool();
@@ -1715,7 +1724,62 @@
         renderPanel();
       };
 
+      // Lieux de restauration du périmètre courant. Même géographie que la liste d'hôtels
+      // — pays déplié s'il y en a un, continent sinon — pour que les deux onglets ne se
+      // contredisent pas quand on passe de l'un à l'autre.
+      const restosDuPerimetre = () => {
+        const tous = window.WD_RESTAURANTS || [];
+        if (searchState.expandedCountry) return tous.filter(v => v.pays === searchState.expandedCountry);
+        if (searchState.continent) return tous.filter(v => v.region === searchState.continent);
+        return tous;
+      };
+
+      // ET entre les groupes, OU à l'intérieur d'un groupe. Cocher « Italienne » et
+      // « Japonaise » cherche l'une ou l'autre, jamais les deux à la fois — un lieu n'a
+      // qu'une cuisine. Mais cocher « Rooftop » et « Italienne » demande bien les deux.
+      const restoMatchesCriteria = (v) => {
+        const actifs = getActiveCriteria();
+        if (!actifs.size) return true;
+        return getActiveCriteriaGroups().every(g => {
+          const coches = g.items.map(it => it.id).filter(id => actifs.has(id));
+          if (!coches.length) return true;
+          return coches.some(id => id === v.type || v.cuisines.indexOf(id) >= 0 || v.tags.indexOf(id) >= 0);
+        });
+      };
+
+      // Intitulé du compte : on nomme ce qu'on a filtré. « Restaurants et bars » tant que
+      // le type n'est pas choisi, l'un ou l'autre dès qu'il l'est.
+      const motLieux = (n) => {
+        const a = getActiveCriteria();
+        const resto = a.has('restaurant'), bar = a.has('bar');
+        if (resto && !bar) return 'restaurant' + (n > 1 ? 's' : '');
+        if (bar && !resto) return 'bar' + (n > 1 ? 's' : '');
+        return n > 1 ? 'restaurants et bars' : 'restaurant ou bar';
+      };
+
       const renderResultsCount = () => {
+        if (searchState.activeTab === 'restaurants') {
+          const lieux = restosDuPerimetre().filter(restoMatchesCriteria);
+          const n = lieux.length;
+          const { label } = getResultsPool();
+          const actifs = getActiveCriteria();
+          const dits = [];
+          if (actifs.size) {
+            const liste = getActiveCriteriaList();
+            actifs.forEach(id => {
+              const c = liste.find(x => x.id === id);
+              // Le type est déjà dit par le mot compté : on ne le répète pas.
+              if (c && id !== 'restaurant' && id !== 'bar') dits.push(c.label.toLowerCase());
+            });
+          }
+          let d = '<span class="wd-booking__dd-results-count-number">' + n + '</span> ' + motLieux(n);
+          if (dits.length) d += ' ' + dits.join(', ');
+          if (label) {
+            d += '<span class="wd-booking__dd-results-count-sep">—</span>' +
+              '<span class="wd-booking__dd-results-count-label">' + esc(label) + '</span>';
+          }
+          return '<div class="wd-booking__dd-results-count">' + d + '</div>';
+        }
         const { pool, label } = getResultsPool();
         const count = pool.filter(hotelMatchesCriteria).length;
         const activeCriteria = getActiveCriteria();
@@ -1893,15 +1957,27 @@
         const countries = getCountries();
         const region = getRegion();
         const hasCriteria = getActiveCriteria().size > 0;
+        // Onglet Restaurants : on compte des lieux de restauration, pas des hôtels. Les
+        // critères de cet onglet ne se lisent pas sur les services d'un hôtel — les leur
+        // appliquer donnait des comptes qui ne voulaient rien dire, et cachait des pays
+        // qui ont pourtant des tables.
+        const surRestos = searchState.activeTab === 'restaurants';
+        const lieuxDe = (nomHotel) => (window.WD_RESTAURANTS || [])
+          .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
         const countryListHtml = countries.map(c => {
           const allInCountry = region.hotels.filter(h => h.country === c);
-          const hotelsInCountry = hasCriteria ? allInCountry.filter(hotelMatchesCriteria) : allInCountry;
-          const count = hotelsInCountry.length;
+          const hotelsInCountry = hasCriteria
+            ? allInCountry.filter(h => surRestos ? lieuxDe(h.name).length > 0 : hotelMatchesCriteria(h))
+            : allInCountry;
+          const count = surRestos
+            ? allInCountry.reduce((n, h) => n + lieuxDe(h.name).length, 0)
+            : hotelsInCountry.length;
           if (hasCriteria && count === 0 && searchState.expandedCountry !== c) return '';
           const isExpanded = searchState.expandedCountry === c;
           let html = '<button class="wd-booking__dd-dest-item' + (isExpanded ? ' wd-booking__dd-dest-item--expanded' : '') + (hasCriteria && count === 0 ? ' wd-booking__dd-dest-item--empty' : '') + '" data-dest-type="country" data-dest-value="' + esc(c) + '" type="button">' +
             esc(c) +
-            '<span class="wd-booking__dd-dest-item-count">' + count + ' hôtel' + (count > 1 ? 's' : '') + '</span>' +
+            '<span class="wd-booking__dd-dest-item-count">' + count + ' ' +
+              (surRestos ? motLieux(count) : 'hôtel' + (count > 1 ? 's' : '')) + '</span>' +
             '<span class="wd-booking__dd-dest-item-arrow"><svg viewBox="0 0 12 12"><polyline points="4,2 8,6 4,10"/></svg></span>' +
             '</button>';
           if (isExpanded) {
@@ -1910,7 +1986,9 @@
               (displayHotels.length ? displayHotels : allInCountry).map(h => {
                 const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
                 const isSelected = searchState.selectedHotel === h.name;
-                const dimmed = hasCriteria && !hotelMatchesCriteria(h);
+                // Sur l'onglet Restaurants, un hôtel est pertinent s'il a au moins un lieu
+                // qui répond ; ses services propres n'ont rien à dire ici.
+                const dimmed = hasCriteria && (surRestos ? lieuxDe(h.name).length === 0 : !hotelMatchesCriteria(h));
                 return '<button type="button" class="wd-booking__dd-hotel-row' + (isSelected ? ' wd-booking__dd-hotel-row--selected' : '') + (dimmed ? ' wd-booking__dd-hotel-row--dimmed' : '') + '" data-dest-type="hotel" data-hotel-name="' + esc(h.name) + '" data-hotel-href="' + esc(h.href || '') + '">' +
                   '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
                   '<div class="wd-booking__dd-hotel-info">' +
