@@ -1592,7 +1592,37 @@
       // Renvoie null quand il y a des résultats — donc rien à proposer. La carte s'en sert
       // pour porter les mêmes actions dans son message d'écartement, plutôt que d'afficher
       // un second bloc par-dessus le premier.
+      // Même rattrapage, sur les tables : quel critère, une fois retiré, en débloque le
+      // plus ? La suggestion porte sur des lieux de restauration, pas sur des hôtels.
+      const assouplissementRestos = () => {
+        const active = getActiveCriteria();
+        if (!active.size) return null;
+        const pool = restosDuPerimetre();
+        if (!pool.length) return null;
+        if (pool.some(restoMatchesCriteria)) return null;      // il reste des tables
+        const liste = getActiveCriteriaList();
+        const ids = [...active];
+        let best = null;
+        // Un lieu répond-il à un sous-ensemble de critères ? Même règle que le filtre :
+        // ET entre les groupes, OU à l'intérieur.
+        const repond = (v, ids2) => getActiveCriteriaGroups().every(g => {
+          const coches = g.items.map(it => it.id).filter(id => ids2.has(id));
+          if (!coches.length) return true;
+          return coches.some(id => id === v.type || v.cuisines.indexOf(id) >= 0 || v.tags.indexOf(id) >= 0);
+        });
+        ids.forEach(cId => {
+          const reduits = new Set(ids.filter(x => x !== cId));
+          const gardes = pool.filter(v => repond(v, reduits));
+          if (gardes.length && (!best || gardes.length > best.count)) {
+            const c = liste.find(x => x.id === cId);
+            best = { id: cId, label: c ? c.label : cId, count: gardes.length, hotel: { name: gardes[0].nom } };
+          }
+        });
+        return { best };
+      };
+
       const chercherAssouplissement = () => {
+        if (searchState.activeTab === 'restaurants') return assouplissementRestos();
         // Les critères des autres onglets ne se lisent pas sur les services d'un hôtel :
         // les leur appliquer donnerait un rattrapage qui ne veut rien dire.
         if (searchState.activeTab !== 'hotels') return null;
@@ -2477,6 +2507,13 @@
         // manger : ses critères de restauration ne se lisent pas sur les services de
         // l'établissement. Elle interroge la liste plutôt que de refaire le calcul.
         window.WD_ONGLET = () => searchState.activeTab;
+        // Le mot qui nomme ce qu'on compte, décidé par la liste : « restaurants et bars »,
+        // ou « bars » seuls dès que le type est choisi. La carte ne le redevine pas.
+        window.WD_MOT_LIEUX = (n) => motLieux(n);
+        // Combien de tables répondent, dans une zone donnée.
+        window.WD_TABLES_ZONE = (continent, country) => (window.WD_RESTAURANTS || [])
+          .filter(v => (country ? v.pays === country : (continent ? v.region === continent : true)))
+          .filter(restoMatchesCriteria).length;
         window.WD_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || [])
           .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
 

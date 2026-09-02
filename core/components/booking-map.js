@@ -610,8 +610,22 @@ function _libelleZone(scope) {
 
 // Combien d'hôtels d'une zone satisfont les critères cochés.
 function _conformes(scope, criteriaSet) {
+  // Sur l'onglet Restaurants on compte des tables, pas des hôtels : un même établissement
+  // peut en avoir trois qui répondent, et annoncer « 1 hôtel » n'aurait aucun sens pour
+  // qui cherche où manger.
+  if (_surRestos() && typeof window.WD_TABLES_ZONE === 'function') {
+    const s = scope || {};
+    return window.WD_TABLES_ZONE(s.continent, s.country);
+  }
   return PULLMAN_HOTELS_MAP.filter(h =>
     _dansLaZone(h, scope) && _criteresManquants(h, criteriaSet).length === 0).length;
+}
+
+// Le mot qui nomme ce qu'on compte. La liste le décide — « restaurants et bars », ou
+// « bars » seuls quand le type est coché ; ailleurs, ce sont des hôtels.
+function _motCompte(n) {
+  if (_surRestos() && typeof window.WD_MOT_LIEUX === 'function') return window.WD_MOT_LIEUX(n);
+  return 'hôtel' + (n > 1 ? 's' : '');
 }
 
 // Peinture du panneau d'avis. Les deux messages de la carte — celui qui écarte l'hôtel
@@ -648,17 +662,20 @@ function _avisRattrapage(criteriaSet) {
   const geo = { continent: _currentScope.continent, country: _currentScope.country };
   const zone = _enZone(geo);
   const reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
-  let suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères.';
+  const quoi = _surRestos() ? 'Aucune table' : 'Aucun hôtel';
+  let suite = quoi + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères.';
   if (reprise) {
     const pluriel = reprise.count > 1;
     suite += ' En retirant <strong>« ' + esc(reprise.label) + ' »</strong>, <strong>' +
-      reprise.count + ' hôtel' + (pluriel ? 's' : '') + '</strong> correspondrai' + (pluriel ? 'ent' : 't') +
+      reprise.count + ' ' + _motCompte(reprise.count) + '</strong> correspondrai' + (pluriel ? 'ent' : 't') +
       (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
   } else {
-    suite += ' Aucun de vos critères ne peut être assoupli pour trouver un hôtel ici.';
+    suite += ' Aucun de vos critères ne peut être assoupli pour trouver ' +
+      (_surRestos() ? 'une table' : 'un hôtel') + ' ici.';
   }
   clearTimeout(_avisTimer);
-  _peindreAvis('Aucun hôtel ne correspond à tous vos critères', suite, reprise);
+  _peindreAvis(_surRestos() ? 'Aucune table ne correspond à tous vos critères'
+                            : 'Aucun hôtel ne correspond à tous vos critères', suite, reprise);
 }
 
 // Message affiché quand un critère vient d'écarter l'hôtel ouvert. Il nomme l'hôtel et
@@ -696,30 +713,33 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // devant une Chine entièrement grise.
   const elargir = dansZone === 0 && dansLarge > 0 ? large : null;
 
+  // « Aucune table » sur l'onglet Restaurants : on ne cherche pas un hôtel.
+  const rien = _surRestos() ? 'Aucune table' : 'Aucun hôtel';
   if (dansZone > 0) {
-    suite = '<strong>' + dansZone + ' hôtel' + (dansZone > 1 ? 's' : '') + '</strong>' +
+    suite = '<strong>' + dansZone + ' ' + _motCompte(dansZone) + '</strong>' +
       (zone ? ' ' + esc(zone) : '') + ' y répond' + (dansZone > 1 ? 'ent' : '') + '.';
   } else if (elargir) {
     const nomLarge = _libelleZone(large);
-    suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères. ' +
+    suite = rien + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères. ' +
       'La carte s\'élargit ' + esc(WD_VERS_CONTINENT[nomLarge] || 'à ' + nomLarge) +
-      ', où <strong>' + dansLarge + ' hôtel' + (dansLarge > 1 ? 's' : '') + '</strong> ' +
+      ', où <strong>' + dansLarge + ' ' + _motCompte(dansLarge) + '</strong> ' +
       (dansLarge > 1 ? 'répondent' : 'répond') + ' à vos critères.';
   } else {
     // Plus rien nulle part : ce message n'est plus une notification, c'est le rattrapage.
     // Il en reprend donc la phrase et les boutons, et le bloc vert ne prend pas le relais
     // derrière lui — les deux se succédaient à l'écran en disant la même chose.
     reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
-    suite = 'Aucun hôtel' + (zone ? ' ' + esc(zone) : '') +
+    suite = rien + (zone ? ' ' + esc(zone) : '') +
       (large ? ' ni ' + esc(_enZone(large)) : '') + ' ne réunit ces critères.';
     if (reprise) {
       const pluriel = reprise.count > 1;
       suite += ' En retirant <strong>« ' + esc(reprise.label) + ' »</strong>, <strong>' +
-        reprise.count + ' hôtel' + (pluriel ? 's' : '') + '</strong> correspondrai' +
+        reprise.count + ' ' + _motCompte(reprise.count) + '</strong> correspondrai' +
         (pluriel ? 'ent' : 't') +
         (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
     } else {
-      suite += ' Aucun de vos critères ne peut être assoupli pour trouver un hôtel ici.';
+      suite += ' Aucun de vos critères ne peut être assoupli pour trouver ' +
+        (_surRestos() ? 'une table' : 'un hôtel') + ' ici.';
     }
   }
 
@@ -740,7 +760,12 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // Le rattrapage n'apparaît que dans le cas sans issue : ailleurs, la carte a de quoi
   // montrer et le message n'a qu'à informer.
   const porteLeRattrapage = dansZone === 0 && !elargir;
-  _peindreAvis(esc(hotel.name) + ' ' + quoi, suite, porteLeRattrapage ? reprise : null);
+  const titre = _surRestos()
+    // On ne dit pas « l'hôtel ne répond pas au critère » : ce sont ses tables qui ne
+    // répondent pas, et le critère coché est une cuisine ou un cadre, pas un service.
+    ? 'Aucune table du ' + esc(hotel.name) + ' ne répond à vos critères'
+    : esc(hotel.name) + ' ' + quoi;
+  _peindreAvis(titre, suite, porteLeRattrapage ? reprise : null);
   clearTimeout(_avisTimer);
   // Un message qui informe s'efface après lecture. Un message qui porte les boutons de
   // rattrapage reste : le faire disparaître seul emporterait la seule sortie offerte.
@@ -887,16 +912,24 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // les nouveaux critères.
   if (ouvert) {
     const encoreLa = PULLMAN_HOTELS_MAP.find(h => h.name === ouvert.name);
-    const manquants = (hasCriteria && encoreLa)
+    // Conformité jugée comme pour les pins : par les tables sur l'onglet Restaurants,
+    // par les services ailleurs. Les mélanger faisait remplacer par un message la card
+    // d'un hôtel qui avait pourtant les tables demandées — ses services, eux, ne
+    // satisfaisaient évidemment aucun critère de cuisine.
+    const surRestos = _surRestos();
+    const manquants = (hasCriteria && encoreLa && !surRestos)
       ? _criteresManquants(encoreLa, criteriaSet)
       : [];
-    const critereOk = !hasCriteria || (encoreLa && manquants.length === 0);
+    const ecarte = hasCriteria && encoreLa && (surRestos
+      ? _lieuxDe(encoreLa.name).length === 0
+      : manquants.length > 0);
+    const critereOk = !hasCriteria || (encoreLa && !ecarte);
     // Appartenance jugée sur la zone géographique, comme la liste — le continent seul
     // laissait passer un hôtel chinois alors que l'utilisateur avait choisi le Japon.
     const zoneOk = !encoreLa || _dansLaZone(encoreLa, _currentScope);
     if (encoreLa && critereOk && zoneOk) {
       _ouvrirDetail(encoreLa, criteriaSet, true);
-    } else if (encoreLa && manquants.length && zoneOk && !refit) {
+    } else if (encoreLa && ecarte && zoneOk && !refit) {
       // L'hôtel vient d'être écarté par un critère : on le dit avant de partir. Sans
       // message, la card disparaissait sans raison visible et la carte restait zoomée
       // sur un hôtel qui ne correspondait plus.
