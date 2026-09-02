@@ -35,6 +35,7 @@ let _vueAvantDetail = null;
 // désaccordait les deux vues : la carte écartait des hôtels que la liste affichait.
 function _dansLaZone(hotel, scope) {
   const s = scope || {};
+  if (s.hotel) return hotel.name === s.hotel;
   if (s.city) return hotel.city === s.city;
   if (s.country) return hotel.country === s.country;
   if (s.continent) return hotel.continent === s.continent;
@@ -43,7 +44,7 @@ function _dansLaZone(hotel, scope) {
 // Une zone est-elle définie ? Sert à savoir s'il faut mettre en avant et recadrer.
 function _zoneDefinie(scope) {
   const s = scope || {};
-  return !!(s.city || s.country || s.continent);
+  return !!(s.hotel || s.city || s.country || s.continent);
 }
 let _currentCriteria = null;
 
@@ -528,6 +529,9 @@ function _fermerDetail(revenir) {
   _detailHotel = null;
   clearTimeout(_avisTimer);
   _markers.forEach(m => m._icon && m._icon.classList.remove('pullman-map-marker--selected'));
+  // Refermer rend la ville : le champ ne doit pas rester sur un hôtel qu'on ne regarde
+  // plus. Seulement à la fermeture voulue — un recalcul des pins n'est pas un abandon.
+  if (revenir && typeof window.WD_OUBLIER_HOTEL === 'function') window.WD_OUBLIER_HOTEL();
   if (revenir && etaitOuvert) {
     // On rend la vue telle qu'elle était avant l'ouverture : la ville si l'on s'y était
     // approché, le continent si l'on venait de là. Y revenir toujours par le continent
@@ -707,7 +711,9 @@ function _peindreAvis(titreHTML, suiteHTML, reprise) {
 // qui s'affichait en surimpression au centre de la carte.
 function _avisRattrapage(criteriaSet) {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const geo = { continent: _currentScope.continent, country: _currentScope.country };
+  // On compte dans la zone géographique, jamais dans « l'hôtel ouvert » : celui-ci la
+  // réduirait à un établissement et tout compte y vaudrait zéro ou un.
+  const geo = { continent: _currentScope.continent, country: _currentScope.country, city: _currentScope.city };
   const zone = _enZone(geo);
   const reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
   const quoi = _surRestos() ? 'Aucune table' : 'Aucun hôtel';
@@ -857,6 +863,9 @@ function _ouvrirDetail(hotel, criteriaSet, sansVol) {
   _bookingMap.invalidateSize({ animate: false });
   // On retient d'où l'on vient, pour y revenir à la fermeture.
   _vueAvantDetail = { centre: _bookingMap.getCenter(), zoom: _bookingMap.getZoom() };
+  // L'hôtel s'inscrit dans le champ de recherche. La liste, en se redessinant, repassera
+  // la zone à la carte : son pin restera en avant et ses voisins s'estomperont.
+  if (typeof window.WD_CHOISIR_HOTEL === 'function') window.WD_CHOISIR_HOTEL(hotel.name);
   const ll = L.latLng(hotel.lat, hotel.lng);
   // Jamais en deçà du zoom courant : venant d'une ville où l'on distinguait ses deux
   // hôtels, revenir au zoom 6 les recollait l'un sur l'autre et on ne savait plus lequel
@@ -1084,7 +1093,7 @@ function _choisirVille(hotel) {
 window.WD_SYNC_ZONE = (zone) => {
   if (!_bookingMap || !zone) return;
   const a = _currentScope || {}, b = zone;
-  if (a.continent === b.continent && a.country === b.country && a.city === b.city) return;
+  if (a.continent === b.continent && a.country === b.country && a.city === b.city && a.hotel === b.hotel) return;
   _currentScope = b;
   _renderMarkers(_currentContinent, _currentCriteria, false);
 };

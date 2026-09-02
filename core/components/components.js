@@ -1251,7 +1251,10 @@
         country: searchState.expandedCountry || null,
         // La ville revient dans la zone, mais cette fois la liste la connaît aussi : c'est
         // ce qui manquait la première fois, et faisait diverger les deux vues.
-        city: searchState.city || null
+        city: searchState.city || null,
+        // L'hôtel ouvert restreint la zone : son pin reste en avant, ses voisins
+        // s'estompent. C'est ce qui permet de voir lequel on regarde.
+        hotel: searchState.selectedHotel || null
       });
 
       const searchState = {
@@ -1582,9 +1585,11 @@
       const getResultsPool = () => {
         const allHotels = REGION_HOTELS.flatMap(r => r.hotels);
         if (searchState.selectedHotel) {
-          const country = searchState.expandedCountry || '';
+          // L'hôtel choisi est le périmètre : c'est lui qu'on regarde. Renvoyer tout son
+          // pays donnait un compteur qui contredisait la chip.
           const region = getRegion();
-          return { pool: region ? region.hotels.filter(h => h.country === country) : [], label: country };
+          const base = region ? region.hotels : allHotels;
+          return { pool: base.filter(h => h.name === searchState.selectedHotel), label: searchState.selectedHotel };
         } else if (searchState.city) {
           // La ville est un périmètre à part entière depuis qu'on peut la choisir sur la
           // carte. Elle passe avant le pays : c'est le choix le plus précis.
@@ -1786,6 +1791,7 @@
         const tous = searchState.selectedResto
           ? (window.WD_RESTAURANTS || []).filter(v => v.nom === searchState.selectedResto)
           : (window.WD_RESTAURANTS || []);
+        if (searchState.selectedHotel) return tous.filter(v => v.hotel === searchState.selectedHotel);
         if (searchState.city) return tous.filter(v => v.ville === searchState.city);
         if (searchState.expandedCountry) return tous.filter(v => v.pays === searchState.expandedCountry);
         if (searchState.continent) return tous.filter(v => v.region === searchState.continent);
@@ -2588,6 +2594,22 @@
         // Cliquer une ville sur la carte la porte dans le champ de recherche. On ne
         // recadre pas au passage : l'utilisateur vient d'y arriver, déplacer la vue sous
         // ses yeux serait lui reprendre ce qu'il a demandé.
+        // Ouvrir la card d'un hôtel l'inscrit dans le champ ; la refermer rend la ville.
+        window.WD_CHOISIR_HOTEL = (nom) => {
+          if (searchState.selectedHotel === nom) return zoneCarte();
+          searchState.selectedHotel = nom;
+          renderPanel();
+          if (renderMapPanel) renderMapPanel();
+          return zoneCarte();
+        };
+        window.WD_OUBLIER_HOTEL = () => {
+          if (!searchState.selectedHotel) return zoneCarte();
+          searchState.selectedHotel = null;
+          renderPanel();
+          if (renderMapPanel) renderMapPanel();
+          return zoneCarte();
+        };
+
         window.WD_CHOISIR_VILLE = (ville, pays, continent) => {
           searchState.city = ville;
           if (continent && !searchState.continent) searchState.continent = continent;
