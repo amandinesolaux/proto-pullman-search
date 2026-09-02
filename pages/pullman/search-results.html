@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=372"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=373"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,11 +13,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=372"></script>
-  <script src="../../core/data/reunions.js?v=372"></script>
-  <script src="../../core/components/components.js?v=372"></script>
+  <script src="../../core/data/restaurants.js?v=373"></script>
+  <script src="../../core/data/reunions.js?v=373"></script>
+  <script src="../../core/components/components.js?v=373"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=372"></script>
+  <script src="../../core/components/booking-map.js?v=373"></script>
 </head>
 <body class="brand-pullman">
 
@@ -335,9 +335,11 @@ wd-booking { margin-top: 20px; }
       if (!items.length) { vide(); return; }
       listEl.innerHTML = items.map(r => {
         const h = parNom.get(r.hotel) || {};
-        // Les visuels des espaces d'abord ; ceux de l'hôtel complètent.
-        const duLieu = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [];
-        const cles = (r.imgs || []).concat(duLieu.filter(k => (r.imgs || []).indexOf(k) < 0)).slice(0, 4);
+        // Les visuels des espaces seulement. On ne complète pas avec ceux de l'hôtel :
+        // une chambre en deuxième vignette d'une card de réunion dit autre chose que ce
+        // qu'on est venu voir. Repli sur l'hôtel pour les deux qui n'en publient pas.
+        const cles = (r.imgs && r.imgs.length ? r.imgs
+          : (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [])).slice(0, 4);
         const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
         // Les trois plus grandes salles : c'est ce qui décide d'un lieu de réunion.
         const top = (r.salles || []).slice().sort((a3, b3) => (b3[1] || 0) - (a3[1] || 0)).slice(0, 3);

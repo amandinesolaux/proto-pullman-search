@@ -413,15 +413,14 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   if (surReunions) {
     const r = _reunionDe(h.name);
     if (r) {
-      const cles = (r.imgs || []).filter(Boolean);
+      // Uniquement les visuels des espaces, sans compléter avec ceux de l'hôtel : sur une
+      // card de réunion, une chambre ou un lobby en deuxième vignette dit autre chose que
+      // ce qu'on est venu voir. Les deux hôtels qui n'en publient pas gardent le visuel de
+      // l'hôtel, faute de mieux.
+      const cles = (r.imgs || []).filter(Boolean).slice(0, 4);
       if (cles.length) {
-        const melange = cles.concat(photos.length ? [] : []).slice(0, 4);
         photos.length = 0;
-        melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
-        // On complète avec les visuels de l'hôtel si les espaces n'en ont pas quatre.
-        (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : []).forEach(k => {
-          if (photos.length < 4 && melange.indexOf(k) < 0) photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
-        });
+        cles.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
       }
       // Les salles sont triées par surface : la plus grande dit le mieux ce que le lieu
       // permet. À égalité, on garde l'ordre publié par Pullman.
