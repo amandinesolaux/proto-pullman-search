@@ -156,9 +156,15 @@ function _addStyle() {
     // Le nom prend la place libre et la qualification cède la première : l'inverse
     // tronquait « LE VERTIGO ROOFTOP BAR » en « LE VERTIGO ROO… » pour laisser voir
     // « Bar · Rooftop & vue · Bor… », deux moitiés illisibles au lieu d'un nom entier.
+    // `.leaflet-container a` de Leaflet vaut (0,1,1) et l'emportait sur ma classe seule :
+    // les noms de tables s'affichaient dans le bleu de lien par défaut. On double le
+    // sélecteur — dans le conteneur Leaflet et hors de lui, la page de résultats n'en
+    // ayant pas autour de ses cards. Troisième fois que cette feuille nous prend de
+    // vitesse : avant elle, la croix de fermeture et les liens de l'encart.
+    '.leaflet-container a.pullman-popup__table-nom,a.pullman-popup__table-nom,' +
     '.pullman-popup__table-nom{font-family:var(--font-sans,sans-serif);font-size:12.5px;font-weight:600;' +
       'color:#445047;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    'a.pullman-popup__table-nom:hover{text-decoration:underline}' +
+    '.leaflet-container a.pullman-popup__table-nom:hover,a.pullman-popup__table-nom:hover{text-decoration:underline;color:#28332B}' +
     // Une seule ligne, comme le nom : « Restaurant · Végétarienne & healthy · Bord de
     // piscine » passait sur deux et faisait déborder la card de 23 px.
     '.pullman-popup__table-type{font-family:var(--font-sans,sans-serif);font-size:11px;' +
