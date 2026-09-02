@@ -57,7 +57,7 @@ function _makeLargeIcon(cityName, greyed, nombre) {
     className: 'pullman-map-marker pullman-map-marker--labeled' + (greyed ? ' pullman-map-marker--greyed' : ''),
     html: '<div class="pullman-dot pullman-dot--large' + (greyed ? ' pullman-dot--greyed' : '') + '"></div>' +
           '<span class="pullman-label">' + cityName +
-          (nombre > 1 ? '<span class="pullman-label__compte">' + nombre + '</span>' : '') + '</span>',
+          (nombre > 1 ? '<span class="pullman-label__compte">· ' + nombre + '</span>' : '') + '</span>',
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   });
@@ -119,10 +119,9 @@ function _addStyle() {
     '.pullman-map-marker:hover .pullman-label--masquee{opacity:1}' +
     // Le pin survolé passe devant, sinon son nom réapparaît sous ceux des voisins.
     '.pullman-map-marker:hover{z-index:10000 !important}' +
-    '.pullman-label__compte{display:inline-flex;align-items:center;justify-content:center;' +
-      'min-width:14px;height:14px;margin-left:5px;padding:0 3px;border-radius:100px;' +
-      'background:rgba(255,255,255,.92);color:#28332B;font-size:9px;font-weight:700;vertical-align:middle}' +
-    '.pullman-map-marker--greyed .pullman-label__compte{background:rgba(255,255,255,.35);color:#28332B}' +
+    // Le compte se lit dans le nom, sans pastille : une puce blanche sur la carte pesait
+    // plus lourd que la ville qu'elle qualifie.
+    '.pullman-label__compte{margin-left:4px;font-weight:400;opacity:.65}' +
     // Pin sélectionné : sans bulle au-dessus de lui, il lui faut sa propre marque
     '.pullman-map-marker--selected .pullman-dot{width:16px;height:16px;background:#fff;border-color:#5FEF91;box-shadow:0 0 0 4px rgba(95,239,145,.35),0 2px 8px rgba(0,0,0,.5)}' +
     // ── Panneau de détail, ancré à gauche de la carte ──────────────────────────
@@ -943,6 +942,14 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     groupes.get(cle).push(hotel);
   });
 
+  // Combien d'hôtels par ville : sert à nommer les pins une fois séparés. « Singapour »
+  // deux fois ne distingue rien ; « Singapore Hill Street » et « Singapore Orchard », si.
+  const parVille = new Map();
+  PULLMAN_HOTELS_MAP.forEach(h => {
+    const k = h.country + '|' + h.city;
+    parVille.set(k, (parVille.get(k) || 0) + 1);
+  });
+
   groupes.forEach(lot => {
     const tete = lot[0];
     const inContinent = _dansLaZone(tete, _currentScope);
@@ -952,8 +959,12 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     const greyed = hasCriteria && !matchesCriteria;
     const lat = lot.reduce((n, h) => n + h.lat, 0) / lot.length;
     const lng = lot.reduce((n, h) => n + h.lng, 0) / lot.length;
+    // Groupé : le nom de la ville. Séparé dans une ville qui en compte plusieurs : le nom
+    // de l'hôtel, sans le « Pullman » que porte déjà chaque pin de cette carte.
+    const plusieurs = (parVille.get(tete.country + '|' + tete.city) || 1) > 1;
+    const libelle = (!grouper && plusieurs) ? tete.name.replace(/^Pullman\s+/, '') : tete.city;
     const icon = isFiltered && inContinent
-      ? _makeLargeIcon(tete.city, greyed, lot.length > 1 ? lot.length : 0)
+      ? _makeLargeIcon(libelle, greyed, lot.length > 1 ? lot.length : 0)
       : _makeSmallIcon(greyed);
 
     const marker = L.marker([lat, lng], {
@@ -969,8 +980,13 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
     // Une ville à plusieurs hôtels n'ouvre rien : elle s'approche, et les pins se
     // séparent d'eux-mêmes.
     marker.on('click', () => {
-      if (lot.length > 1) _bookingMap.flyTo([lat, lng], WD_ZOOM_VILLES, { duration: 0.8 });
-      else _ouvrirDetail(tete, criteriaSet);
+      if (lot.length > 1) {
+        // On cadre sur les hôtels eux-mêmes, et non à un zoom fixe : les deux Pullman de
+        // Singapour sont à 9 km, qui ne font que quelques pixels au zoom 6 — on croyait
+        // que les pins ne s'étaient pas séparés alors qu'ils se touchaient.
+        _bookingMap.flyToBounds(L.latLngBounds(lot.map(x => [x.lat, x.lng])),
+          { padding: [80, 80], maxZoom: 13, duration: 0.9 });
+      } else _ouvrirDetail(tete, criteriaSet);
     });
 
     _markers.push(marker);
