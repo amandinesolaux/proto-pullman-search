@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=383"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=384"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,11 +17,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/data/restaurants.js?v=383"></script>
-  <script src="../../core/data/reunions.js?v=383"></script>
-  <script src="../../core/components/components.js?v=383"></script>
+  <script src="../../core/data/restaurants.js?v=384"></script>
+  <script src="../../core/data/reunions.js?v=384"></script>
+  <script src="../../core/components/components.js?v=384"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=383"></script>
+  <script src="../../core/components/booking-map.js?v=384"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
@@ -441,6 +441,16 @@ body.brand-pullman .wd-booking__dd-results-bar--hint { background: none; padding
 /* Sous ~820px le CTA viendrait chevaucher la dernière carte : on le remonte au-dessus de la rangée */
 @media (max-width: 820px) {
   .wd-booking__wizard-cta { top: 14px; transform: none; }
+}
+
+/* Sur mobile, ce CTA était calé en absolu sur la rangée de cartes du desktop : il
+   flottait au-dessus du panneau, sans rapport avec ce qu'on lisait. Il reprend sa place
+   dans le fil, sous les destinations, et occupe la largeur comme les autres actions. */
+@media (max-width: 767px) {
+  .wd-booking__wizard-cta { position: relative; transform: none; right: auto; top: auto;
+    display: flex; width: 100%; justify-content: center; margin: 16px 0 4px;
+    min-height: 48px; }
+  wd-booking[data-disclosure="full"] .wd-booking__wizard-cta { display: flex; }
 }
 /* Vue complète (continent choisi) : le CTA wizard se retire — re-cliquer le continent le fait revenir */
 wd-booking[data-disclosure="full"] .wd-booking__wizard-cta { display: none; }

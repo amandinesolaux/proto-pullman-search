@@ -1203,7 +1203,7 @@ wd-footer { display: block; }
    affine. Les cibles tactiles ne descendent pas sous 44 px. */
 @media (max-width: 767px) {
   /* La cause du débordement, et elle seule. */
-  .wd-booking__fields { min-width: 0; flex-direction: column; align-items: stretch; gap: 6px; padding: 10px; }
+  .wd-booking__fields { min-width: 0; flex-direction: column; align-items: stretch; gap: 14px; padding: 10px; }
   /* Les 48 px de marge latérale du desktop retiraient 96 px sur 375 : le panneau n'en
      gardait que 279, et la carte 168. */
   .wd-booking { padding: 0; max-width: none; }
