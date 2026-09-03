@@ -822,6 +822,12 @@
     ]},
   ];
 
+  // Ordre d'affichage des continents. Le jeu est rangé par volume d'hôtels, ce qui
+  // n'aide pas à retrouver le sien : on cherche un nom, pas un classement. « Tous les
+  // continents » ouvre la rangée, le reste suit l'alphabet — localeCompare en français
+  // pour que les accents ne renvoient pas l'Amérique après l'Océanie.
+  const CONTINENTS_AFFICHES = [...REGION_HOTELS].sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+
   // Position réelle de l'hôtel quand on la connaît.
   const HOTEL_COORDS = {
     "Pullman Paris Montparnasse": [48.841, 2.322],
@@ -1461,7 +1467,7 @@
             '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
             '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
           '</button>';
-        continentsEl.innerHTML = allCard + REGION_HOTELS.map(r => {
+        continentsEl.innerHTML = allCard + CONTINENTS_AFFICHES.map(r => {
           const active = r.id === searchState.continent;
           return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button" role="tab" aria-selected="' + active + '">' +
             '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
@@ -2684,7 +2690,7 @@
               '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
               '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
             '</button>';
-          mapViewContinents.innerHTML = allCard + REGION_HOTELS.map(r => {
+          mapViewContinents.innerHTML = allCard + CONTINENTS_AFFICHES.map(r => {
             const active = r.id === searchState.continent;
             return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button">' +
               '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
