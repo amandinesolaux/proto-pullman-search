@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=422"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=423"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,11 +13,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=422"></script>
-  <script src="../../core/data/reunions.js?v=422"></script>
-  <script src="../../core/components/components.js?v=422"></script>
+  <script src="../../core/data/restaurants.js?v=423"></script>
+  <script src="../../core/data/reunions.js?v=423"></script>
+  <script src="../../core/components/components.js?v=423"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=422"></script>
+  <script src="../../core/components/booking-map.js?v=423"></script>
 </head>
 <body class="brand-pullman">
 
@@ -170,6 +170,12 @@ wd-booking { margin-top: 20px; }
 .srx-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .srx-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .srx-card-name { font-family: var(--font-sans); font-weight: 700; font-size: 16.5px; color: #445047; margin: 0 0 3px; }
+/* Le nom mène à la fiche, comme « Voir l'hôtel ». Il n'en prend pas la couleur pour
+   autant : un titre bleu dans une card blanche crierait plus fort que le prix. Il
+   garde son encre et ne se signale qu'au survol. */
+.srx-card-name a { color: inherit; text-decoration: none; }
+.srx-card-name a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.srx-card-name a:focus-visible { outline: 2px solid var(--pul-bg, #445047); outline-offset: 2px; }
 .srx-card-loc { font-family: var(--font-sans); font-size: 13px; color: rgba(68,80,71,.78); margin: 0 0 10px; }
 .srx-card-rating { flex-shrink: 0; text-align: right; font-family: var(--font-sans); }
 .srx-card-rating b { display: inline-block; background: var(--pul-bg, #445047); color: #fff; font-size: 13px; font-weight: 700; padding: 5px 8px; }
@@ -385,7 +391,9 @@ wd-booking { margin-top: 20px; }
           '</div>' +
           '<div class="srx-card-body">' +
             '<div class="srx-card-top"><div>' +
-              '<h2 class="srx-card-name">' + esc(r.hotel) + '</h2>' +
+              '<h2 class="srx-card-name">' + (h.href
+                ? '<a href="' + esc(h.href) + '" target="_blank" rel="noopener">' + esc(r.hotel) + '</a>'
+                : esc(r.hotel)) + '</h2>' +
               '<p class="srx-card-loc">' + esc(r.ville) + ' · ' + esc(r.pays) + '</p>' +
             '</div></div>' +
             '<div class="srx-badges">' + badges.map(b => '<span class="srx-badge">' + esc(b) + '</span>').join('') + '</div>' +
@@ -802,7 +810,9 @@ wd-booking { margin-top: 20px; }
           '</div>' +
           '<div class="srx-card-body">' +
             '<div class="srx-card-top"><div>' +
-              '<h3 class="srx-card-name">' + esc(h.name) + '</h3>' +
+              '<h3 class="srx-card-name">' + (h.href
+                ? '<a href="' + esc(h.href) + '" target="_blank" rel="noopener">' + esc(h.name) + '</a>'
+                : esc(h.name)) + '</h3>' +
               '<p class="srx-card-loc">' + esc(h.loc) + '</p>' +
             '</div>' +
             '<div class="srx-card-rating"><b>' + h.rating + '</b><span>' + h.reviews + ' avis</span></div></div>' +

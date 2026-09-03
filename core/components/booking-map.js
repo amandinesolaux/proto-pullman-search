@@ -289,6 +289,11 @@ function _addStyle() {
     '.pullman-popup__badge{position:absolute;top:8px;left:8px;padding:3px 8px;background:rgba(0,0,0,.62);font-family:var(--font-sans,sans-serif);font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#fff}' +
     '.pullman-popup__body{padding:11px 14px 12px;display:flex;flex-direction:column;gap:5px}' +
     '.pullman-popup__name{font-family:var(--font-sans,sans-serif);font-size:13px;font-weight:700;color:#445047;margin:0;line-height:1.3}' +
+    // Le nom mène à la fiche. Deux classes dans le sélecteur, pas une : dans le
+    // conteneur Leaflet, `.leaflet-container a` impose son bleu à (0,1,1) et une
+    // classe seule ne suffit jamais — le piège s'est déjà refermé trois fois ici.
+    '.pullman-popup__body .pullman-popup__name a{color:#445047;text-decoration:none}' +
+    '.pullman-popup__body .pullman-popup__name a:hover{color:#445047;text-decoration:underline;text-underline-offset:3px}' +
     // Opacité .78 et non .62 : sur blanc, .62 tombait à 3,16:1, sous le seuil AA de
     // 4,5:1 pour ce corps de 11px. À .78 on est à 4,7:1.
     '.pullman-popup__location{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78);margin:0;display:flex;align-items:center;gap:5px;min-width:0}' +
@@ -521,7 +526,9 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       (h.badge ? '<span class="pullman-popup__badge">' + esc(h.badge) + '</span>' : '') +
     '</div>' +
     '<div class="pullman-popup__body">' +
-      '<h3 class="pullman-popup__name">' + esc(h.name) + '</h3>' +
+      '<h3 class="pullman-popup__name">' + (h.href
+        ? '<a href="' + esc(h.href) + '" target="_blank" rel="noopener">' + esc(h.name) + '</a>'
+        : esc(h.name)) + '</h3>' +
       // Lieu et note sur une seule ligne : même registre (identité de l'hôtel), et
       // l'encart gagne une rangée sur une carte où la place est comptée.
       '<p class="pullman-popup__location">' + pin +
