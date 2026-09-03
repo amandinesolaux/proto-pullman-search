@@ -1,3 +1,6 @@
 # macOS
 .DS_Store
 **/.DS_Store
+
+# fichiers temporaires de capture (scripts de rendu headless)
+pages/**/.shot-*.html

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=407"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=408"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,11 +17,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/data/restaurants.js?v=407"></script>
-  <script src="../../core/data/reunions.js?v=407"></script>
-  <script src="../../core/components/components.js?v=407"></script>
+  <script src="../../core/data/restaurants.js?v=408"></script>
+  <script src="../../core/data/reunions.js?v=408"></script>
+  <script src="../../core/components/components.js?v=408"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=407"></script>
+  <script src="../../core/components/booking-map.js?v=408"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
@@ -427,6 +427,19 @@ body.brand-pullman .wd-booking__dest-chip { max-width: none; flex-shrink: 0; }
 /* La barre de recherche reste sur UNE ligne : l'input se comprime au lieu de passer à la ligne */
 body.brand-pullman .wd-booking__dest-input-row { flex-wrap: nowrap; overflow: hidden; }
 body.brand-pullman .wd-booking__dest-input { min-width: 30px; }
+
+/* Sur mobile, l'inverse. La barre desktop tient sur une ligne parce qu'elle en a la
+   largeur ; à 390 px, une seule puce « Pullman Cannes Mandelieu » la remplit, et la
+   deuxième était coupée par l'overflow — on ne pouvait plus ni la lire ni la retirer.
+   Le champ est empilé ici, donc il peut grandir : les puces passent à la ligne, et
+   celle qui dépasserait encore se tronque au lieu de sortir du cadre. */
+@media (max-width: 767px) {
+  body.brand-pullman .wd-booking__dest-input-row { flex-wrap: wrap; overflow: visible; }
+  body.brand-pullman .wd-booking__dest-chip { max-width: 100%; flex-shrink: 1; }
+  /* Le champ de saisie garde de quoi taper, et prend sa propre ligne quand il n'y
+     tient plus : une zone de frappe de 30 px coincée après deux puces est inutilisable. */
+  body.brand-pullman .wd-booking__dest-input { min-width: 9rem; flex: 1 1 9rem; }
+}
 
 /* État intermédiaire : le titre « Reprendre votre recherche » s'aligne sur la gouttière (comme DESTINATION) */
 wd-booking[data-disclosure="intermediate"] .wd-booking__dd-dest-subtitle { padding-left: 0; }
