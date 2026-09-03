@@ -1078,6 +1078,7 @@
     render() {
       const btn = this.attr("cta", "Rechercher");
       return `<div class="wd-booking">
+        <button class="wd-booking__plein-fermer" type="button" data-ferme-plein-ecran aria-label="Fermer la recherche"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         <div class="wd-booking__tabs">
           <button class="wd-booking__tab wd-booking__tab--active" data-tab="hotels">Hôtels<span class="wd-booking__tab-line"></span></button>
           <button class="wd-booking__tab" data-tab="restaurants">Restaurants<span class="wd-booking__tab-line"></span></button>
@@ -2310,6 +2311,7 @@
       this.addEventListener('click', (e) => {
         if (e.target.closest('[data-ouvre-filtres]')) { e.preventDefault(); feuilleFiltres(true); majFiltres(); return; }
         if (e.target.closest('[data-ferme-filtres]')) { e.preventDefault(); feuilleFiltres(false); return; }
+        if (e.target.closest('[data-ferme-plein-ecran]')) { e.preventDefault(); close(); return; }
         if (e.target.closest('[data-filtres-effacer]')) {
           e.preventDefault();
           getActiveCriteria().clear();

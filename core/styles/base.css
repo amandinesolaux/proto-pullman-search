@@ -1191,7 +1191,8 @@ wd-footer { display: block; }
 /* Le bouton de filtres et le pied de la feuille n'existent que sur mobile : au-dessus,
    les critères sont une colonne toujours visible, qui n'a besoin ni d'être ouverte ni
    d'être appliquée. */
-.wd-booking__filtres-btn, .wd-booking__filtres-pied, .wd-booking__filtres-fermer { display: none; }
+.wd-booking__filtres-btn, .wd-booking__filtres-pied, .wd-booking__filtres-fermer,
+.wd-booking__plein-fermer { display: none; }
 
 /* ══ Mobile ═══════════════════════════════════════════════════════════════════════
    Le prototype était pensé pour le desktop : la rangée de champs imposait une largeur
@@ -1245,6 +1246,36 @@ wd-footer { display: block; }
     bottom: 12px; z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
   wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
 
+  /* ── Le plein écran ne sert qu'au premier champ ────────────────────────────────
+     Ouvrir « Que recherchez-vous ? » ouvre une fenêtre dédiée à cette question. Les
+     dates et le nombre de voyageurs y restaient affichés sans qu'on puisse y répondre
+     depuis là : 150 px de barre au-dessus d'une liste de destinations qui n'en gardait
+     plus que 500 sur un iPhone, clavier ouvert. Ils reviennent dès qu'on referme, et
+     restent accessibles depuis la barre repliée, où on les touche directement. */
+  /* La colonne des destinations gardait le plafond du desktop : 240 px de liste qui
+     défile à l'intérieur d'un panneau qui défile déjà. Deux zones de défilement
+     imbriquées, sur un écran tactile, se disputent le même geste. Une seule reste. */
+  .wd-booking__dd-dest-col { max-height: none; min-height: 0; overflow-y: visible; }
+  /* Le compteur se collait au bas de cette colonne. Elle ne défile plus, alors il se
+     collait au panneau : il flottait par-dessus la liste, son dégradé effaçait la ligne
+     du dessous et ses 28 px de retrait ouvraient un trou au milieu du défilement. Il
+     redescend dans le fil, à la fin de la liste qu'il compte. */
+  .wd-booking__dd-results-bar { position: static; background: none; padding: 14px 12px 2px; }
+  wd-booking[data-plein-ecran] .wd-booking__field--dates,
+  wd-booking[data-plein-ecran] .wd-booking__field--guests,
+  wd-booking[data-plein-ecran] .wd-booking__special-rates { display: none; }
+  /* Une fenêtre qui prend l'écran doit dire comment on en sort. */
+  wd-booking[data-plein-ecran] .wd-booking__plein-fermer { display: inline-flex;
+    align-items: center; justify-content: center; position: absolute;
+    top: 8px; right: 8px; z-index: 3; width: 44px; height: 44px; padding: 0;
+    border: none; border-radius: 100px; color: #fff; cursor: pointer;
+    /* Un fond plein, parce que la croix se pose sur la rangée d'onglets qui défile :
+       transparente, elle se lisait par-dessus « Célébrations ». */
+    background: #1a2220; box-shadow: 0 0 12px 6px #1a2220; }
+  wd-booking[data-plein-ecran] .wd-booking__plein-fermer:hover { background: #232e2a; box-shadow: 0 0 12px 6px #232e2a; }
+  /* Le dernier onglet doit pouvoir défiler jusque sous la croix sans passer dessous. */
+  wd-booking[data-plein-ecran] .wd-booking__tabs { padding-right: 56px; }
+
   /* Destinations et critères ne cohabitent pas à 375 px : ils s'empilent. */
   .wd-booking__dd-two-cols { display: flex; flex-direction: column; gap: 20px; }
   .wd-booking__dd-criteria-col { border-left: none; border-right: none; padding-left: 0;
@@ -1266,9 +1297,6 @@ wd-footer { display: block; }
      le dit mieux qu'eux. Il reste le champ de destination, les filtres posés sur la
      carte, et la carte prend les trois quarts de l'écran. */
   .wd-booking__dd-mapview-wrap { width: auto; height: 74vh; height: 74svh; min-height: 320px; }
-  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__field--dates,
-  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__field--guests,
-  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__special-rates,
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview .wd-booking__dd-col-title,
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-mapview-continents,
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__wizard-cta { display: none; }
