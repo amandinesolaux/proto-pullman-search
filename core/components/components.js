@@ -108,9 +108,13 @@
       { name: 'Tokyo', country: 'Japon', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=225&fit=crop' }        // ruelle néon
     ],
     familyMembers: [
-      { firstName: 'Léo', age: 6 },
-      { firstName: 'Emma', age: 3 }
+      { firstName: 'Léo', age: 8 },
+      { firstName: 'Emma', age: 4 }
     ],
+    // Configuration de voyage habituelle, proposée en pré-remplissage dans le panneau
+    // voyageurs. Deux adultes et deux enfants : c'est ce qui distingue une recherche
+    // familiale d'une recherche d'affaires, et personne n'a envie de le ressaisir.
+    foyer: { adultes: 2, enfants: [4, 8], chambres: 1 },
     pastStays: [
       { hotel: 'Pullman Paris Montparnasse', location: 'Paris, France', date: '2025-03' },
       { hotel: 'Pullman Bali Legian Beach', location: 'Bali, Indonésie', date: '2024-08' }
@@ -1181,6 +1185,11 @@
         </div>
         <div class="wd-booking__guests" id="wd-guests-panel" data-state="closed" role="dialog" aria-label="Voyageurs et chambres">
           <div class="wd-booking__gp-body">
+            <div class="wd-booking__gp-perso" id="wd-gp-perso" hidden>
+              <span class="wd-booking__gp-perso-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-1a5 5 0 0 1 5-5h1a5 5 0 0 1 5 5v1"/><circle cx="9.5" cy="8" r="3"/><path d="M17 20v-1a4 4 0 0 0-2-3.4"/><circle cx="17" cy="9" r="2"/></svg></span>
+              <span class="wd-booking__gp-perso-text"><b id="wd-gp-perso-titre"></b><span id="wd-gp-perso-detail"></span></span>
+              <button type="button" class="wd-booking__gp-perso-btn" data-gp="foyer">Pré-remplir</button>
+            </div>
             <div class="wd-booking__gp-rooms" id="wd-gp-rooms"></div>
             <button type="button" class="wd-booking__gp-add" id="wd-gp-add">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -3112,7 +3121,48 @@
         return who + ', ' + plural(gpRooms.length, 'chambre');
       };
 
+      // ── Pré-remplissage du foyer ─────────────────────────────────────────────────
+      // Réservé au compte connecté : c'est une donnée personnelle, elle n'a rien à faire
+      // devant un visiteur anonyme. La proposition s'efface dès que la configuration
+      // affichée correspond déjà au foyer — sinon elle invite à refaire ce qui est fait.
+      const persoEl = this.querySelector('#wd-gp-perso');
+      const persoTitreEl = this.querySelector('#wd-gp-perso-titre');
+      const persoDetailEl = this.querySelector('#wd-gp-perso-detail');
+      const foyer = () => {
+        const connecte = !!(document.querySelector('wd-header') || {}).isLoggedIn;
+        const f = connecte && typeof WD_USER_PROFILE !== 'undefined' ? WD_USER_PROFILE.foyer : null;
+        return f && f.adultes ? f : null;
+      };
+      const foyerDejaPose = (f) => {
+        if (gpRooms.length !== (f.chambres || 1)) return false;
+        const t = gpTotals();
+        if (t.adults !== f.adultes || t.children !== f.enfants.length) return false;
+        const ages = gpRooms.flatMap(r => r.children).filter(a => a !== null).sort();
+        return String(ages) === String([...f.enfants].sort());
+      };
+      const majPerso = () => {
+        if (!persoEl) return;
+        const f = foyer();
+        if (!f || foyerDejaPose(f)) { persoEl.hidden = true; return; }
+        const enf = f.enfants.length;
+        const ages = f.enfants.length === 2
+          ? f.enfants[0] + ' et ' + f.enfants[1] + ' ans'
+          : f.enfants.join(', ') + ' ans';
+        persoTitreEl.textContent = 'Votre foyer';
+        persoDetailEl.textContent = plural(f.adultes, 'adulte')
+          + (enf ? ', ' + plural(enf, 'enfant') + ' (' + ages + ')' : '');
+        persoEl.hidden = false;
+      };
+      const appliquerFoyer = () => {
+        const f = foyer();
+        if (!f) return;
+        gpRooms = [{ adults: f.adultes, children: [...f.enfants] }];
+        renderGuests();
+        formatGuestsField();
+      };
+
       const renderGuests = () => {
+        majPerso();
         const multi = gpRooms.length > 1;
         gpRoomsEl.innerHTML = gpRooms.map((room, i) => {
           const counter = (kind, label, val, min, max) =>
@@ -3193,6 +3243,7 @@
           e.stopPropagation();
           const btn = e.target.closest('[data-gp]');
           if (!btn || btn.disabled) return;
+          if (btn.dataset.gp === 'foyer') { appliquerFoyer(); return; }
           const i = Number(btn.dataset.room);
           const room = gpRooms[i];
           if (btn.dataset.gp === 'remove-room') { gpRooms.splice(i, 1); renderGuests(); return; }

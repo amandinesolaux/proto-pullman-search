@@ -907,6 +907,24 @@ wd-section-heading { display: block; }
 /* Résumé sur sa propre ligne : à 380px de large il se comprimait contre les boutons */
 .wd-booking__gp-footer { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }
 .wd-booking__gp-hint { margin: 0; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); }
+
+/* Pré-remplissage du foyer : une proposition, pas une action principale. Elle est posée
+   au-dessus des compteurs parce qu'elle sert avant qu'on commence à les régler, et elle
+   s'efface une fois la configuration en place. Contour discret, pas de fond vert : ce
+   n'est pas ce qui valide la recherche. */
+.wd-booking__gp-perso { display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
+  padding: 12px 14px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.03); }
+.wd-booking__gp-perso[hidden] { display: none; }
+.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: var(--pul-highlight, #5FEF91); }
+.wd-booking__gp-perso-text { flex: 1; min-width: 0; display: flex; flex-direction: column;
+  font-family: var(--font-sans); line-height: 1.35; }
+.wd-booking__gp-perso-text b { font-size: 13px; font-weight: 600; color: #fff; }
+.wd-booking__gp-perso-text span { font-size: 12px; color: rgba(255,255,255,.6); }
+.wd-booking__gp-perso-btn { flex-shrink: 0; min-height: 34px; padding: 0 14px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff;
+  font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background .15s, border-color .15s; }
+.wd-booking__gp-perso-btn:hover { background: rgba(255,255,255,.1); border-color: #fff; }
 .wd-booking__gp-hint--warn { color: #fff; }
 .wd-booking__gp-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
 
@@ -1482,6 +1500,12 @@ wd-footer { display: block; }
   .wd-booking__gp-counter-label, .wd-booking__gp-count { font-size: 15px; }
   .wd-booking__gp-add, .wd-booking__gp-remove { font-size: 15px; }
   .wd-booking__gp-hint, .wd-booking__gp-age-label { font-size: 13px; }
+  /* 362 px ne suffisent pas pour l'icône, deux lignes de texte et un bouton côte à côte :
+     le bouton passe dessous et prend la largeur, avec une cible de 44 px. */
+  .wd-booking__gp-perso { flex-wrap: wrap; row-gap: 10px; }
+  .wd-booking__gp-perso-text b { font-size: 14px; }
+  .wd-booking__gp-perso-text span { font-size: 13px; }
+  .wd-booking__gp-perso-btn { flex: 1 1 100%; min-height: 44px; font-size: 14px; }
   .wd-booking__gp-room-title { font-size: 12px; }
   wd-booking[data-filtres] .wd-booking__dd-col-title { font-size: 17px; }
 
