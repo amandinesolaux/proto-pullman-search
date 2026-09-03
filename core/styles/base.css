@@ -1210,7 +1210,9 @@ wd-footer { display: block; }
   .wd-booking { padding: 0; max-width: none; }
   /* Quatre onglets ne tiennent pas sur 375 px : « Célébrations » était coupé. Ils
      défilent horizontalement, sans barre visible. */
-  .wd-booking__tabs { padding: 12px 12px 8px; overflow-x: auto; scrollbar-width: none; }
+  /* 16 px d'écart et non 22 : c'est ce qui fait tenir les quatre onglets dans 390 px.
+     Ils défilent toujours si la langue les rallonge, mais au repos on les voit tous. */
+  .wd-booking__tabs { padding: 12px 12px 8px; gap: 16px; overflow-x: auto; scrollbar-width: none; }
   .wd-booking__tabs::-webkit-scrollbar { display: none; }
   .wd-booking__tab { flex: 0 0 auto; }
   /* Trois champs empilés prenaient 382 px de haut, laissant 331 px au panneau sur un
@@ -1432,7 +1434,7 @@ wd-footer { display: block; }
   .wd-booking__dest-input, .wd-booking__gp-age-select { font-size: 16px; }
   .wd-booking__dest-chip { font-size: 13px; padding: 4px 9px; max-width: 200px; }
   .wd-booking__field { min-height: 56px; }
-  .wd-booking__tab { font-size: 16px; }
+  .wd-booking__tab { font-size: 14px; }
   .wd-booking__special-rates-link { font-size: 15px; }
   .wd-booking__cta { font-size: 16px; }
 
@@ -1490,7 +1492,13 @@ wd-footer { display: block; }
   .wd-booking__dd-criteria-item { min-height: 44px; }
   .wd-booking__dd-dest-item { min-height: 48px; }
   .wd-booking__dd-hotel-row { min-height: 56px; }
-  .wd-booking__dd-continent { min-width: 96px; }
+  /* Les vignettes gardaient le carré de 72 px du desktop, où elles se survolent ; au
+     doigt elles se visent, et l'image d'un continent tient mal dans un timbre. Carrées
+     à 96 px : trois tiennent dans la largeur et la quatrième dépasse d'une trentaine de
+     pixels — assez pour qu'on sache qu'il y en a d'autres et qu'on pousse la bande. */
+  .wd-booking__dd-continent { width: 96px; min-width: 96px; height: 96px; }
+  .wd-booking__dd-continent-label { font-size: 11px; bottom: 8px; left: 8px; right: 8px; }
+  .wd-booking__dd-continents { gap: 12px; }
   .wd-booking__tab { min-height: 44px; }
   .wd-booking__dd-noresult-relax, .wd-booking__dd-noresult-reset { min-height: 44px; }
   .wd-booking__dp-day { min-height: 40px; }
