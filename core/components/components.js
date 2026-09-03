@@ -1092,7 +1092,7 @@
               <span class="wd-booking__label">Que recherchez-vous ?</span>
               <div class="wd-booking__dest-input-row">
                 <div class="wd-booking__dest-chips" id="wd-dest-chips"></div>
-                <input type="text" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" />
+                <input type="search" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" enterkeyhint="search" aria-label="Que recherchez-vous ?" />
               </div>
             </div>
             <button class="wd-booking__dest-clear" id="wd-dest-clear" type="button" title="Effacer la recherche" aria-label="Effacer toute la recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
@@ -2266,15 +2266,36 @@
       // bascule, pas seulement le panneau — les trois champs restent ainsi atteignables
       // au pouce pendant qu'on affine, au lieu d'être repoussés hors du cadre.
       const surMobile = () => window.matchMedia('(max-width: 767px)').matches;
+
+      // Le clavier ne réduit pas la fenêtre : il se pose dessus. Un panneau en position
+      // fixed garde donc ses 844 px pendant qu'on n'en voit plus que 370 — la liste des
+      // destinations et le bouton « Rechercher » se retrouvent sous le clavier, hors
+      // d'atteinte. visualViewport est la seule mesure qui dise ce qui reste visible ;
+      // le panneau s'y ajuste, et se retrouve entier au-dessus du clavier.
+      const vueVisible = window.visualViewport;
+      const suivreClavier = () => {
+        if (!vueVisible || !this.dataset.pleinEcran) return;
+        this.style.setProperty('--wd-vue-visible', Math.round(vueVisible.height) + 'px');
+      };
       const basculerPleinEcran = (actif) => {
         if (actif && surMobile()) {
           this.dataset.pleinEcran = '1';
           // On bloque le défilement de la page derrière : sans cela, faire défiler la
           // liste des destinations entraîne la page et on perd le panneau de vue.
           document.body.style.overflow = 'hidden';
+          if (vueVisible) {
+            suivreClavier();
+            vueVisible.addEventListener('resize', suivreClavier);
+            vueVisible.addEventListener('scroll', suivreClavier);
+          }
         } else {
           delete this.dataset.pleinEcran;
           document.body.style.overflow = '';
+          this.style.removeProperty('--wd-vue-visible');
+          if (vueVisible) {
+            vueVisible.removeEventListener('resize', suivreClavier);
+            vueVisible.removeEventListener('scroll', suivreClavier);
+          }
         }
       };
 

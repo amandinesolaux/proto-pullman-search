@@ -374,7 +374,13 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 /* Typing placeholder */
 /* ---------- Booking Dropdown ---------- */
 .wd-booking { position: relative; }
-.wd-booking__dest-input { display: block; flex: 1; border: none; outline: none; background: transparent; font-family: var(--font-sans); font-size: 12px; color: #fff; min-width: 80px; font-weight: 400; padding: 0; }
+/* type="search" et non text : c'est ce qui retire la barre AutoFill d'iOS (mots de
+   passe, cartes, contacts) posée au-dessus du clavier — autocomplete="off" ne suffit
+   pas, Safari l'ignore pour cette barre. En échange il ajoute sa propre croix
+   d'effacement, qui doublerait la nôtre : on la retire. */
+.wd-booking__dest-input::-webkit-search-cancel-button,
+.wd-booking__dest-input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
+.wd-booking__dest-input { -webkit-appearance: none; appearance: none; display: block; flex: 1; border: none; outline: none; background: transparent; font-family: var(--font-sans); font-size: 12px; color: #fff; min-width: 80px; font-weight: 400; padding: 0; }
 .wd-booking__dest-input::placeholder { color: rgba(255,255,255,.5); }
 /* Rien de particulier pour l'état renseigné : le champ dates affiche label + valeur
    comme ses voisins. Deux règles vivaient ici — l'une masquait la valeur (la plage
@@ -1226,7 +1232,10 @@ wd-footer { display: block; }
   .wd-booking__cta { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; }
 
   /* Le composant entier passe en plein écran pendant la recherche. */
-  wd-booking[data-plein-ecran] { position: fixed; inset: 0; z-index: 1000; margin: 0;
+  wd-booking[data-plein-ecran] { position: fixed; inset: 0 0 auto 0; z-index: 1000; margin: 0;
+    /* --wd-vue-visible est posée par le composant depuis visualViewport : c'est la
+       hauteur qui reste au-dessus du clavier. Sans clavier, elle vaut l'écran entier. */
+    height: var(--wd-vue-visible, 100%);
     display: flex; flex-direction: column; background: #1a2220; overflow: hidden; }
   wd-booking[data-plein-ecran] .wd-booking { margin: 0; border-radius: 0; height: 100%;
     display: flex; flex-direction: column; }
@@ -1244,7 +1253,12 @@ wd-footer { display: block; }
   /* z-index 2 suffisait tant que rien ne se posait sur la carte ; la pastille des filtres
      y monte à 500 et passait devant l'action principale. 1050 la remet au-dessus de la
      carte, sous la feuille de filtres (1100) qui doit tout recouvrir. */
-  wd-booking[data-plein-ecran] .wd-booking__cta { position: fixed; left: 12px; right: 12px;
+  /* absolute et non fixed : le bouton se cale sur le panneau, qui suit lui-même la
+     hauteur visible. En fixed il restait collé au bas de la fenêtre, donc sous le
+     clavier dès qu'on tapait une destination. La rangée de champs repasse en static
+     pour ne pas servir de repère : elle est haute de 76 px, le bouton s'y calait. */
+  wd-booking[data-plein-ecran] .wd-booking__fields { position: static; }
+  wd-booking[data-plein-ecran] .wd-booking__cta { position: absolute; left: 12px; right: 12px;
     bottom: 12px; z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
   wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
 
