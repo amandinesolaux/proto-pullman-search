@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=420"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=422"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,11 +17,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/data/restaurants.js?v=420"></script>
-  <script src="../../core/data/reunions.js?v=420"></script>
-  <script src="../../core/components/components.js?v=420"></script>
+  <script src="../../core/data/restaurants.js?v=422"></script>
+  <script src="../../core/data/reunions.js?v=422"></script>
+  <script src="../../core/components/components.js?v=422"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=420"></script>
+  <script src="../../core/components/booking-map.js?v=422"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
@@ -464,6 +464,24 @@ body.brand-pullman .wd-booking__dd-results-bar--hint { background: none; padding
     display: flex; width: 100%; justify-content: center; margin: 16px 0 4px;
     min-height: 48px; }
   wd-booking[data-disclosure="full"] .wd-booking__wizard-cta { display: flex; }
+
+  /* En plein écran, le CTA rejoint « Rechercher » au bas de la fenêtre : les deux
+     propositions — chercher soi-même ou se laisser guider — se lisent alors ensemble,
+     au lieu que la seconde attende en fin de liste qu'on l'ait dépassée.
+     76 px = 12 (bas) + 48 (hauteur du bouton) + 16 d'écart demandé. Fond plein, sinon
+     la liste défilerait derrière un bouton translucide. */
+  /* dd-body repasse en static : c'est lui qui sert de repère par défaut, et le bouton
+     se calait alors 76 px au-dessus du bas de la liste, pas de la fenêtre. Il est le
+     seul élément à s'y ancrer, rien d'autre ne bouge. */
+  wd-booking[data-plein-ecran] .wd-booking__dd-body { position: static; }
+  wd-booking[data-plein-ecran] .wd-booking__wizard-cta {
+    position: absolute; left: 14px; right: 14px; bottom: 76px; top: auto;
+    width: auto; margin: 0; z-index: 1050; background: #1a2220; }
+  wd-booking[data-plein-ecran] .wd-booking__wizard-cta:hover { background: #232e2a; }
+  /* La zone de défilement s'arrête au-dessus des deux boutons : 12 + 48 + 16 + 48 + 16. */
+  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 140px; }
+  /* En vue carte, la carte occupe tout : le CTA y est masqué, rien à réserver. */
+  wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dropdown { padding-bottom: 0; }
 }
 /* Vue complète (continent choisi) : le CTA wizard se retire — re-cliquer le continent le fait revenir */
 wd-booking[data-disclosure="full"] .wd-booking__wizard-cta { display: none; }
