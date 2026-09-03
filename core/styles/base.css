@@ -1210,7 +1210,7 @@ wd-footer { display: block; }
    affine. Les cibles tactiles ne descendent pas sous 44 px. */
 @media (max-width: 767px) {
   /* La cause du débordement, et elle seule. */
-  .wd-booking__fields { min-width: 0; flex-direction: column; align-items: stretch; gap: 14px; padding: 10px; }
+  .wd-booking__fields { min-width: 0; flex-direction: column; align-items: stretch; gap: 14px; padding: 10px 14px; }
   /* Les 48 px de marge latérale du desktop retiraient 96 px sur 375 : le panneau n'en
      gardait que 279, et la carte 168. */
   .wd-booking { padding: 0; max-width: none; }
@@ -1218,7 +1218,7 @@ wd-footer { display: block; }
      défilent horizontalement, sans barre visible. */
   /* 16 px d'écart et non 22 : c'est ce qui fait tenir les quatre onglets dans 390 px.
      Ils défilent toujours si la langue les rallonge, mais au repos on les voit tous. */
-  .wd-booking__tabs { padding: 12px 12px 8px; gap: 16px; overflow-x: auto; scrollbar-width: none; }
+  .wd-booking__tabs { padding: 12px 14px 8px; gap: 16px; overflow-x: auto; scrollbar-width: none; }
   .wd-booking__tabs::-webkit-scrollbar { display: none; }
   .wd-booking__tab { flex: 0 0 auto; }
   /* Trois champs empilés prenaient 382 px de haut, laissant 331 px au panneau sur un
@@ -1258,7 +1258,7 @@ wd-footer { display: block; }
      clavier dès qu'on tapait une destination. La rangée de champs repasse en static
      pour ne pas servir de repère : elle est haute de 76 px, le bouton s'y calait. */
   wd-booking[data-plein-ecran] .wd-booking__fields { position: static; }
-  wd-booking[data-plein-ecran] .wd-booking__cta { position: absolute; left: 12px; right: 12px;
+  wd-booking[data-plein-ecran] .wd-booking__cta { position: absolute; left: 14px; right: 14px;
     bottom: 12px; z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
   wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
 
@@ -1331,7 +1331,9 @@ wd-footer { display: block; }
      message d'exclusion et par les commandes de zoom. */
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col { position: relative; }
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col .wd-booking__filtres-btn {
-    position: absolute; left: 12px; bottom: 76px; z-index: 500; margin: 0;
+    /* left: 0 et non 14 : la colonne porte déjà les 14 px de gouttière, la pastille
+       se posait sinon à 28 quand tout le reste tient sur 14. */
+    position: absolute; left: 0; bottom: 76px; z-index: 500; margin: 0;
     background: #1a2220; border-color: rgba(255,255,255,.3);
     box-shadow: 0 4px 16px rgba(0,0,0,.45); }
 

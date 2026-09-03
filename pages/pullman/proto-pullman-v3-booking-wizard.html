@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=402"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=405"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -17,11 +17,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/data/restaurants.js?v=402"></script>
-  <script src="../../core/data/reunions.js?v=402"></script>
-  <script src="../../core/components/components.js?v=402"></script>
+  <script src="../../core/data/restaurants.js?v=405"></script>
+  <script src="../../core/data/reunions.js?v=405"></script>
+  <script src="../../core/components/components.js?v=405"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=402"></script>
+  <script src="../../core/components/booking-map.js?v=405"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
@@ -510,6 +510,15 @@ wd-booking[data-disclosure="full"] .wd-booking__dd-criteria-col {
    ce qui la fait tomber pile sous la tuile ✨ de la bannière. */
 body.brand-pullman .wd-booking__tabs { padding-left: 0; }
 body.brand-pullman .wd-booking__fields { padding-left: 0; }
+
+/* Sur mobile il n'y a plus de gouttière de 48 px à rejoindre : .wd-booking perd sa
+   marge, et ces deux zéros collaient les onglets et le champ au bord de l'écran
+   pendant que le contenu du panneau — Filtres, DESTINATION, les vignettes — restait
+   à 14. Trois alignements différents sur la même colonne. On reprend le 14 du panneau. */
+@media (max-width: 767px) {
+  body.brand-pullman .wd-booking__tabs,
+  body.brand-pullman .wd-booking__fields { padding-left: 14px; }
+}
 
 /* Le fond #1a2220 du calendrier (et du panneau voyageurs) est désormais porté par base.css,
    avec celui du dropdown : la surcharge qui vivait ici n'a plus lieu d'être. */
