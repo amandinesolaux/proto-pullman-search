@@ -1186,8 +1186,10 @@
         <div class="wd-booking__guests" id="wd-guests-panel" data-state="closed" role="dialog" aria-label="Voyageurs et chambres">
           <div class="wd-booking__gp-body">
             <div class="wd-booking__gp-perso" id="wd-gp-perso" hidden>
-              <span class="wd-booking__gp-perso-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-1a5 5 0 0 1 5-5h1a5 5 0 0 1 5 5v1"/><circle cx="9.5" cy="8" r="3"/><path d="M17 20v-1a4 4 0 0 0-2-3.4"/><circle cx="17" cy="9" r="2"/></svg></span>
-              <span class="wd-booking__gp-perso-text"><b id="wd-gp-perso-titre"></b><span id="wd-gp-perso-detail"></span></span>
+              <span class="wd-booking__gp-perso-text">
+                <span class="wd-booking__gp-perso-head"><span class="wd-booking__gp-perso-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-1a5 5 0 0 1 5-5h1a5 5 0 0 1 5 5v1"/><circle cx="9.5" cy="8" r="3"/><path d="M17 20v-1a4 4 0 0 0-2-3.4"/><circle cx="17" cy="9" r="2"/></svg></span><b id="wd-gp-perso-titre"></b></span>
+                <span id="wd-gp-perso-detail"></span>
+              </span>
               <button type="button" class="wd-booking__gp-perso-btn" data-gp="foyer">Pré-remplir</button>
             </div>
             <div class="wd-booking__gp-rooms" id="wd-gp-rooms"></div>

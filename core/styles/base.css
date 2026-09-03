@@ -916,14 +916,18 @@ wd-section-heading { display: block; }
    et de la liste de résultats, avec les mêmes valeurs — #445047 pour le texte, #BCCABE
    pour les filets. Le bloc se détache donc sans bordure ni ombre, et le vert reste
    entièrement du côté des actions du panneau. */
-.wd-booking__gp-perso { display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
-  padding: 12px 14px; border: none; background: #fff; color: var(--pul-bg, #445047); }
+.wd-booking__gp-perso { display: flex; align-items: center; gap: 12px; margin: 0 0 16px;
+  padding: 10px 14px; border: none; background: #fff; color: var(--pul-bg, #445047); }
 .wd-booking__gp-perso[hidden] { display: none; }
-.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: rgba(68,80,71,.55); }
+/* L'icône accompagne le titre, sur sa ligne : en colonne à gauche, elle décalait la
+   composition du foyer d'un cran sans rien apporter. Le détail se ferre donc au même
+   bord que l'icône, et le bloc y gagne une hauteur de ligne. */
 .wd-booking__gp-perso-text { flex: 1; min-width: 0; display: flex; flex-direction: column;
-  font-family: var(--font-sans); line-height: 1.35; }
+  align-items: flex-start; gap: 1px; font-family: var(--font-sans); line-height: 1.35; }
+.wd-booking__gp-perso-head { display: inline-flex; align-items: center; gap: 7px; }
+.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: rgba(68,80,71,.55); }
 .wd-booking__gp-perso-text b { font-size: 13px; font-weight: 700; color: var(--pul-bg, #445047); }
-.wd-booking__gp-perso-text span { font-size: 12px; color: rgba(68,80,71,.72); }
+#wd-gp-perso-detail { font-size: 12px; color: rgba(68,80,71,.72); }
 /* Contour sur le filet clair de la marque, pas sur un gris quelconque. Il reste une
    commande secondaire : c'est « Appliquer », en bas du panneau, qui valide. */
 .wd-booking__gp-perso-btn { flex-shrink: 0; min-height: 34px; padding: 0 14px; border-radius: 100px;
