@@ -1092,7 +1092,7 @@
               <span class="wd-booking__label">Que recherchez-vous ?</span>
               <div class="wd-booking__dest-input-row">
                 <div class="wd-booking__dest-chips" id="wd-dest-chips"></div>
-                <input type="search" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="search" enterkeyhint="search" aria-label="Que recherchez-vous ?" />
+                <form class="wd-booking__dest-form" autocomplete="off" role="search"><input type="text" id="wd-dest-input" name="search.destination.userlang" class="wd-booking__dest-input" placeholder="Une destination, un hôtel, une envie..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" role="combobox" aria-autocomplete="both" aria-expanded="false" aria-controls="wd-dest-list" aria-label="Que recherchez-vous ?" /></form>
               </div>
             </div>
             <button class="wd-booking__dest-clear" id="wd-dest-clear" type="button" title="Effacer la recherche" aria-label="Effacer toute la recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
@@ -2326,6 +2326,11 @@
       this.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && this.dataset.filtres) { e.stopPropagation(); feuilleFiltres(false); }
       });
+
+      // Le formulaire n'existe que pour Safari (voir le template) : il ne soumet rien.
+      // Sans cela, Entrée dans le champ rechargerait la page et effacerait la recherche.
+      const destForm = this.querySelector('.wd-booking__dest-form');
+      if (destForm) destForm.addEventListener('submit', (e) => e.preventDefault());
 
       const open = () => {
         dropdown.dataset.state = 'open';
