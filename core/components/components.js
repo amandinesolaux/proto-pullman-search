@@ -419,7 +419,6 @@
       { name: "Londres", country: "Royaume-Uni", count: 5, type: "Ville" },
       { name: "Lisbonne", country: "Portugal", count: 2, type: "Ville" },
       { name: "Marseille", country: "France", count: 2, type: "Ville" },
-      { name: "Marrakech", country: "Maroc", count: 3, type: "Ville" },
       { name: "Nice", country: "France", count: 2, type: "Ville" },
       { name: "Bordeaux", country: "France", count: 1, type: "Ville" },
       { name: "Barcelone", country: "Espagne", count: 4, type: "Ville" },
@@ -809,13 +808,7 @@
       { name:'Pullman Rosario City Center', loc:'Rosario, Argentine', country:'Argentine', img:'aja_p_1934-18', imgs:['aja_p_1934-18','aja_p_1934-28','aja_p_1934-31','aja_p_1934-45'], href:'https://pullman.accor.com/fr/hotels/rosario/6784.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
     ]},
     { id:'afrique', label:'Afrique', img:'https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=200&h=200&fit=crop', hotels: [
-      /* Marrakech Palmeraie ne figure plus dans le portefeuille Pullman (absent des 148
-         hôtels listés, pas de fiche, pas d'URL). Ses services ne sont donc vérifiables
-         nulle part : club enfants et animaux sont ici une hypothèse de prototype,
-         posée pour disposer d'un cas famille + animaux au Maroc. À ne pas relever
-         comme une donnée. */
-      { name:'Pullman Marrakech Palmeraie', loc:'Marrakech, Maroc', country:'Maroc', img:'aja_p_0795-31', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','pets','kids-club','family'] },
-      { name:'Pullman Mazagan Royal Golf & Spa', loc:'El Jadida, Maroc', country:'Maroc', img:'aja_p_6645-45', imgs:['aja_p_6645-45','aja_p_5066-24','aja_p_6645-49','aja_p_6645-38'], href:'https://pullman.accor.com/fr/hotels/el-jadida/2960.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','family'] },
+      { name:'Pullman Mazagan Royal Golf & Spa', loc:'El Jadida, Maroc', country:'Maroc', img:'aja_p_6645-45', imgs:['aja_p_6645-45','aja_p_5066-24','aja_p_6645-49','aja_p_6645-38'], href:'https://pullman.accor.com/fr/hotels/el-jadida/2960.html', services:['pool','restaurant','bar','spa','beach','parking','meeting-rooms','gym','wifi','breakfast','golf','garden','family','pets'] },
       { name:'Pullman Abidjan', loc:'Abidjan, Côte d\'Ivoire', country:'Côte d\'Ivoire', img:'HCM_P_9207481', imgs:['HCM_P_9207481','aja_p_4970-20','HCM_P_6188544','aja_p_4954-72'], href:'https://pullman.accor.com/fr/hotels/abidjan/1146.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
       { name:'Pullman Cape Town', loc:'Le Cap, Afrique du Sud', country:'Afrique du Sud', img:'HCM_P_1079779', imgs:['HCM_P_1079779','HCM_P_1194670','HCM_P_6275612','HCM_P_9357632'], href:'https://pullman.accor.com/fr/hotels/cape-town/C0H1.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
       { name:'Pullman Dakar Teranga', loc:'Dakar, Sénégal', country:'Sénégal', img:'aja_p_4585-30', imgs:['aja_p_4585-30','aja_p_4247-50','aja_p_4247-52','aja_p_5749-04'], href:'https://pullman.accor.com/fr/hotels/dakar/0563.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast'] },
@@ -6081,7 +6074,7 @@
             { name: 'Auvergne-Rhône-Alpes', cities: ['Lyon'] },
             { name: 'Asie du Sud-Est', cities: ['Bangkok', 'Singapour', 'Bali', 'Hô Chi Minh-Ville', 'Kuala Lumpur'] },
             { name: 'Moyen-Orient', cities: ['Dubaï', 'Doha', 'Ras Al Khaimah', 'Sharjah'] },
-            { name: 'Maghreb', cities: ['Marrakech', 'El Jadida'] },
+            { name: 'Maghreb', cities: ['El Jadida'] },
             { name: 'Océan Indien', cities: ['Maldives'] }
           ].filter(r => r.cities.some(findCity));
 
