@@ -619,6 +619,9 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__dest-chip-close:hover { color: #fff; }
 .wd-booking__dest-chip-close svg { width: 10px; height: 10px; }
 .wd-booking__dest-chip--more { background: rgba(68,80,71,.35); border-color: rgba(68,80,71,.5); cursor: default; font-weight: 600; }
+/* La classe pose display: inline-flex, qui l'emporte sur le display:none que le
+   navigateur applique à [hidden] : sans cette règle, replier une puce ne la cache pas. */
+.wd-booking__dest-chip[hidden] { display: none; }
 .wd-booking__chip-icon { width: 12px; height: 12px; flex-shrink: 0; color: rgba(255,255,255,.6); }
 
 /* Google-style suggestions */

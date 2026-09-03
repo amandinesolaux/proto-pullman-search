@@ -1486,8 +1486,8 @@
         'restaurant': 'restaurant', 'gastronomie': 'restaurant', 'gastro': 'restaurant',
         'bar': 'bar', 'rooftop': 'bar', 'cocktail': 'bar',
         'parking': 'parking', 'voiture': 'parking',
-        'animaux': 'pets', 'chien': 'pets', 'chat': 'pets', 'pet': 'pets', 'pets': 'pets', 'dog': 'pets',
-        'famille': 'family', 'enfant': 'family', 'enfants': 'family', 'kids': 'family', 'family': 'family',
+        'animaux': 'pets', 'animal': 'pets', 'chien': 'pets', 'chat': 'pets', 'pet': 'pets', 'dog': 'pets',
+        'famille': 'family', 'familial': 'family', 'familiale': 'family', 'enfant': 'family', 'kids': 'family', 'family': 'family',
         'réunion': 'meeting', 'reunion': 'meeting', 'meeting': 'meeting', 'business': 'meeting', 'séminaire': 'meeting', 'seminaire': 'meeting',
       };
       const CONTINENT_KEYWORDS = {};
@@ -1547,7 +1547,11 @@
         const sortedKeys = Object.keys(CRITERIA_KEYWORDS).sort((a, b) => b.length - a.length);
         for (const kw of sortedKeys) {
           const kwNorm = kw.normalize('NFD').replace(/[̀-ͯ]/g, '');
-          const re = new RegExp('(?:^|[\\s,])' + escRe(kwNorm) + '(?:$|[\\s,])', 'i');
+          // Le pluriel et l'apostrophe font partie de la langue : « adapté aux familles »
+          // ou « avec des piscines » ne trouvaient rien, parce que la frontière de mot
+          // exigeait une espace juste après le mot au singulier. Un s ou un x final est
+          // maintenant admis, et l'apostrophe compte comme une frontière (« d'enfants »).
+          const re = new RegExp("(?:^|[\\s,'\u2019])" + escRe(kwNorm) + "(?:s|x)?(?:$|[\\s,.;:!?'\u2019])", 'i');
           if (re.test(lower)) {
             const cId = CRITERIA_KEYWORDS[kw];
             if (!result.criteria.includes(cId)) result.criteria.push(cId);
@@ -2202,6 +2206,49 @@
       };
 
       const MAX_VISIBLE_CHIPS = 3;
+      // Sur mobile le champ est empilé, donc il peut grandir — mais pas sans fin. Deux
+      // lignes de puces, au-delà le reste se replie derrière un « +N ». Le plafond ne
+      // peut pas être un nombre de puces : « Pullman Cannes Mandelieu » en occupe une à
+      // elle seule quand « Spa » en laisse trois. C'est donc la hauteur qu'on mesure.
+      const LIGNES_PUCES_MAX = 2;
+      const replierPuces = () => {
+        if (!chipsEl) return;
+        const puces = [...chipsEl.querySelectorAll('.wd-booking__dest-chip:not(.wd-booking__dest-chip--more)')];
+        let plus = chipsEl.querySelector('.wd-booking__dest-chip--more');
+        puces.forEach(p => p.removeAttribute('hidden'));
+        if (plus) plus.hidden = true;
+        // Hors mobile, la rangée tient sur une ligne et se coupe : rien à replier.
+        if (!surMobile() || puces.length < 2 || !destField.getBoundingClientRect().height) return;
+
+        // On compte les lignes de puces, pas celles du champ : la saisie descend sur sa
+        // propre ligne dès qu'une puce est là, et l'inclure ne laisserait qu'une ligne
+        // de puces — le champ se replierait avant même d'avoir grandi.
+        const lignes = () => {
+          const vus = puces.filter(p => !p.hidden);
+          if (plus && !plus.hidden) vus.push(plus);
+          const hauts = vus.map(e => e.getBoundingClientRect())
+                           .filter(r => r.height > 0).map(r => Math.round(r.top));
+          return new Set(hauts).size;
+        };
+
+        let caches = 0;
+        while (lignes() > LIGNES_PUCES_MAX) {
+          const visibles = puces.filter(p => !p.hidden);
+          if (visibles.length <= 1) break;   // on garde toujours une puce lisible
+          visibles[visibles.length - 1].hidden = true;
+          caches++;
+          if (!plus) {
+            plus = document.createElement('span');
+            plus.className = 'wd-booking__dest-chip wd-booking__dest-chip--more';
+            chipsEl.appendChild(plus);
+          }
+          plus.hidden = false;
+          plus.textContent = '+' + caches;
+          plus.title = caches + (caches > 1 ? ' autres critères' : ' autre critère');
+        }
+        if (!caches && plus) plus.hidden = true;
+      };
+
       const renderChips = () => {
         updateClearBtn();
         const chips = buildChips();
@@ -2210,8 +2257,9 @@
           return;
         }
         const closeIcon = '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg>';
-        const visible = chips.slice(0, MAX_VISIBLE_CHIPS);
-        const overflow = chips.length - MAX_VISIBLE_CHIPS;
+        const plafond = surMobile() ? chips.length : MAX_VISIBLE_CHIPS;
+        const visible = chips.slice(0, plafond);
+        const overflow = chips.length - plafond;
         let html = visible.map(c =>
           '<span class="wd-booking__dest-chip">' +
           (c.icon || '') + esc(c.label) +
@@ -2222,7 +2270,14 @@
           html += '<span class="wd-booking__dest-chip wd-booking__dest-chip--more">+' + overflow + '</span>';
         }
         chipsEl.innerHTML = html;
+        replierPuces();
       };
+
+      let minuteurPuces = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(minuteurPuces);
+        minuteurPuces = setTimeout(replierPuces, 150);
+      });
 
       const searchIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="5"/><line x1="10" y1="10" x2="14.5" y2="14.5" stroke-linecap="round"/></svg>';
       const renderSuggestions = (text) => {
