@@ -913,18 +913,24 @@ wd-section-heading { display: block; }
    s'efface une fois la configuration en place. Contour discret, pas de fond vert : ce
    n'est pas ce qui valide la recherche. */
 .wd-booking__gp-perso { display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
-  padding: 12px 14px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.03); }
+  padding: 12px 14px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.03); }
 .wd-booking__gp-perso[hidden] { display: none; }
-.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: var(--pul-highlight, #5FEF91); }
+/* Le pictogramme était en vert vif : dans ce panneau le vert dit « action » — il porte
+   « Ajouter une chambre » et le bouton « Appliquer ». Sur une icône décorative il
+   promettait un geste qui n'existe pas, et tirait l'œil avant le texte. Il repasse au
+   blanc atténué, comme les autres glyphes qui ne font qu'accompagner. */
+.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: rgba(255,255,255,.45); }
 .wd-booking__gp-perso-text { flex: 1; min-width: 0; display: flex; flex-direction: column;
   font-family: var(--font-sans); line-height: 1.35; }
 .wd-booking__gp-perso-text b { font-size: 13px; font-weight: 600; color: #fff; }
-.wd-booking__gp-perso-text span { font-size: 12px; color: rgba(255,255,255,.6); }
+.wd-booking__gp-perso-text span { font-size: 12px; color: rgba(255,255,255,.55); }
+/* Contour à .25 comme les boutons + / − du panneau, et non à .5 : c'est une commande
+   secondaire, elle ne doit pas peser autant que « Appliquer ». */
 .wd-booking__gp-perso-btn { flex-shrink: 0; min-height: 34px; padding: 0 14px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,.5); background: transparent; color: #fff;
+  border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff;
   font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer;
   transition: background .15s, border-color .15s; }
-.wd-booking__gp-perso-btn:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+.wd-booking__gp-perso-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
 .wd-booking__gp-hint--warn { color: #fff; }
 .wd-booking__gp-actions { display: flex; align-items: center; justify-content: flex-end; gap: 16px; }
 
