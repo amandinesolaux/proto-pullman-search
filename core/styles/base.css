@@ -925,7 +925,10 @@ wd-section-heading { display: block; }
 .wd-booking__gp-perso-text { flex: 1; min-width: 0; display: flex; flex-direction: column;
   align-items: flex-start; gap: 1px; font-family: var(--font-sans); line-height: 1.35; }
 .wd-booking__gp-perso-head { display: inline-flex; align-items: center; gap: 7px; }
-.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: rgba(68,80,71,.55); }
+/* Trait épaissi pour tenir la ligne à côté d'un titre en 700 : à 1,6 l'icône
+   paraissait plus claire que le texte qu'elle accompagne. L'opacité remonte avec,
+   sinon l'épaisseur seule ne suffit pas à égaliser les deux densités. */
+.wd-booking__gp-perso-icon { display: inline-flex; flex-shrink: 0; color: rgba(68,80,71,.75); }
 .wd-booking__gp-perso-text b { font-size: 13px; font-weight: 700; color: var(--pul-bg, #445047); }
 #wd-gp-perso-detail { font-size: 12px; color: rgba(68,80,71,.72); }
 /* Contour sur le filet clair de la marque, pas sur un gris quelconque. Il reste une
