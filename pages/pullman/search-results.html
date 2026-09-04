@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=423"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=426"/>
   <link rel="stylesheet" href="../../core/styles/discovery-modal.css"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
@@ -13,11 +13,11 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=423"></script>
-  <script src="../../core/data/reunions.js?v=423"></script>
-  <script src="../../core/components/components.js?v=423"></script>
+  <script src="../../core/data/restaurants.js?v=426"></script>
+  <script src="../../core/data/reunions.js?v=426"></script>
+  <script src="../../core/components/components.js?v=426"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=423"></script>
+  <script src="../../core/components/booking-map.js?v=426"></script>
 </head>
 <body class="brand-pullman">
 
@@ -586,7 +586,7 @@ wd-booking { margin-top: 20px; }
             '<div class="srx-card-bottom">' +
               '<span class="srx-actions">' +
                 (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
-                (v.url ? '<a class="srx-cta" href="' + esc(v.url) + '" target="_blank" rel="noopener">Voir la table</a>' : '') +
+                (v.url ? '<a class="srx-cta" href="' + esc(v.url) + '" target="_blank" rel="noopener">Voir la fiche</a>' : '') +
               '</span>' +
             '</div>' +
           '</div></article>';
@@ -607,7 +607,7 @@ wd-booking { margin-top: 20px; }
         if (id === null || !reste.length) np.delete('criteria'); else np.set('criteria', reste.join(','));
         return location.pathname + '?' + np.toString();
       };
-      let inner = '<h2>Aucune table ne correspond à tous vos critères</h2>';
+      let inner = '<h2>Aucun restaurant ni bar ne correspond à tous vos critères</h2>';
       if (best) {
         inner += '<p>En retirant <strong>« ' + esc(best.label) + ' »</strong>, <strong>' + best.count + ' ' + mot(best.count) +
           '</strong> correspondrai' + (best.count > 1 ? 'ent' : 't') + '.</p>' +

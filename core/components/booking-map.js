@@ -76,6 +76,43 @@ function _makeLargeIcon(cityName, greyed, nombre) {
 function _installerGalerie() {
   if (document.documentElement.dataset.wdGalerie) return;
   document.documentElement.dataset.wdGalerie = '1';
+  // Déplier la liste des restaurants et bars, en revenir, ou en choisir un — auquel cas
+  // la card se referme sur ce lieu et lui donne sa photo. Le geste de la navigation
+  // séquentielle, mais après le choix plutôt qu'à sa place.
+  document.addEventListener('click', (e) => {
+    const carte = e.target.closest('.pullman-popup');
+    if (!carte) return;
+    if (e.target.closest('[data-lieux-deplier]')) {
+      e.preventDefault(); carte.classList.add('pullman-popup--deplie');
+      const l = carte.querySelector('.pullman-popup__lieux'); if (l) l.hidden = false;
+      return;
+    }
+    if (e.target.closest('[data-lieux-replier]')) {
+      e.preventDefault(); carte.classList.remove('pullman-popup--deplie');
+      return;
+    }
+    const choix = e.target.closest('[data-lieu]');
+    if (choix) {
+      e.preventDefault();
+      carte.classList.remove('pullman-popup--deplie');
+      // La vitrine reprend le lieu choisi : son nom, son qualificatif, sa photo.
+      const vitrine = carte.querySelector('[data-lieu-vitrine]');
+      if (vitrine) {
+        const nom = vitrine.querySelector('.pullman-popup__table-nom');
+        const typ = vitrine.querySelector('.pullman-popup__table-type');
+        if (nom) nom.textContent = choix.querySelector('.pullman-popup__lieu-nom').textContent;
+        if (typ) typ.textContent = choix.querySelector('.pullman-popup__lieu-type').textContent;
+      }
+      carte.querySelectorAll('[data-lieu]').forEach(b => b.removeAttribute('data-on'));
+      choix.setAttribute('data-on', '');
+      const i = Number(choix.dataset.lieuPhoto);
+      if (i >= 0) {
+        const pt = carte.querySelector('.pullman-popup__point[data-point="' + i + '"]');
+        if (pt) pt.click();
+      }
+    }
+  });
+
   document.addEventListener('click', (e) => {
     const bouton = e.target.closest('[data-photo],[data-point]');
     if (!bouton) return;
@@ -205,6 +242,28 @@ function _addStyle() {
     // message très long n'aurait pas défilé, il aurait été coupé net par le bord de la
     // carte, boutons compris. Le cas ne se présente pas — 295 px mesurés pour 316 — mais
     // la troncature silencieuse est le mauvais échec à retenir.
+    // Le compteur devient un bouton : il annonçait des lieux sans jamais y mener.
+    '.pullman-popup__tables-reste{border:none;background:none;padding:0;font:inherit;text-align:left;color:#445047;text-decoration:underline;text-underline-offset:2px;cursor:pointer}' +
+    'button.pullman-popup__tables-reste:hover{color:#28332B}' +
+    // Deux colonnes, une ligne par lieu : sept tiennent dans la hauteur d'une card sans
+    // photo, là où le format d'origine en montrait un seul.
+    // display:none et non l'attribut hidden : la classe pose display:flex et l'emporte
+    // sur le hidden du navigateur — la liste restait affichée sous la card.
+    '.pullman-popup__lieux{display:none;padding:12px 14px 14px;flex-direction:column;gap:10px}' +
+    '.pullman-popup__lieux-liste{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}' +
+    '.pullman-popup__lieu{border:none;background:none;padding:3px 0;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0}' +
+    '.pullman-popup__lieu:hover .pullman-popup__lieu-nom{text-decoration:underline;text-underline-offset:2px}' +
+    '.pullman-popup__lieu[data-on] .pullman-popup__lieu-nom{color:#28332B}' +
+    '.pullman-popup__lieu-nom{font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;color:#445047;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.pullman-popup__lieu-type{font-family:var(--font-sans,sans-serif);font-size:10.5px;color:rgba(68,80,71,.68);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.pullman-popup__lieux-pied{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:9px;border-top:1px solid #BCCABE}' +
+    '.pullman-popup__lieux-retour{border:none;background:none;padding:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;color:rgba(68,80,71,.8);text-decoration:underline;text-underline-offset:2px;cursor:pointer}' +
+    '.pullman-popup--deplie .pullman-popup__media,' +
+    '.pullman-popup--deplie .pullman-popup__location,' +
+    '.pullman-popup--deplie .pullman-popup__tables,' +
+    '.pullman-popup--deplie .pullman-popup__foot{display:none}' +
+    '.pullman-popup--deplie .pullman-popup__lieux{display:flex}' +
+    '.pullman-popup--deplie .pullman-popup__body{padding-bottom:0}' +
     '.wd-map-detail--avis{width:344px;overflow-y:auto;overscroll-behavior:contain}' +
     // L'air se prend en hauteur : marges hautes et basses plus généreuses que les côtés,
     // interlignes plus amples, et de vrais intervalles entre le titre, le texte et les
@@ -465,26 +524,57 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       photos.length = 0;
       melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
     }
-    const vus = lieux.slice(0, 1);
-    const reste = lieux.length - vus.length;
+    // Le qualificatif d'un lieu : sa cuisine si elle est déclarée, son cadre sinon.
+    // Les bars n'ont jamais de cuisine renseignée chez Accor.
+    const qualifie = (v, n) => [v.type === 'bar' ? 'Bar' : 'Restaurant']
+      .concat(v.cuisines.concat(v.tags).slice(0, n).map(_libelleResto)).join(' · ');
+    // « 3 restaurants · 2 bars » plutôt qu'un nom collectif. Aucun ne convenait : « table »
+    // ne couvre pas un bar de piscine, et Pullman lui-même titre « Restaurants et vie
+    // nocturne ». Compter par type dit la composition sans avoir à déplier.
+    const composition = (liste) => {
+      const r = liste.filter(v => v.type !== 'bar').length, b = liste.length - r;
+      return [r ? r + ' restaurant' + (r > 1 ? 's' : '') : null,
+              b ? b + ' bar' + (b > 1 ? 's' : '') : null].filter(Boolean).join(' · ');
+    };
+    // Chaque lieu retrouve sa photo dans la galerie : c'est la récompense du clic, et
+    // ce qui manquait à une liste qui ne dit que des noms.
+    const indexPhoto = (v) => {
+      if (!v.img) return -1;
+      const i = photos.findIndex(u => u.indexOf(v.img) >= 0);
+      return i;
+    };
+    const premier = lieux[0];
+    const autres = lieux.slice(1);
     tables = '<div class="pullman-popup__tables">' +
       (lieux.length
-        ? vus.map(v => {
-            // Ce qui qualifie la table : sa cuisine si elle est déclarée, son cadre sinon.
-            // Les bars n'ont jamais de cuisine renseignée chez Accor.
-            const dits = v.cuisines.concat(v.tags).slice(0, 2).map(_libelleResto);
-            const ligne = [v.type === 'bar' ? 'Bar' : 'Restaurant'].concat(dits).join(' · ');
-            const nom = esc(v.nom);
-            return '<div class="pullman-popup__table">' +
-              (v.url
-                ? '<a class="pullman-popup__table-nom" href="' + esc(v.url) + '" target="_blank" rel="noopener">' + nom + '</a>'
-                : '<span class="pullman-popup__table-nom">' + nom + '</span>') +
-              '<span class="pullman-popup__table-type">' + esc(ligne) + '</span>' +
-            '</div>';
-          }).join('') +
-          (reste > 0 ? '<p class="pullman-popup__tables-reste">et ' + reste + ' autre' + (reste > 1 ? 's' : '') + ' table' + (reste > 1 ? 's' : '') + '</p>' : '')
-        : '<p class="pullman-popup__tables-reste">Aucune table ne répond à vos critères.</p>') +
-    '</div>';
+        ? '<div class="pullman-popup__table" data-lieu-vitrine>' +
+            (premier.url
+              ? '<a class="pullman-popup__table-nom" href="' + esc(premier.url) + '" target="_blank" rel="noopener">' + esc(premier.nom) + '</a>'
+              : '<span class="pullman-popup__table-nom">' + esc(premier.nom) + '</span>') +
+            '<span class="pullman-popup__table-type">' + esc(qualifie(premier, 2)) + '</span>' +
+          '</div>' +
+          (autres.length
+            ? '<button type="button" class="pullman-popup__tables-reste" data-lieux-deplier>et ' + esc(composition(autres)) + '</button>'
+            : '')
+        : '<p class="pullman-popup__tables-reste">Aucun restaurant ni bar ne répond à vos critères.</p>') +
+    '</div>' +
+    // L'état déplié : pas de photo, une ligne par lieu, deux colonnes. C'est ce qui
+    // permet d'en montrer sept sans jamais faire défiler la card.
+    (lieux.length > 1
+      ? '<div class="pullman-popup__lieux" hidden>' +
+          '<div class="pullman-popup__lieux-liste">' +
+            lieux.map((v, i) =>
+              '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '">' +
+                '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
+                '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
+              '</button>').join('') +
+          '</div>' +
+          '<div class="pullman-popup__lieux-pied">' +
+            '<button type="button" class="pullman-popup__lieux-retour" data-lieux-replier>Revenir</button>' +
+            '<a class="pullman-popup__link" href="search-results.html?tab=restaurants&hotel=' + encodeURIComponent(h.name) + '">Voir dans la liste</a>' +
+          '</div>' +
+        '</div>'
+      : '');
   }
 
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
@@ -783,7 +873,7 @@ function _avisRattrapage(criteriaSet) {
   const geo = { continent: _currentScope.continent, country: _currentScope.country, city: _currentScope.city };
   const zone = _enZone(geo);
   const reprise = typeof window.WD_ASSOUPLISSEMENT === 'function' ? window.WD_ASSOUPLISSEMENT() : null;
-  const quoi = _surRestos() ? 'Aucune table' : 'Aucun hôtel';
+  const quoi = _surRestos() ? 'Aucun restaurant ni bar' : 'Aucun hôtel';
   let suite = quoi + (zone ? ' ' + esc(zone) : '') + ' ne réunit ces critères.';
   if (reprise) {
     const pluriel = reprise.count > 1;
@@ -792,10 +882,10 @@ function _avisRattrapage(criteriaSet) {
       (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
   } else {
     suite += ' Aucun de vos critères ne peut être assoupli pour trouver ' +
-      (_surRestos() ? 'une table' : 'un hôtel') + ' ici.';
+      (_surRestos() ? 'un restaurant ni un bar' : 'un hôtel') + ' ici.';
   }
   clearTimeout(_avisTimer);
-  _peindreAvis(_surRestos() ? 'Aucune table ne correspond à tous vos critères'
+  _peindreAvis(_surRestos() ? 'Aucun restaurant ni bar ne correspond à tous vos critères'
                             : 'Aucun hôtel ne correspond à tous vos critères', suite, reprise);
 }
 
@@ -834,8 +924,8 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // devant une Chine entièrement grise.
   const elargir = dansZone === 0 && dansLarge > 0 ? large : null;
 
-  // « Aucune table » sur l'onglet Restaurants : on ne cherche pas un hôtel.
-  const rien = _surRestos() ? 'Aucune table' : 'Aucun hôtel';
+  // « Aucun restaurant ni bar » sur l'onglet Restaurants : on ne cherche pas un hôtel.
+  const rien = _surRestos() ? 'Aucun restaurant ni bar' : 'Aucun hôtel';
   if (dansZone > 0) {
     suite = '<strong>' + dansZone + ' ' + _motCompte(dansZone) + '</strong>' +
       (zone ? ' ' + esc(zone) : '') + ' y répond' + (dansZone > 1 ? 'ent' : '') + '.';
@@ -860,7 +950,7 @@ function _messageDetail(hotel, manquants, criteriaSet) {
         (pluriel ? '' : ' : <strong>' + esc(reprise.hotel.name) + '</strong>') + '.';
     } else {
       suite += ' Aucun de vos critères ne peut être assoupli pour trouver ' +
-        (_surRestos() ? 'une table' : 'un hôtel') + ' ici.';
+        (_surRestos() ? 'un restaurant ni un bar' : 'un hôtel') + ' ici.';
     }
   }
 
@@ -882,9 +972,9 @@ function _messageDetail(hotel, manquants, criteriaSet) {
   // montrer et le message n'a qu'à informer.
   const porteLeRattrapage = dansZone === 0 && !elargir;
   const titre = _surRestos()
-    // On ne dit pas « l'hôtel ne répond pas au critère » : ce sont ses tables qui ne
+    // On ne dit pas « l'hôtel ne répond pas au critère » : ce sont ses lieux qui ne
     // répondent pas, et le critère coché est une cuisine ou un cadre, pas un service.
-    ? 'Aucune table du ' + esc(hotel.name) + ' ne répond à vos critères'
+    ? 'Aucun restaurant ni bar du ' + esc(hotel.name) + ' ne répond à vos critères'
     : _surReunions()
       // Idem pour les réunions : ce sont ses espaces. Et il n'y a pas de « critère
       // manquant » à nommer — une capacité n'est pas un service absent — d'où le
