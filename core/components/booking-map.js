@@ -110,6 +110,15 @@ function _installerGalerie() {
         const pt = carte.querySelector('.pullman-popup__point[data-point="' + i + '"]');
         if (pt) pt.click();
       }
+      // Le CTA suit : il mène au lieu affiché, pas à celui d'avant. Sans page propre,
+      // il disparaît plutôt que de renvoyer ailleurs.
+      const cta = carte.querySelector('[data-lieu-cta]');
+      if (cta) {
+        const url = choix.dataset.lieuUrl || '';
+        cta.textContent = 'Voir le ' + (choix.dataset.lieuBar ? 'bar' : 'restaurant');
+        if (url) { cta.setAttribute('href', url); cta.hidden = false; }
+        else { cta.removeAttribute('href'); cta.hidden = true; }
+      }
     }
   });
 
@@ -249,6 +258,7 @@ function _addStyle() {
     // photo, là où le format d'origine en montrait un seul.
     // display:none et non l'attribut hidden : la classe pose display:flex et l'emporte
     // sur le hidden du navigateur — la liste restait affichée sous la card.
+    '.pullman-popup__cta[hidden]{display:none}' +
     '.pullman-popup__lieux{display:none;padding:12px 14px 14px;flex-direction:column;gap:10px}' +
     '.pullman-popup__lieux-liste{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}' +
     '.pullman-popup__lieu{border:none;background:none;padding:3px 0;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0}' +
@@ -473,6 +483,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // Onglet Réunions : la card présente les espaces de l'hôtel — les deux plus grands,
   // avec leur surface et ce qu'ils accueillent en théâtre. Le reste est annoncé.
   let tables = '';
+  // Le lieu en vitrine porte sa propre page : le pied de card en fait une action.
+  let lieuCta = null;
   const surReunions = _surReunions();
   if (surReunions) {
     const r = _reunionDe(h.name);
@@ -555,6 +567,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     };
     const premier = lieux[0];
     const autres = lieux.slice(1);
+    if (premier && premier.url) lieuCta = { url: premier.url, bar: premier.type === 'bar' };
     tables = '<div class="pullman-popup__tables">' +
       (lieux.length
         ? '<div class="pullman-popup__table" data-lieu-vitrine>' +
@@ -574,7 +587,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       ? '<div class="pullman-popup__lieux" hidden>' +
           '<div class="pullman-popup__lieux-liste">' +
             lieux.map((v, i) =>
-              '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '">' +
+              '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '"' +
+                ' data-lieu-url="' + esc(v.url || '') + '" data-lieu-bar="' + (v.type === 'bar' ? '1' : '') + '">' +
                 '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
                 '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
               '</button>').join('') +
@@ -595,9 +609,18 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // Sur l'onglet Restaurants, une seule sortie : la fiche de l'hôtel qui héberge la table.
   // En lien et non en pilule : les noms des tables sont déjà des liens, et la pilule
   // coûtait 23 px de haut qui manquaient à la photo.
-  const ctaResto = h.href
+  // Deux sorties sur l'onglet Restaurants : l'hôtel qui situe, et le lieu lui-même —
+  // c'est lui qu'on est venu voir. Le libellé suit le type : on ne dit pas « restaurant »
+  // d'un bar de piscine. 122 lieux sur 360 n'ont pas de page propre : pas de CTA alors,
+  // plutôt qu'un bouton qui mène à la page de l'hôtel en promettant autre chose.
+  const ctaResto = (h.href || lieuCta)
     ? '<div class="pullman-popup__actions">' +
-        '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l\u2019hôtel ' + arrow + '</a>' +
+        (h.href ? '<a class="pullman-popup__link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l\u2019hôtel ' + arrow + '</a>' : '') +
+        (surRestos
+          ? '<a class="pullman-popup__cta" data-lieu-cta href="' + esc(lieuCta ? lieuCta.url : '') + '"' +
+            ' target="_blank" rel="noopener"' + (lieuCta ? '' : ' hidden') + '>Voir le ' +
+            (lieuCta && lieuCta.bar ? 'bar' : 'restaurant') + '</a>'
+          : '') +
       '</div>'
     : '';
   const cta = h.href
