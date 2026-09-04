@@ -518,9 +518,14 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     const lieux = _lieuxDe(h.name);
     // La card montre les tables : ce sont leurs photos qu'on met en tête, celles de
     // l'hôtel derrière. Sans cela on présentait un lobby pour parler d'un rooftop.
-    const clesTables = lieux.map(v => v.img).filter(Boolean);
+    // Une photo par lieu, dans leur ordre : c'est ce qui permet à un clic sur le
+    // cinquième restaurant de montrer le cinquième visuel. Le plafond de 4 valait quand
+    // la card n'en montrait qu'un — au-delà, les lieux suivants n'avaient plus de photo
+    // à désigner et gardaient celle du précédent.
+    const clesTables = [...new Set(lieux.map(v => v.img).filter(Boolean))];
     if (clesTables.length) {
-      const melange = clesTables.concat(cles.filter(k => clesTables.indexOf(k) < 0)).slice(0, 4);
+      const melange = clesTables.concat(cles.filter(k => clesTables.indexOf(k) < 0))
+        .slice(0, Math.max(4, clesTables.length + 1));
       photos.length = 0;
       melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
     }
@@ -538,10 +543,15 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     };
     // Chaque lieu retrouve sa photo dans la galerie : c'est la récompense du clic, et
     // ce qui manquait à une liste qui ne dit que des noms.
+    // Quinze lieux sur 360 n'ont pas de visuel à eux. Sans repli, cliquer l'un d'eux
+    // laissait la photo du lieu précédent : on étiquetait le restaurant d'un nom qui
+    // n'était pas le sien. Ils renvoient donc vers la première photo de l'hôtel — un
+    // visuel générique vaut mieux qu'un visuel faux.
+    const premiereHotel = Math.min(clesTables.length, photos.length - 1);
     const indexPhoto = (v) => {
-      if (!v.img) return -1;
+      if (!v.img) return premiereHotel;
       const i = photos.findIndex(u => u.indexOf(v.img) >= 0);
-      return i;
+      return i >= 0 ? i : premiereHotel;
     };
     const premier = lieux[0];
     const autres = lieux.slice(1);
