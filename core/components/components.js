@@ -4820,19 +4820,33 @@
     }
 
     _agentRecap() {
-      const bits = [];
-      if (this.state.agentZone) bits.push(this.state.agentZone);
-      const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
-        pets: 'animaux acceptés', beach: 'bord de mer',
-        'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale',
-        'cap-30': 'moins de 30 participants', 'cap-100': '30 à 100 participants', 'cap-300': '100 à 300 participants',
-        'cap-800': '300 à 800 participants', 'cap-plus': 'plus de 800 participants' };
-      (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
+      // On ne récite pas des étiquettes — « je garde nature, spa » n'est pas une
+      // phrase. La zone et les critères se disent comme on décrirait l'hôtel qu'on
+      // cherche, et le carrousel qui suit dispense d'annoncer qu'on va chercher.
+      const zones = { centre: 'en centre-ville', affaires: 'dans le quartier d\u2019affaires',
+        'aéroport': 'près de l\u2019aéroport', gare: 'près de la gare', nature: 'en pleine nature',
+        ville: 'en ville', 'bord de mer': 'au bord de la mer' };
+      const avec = { spa: 'avec un spa', restaurant: 'avec un restaurant',
+        workspace: 'avec un espace de travail', 'meeting-room': 'avec une salle de réunion',
+        kids: 'avec un espace pour les enfants', pets: 'qui acceptent les animaux',
+        beach: 'en bord de mer', local: 'ancrés dans la vie locale' };
+      const capacites = { 'cap-30': 'pour moins de 30 personnes', 'cap-100': 'pour 30 à 100 personnes',
+        'cap-300': 'pour 100 à 300 personnes', 'cap-800': 'pour plus de 300 personnes' };
+
+      const quoi = this.state.selectedStayType === 'event' ? 'des salles' : 'des hôtels';
+      const morceaux = [];
+      if (this.state.agentZone && zones[this.state.agentZone]) morceaux.push(zones[this.state.agentZone]);
+      (this.state.selectedTypes || []).forEach(c => {
+        if (avec[c]) morceaux.push(avec[c]);
+        else if (capacites[c]) morceaux.push(capacites[c]);
+      });
+
       const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
-      if (bits.length && notes) return 'Je garde ' + bits.join(', ') + ', sans oublier ' + notes + '. Voyons ce qui correspond.';
-      if (notes) return 'Je garde ' + notes + ' en tête. Voyons ce qui correspond.';
-      if (bits.length) return 'Je garde ' + bits.join(', ') + '. Voyons ce qui correspond.';
-      return 'Parfait, voyons ce qui correspond.';
+      let p = morceaux.length
+        ? 'Je vous cherche ' + quoi + ' ' + morceaux.join(', ') + '.'
+        : 'Voici ce qui me paraît le plus proche.';
+      if (notes) p += ' Je n\u2019oublie pas ' + notes + '.';
+      return p;
     }
 
     renderQuestion1() {
