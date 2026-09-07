@@ -4451,14 +4451,16 @@
     // semblant.
     _agentLire(texte) {
       const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      // Les libellés se complètent après « des hôtels » : ils doivent se lire dans la
+      // phrase, pas s'y coller comme une étiquette.
       const VOC = [
-        { re: /\b(chien|chienne|chat|chatte|animal|animaux)\b/, v: 'pets', dit: 'les hôtels qui acceptent les animaux' },
-        { re: /\b(spa|piscine|hammam|sauna|massage)\b/,          v: 'spa', dit: 'un spa' },
-        { re: /\b(restaurant|table|diner|dine|gastronomi\w*)\b/, v: 'restaurant', dit: 'un restaurant' },
-        { re: /\b(salle|salles|reunion|reunions|seminaire)\b/,    v: 'meeting-room', dit: 'une salle de réunion' },
-        { re: /\b(coworking|bureau|bureaux|travailler|teletravail)\b/, v: 'workspace', dit: 'un espace de travail' },
-        { re: /\b(enfant|enfants|famille|familial\w*|kids)\b/,   v: 'kids', dit: 'un espace pour les enfants' },
-        { re: /\b(plage|mer|littoral)\b/,                        v: 'beach', dit: 'le bord de mer' }
+        { re: /\b(chien|chienne|chat|chatte|animal|animaux)\b/, v: 'pets', dit: 'qui acceptent les animaux' },
+        { re: /\b(spa|piscine|hammam|sauna|massage)\b/,          v: 'spa', dit: 'avec un spa' },
+        { re: /\b(restaurant|table|diner|dine|gastronomi\w*)\b/, v: 'restaurant', dit: 'avec un restaurant' },
+        { re: /\b(salle|salles|reunion|reunions|seminaire)\b/,    v: 'meeting-room', dit: 'avec une salle de réunion' },
+        { re: /\b(coworking|bureau|bureaux|travailler|teletravail)\b/, v: 'workspace', dit: 'avec un espace de travail' },
+        { re: /\b(enfant|enfants|famille|familial\w*|kids)\b/,   v: 'kids', dit: 'avec un espace pour les enfants' },
+        { re: /\b(plage|mer|littoral)\b/,                        v: 'beach', dit: 'en bord de mer' }
       ];
       const trouves = VOC.filter(o => o.re.test(t));
       return { criteres: trouves.map(o => o.v), dits: trouves.map(o => o.dit) };
@@ -4667,7 +4669,7 @@
         const lu = this._agentLire(texte);
         lu.criteres.forEach(retenir);
         if (lu.dits.length) {
-          accuse = 'Noté : ' + lu.dits.join(' et ') + '.';
+          accuse = 'Entendu, je ne garde que des hôtels ' + lu.dits.join(' et ') + '.';
         }
         // La question du tour a-t-elle sa réponse dans ce qui vient d'être écrit ?
         const rep = tour && tour.lit ? tour.lit(t) : null;
@@ -4680,7 +4682,13 @@
           // garde la phrase pour le récapitulatif. Si quelque chose a été compris, le
           // critère suffit : répéter la note à côté ferait doublon.
           if (!accuse) {
-            accuse = 'Je note « ' + texte + ' ».';
+            // Une question posée n'est pas une information à consigner : y répondre
+            // « je note » est la pire réponse possible. On dit ce qu'on sait — et ce
+            // qu'on ne sait pas —, et on passe la main à qui pourra trancher.
+            const question = /\?\s*$/.test(texte.trim());
+            accuse = question
+              ? 'Bonne question. Je ne peux pas vous le confirmer ici, mais l\u2019hôtel le pourra — je transmets le point avec votre demande.'
+              : 'Très bien, je garde ça de côté.';
             this.state.agentNotes = (this.state.agentNotes || []).concat(texte);
           }
         }
@@ -4701,7 +4709,7 @@
         if (!avance && tour) {
           // Recadrage : on accuse réception, puis on repose la question restée en
           // suspens. Sans ça l'agent enchaînait comme si on lui avait répondu.
-          dit = accuse + ' Il me manque encore votre réponse : ' + tour.q.charAt(0).toLowerCase() + tour.q.slice(1);
+          dit = accuse + ' Reste à savoir : ' + tour.q.charAt(0).toLowerCase() + tour.q.slice(1);
         } else if (suivant) {
           dit = (accuse ? accuse + ' ' : '') + suivant.q;
         } else {
@@ -4731,10 +4739,10 @@
         'cap-800': '300 à 800 participants', 'cap-plus': 'plus de 800 participants' };
       (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
       const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
-      if (bits.length && notes) return 'Je retiens : ' + bits.join(', ') + ', et vos notes ' + notes + '.';
-      if (notes) return 'Je retiens ' + notes + '. Je regarde ce qui correspond.';
-      if (bits.length) return 'Je retiens : ' + bits.join(', ') + '.';
-      return 'Très bien, je regarde ce qui correspond.';
+      if (bits.length && notes) return 'Je garde ' + bits.join(', ') + ', sans oublier ' + notes + '. Voyons ce qui correspond.';
+      if (notes) return 'Je garde ' + notes + ' en tête. Voyons ce qui correspond.';
+      if (bits.length) return 'Je garde ' + bits.join(', ') + '. Voyons ce qui correspond.';
+      return 'Parfait, voyons ce qui correspond.';
     }
 
     renderQuestion1() {
