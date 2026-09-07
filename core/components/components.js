@@ -4625,13 +4625,17 @@
       }
 
       // Une table a été demandée : c'est elle qu'on montre, pas l'hôtel qui l'abrite.
+      // Quinze lieux sur 360 n'ont pas de visuel : ils empruntent celui de leur hôtel
+      // plutôt que de laisser un rectangle vide au milieu du carrousel.
       if (crit.indexOf('restaurant') >= 0) {
+        const parHotel = {};
+        (window.WD_HOTELS || []).forEach(h => { parHotel[h.name] = h; });
         const tables = (window.WD_RESTAURANTS || [])
           .filter(v => dansLaZone(v.ville, v.pays))
           .slice(0, 6)
           .map(v => ({ titre: v.nom, sous: v.hotel + ' · ' + v.ville,
             detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
-            img: photo(v.img), href: v.url || null }));
+            img: photo(v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
         if (tables.length) return tables;
       }
 
@@ -4664,43 +4668,70 @@
       }
     }
 
+    // Fin du parcours : la liste complète, filtrée par ce que l'échange a produit.
+    // L'écran « nous cherchons votre hôtel idéal » disparaît — il faisait patienter
+    // devant une recherche déjà faite, et laissait au passage fuiter des valeurs
+    // internes dans son récapitulatif.
+    _agentLienResultats() {
+      const st = this.state;
+      const p = new URLSearchParams();
+      const versListe = { spa: 'spa', restaurant: 'restaurant', pets: 'pets', kids: 'family',
+                          beach: 'beach', 'meeting-room': 'meeting' };
+      p.set('tab', st.selectedStayType === 'event' ? 'reunions'
+        : ((st.selectedTypes || []).indexOf('restaurant') >= 0 ? 'restaurants' : 'hotels'));
+      const lieu = st.businessLocation && st.businessLocation !== '__ouvert__'
+        ? st.businessLocation : (st.destinationInput || '');
+      if (lieu) p.set('city', lieu);
+      const crit = (st.selectedTypes || []).map(c => versListe[c]).filter(Boolean);
+      if (crit.length) p.set('criteria', crit.join(','));
+      if (st.checkInDate) p.set('checkin', st.checkInDate);
+      if (st.checkOutDate) p.set('checkout', st.checkOutDate);
+      return 'search-results.html?' + p.toString();
+    }
+
     renderAgent() {
       const st = this.state;
       const tours = this._agentTours();
       const tour = tours[st.agentTurn];
       const fini = !tour;
+      // Le carrousel s'écrit dans la dernière bulle de l'agent : ce qu'il propose fait
+      // partie de sa réponse. Posé en dessous, il devenait un encart qui n'appartenait
+      // plus à l'échange.
+      const props = fini ? this._agentPropositions() : [];
+      const carrousel = props.length
+        ? '<div class="wd-agent__carrousel">' + props.map(p =>
+            (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
+                    : '<div class="wd-agent__prop">') +
+              (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
+                     : '<span class="wd-agent__prop-img"></span>') +
+              '<span class="wd-agent__prop-nom">' + esc(p.titre) + '</span>' +
+              '<span class="wd-agent__prop-sous">' + esc(p.sous) + '</span>' +
+              (p.detail ? '<span class="wd-agent__prop-detail">' + esc(p.detail) + '</span>' : '') +
+            (p.href ? '</a>' : '</div>')).join('') +
+          '</div>'
+        : '';
+      const dernier = (st.agentThread || []).length - 1;
+
       let vuAgent = false;
-      const fil = (st.agentThread || []).map(m => {
+      const fil = (st.agentThread || []).map((m, i) => {
         // L'étiquette une seule fois : la répéter à chaque tour n'apprend rien.
         const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Assistant Pullman</span>') : '';
-        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + '"><p>' + m.texte + '</p></div>';
+        const porte = fini && i === dernier && m.qui === 'agent' && carrousel;
+        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + '">'
+          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + '</div>';
       }).join('')
       + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="L\u2019assistant écrit"><span></span><span></span><span></span></div>' : '');
       const propositions = (tour && !st.agentTyping)
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
         : '';
-      let cloture = '';
-      if (fini) {
-        const props = this._agentPropositions();
-        const quoi = st.selectedStayType === 'event' ? 'salle' : ((st.selectedTypes || []).indexOf('restaurant') >= 0 ? 'table' : 'hôtel');
-        cloture = '<div class="wd-agent__props">' +
-          (props.length
-            ? '<p class="wd-agent__props-titre">Ce que je vous propose' +
-                (this.state.agentAssoupli ? ' — en mettant de côté ' + esc(this.state.agentAssoupli) : '') + '</p>' +
-              '<div class="wd-agent__carrousel">' + props.map(p =>
-                (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
-                        : '<div class="wd-agent__prop">') +
-                  (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />' : '<span class="wd-agent__prop-img"></span>') +
-                  '<span class="wd-agent__prop-nom">' + esc(p.titre) + '</span>' +
-                  '<span class="wd-agent__prop-sous">' + esc(p.sous) + '</span>' +
-                  (p.detail ? '<span class="wd-agent__prop-detail">' + esc(p.detail) + '</span>' : '') +
-                (p.href ? '</a>' : '</div>')).join('') +
-              '</div>'
-            : '<p class="wd-agent__props-titre">Aucune ' + quoi + ' ne réunit tout cela. La liste complète vous laissera assouplir un critère.</p>') +
-          '<button type="button" class="wd-discovery-modal__continue is-active wd-agent__tout" data-agent-voir>Voir tous les résultats</button>' +
-        '</div>';
-      }
+      const cloture = fini
+        ? '<div class="wd-agent__props">' +
+            (props.length ? '' : '<p class="wd-agent__props-titre">Rien ne réunit tout cela. La liste complète vous laissera assouplir un critère.</p>') +
+            '<a class="wd-discovery-modal__continue is-active wd-agent__tout" href="' + esc(this._agentLienResultats()) + '">Voir tous les résultats</a>' +
+          '</div>'
+        : '';
+
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">
@@ -7638,8 +7669,8 @@
         case 1.5:
           return 'agent';
 
-        case 'agent':
-          return 'results';
+        // La conversation est terminale : on en sort par un lien, vers la liste complète
+        // ou vers la fiche d'une proposition. Plus d'étape intermédiaire.
 
         default:
           return 'agent';

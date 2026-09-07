@@ -2122,6 +2122,10 @@
 .wd-agent__thread { display: flex; flex-direction: column; gap: 12px;
   flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px 2px 4px 0; }
 .wd-agent__msg { max-width: 86%; }
+/* La bulle qui porte les propositions prend toute la largeur : à 86 % les cartes
+   n'auraient plus la place de défiler. */
+.wd-agent__msg--props { max-width: 100%; width: 100%; }
+.wd-agent__msg--props .wd-agent__carrousel { margin-top: 12px; }
 .wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
 .wd-agent__msg--agent { align-self: flex-start; background: #EDF2EE; color: #445047; padding: 12px 14px; }
 .wd-agent__msg--moi { align-self: flex-end; background: #445047; color: #fff; padding: 12px 14px; }
@@ -2171,26 +2175,29 @@
   display: flex; flex-direction: column; gap: 10px; }
 .wd-agent__props-titre { margin: 0; font-family: var(--font-sans); font-size: 10px; font-weight: 700;
   letter-spacing: .8px; text-transform: uppercase; color: rgba(68,80,71,.5); }
-.wd-agent__carrousel { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+.wd-agent__carrousel { display: flex; align-items: stretch; gap: 10px; overflow-x: auto; padding-bottom: 4px;
   scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .wd-agent__carrousel::-webkit-scrollbar { display: none; }
-/* Sans bordure : la photo délimite déjà la carte, et un filet autour d'une image
-   sur fond blanc n'ajoute qu'un trait. Le survol se marque sur le nom, là où le
-   regard est. */
-.wd-agent__prop { flex: 0 0 168px; display: flex; flex-direction: column; text-decoration: none;
-  border: none; background: transparent; color: #445047; }
+/* Ni bordure ni transparence : le filet n'ajoutait qu'un trait autour de l'image,
+   mais sans fond la carte cessait d'exister — un titre sous une photo n'est pas une
+   carte, et une photo manquante laissait un trou. Elle reçoit donc la surface teintée
+   de la conversation, la même que les bulles de l'agent. */
+.wd-agent__prop { flex: 0 0 172px; display: flex; flex-direction: column; text-decoration: none;
+  border: none; background: #fff; color: #445047; }
+a.wd-agent__prop:hover { background: #F7FAF7; }
 a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-underline-offset: 3px; }
 .wd-agent__prop-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
-  background: #EDF2EE; }
+  background: #E3EAE4; }
 .wd-agent__prop-nom { font-family: var(--font-sans); font-size: 13px; font-weight: 700;
-  color: #445047; padding: 8px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  color: #445047; padding: 9px 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wd-agent__prop-sous { font-family: var(--font-sans); font-size: 11.5px; color: rgba(68,80,71,.7);
-  padding: 1px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  padding: 1px 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wd-agent__prop-detail { font-family: var(--font-sans); font-size: 11.5px; color: rgba(68,80,71,.55);
-  padding: 2px 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  padding: 2px 10px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* La liste complète reste accessible, mais elle n'est plus l'action principale :
    c'est la sortie de qui veut comparer, pas la conclusion de l'échange. */
-.wd-agent__tout { align-self: flex-start; background: transparent; color: #445047;
+.wd-agent__tout { align-self: flex-start; display: inline-flex; align-items: center;
+  text-decoration: none; background: transparent; color: #445047;
   border: 1px solid #BCCABE; box-shadow: none; }
 .wd-agent__tout:hover { background: #F2F6F2; border-color: #445047; }
 
