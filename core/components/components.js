@@ -5990,6 +5990,11 @@
             this._rerenderContent();
             const mc = this.querySelector('.wd-discovery-modal__content');
             if (mc) mc.scrollTop = 0;
+            // « Solo » et « En couple » referment la question : on enchaîne. « En famille »
+            // et « Entre amis » demandent encore un nombre — le bouton reste inactif, donc
+            // le passage ne se déclenche pas. C'est l'état du bouton qui décide, pas une
+            // liste de cas à tenir à jour.
+            this._avancerApresChoix();
           });
         });
 
@@ -6096,6 +6101,7 @@
             if (continueBtn) {
               continueBtn.classList.add('is-active');
             }
+            this._avancerApresChoix();
           });
         });
       }
@@ -6575,6 +6581,8 @@
           const value = chip.dataset.stubValue;
           this.state[field] = value;
           this._rerenderContent();
+          // Le re-rendu recrée le bouton : on le rejoue après, sur le nouveau DOM.
+          this._avancerApresChoix();
         });
       });
 
@@ -6641,6 +6649,20 @@
           this.updateCarouselPosition();
         });
       });
+
+      // Sur une question à choix unique, cliquer une carte suffit : demander ensuite
+      // « Continuer » fait payer deux gestes pour une seule décision, et le second
+      // n'apporte rien — il n'y a rien à confirmer quand on ne peut choisir qu'une
+      // réponse. Le délai laisse voir l'état sélectionné avant la transition, sinon
+      // l'écran change avant qu'on ait vu ce qu'on a choisi. « Retour » reste la
+      // sortie. Les questions à choix multiple gardent leur bouton : là, il marque
+      // la fin d'une sélection qu'on peut encore compléter.
+      this._avancerApresChoix = () => {
+        const btn = this.querySelector('.wd-discovery-modal__continue');
+        if (!btn || !btn.classList.contains('is-active')) return;
+        clearTimeout(this._minuteurChoix);
+        this._minuteurChoix = setTimeout(() => btn.click(), 220);
+      };
 
       // Bouton "Continuer"
       const continueBtn = this.querySelector('.wd-discovery-modal__continue');
@@ -6709,6 +6731,7 @@
             if (continueBtn) {
               continueBtn.classList.add('is-active');
             }
+            this._avancerApresChoix();
             return;
           }
 
@@ -6801,6 +6824,7 @@
               if (stepper) {
                 stepper.textContent = `Étape 1/${this._getStepTotal()}`;
               }
+              this._avancerApresChoix();
             } else {
               console.log('Q1: Not active card, navigating to:', clickedIndex);
               this.state.carouselIndex = clickedIndex;
