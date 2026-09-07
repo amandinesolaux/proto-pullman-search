@@ -4452,7 +4452,7 @@
       if (type === 'event') {
         return [
           { q: 'Combien de participants attendez-vous ?',
-            r: [{ t: 'Moins de 30', v: 'cap-100' }, { t: '30 à 100', v: 'cap-100' },
+            r: [{ t: 'Moins de 30', v: 'cap-30' }, { t: '30 à 100', v: 'cap-100' },
                 { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }] },
           { q: 'Sur combien de jours ?',
             r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }] }
@@ -4485,9 +4485,38 @@
       ];
     }
 
-    // Ce que les quatre questions ont produit, ligne par ligne. Une phrase les
-    // résumait, mais on ne vérifie pas une phrase : on la lit. Un relevé se
-    // parcourt, et une erreur y saute aux yeux avant qu'on lance la recherche.
+    // Ce que les quatre questions ont produit, dit à voix haute. Un encadré à
+    // colonnes au milieu d'un échange, c'est un formulaire déguisé : la synthèse
+    // appartient à la conversation, donc elle se formule.
+    _agentSynthese() {
+      const st = this.state;
+      const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      const quoi = { pro: 'vous partez en déplacement professionnel',
+                     event: 'vous organisez un séminaire',
+                     escapade: 'vous préparez un séjour',
+                     guide: 'vous cherchez encore votre prochaine destination' };
+      let p = quoi[st.selectedStayType] || 'vous préparez un séjour';
+
+      const lieu = st.businessLocation && st.businessLocation !== '__ouvert__'
+        ? st.businessLocation : (st.destinationInput || null);
+      if (lieu) p += ' à ' + lieu;
+
+      if (st.checkInDate && st.checkOutDate) {
+        const a1 = new Date(st.checkInDate), a2 = new Date(st.checkOutDate);
+        const nuits = Math.round((a2 - a1) / 86400000);
+        const jour = (n) => n === 1 ? '1er' : String(n);
+        p += ', du ' + jour(a1.getDate()) + (a1.getMonth() === a2.getMonth() ? '' : ' ' + MOIS[a1.getMonth()])
+           + ' au ' + jour(a2.getDate()) + ' ' + MOIS[a2.getMonth()]
+           + (nuits > 0 ? ' — ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') : '');
+      } else if (st.selectedMonth) {
+        p += ', en ' + st.selectedMonth;
+      }
+
+      if (st.selectedStayType === 'pro' && st.bleisureChoice === 'yes') p += ', que vous prolongez sur place';
+      if (!lieu) p += ', sans destination arrêtée';
+      return p + '.';
+    }
+
     _agentResume() {
       const st = this.state;
       const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -4543,19 +4572,12 @@
             '<button type="button" class="wd-discovery-modal__continue is-active" data-agent-voir>Voir les résultats</button>' +
           '</div>'
         : '';
-      const resume = '<div class="wd-agent__resume">' +
-        '<p class="wd-agent__resume-titre">Ce que j\u2019ai noté</p>' +
-        '<dl class="wd-agent__resume-liste">' +
-          this._agentResume().map(r =>
-            '<div class="wd-agent__resume-ligne"><dt>' + r.l + '</dt>' +
-            '<dd' + (r.ouvert ? ' class="est-ouvert"' : '') + '>' + r.v + '</dd></div>').join('') +
-        '</dl></div>';
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">
             <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
             <div class="wd-agent">
-              <div class="wd-agent__thread" id="wdAgentThread">${resume}${fil}</div>
+              <div class="wd-agent__thread" id="wdAgentThread">${fil}</div>
               ${propositions}
               ${cloture}
               <form class="wd-agent__composer" id="wdAgentComposer">
@@ -4581,12 +4603,11 @@
       // la phrase commence, et elle prend sa majuscule.
       const prenom = this.state.isConnected && this.state.userProfile
         ? this.state.userProfile.firstName : null;
-      // Le contexte est désormais dans la synthèse, au-dessus : le redire en bulle
-      // le ferait lire deux fois. L'agent ouvre donc sur ce qui manque encore.
-      this.state.agentThread = [
-        { qui: 'agent', texte: (prenom ? prenom + ', il' : 'Il') + ' me manque deux choses pour affiner.' },
-        { qui: 'agent', texte: tours[0].q }
-      ];
+      // Une seule bulle : couper la reprise de la question en deux messages faisait
+      // deux prises de parole là où il n'y en a qu'une.
+      this.state.agentThread = [{ qui: 'agent',
+        texte: (prenom ? prenom + ', je comprends que ' : 'Je comprends que ')
+             + this._agentSynthese() + ' ' + tours[0].q }];
     }
 
     _agentRepondre(texte, choix) {
@@ -4636,7 +4657,9 @@
       const bits = [];
       if (this.state.agentZone) bits.push(this.state.agentZone);
       const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
-        'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale' };
+        'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale',
+        'cap-30': 'moins de 30 participants', 'cap-100': '30 à 100 participants', 'cap-300': '100 à 300 participants',
+        'cap-800': '300 à 800 participants', 'cap-plus': 'plus de 800 participants' };
       (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
       const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
       if (bits.length && notes) return 'Je retiens : ' + bits.join(', ') + ', et vos notes ' + notes + '.';
