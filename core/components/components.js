@@ -4203,7 +4203,7 @@
         agentZone: null,
         agentTurn: 0,
         agentTyping: false,
-        agentLibre: null,
+        agentNotes: [],
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -4301,7 +4301,7 @@
         agentZone: null,
         agentTurn: 0,
         agentTyping: false,
-        agentLibre: null,
+        agentNotes: [],
         // État guide (mini-triage)
         guideWork: null,
         guideGroup: null
@@ -4485,6 +4485,42 @@
       ];
     }
 
+    // Ce que les quatre questions ont produit, ligne par ligne. Une phrase les
+    // résumait, mais on ne vérifie pas une phrase : on la lit. Un relevé se
+    // parcourt, et une erreur y saute aux yeux avant qu'on lance la recherche.
+    _agentResume() {
+      const st = this.state;
+      const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      const motifs = { pro: 'Déplacement professionnel', event: 'Séminaire ou événement',
+                       escapade: 'Séjour personnel', guide: 'Encore à définir' };
+      const lignes = [{ l: 'Motif', v: motifs[st.selectedStayType] || 'Séjour' }];
+
+      if (st.businessLocation && st.businessLocation !== '__ouvert__') lignes.push({ l: 'Destination', v: st.businessLocation });
+      else if (st.destinationInput) lignes.push({ l: 'Destination', v: st.destinationInput });
+      else lignes.push({ l: 'Destination', v: 'à définir ensemble', ouvert: true });
+
+      if (st.checkInDate && st.checkOutDate) {
+        const a1 = new Date(st.checkInDate), a2 = new Date(st.checkOutDate);
+        const nuits = Math.round((a2 - a1) / 86400000);
+        lignes.push({ l: 'Dates', v: a1.getDate() + (a1.getMonth() === a2.getMonth() ? '' : ' ' + MOIS[a1.getMonth()])
+          + ' → ' + a2.getDate() + ' ' + MOIS[a2.getMonth()] + ' · ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') });
+      } else if (st.selectedMonth) {
+        lignes.push({ l: 'Période', v: st.selectedMonth + (st.selectedDuration ? ' · ' + st.selectedDuration : '') });
+      } else {
+        lignes.push({ l: 'Dates', v: 'à définir ensemble', ouvert: true });
+      }
+
+      if (st.selectedStayType === 'pro') {
+        lignes.push({ l: 'Sur place', v: st.bleisureChoice === 'yes' ? 'Séjour prolongé' : 'Pas de prolongation' });
+      } else if (st.selectedWho && st.selectedWho !== 'business') {
+        // « business » est posé par le parcours, pas choisi : l'afficher ferait passer
+        // une mécanique interne pour une réponse.
+        const qui = { solo: 'Seul', couple: 'En couple', family: 'En famille', friends: 'Entre amis' };
+        lignes.push({ l: 'Voyageurs', v: qui[st.selectedWho] || st.selectedWho });
+      }
+      return lignes;
+    }
+
     renderAgent() {
       const st = this.state;
       const tours = this._agentTours();
@@ -4493,10 +4529,10 @@
       let vuAgent = false;
       const fil = (st.agentThread || []).map(m => {
         // L'étiquette une seule fois : la répéter à chaque tour n'apprend rien.
-        const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Pullman</span>') : '';
+        const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Assistant Pullman</span>') : '';
         return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + '"><p>' + m.texte + '</p></div>';
       }).join('')
-      + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="Pullman écrit"><span></span><span></span><span></span></div>' : '');
+      + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="L\u2019assistant écrit"><span></span><span></span><span></span></div>' : '');
       const propositions = (tour && !st.agentTyping)
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
@@ -4507,12 +4543,19 @@
             '<button type="button" class="wd-discovery-modal__continue is-active" data-agent-voir>Voir les résultats</button>' +
           '</div>'
         : '';
+      const resume = '<div class="wd-agent__resume">' +
+        '<p class="wd-agent__resume-titre">Ce que j\u2019ai noté</p>' +
+        '<dl class="wd-agent__resume-liste">' +
+          this._agentResume().map(r =>
+            '<div class="wd-agent__resume-ligne"><dt>' + r.l + '</dt>' +
+            '<dd' + (r.ouvert ? ' class="est-ouvert"' : '') + '>' + r.v + '</dd></div>').join('') +
+        '</dl></div>';
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">
             <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
             <div class="wd-agent">
-              <div class="wd-agent__thread" id="wdAgentThread">${fil}</div>
+              <div class="wd-agent__thread" id="wdAgentThread">${resume}${fil}</div>
               ${propositions}
               ${cloture}
               <form class="wd-agent__composer" id="wdAgentComposer">
@@ -4521,7 +4564,7 @@
               </form>
             </div>
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Conversation</div>
+              <div class="wd-discovery-modal__stepper">Questionnaire terminé</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
               <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
             </div>
@@ -4538,9 +4581,10 @@
       // la phrase commence, et elle prend sa majuscule.
       const prenom = this.state.isConnected && this.state.userProfile
         ? this.state.userProfile.firstName : null;
-      const ctx = this._agentContexte();
+      // Le contexte est désormais dans la synthèse, au-dessus : le redire en bulle
+      // le ferait lire deux fois. L'agent ouvre donc sur ce qui manque encore.
       this.state.agentThread = [
-        { qui: 'agent', texte: prenom ? prenom + ', ' + ctx.charAt(0).toLowerCase() + ctx.slice(1) : ctx },
+        { qui: 'agent', texte: (prenom ? prenom + ', il' : 'Il') + ' me manque deux choses pour affiner.' },
         { qui: 'agent', texte: tours[0].q }
       ];
     }
@@ -4552,7 +4596,11 @@
       // Ce qui est écrit à la main est repris tel quel dans le récapitulatif. Le
       // prototype ne sait pas l'interpréter — le redire prouve au moins qu'il l'a
       // reçu, là où une réponse générique donne l'impression du contraire.
-      if (!choix) this.state.agentLibre = texte;
+      if (!choix) {
+        // Toutes les notes, pas seulement la dernière : la précédente disparaissait
+        // du récapitulatif alors qu'on venait de l'écrire.
+        this.state.agentNotes = (this.state.agentNotes || []).concat(texte);
+      }
       if (choix) {
         // La réponse alimente vraiment la recherche : sans cela l'échange serait
         // un décor, et les résultats ne diraient rien de ce qu'on vient de dire.
@@ -4590,9 +4638,9 @@
       const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
         'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale' };
       (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
-      const libre = this.state.agentLibre;
-      if (bits.length && libre) return 'Je retiens : ' + bits.join(', ') + ', et votre note « ' + libre + ' ».';
-      if (libre) return 'Je retiens votre note « ' + libre + ' ». Je regarde ce qui correspond.';
+      const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
+      if (bits.length && notes) return 'Je retiens : ' + bits.join(', ') + ', et vos notes ' + notes + '.';
+      if (notes) return 'Je retiens ' + notes + '. Je regarde ce qui correspond.';
       if (bits.length) return 'Je retiens : ' + bits.join(', ') + '.';
       return 'Très bien, je regarde ce qui correspond.';
     }
@@ -6851,10 +6899,12 @@
       // La conversation s'amorce au moment où l'on y entre, pas avant : le contexte
       // repris doit refléter les quatre réponses telles qu'elles viennent d'être données.
       if (this.state.currentStep === 'agent') {
+        // On teste l'état, pas le DOM : la synthèse remplit le fil avant les bulles,
+        // et un fil « non vide » ne dit plus que la conversation a commencé.
+        const vierge = !(this.state.agentThread || []).length;
         this._agentAmorcer();
-        const fil = this.querySelector('#wdAgentThread');
-        if (fil && !fil.innerHTML.trim()) { this._rerenderContent(); return; }
-        if (fil) fil.scrollTop = fil.scrollHeight;
+        if (vierge) { this._rerenderContent(); return; }
+        this._agentDefiler();
 
         this.querySelectorAll('[data-agent-reply]').forEach(btn => {
           btn.addEventListener('click', (e) => {

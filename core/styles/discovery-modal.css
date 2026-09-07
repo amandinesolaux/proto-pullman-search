@@ -2115,6 +2115,22 @@
 
 .wd-agent__thread { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 240px;
   overflow-y: auto; padding: 4px 2px 4px 0; }
+/* La synthèse n'est pas une bulle : ce n'est pas quelqu'un qui parle, c'est un
+   relevé qu'on vérifie. Encadré, aligné, il se parcourt d'un regard — et une
+   valeur fausse s'y repère avant qu'on lance la recherche. */
+.wd-agent__resume { border: 1px solid #BCCABE; padding: 14px 16px 12px; margin-bottom: 4px; }
+.wd-agent__resume-titre { margin: 0 0 10px; font-family: var(--font-sans); font-size: 10px;
+  font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: rgba(68,80,71,.5); }
+.wd-agent__resume-liste { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.wd-agent__resume-ligne { display: flex; gap: 12px; align-items: baseline; }
+.wd-agent__resume-ligne dt { flex: 0 0 6.5rem; font-family: var(--font-sans); font-size: 12px;
+  color: rgba(68,80,71,.6); }
+.wd-agent__resume-ligne dd { margin: 0; font-family: var(--font-sans); font-size: 14px;
+  font-weight: 600; color: #445047; }
+/* Ce qui reste à définir se distingue de ce qui est arrêté : sans ça, « à définir
+   ensemble » se lit comme une réponse. */
+.wd-agent__resume-ligne dd.est-ouvert { font-weight: 400; font-style: italic; color: rgba(68,80,71,.6); }
+
 .wd-agent__msg { max-width: 86%; }
 .wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
 .wd-agent__msg--agent { align-self: flex-start; background: #EDF2EE; color: #445047; padding: 12px 14px; }
