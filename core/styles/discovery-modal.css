@@ -2209,3 +2209,11 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-agent__msg { max-width: 92%; }
   .wd-agent__reply { min-height: 44px; font-size: 15px; }
 }
+
+/* Trois façons de répondre à « quand » : au jour près, à quelques jours près, ou par
+   période. Les modes se posent au-dessus du champ, avant qu'on ouvre le calendrier —
+   choisir son mode après avoir saisi des dates n'aurait pas de sens. */
+.wd-discovery-modal__dates-modes { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+/* La marge se pose sous les dates, sans intertitre : trois pastilles se lisent seules. */
+.wd-discovery-modal__dates-flex { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+.wd-discovery-modal__question--dates .wd-discovery-modal__question-label { display: none; }

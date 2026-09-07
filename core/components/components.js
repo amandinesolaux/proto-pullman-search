@@ -4205,6 +4205,8 @@
         agentTyping: false,
         agentNotes: [],
         agentAssoupli: null,
+        dateMode: 'exactes',
+        dateFlex: 3,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -4304,6 +4306,8 @@
         agentTyping: false,
         agentNotes: [],
         agentAssoupli: null,
+        dateMode: 'exactes',
+        dateFlex: 3,
         // État guide (mini-triage)
         guideWork: null,
         guideGroup: null
@@ -4468,62 +4472,98 @@
       return { criteres: trouves.map(o => o.v), dits: trouves.map(o => o.dit) };
     }
 
+    // Chaque question porte sa condition, et l'agent ne pose que celles qui ont encore
+    // un sens. Demander « le bord de mer, une ville ou la nature ? » à quelqu'un qui
+    // vient d'écrire « Nice » lui redemande ce qu'il vient de dire — c'est le défaut
+    // que produit un script figé, pas un script tout court.
     _agentTours() {
       const st = this.state;
       const type = st.selectedStayType;
       const foyer = st.isConnected && st.userProfile && st.userProfile.foyer;
+      const lieuConnu = !!(st.businessLocation && st.businessLocation !== '__ouvert__') || !!st.destinationInput;
+
+      const tous = [];
 
       if (type === 'event') {
-        return [
-          { q: 'Combien de participants attendez-vous ?',
-            r: [{ t: 'Moins de 30', v: 'cap-30' }, { t: '30 à 100', v: 'cap-100' },
-                { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }],
-            // Un nombre écrit en chiffres ou en lettres répond à la question ; le reste,
-            // non — et l'agent doit alors la reposer plutôt que d'avancer à vide.
-            lit: (t) => {
-              const mots = { vingtaine: 20, trentaine: 30, quarantaine: 40, cinquantaine: 50, centaine: 100 };
-              let n = null;
-              const chiffre = t.match(/\b(\d{1,4})\b/);
-              if (chiffre) n = Number(chiffre[1]);
-              else { for (const m in mots) if (t.indexOf(m) >= 0) { n = mots[m]; break; } }
-              if (n === null) return null;
-              return { v: n < 30 ? 'cap-30' : n <= 100 ? 'cap-100' : n <= 300 ? 'cap-300' : 'cap-800' };
-            } },
-          { q: 'Sur combien de jours ?',
-            r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }],
-            lit: (t) => /\b(\d+)\s*(jour|journee)|une journee|demi-journee|deux jours|trois jours/.test(t) ? {} : null }
-        ];
+        tous.push({ q: 'Combien de participants attendez-vous ?',
+          r: [{ t: 'Moins de 30', v: 'cap-30' }, { t: '30 à 100', v: 'cap-100' },
+              { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }],
+          lit: (t) => {
+            const mots = { vingtaine: 20, trentaine: 30, quarantaine: 40, cinquantaine: 50, centaine: 100 };
+            let n = null;
+            const chiffre = t.match(/\b(\d{1,4})\b/);
+            if (chiffre) n = Number(chiffre[1]);
+            else { for (const m in mots) if (t.indexOf(m) >= 0) { n = mots[m]; break; } }
+            if (n === null) return null;
+            return { v: n < 30 ? 'cap-30' : n <= 100 ? 'cap-100' : n <= 300 ? 'cap-300' : 'cap-800' };
+          } });
+        tous.push({ q: 'Sur combien de jours ?',
+          r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }],
+          lit: (t) => /\b(\d+)\s*(jour|journee)|une journee|demi-journee|deux jours|trois jours/.test(t) ? {} : null });
+        return tous;
       }
+
       if (type === 'pro') {
-        const t2 = st.bleisureChoice === 'yes'
-          ? { q: 'Vous restez seul, ou quelqu\u2019un vous rejoint ?',
-              r: [{ t: 'Seul' },
-                  { t: 'Mon conjoint', v: 'restaurant' },
-                  { t: foyer ? 'Ma famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'Ma famille', v: 'kids' }] }
-          : { q: 'Un espace de travail dans l\u2019hôtel, ou ça n\u2019a pas d\u2019importance ?',
-              r: [{ t: 'Un espace de travail', v: 'workspace' },
-                  { t: 'Une salle de réunion', v: 'meeting-room' },
-                  { t: 'Peu importe' }] };
-        return [
-          { q: 'Vous préférez être près du centre, du quartier d\u2019affaires, ou de l\u2019aéroport ?',
+        // Le quartier ne se demande que si l'on sait dans quelle ville. Sinon c'est la
+        // région qui manque, et c'est elle qu'on demande.
+        if (lieuConnu) {
+          tous.push({ q: 'Vous préférez être près du centre, du quartier d\u2019affaires, ou de l\u2019aéroport ?',
             r: [{ t: 'Centre-ville', z: 'centre' }, { t: 'Quartier d\u2019affaires', z: 'affaires' },
                 { t: 'Près de l\u2019aéroport', z: 'aéroport' }, { t: 'Peu importe' }],
             lit: (t) => /centre|hypercentre|downtown/.test(t) ? { z: 'centre' }
                       : /aeroport|airport/.test(t) ? { z: 'aéroport' }
                       : /affaire|business|quartier d/.test(t) ? { z: 'affaires' }
                       : /gare|station/.test(t) ? { z: 'gare' }
-                      : /peu importe|indifferent|pas d.importance/.test(t) ? {} : null },
-          t2
-        ];
+                      : /peu importe|indifferent|pas d.importance/.test(t) ? {} : null });
+        } else {
+          tous.push({ q: 'Sur quelle région porte ce déplacement ?',
+            r: [{ t: 'Europe' }, { t: 'Asie' }, { t: 'Moyen-Orient' }, { t: 'Amériques' }],
+            lit: (t) => /europe|asie|orient|amerique|afrique|oceanie/.test(t) ? {} : null });
+        }
+        tous.push(st.bleisureChoice === 'yes'
+          ? { q: 'Vous restez seul, ou quelqu\u2019un vous rejoint ?',
+              r: [{ t: 'Seul' }, { t: 'Mon conjoint', v: 'restaurant' },
+                  { t: foyer ? 'Ma famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'Ma famille', v: 'kids' }],
+              lit: (t) => /seul|personne/.test(t) ? {} : /conjoint|mari|femme|epouse|compagn/.test(t) ? { v: 'restaurant' }
+                        : /famille|enfant/.test(t) ? { v: 'kids' } : null }
+          : { q: 'Un espace de travail dans l\u2019hôtel, ou ça n\u2019a pas d\u2019importance ?',
+              r: [{ t: 'Un espace de travail', v: 'workspace' }, { t: 'Une salle de réunion', v: 'meeting-room' },
+                  { t: 'Peu importe' }],
+              lit: (t) => /travail|bureau|coworking/.test(t) ? { v: 'workspace' }
+                        : /reunion|salle/.test(t) ? { v: 'meeting-room' }
+                        : /peu importe|indifferent/.test(t) ? {} : null });
+        return tous;
       }
-      return [
-        { q: 'Vous verriez plutôt le bord de mer, une ville, ou la nature ?',
-          r: [{ t: 'Le bord de mer', z: 'bord de mer' }, { t: 'Une ville', z: 'ville' },
-              { t: 'La nature', z: 'nature' }, { t: 'Peu importe' }] },
-        { q: 'Quelque chose qui compte particulièrement ?',
-          r: [{ t: 'Un spa', v: 'spa' }, { t: 'Une piscine', v: 'spa' },
-              { t: 'Une bonne table', v: 'restaurant' }, { t: 'Peu importe' }] }
-      ];
+
+      // Séjour personnel et « je me laisse guider ».
+      if (!lieuConnu) {
+        // Sans destination, le cadre est la question la plus utile — c'est elle qui
+        // ouvre le champ des propositions.
+        tous.push({ q: 'Vous verriez plutôt le bord de mer, une ville, ou la nature ?',
+          r: [{ t: 'Le bord de mer', z: 'bord de mer', v: 'beach' }, { t: 'Une ville', z: 'ville' },
+              { t: 'La nature', z: 'nature' }, { t: 'Peu importe' }],
+          lit: (t) => /mer|plage|littoral|balnea/.test(t) ? { z: 'bord de mer', v: 'beach' }
+                    : /ville|urbain|citadin/.test(t) ? { z: 'ville' }
+                    : /nature|montagne|campagne|vert/.test(t) ? { z: 'nature' }
+                    : /peu importe|indifferent/.test(t) ? {} : null });
+      }
+      tous.push({ q: 'Quelque chose qui compte particulièrement ?',
+        r: [{ t: 'Un spa', v: 'spa' }, { t: 'Une piscine', v: 'spa' },
+            { t: 'Une bonne table', v: 'restaurant' }, { t: 'Peu importe' }],
+        lit: (t) => /spa|piscine|hammam|sauna/.test(t) ? { v: 'spa' }
+                  : /table|restaurant|gastronom/.test(t) ? { v: 'restaurant' }
+                  : /peu importe|indifferent|rien/.test(t) ? {} : null });
+      if (lieuConnu) {
+        // La destination étant réglée, on gagne plus à savoir qui vient : c'est ce qui
+        // décide de l'espace enfants ou des animaux, deux critères qui filtrent vraiment.
+        tous.push({ q: 'Autre chose à savoir avant que je cherche ?',
+          r: [{ t: 'Rien de plus' }, { t: 'Un animal m\u2019accompagne', v: 'pets' },
+              { t: 'Je voyage avec des enfants', v: 'kids' }],
+          lit: (t) => /chien|chat|animal|animaux/.test(t) ? { v: 'pets' }
+                    : /enfant|famille|bebe/.test(t) ? { v: 'kids' }
+                    : /rien|non|c.est tout/.test(t) ? {} : null });
+      }
+      return tous;
     }
 
     // Ce que les quatre questions ont produit, dit à voix haute. Un encadré à
@@ -4550,45 +4590,16 @@
            + ' au ' + jour(a2.getDate()) + ' ' + MOIS[a2.getMonth()]
            + (nuits > 0 ? ' — ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') : '');
       } else if (st.selectedMonth) {
+        const DUREES = { '1week': 'une semaine', '2weeks': 'deux semaines',
+                         '3weeks': 'trois semaines', 'more': 'plus de trois semaines' };
         p += ', en ' + st.selectedMonth;
+        if (DUREES[st.selectedDuration]) p += ', pour ' + DUREES[st.selectedDuration];
       }
 
+      if (st.dateMode === 'flexibles' && st.checkInDate) p += ', à ' + st.dateFlex + ' jour' + (st.dateFlex > 1 ? 's' : '') + ' près';
       if (st.selectedStayType === 'pro' && st.bleisureChoice === 'yes') p += ', que vous prolongez sur place';
       if (!lieu) p += ', sans destination arrêtée';
       return p + '.';
-    }
-
-    _agentResume() {
-      const st = this.state;
-      const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-      const motifs = { pro: 'Déplacement professionnel', event: 'Séminaire ou événement',
-                       escapade: 'Séjour personnel', guide: 'Encore à définir' };
-      const lignes = [{ l: 'Motif', v: motifs[st.selectedStayType] || 'Séjour' }];
-
-      if (st.businessLocation && st.businessLocation !== '__ouvert__') lignes.push({ l: 'Destination', v: st.businessLocation });
-      else if (st.destinationInput) lignes.push({ l: 'Destination', v: st.destinationInput });
-      else lignes.push({ l: 'Destination', v: 'à définir ensemble', ouvert: true });
-
-      if (st.checkInDate && st.checkOutDate) {
-        const a1 = new Date(st.checkInDate), a2 = new Date(st.checkOutDate);
-        const nuits = Math.round((a2 - a1) / 86400000);
-        lignes.push({ l: 'Dates', v: a1.getDate() + (a1.getMonth() === a2.getMonth() ? '' : ' ' + MOIS[a1.getMonth()])
-          + ' → ' + a2.getDate() + ' ' + MOIS[a2.getMonth()] + ' · ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') });
-      } else if (st.selectedMonth) {
-        lignes.push({ l: 'Période', v: st.selectedMonth + (st.selectedDuration ? ' · ' + st.selectedDuration : '') });
-      } else {
-        lignes.push({ l: 'Dates', v: 'à définir ensemble', ouvert: true });
-      }
-
-      if (st.selectedStayType === 'pro') {
-        lignes.push({ l: 'Sur place', v: st.bleisureChoice === 'yes' ? 'Séjour prolongé' : 'Pas de prolongation' });
-      } else if (st.selectedWho && st.selectedWho !== 'business') {
-        // « business » est posé par le parcours, pas choisi : l'afficher ferait passer
-        // une mécanique interne pour une réponse.
-        const qui = { solo: 'Seul', couple: 'En couple', family: 'En famille', friends: 'Entre amis' };
-        lignes.push({ l: 'Voyageurs', v: qui[st.selectedWho] || st.selectedWho });
-      }
-      return lignes;
     }
 
     // Ce que l'agent propose en fin d'échange. L'objet suit la demande : des salles
@@ -5459,6 +5470,11 @@
 
       const currentYear = new Date().getFullYear();
       const selectedYear = this.state.selectedYear || currentYear;
+      // Arrivé par « Plutôt une période », cet écran est la troisième réponse à la
+      // question des dates, pas une question de plus : il en garde l'en-tête.
+      const venuDesDates = this.state.dateMode === 'periode' && !!this.state.dateStepOrigin;
+      const prenomPeriode = this.state.isConnected && this.state.userProfile
+        ? this.state.userProfile.firstName : '';
 
       return `
         <div class="wd-discovery-modal">
@@ -5466,11 +5482,20 @@
             <button class="wd-discovery-modal__close" aria-label="Fermer">
               ${ICON.close}
             </button>
+            ${venuDesDates ? `
+            <h2 class="wd-discovery-modal__title">${prenomPeriode ? prenomPeriode + ', quand partez-vous ?' : 'Quand partez-vous ?'}</h2>
+
+            <div class="wd-discovery-modal__question wd-discovery-modal__question--dates">
+              <div class="wd-discovery-modal__dates-modes">
+                <button type="button" class="wd-discovery-modal__chip" data-date-mode="exactes">Dates précises</button>
+                <button type="button" class="wd-discovery-modal__chip" data-date-mode="flexibles">Dates flexibles</button>
+                <button type="button" class="wd-discovery-modal__chip is-selected" data-date-mode="periode">Plutôt une période</button>
+              </div>` : `
             <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, trouvez votre prochain hôtel` : 'Trouvez votre prochain hôtel'}</h2>
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">5. À quelle période et pour quelle durée souhaitez-vous partir ?</label>
+              <label class="wd-discovery-modal__question-label">5. À quelle période et pour quelle durée souhaitez-vous partir ?</label>`}
 
               <!-- Période (même composant que le date picker business, en sélection de mois) -->
               <div class="wd-discovery-modal__form-section">
@@ -5514,7 +5539,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 5/7</div>
+              <div class="wd-discovery-modal__stepper">${venuDesDates ? 'Étape ' + this._getStepNumber() + '/' + this._getStepTotal() : 'Étape 5/7'}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -6085,13 +6110,7 @@
       const firstName = this.state.isConnected && this.state.userProfile ? this.state.userProfile.firstName : '';
       const dateTitle = isEvent
         ? (firstName ? `${firstName}, quand a lieu votre événement ?` : 'Quand a lieu votre événement ?')
-        : (firstName ? `${firstName}, quelles sont vos dates ?` : 'Quelles sont vos dates ?');
-      const dateSubtitle = isEvent
-        ? 'Indiquez les dates de votre événement pour vérifier la disponibilité des espaces.'
-        : 'Précisez vos dates de séjour.';
-      const dateLabel = isEvent
-        ? 'Dates de l\'événement'
-        : 'Quelles sont vos dates d\'arrivée et de départ ?';
+        : (firstName ? `${firstName}, quand partez-vous ?` : 'Quand partez-vous ?');
 
       return `
         <div class="wd-discovery-modal">
@@ -6100,10 +6119,17 @@
               ${ICON.close}
             </button>
             <h2 class="wd-discovery-modal__title">${dateTitle}</h2>
-            <p class="wd-discovery-modal__subtitle">${dateSubtitle}</p>
 
-            <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">${dateLabel}</label>
+            <div class="wd-discovery-modal__question wd-discovery-modal__question--dates">
+              <!-- Trois façons de répondre à « quand ». Un déplacement a ses dates au
+                   jour près, un séjour se cale à quelques jours, une envie n'a qu'un
+                   mois. Imposer le calendrier aux trois obligeait à inventer des dates
+                   qu'on n'a pas encore. -->
+              <div class="wd-discovery-modal__dates-modes">
+                <button type="button" class="wd-discovery-modal__chip${this.state.dateMode !== 'flexibles' ? ' is-selected' : ''}" data-date-mode="exactes">Dates précises</button>
+                <button type="button" class="wd-discovery-modal__chip${this.state.dateMode === 'flexibles' ? ' is-selected' : ''}" data-date-mode="flexibles">Dates flexibles</button>
+                <button type="button" class="wd-discovery-modal__chip" data-date-mode="periode">Plutôt une période</button>
+              </div>
 
               <div class="wd-discovery-modal__daterange">
                 <button type="button" class="wd-discovery-modal__daterange-field" id="dateRangeField" aria-haspopup="dialog" aria-expanded="false">
@@ -6112,6 +6138,10 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
                   </span>
                 </button>
+                ${this.state.dateMode === 'flexibles' ? `
+                <div class="wd-discovery-modal__dates-flex">
+                  ${[1,3,7].map(n => `<button type="button" class="wd-discovery-modal__chip${this.state.dateFlex === n ? ' is-selected' : ''}" data-date-flex="${n}">± ${n} jour${n > 1 ? 's' : ''}</button>`).join('')}
+                </div>` : ''}
 
                 <div class="wd-discovery-modal__calendar wd-discovery-modal__calendar--range" id="dateRangeCalendar" role="dialog" aria-label="Choisir vos dates" hidden>
                   <div class="wd-discovery-modal__calendar-nav">
@@ -7128,6 +7158,39 @@
         dot.addEventListener('click', () => {
           this.state.carouselIndex = parseInt(dot.dataset.dot);
           this.updateCarouselPosition();
+        });
+      });
+
+      // Le choix du mode de dates. « Plutôt une période » n'est pas un réglage mais
+      // une autre question : elle a son écran, celui du mois et de la durée.
+      this.querySelectorAll('[data-date-mode]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const mode = btn.dataset.dateMode;
+          if (mode === 'periode') {
+            if (this.state.currentStep === 4) return;
+            this.state.dateStepOrigin = this.state.currentStep;
+            this.state.stepHistory.push(this.state.currentStep);
+            this.state.dateMode = 'periode';
+            this.state.currentStep = 4;
+            this._rerenderContent();
+            return;
+          }
+          this.state.dateMode = mode;
+          // Depuis l'écran période, changer de mode revient au calendrier : les trois
+          // pastilles répondent à la même question, elles doivent se valoir.
+          if (this.state.currentStep === 4 && this.state.dateStepOrigin) {
+            this.state.currentStep = this.state.dateStepOrigin;
+            this.state.stepHistory = this.state.stepHistory.filter(x => x !== 4);
+          }
+          this._rerenderContent();
+        });
+      });
+      this.querySelectorAll('[data-date-flex]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this.state.dateFlex = Number(btn.dataset.dateFlex);
+          this._rerenderContent();
         });
       });
 
