@@ -2217,3 +2217,8 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 /* La marge se pose sous les dates, sans intertitre : trois pastilles se lisent seules. */
 .wd-discovery-modal__dates-flex { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
 .wd-discovery-modal__question--dates .wd-discovery-modal__question-label { display: none; }
+
+/* Ce que l'agent a dû élargir ou laisser de côté, dit avant ses propositions :
+   une liste qui répond de biais doit annoncer de quel biais. */
+.wd-agent__reserve { font-family: var(--font-sans); font-size: 13px; line-height: 1.5;
+  color: rgba(68,80,71,.72); margin: 8px 0 0; }

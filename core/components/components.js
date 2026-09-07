@@ -4617,66 +4617,156 @@
         || (pays || '').toLowerCase().indexOf(lieu) >= 0;
       const crit = st.selectedTypes || [];
 
-      // Séminaire : ce qu'on cherche, c'est une salle, pas un hôtel.
-      if (st.selectedStayType === 'event') {
-        const seuils = { 'cap-30': 30, 'cap-100': 100, 'cap-300': 300, 'cap-800': 800 };
-        const mini = crit.reduce((n, c) => Math.max(n, seuils[c] || 0), 0);
-        const out = [];
-        (window.WD_REUNIONS || []).forEach(r => {
-          if (!dansLaZone(r.ville, r.pays)) return;
-          (r.salles || []).forEach(sa => {
-            const theatre = sa[3] || 0;
-            if (mini && theatre < mini) return;
-            out.push({ titre: sa[0], sous: r.hotel + ' · ' + r.ville,
-              detail: (sa[1] ? sa[1] + ' m²' : '') + (theatre ? ' · jusqu\u2019à ' + theatre + ' en théâtre' : ''),
-              img: photo((r.imgs || [])[0]), href: null });
-          });
-        });
-        return out.slice(0, 6);
-      }
-
-      // Une table a été demandée : c'est elle qu'on montre, pas l'hôtel qui l'abrite.
-      // Quinze lieux sur 360 n'ont pas de visuel : ils empruntent celui de leur hôtel
-      // plutôt que de laisser un rectangle vide au milieu du carrousel.
-      if (crit.indexOf('restaurant') >= 0) {
-        const parHotel = {};
-        (window.WD_HOTELS || []).forEach(h => { parHotel[h.name] = h; });
-        const tables = (window.WD_RESTAURANTS || [])
-          .filter(v => dansLaZone(v.ville, v.pays))
-          .slice(0, 6)
-          .map(v => ({ titre: v.nom, sous: v.hotel + ' · ' + v.ville,
-            detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
-            img: photo(v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
-        if (tables.length) return tables;
-      }
-
-      // Sinon des hôtels, filtrés par ce que la conversation a retenu. « workspace »
+      // Ce que la conversation a retenu, traduit en services déclarés. « workspace »
       // n'a pas d'équivalent dans les services relevés : le rabattre sur « salle de
       // réunion » ferait filtrer sur autre chose que ce qui a été demandé.
       const vers = { spa: 'spa', pets: 'pets', kids: 'family', beach: 'beach',
                      'meeting-room': 'meeting' };
       const voulus = crit.map(c => vers[c]).filter(Boolean);
-      const dansLeLieu = (window.WD_HOTELS || []).filter(h => dansLaZone(h.city, h.country));
-      const carte = (h) => ({ titre: h.name, sous: h.city + ' · ' + h.country,
-        detail: (h.rating ? h.rating + '/10' : '') + (h.price ? ' · dès ' + h.price + ' €' : ''),
-        img: photo(h.img), href: h.href || null });
+      const tousHotels = window.WD_HOTELS || [];
+
+      // Où chercher. La ville saisie d'abord — mais Pullman n'est pas partout, et une
+      // ville sans adresse ne doit pas produire une réponse vide : on regarde autour,
+      // et on le dit. C'est ce que ferait un conseiller à qui l'on demande Barcelone.
+      st.agentAilleurs = null;
+      st.agentCapacite = null;
+      let peri = tousHotels.filter(h => dansLaZone(h.city, h.country));
+      if (!peri.length && lieu) {
+        const norm = (x) => (x || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const cleVille = Object.keys(CITY_COORDS).find(c => norm(c) === norm(lieu));
+        const pt = cleVille ? CITY_COORDS[cleVille] : null;
+        const libelle = (st.businessLocation && st.businessLocation !== '__ouvert__')
+          ? st.businessLocation : (st.destinationInput || lieu);
+        if (pt) {
+          const km = (h) => {
+            const dx = (h.lat - pt[0]) * 111;
+            const dy = (h.lng - pt[1]) * 111 * Math.cos(pt[0] * Math.PI / 180);
+            return Math.sqrt(dx * dx + dy * dy);
+          };
+          peri = tousHotels.slice().sort((a, b) => km(a) - km(b));
+          // « proche » se remplit plus bas, une fois les critères passés : annoncer
+          // Toulouse pour montrer El Jadida ferait dire à la phrase le contraire de
+          // ce que le carrousel affiche.
+          st.agentAilleurs = { ville: cleVille || libelle, proche: null, km: null };
+        } else {
+          // Ville inconnue de nos relevés : on ne peut pas parler de proximité, alors
+          // on ne le prétend pas — on propose, et on dit que c'est ailleurs.
+          peri = tousHotels;
+          st.agentAilleurs = { ville: libelle, proche: null, km: null, sansRepere: true };
+        }
+      }
 
       // Le cumul strict vide vite la liste — aucun Pullman parisien n'a de spa. Plutôt
       // que de ne rien montrer, on relâche le dernier critère demandé et on le dit :
       // c'est ce que fait déjà la carte quand un filtre écarte tout.
+      const noms = { spa: 'le spa', pets: 'les animaux', family: 'l\u2019espace enfants',
+                     beach: 'le bord de mer', meeting: 'la salle de réunion' };
       let restants = voulus.slice();
-      let laisse = null;
+      let retenus = [];
+      st.agentAssoupli = null;
       while (true) {
-        const trouves = dansLeLieu.filter(h => restants.every(a => (h.amenities || []).indexOf(a) >= 0));
-        if (trouves.length || !restants.length) {
-          this.state.agentAssoupli = laisse;
-          return trouves.slice(0, 6).map(carte);
-        }
-        const perdu = restants.pop();
-        const noms = { spa: 'le spa', pets: 'les animaux', family: 'l\u2019espace enfants',
-                       beach: 'le bord de mer', meeting: 'la salle de réunion' };
-        laisse = noms[perdu] || perdu;
+        retenus = peri.filter(h => restants.every(a => (h.amenities || []).indexOf(a) >= 0));
+        if (retenus.length || !restants.length) break;
+        st.agentAssoupli = noms[restants.pop()] || null;
       }
+      if (!retenus.length) retenus = peri;      // dernier recours : jamais rien à montrer
+      // La phrase nomme la ville qu'on propose vraiment.
+      if (st.agentAilleurs && !st.agentAilleurs.sansRepere && retenus.length) {
+        st.agentAilleurs.proche = retenus[0].city;
+        // Filtré, « le plus proche » ne veut plus dire la même chose : le premier
+        // hôtel avec un spa peut être à 900 km quand un autre, sans spa, est à 250.
+        st.agentAilleurs.filtre = restants.length > 0;
+      }
+
+      // Séminaire : ce qu'on cherche, c'est une salle, pas un hôtel. Même échelle de
+      // repli que pour les hôtels — la ville d'abord, la capacité ensuite, et on dit
+      // ce qu'on a dû lâcher plutôt que de renvoyer une page vide.
+      if (st.selectedStayType === 'event') {
+        const seuils = { 'cap-30': 30, 'cap-100': 100, 'cap-300': 300, 'cap-800': 800 };
+        let mini = crit.reduce((n, c) => Math.max(n, seuils[c] || 0), 0);
+        const rangVille = {};
+        peri.forEach((h, i) => { if (!(h.city in rangVille)) rangVille[h.city] = i; });
+        const lieux = (window.WD_REUNIONS || [])
+          .filter(r => r.ville in rangVille)
+          .sort((a, b) => rangVille[a.ville] - rangVille[b.ville]);
+        const recolte = (seuil) => {
+          const out = [];
+          lieux.forEach(r => (r.salles || []).forEach(sa => {
+            const theatre = sa[3] || 0;
+            if (seuil && theatre < seuil) return;
+            out.push({ titre: sa[0], sous: r.hotel + ' \u00b7 ' + r.ville,
+              detail: (sa[1] ? sa[1] + ' m²' : '') + (theatre ? ' \u00b7 jusqu\u2019à ' + theatre + ' en théâtre' : ''),
+              img: photo((r.imgs || [])[0]), href: null });
+          }));
+          return out;
+        };
+        let salles = recolte(mini);
+        if (!salles.length && mini) {
+          // Aucune salle assez grande : on montre les plus grandes disponibles plutôt
+          // que rien, et la phrase le dit.
+          st.agentCapacite = mini;
+          salles = recolte(0).sort((a, b) => {
+            const n = (x) => Number((x.detail.match(/jusqu\u2019à (\d+)/) || [0, 0])[1]);
+            return n(b) - n(a);
+          });
+        }
+        // La ville annoncée est celle de la première salle montrée, pas celle du
+        // premier hôtel : la salle a pu être écartée pour sa taille.
+        if (st.agentAilleurs && !st.agentAilleurs.sansRepere && salles.length) {
+          st.agentAilleurs.proche = (salles[0].sous.split(' \u00b7 ')[1] || '').trim();
+          st.agentAilleurs.filtre = false;
+        }
+        return salles.slice(0, 6);
+      }
+
+      // Une table a été demandée : c'est elle qu'on montre, pas l'hôtel qui l'abrite —
+      // mais seulement dans les hôtels qui tiennent le reste de la demande. Quinze
+      // lieux sur 360 n'ont pas de visuel : ils empruntent celui de leur hôtel plutôt
+      // que de laisser un rectangle vide au milieu du carrousel.
+      if (crit.indexOf('restaurant') >= 0) {
+        const parHotel = {}, rang = {};
+        retenus.forEach((h, i) => { parHotel[h.name] = h; rang[h.name] = i; });
+        const brutes = (window.WD_RESTAURANTS || [])
+          .filter(v => parHotel[v.hotel])
+          .sort((a, b) => (rang[a.hotel] - rang[b.hotel])
+            || ((a.type === 'bar' ? 1 : 0) - (b.type === 'bar' ? 1 : 0)));
+        const vues = {};
+        const tables = brutes.filter(v => (vues[v.hotel] = (vues[v.hotel] || 0) + 1) <= 2)
+          .slice(0, 6)
+          .map(v => ({ titre: v.nom, sous: v.hotel + ' \u00b7 ' + v.ville,
+            detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
+            img: photo(v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
+        if (tables.length) return tables;
+      }
+
+      return retenus.slice(0, 6).map(h => ({ titre: h.name, sous: h.city + ' \u00b7 ' + h.country,
+        detail: (h.rating ? h.rating + '/10' : '') + (h.price ? ' \u00b7 dès ' + h.price + ' €' : ''),
+        img: photo(h.img), href: h.href || null }));
+    }
+
+    // Ce que l'agent doit dire à côté de ses propositions : où il a dû aller les
+    // chercher, et quel critère il a laissé. Le taire donnerait une liste qui a l'air
+    // de répondre à la demande alors qu'elle y répond de biais.
+    _agentReserve() {
+      const st = this.state;
+      const bouts = [];
+      if (st.agentAilleurs) {
+        const a = st.agentAilleurs;
+        bouts.push(!a.proche
+          ? 'Je ne trouve pas de Pullman à ' + a.ville + '. Voici ailleurs.'
+          : a.filtre
+            ? 'Pullman n\u2019a pas encore d\u2019adresse à ' + a.ville
+              + '. Voici les plus proches qui répondent à votre demande.'
+            : 'Pullman n\u2019a pas encore d\u2019adresse à ' + a.ville
+              + ' — le plus proche est à ' + a.proche + '.');
+      }
+      if (st.agentCapacite) {
+        bouts.push('Aucune salle ne va jusqu\u2019à ' + st.agentCapacite
+          + ' personnes : voici les plus grandes.');
+      } else if (st.agentAssoupli) {
+        bouts.push('Aucun ne réunit tout : j\u2019ai laissé de côté ' + st.agentAssoupli + '.');
+      }
+      return bouts.join(' ');
     }
 
     // Fin du parcours : la liste complète, filtrée par ce que l'échange a produit.
@@ -4709,8 +4799,10 @@
       // partie de sa réponse. Posé en dessous, il devenait un encart qui n'appartenait
       // plus à l'échange.
       const props = fini ? this._agentPropositions() : [];
+      const reserve = props.length ? this._agentReserve() : '';
       const carrousel = props.length
-        ? '<div class="wd-agent__carrousel">' + props.map(p =>
+        ? (reserve ? '<p class="wd-agent__reserve">' + reserve + '</p>' : '')
+          + '<div class="wd-agent__carrousel">' + props.map(p =>
             (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
                     : '<div class="wd-agent__prop">') +
               (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
@@ -4845,7 +4937,7 @@
         } else if (suivant) {
           dit = (accuse ? accuse + ' ' : '') + suivant.q;
         } else {
-          dit = (accuse ? accuse + ' ' : '') + this._agentRecap();
+          dit = this._agentRecap();
         }
         this.state.agentThread.push({ qui: 'agent', texte: dit });
         this.state.agentTyping = false;
@@ -4879,13 +4971,28 @@
       const morceaux = [];
       if (this.state.agentZone && zones[this.state.agentZone]) morceaux.push(zones[this.state.agentZone]);
       (this.state.selectedTypes || []).forEach(c => {
+        // Pour un séminaire, ce sont déjà des salles qu'on cherche : « des salles avec
+        // une salle de réunion » ne dit rien de plus.
+        if (c === 'meeting-room' && this.state.selectedStayType === 'event') return;
         if (avec[c]) morceaux.push(avec[c]);
         else if (capacites[c]) morceaux.push(capacites[c]);
       });
 
       const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
+      // « avec un restaurant et avec un espace enfants » : le second « avec » est de
+      // trop. La préposition se pose une fois et vaut pour la suite.
+      let avecPose = false;
+      const dits = morceaux.map(x => {
+        if (x.indexOf('avec ') !== 0) return x;
+        if (avecPose) return x.slice(5);
+        avecPose = true;
+        return x;
+      });
+      const liste = dits.length > 1
+        ? dits.slice(0, -1).join(', ') + ' et ' + dits[dits.length - 1]
+        : dits[0];
       let p = morceaux.length
-        ? 'Je vous cherche ' + quoi + ' ' + morceaux.join(', ') + '.'
+        ? 'Je vous cherche ' + quoi + ' ' + liste + '.'
         : 'Voici ce qui me paraît le plus proche.';
       if (notes) p += ' Je n\u2019oublie pas ' + notes + '.';
       return p;
@@ -6679,14 +6786,16 @@
           const esc = s => (s || '').replace(/"/g, '&quot;');
           const cap = s => (s || '').replace(/\b\p{L}/gu, m => m.toUpperCase());
 
-          // Catalogue des villes Pullman, agrégé depuis les hôtels (ville → pays + nb d'hôtels)
+          // Catalogue des villes Pullman, agrégé depuis la vraie base (WD_HOTELS).
+          // PREVIEW_HOTELS servait ici : c'est une liste de démonstration qui contient
+          // des adresses que la marque n'a plus (Barcelone, Marrakech) et des villes
+          // où elle n'est pas (Nice, Marseille). Le champ les proposait, la
+          // conversation s'engageait, et il n'y avait rien à montrer au bout.
           const cityMap = new Map();
-          PREVIEW_HOTELS.forEach(h => {
-            const [rawCity, rawCountry] = (h.loc || '').split(',');
-            const city = (rawCity || '').trim();
+          (window.WD_HOTELS || []).forEach(h => {
+            const city = (h.city || '').trim();
             if (!city) return;
-            const country = (rawCountry || '').trim();
-            if (!cityMap.has(city)) cityMap.set(city, { city, country, count: 0 });
+            if (!cityMap.has(city)) cityMap.set(city, { city, country: (h.country || '').trim(), count: 0 });
             cityMap.get(city).count++;
           });
           const pullmanCities = [...cityMap.values()];
@@ -6698,11 +6807,12 @@
           // Régions → villes Pullman réellement présentes
           const regions = [
             { name: 'Île-de-France', cities: ['Paris', 'Paris La Défense'] },
-            { name: 'Côte d\'Azur', cities: ['Nice', 'Cannes'] },
-            { name: 'Provence', cities: ['Marseille', 'Cannes', 'Nice'] },
+            { name: 'Côte d\'Azur', cities: ['Mandelieu'] },
             { name: 'Occitanie', cities: ['Toulouse', 'Montpellier'] },
             { name: 'Nouvelle-Aquitaine', cities: ['Bordeaux'] },
             { name: 'Auvergne-Rhône-Alpes', cities: ['Lyon'] },
+            { name: 'Europe du Nord', cities: ['Londres', 'Liverpool', 'Bruxelles', 'Eindhoven'] },
+            { name: 'Europe centrale', cities: ['Berlin', 'Munich', 'Cologne', 'Stuttgart', 'Bâle'] },
             { name: 'Asie du Sud-Est', cities: ['Bangkok', 'Singapour', 'Bali', 'Hô Chi Minh-Ville', 'Kuala Lumpur'] },
             { name: 'Moyen-Orient', cities: ['Dubaï', 'Doha', 'Ras Al Khaimah', 'Sharjah'] },
             { name: 'Maghreb', cities: ['El Jadida'] },
@@ -6722,12 +6832,18 @@
             'dijon': ['Lyon', 'Paris'],
             'genève': ['Lyon', 'Bâle'],
             'amsterdam': ['Eindhoven', 'Bruxelles'],
-            'madrid': ['Barcelone'],
+            'nice': ['Mandelieu', 'Lyon'],
+            'cannes': ['Mandelieu'],
+            'marseille': ['Mandelieu', 'Montpellier'],
+            'madrid': ['Toulouse', 'Montpellier'],
+            'barcelone': ['Montpellier', 'Toulouse'],
+            'marrakech': ['El Jadida'],
+            'casablanca': ['El Jadida'],
             'new york': ['Miami']
           };
 
           // Destinations populaires (affichées au focus / si aucune saisie)
-          const popular = ['Paris', 'Nice', 'Lyon', 'Marseille', 'Bordeaux', 'Londres', 'Barcelone', 'Dubaï', 'Marrakech', 'Singapour', 'Bangkok', 'Tokyo']
+          const popular = ['Paris', 'Lyon', 'Bordeaux', 'Londres', 'Bruxelles', 'Berlin', 'Dubaï', 'Singapour', 'Bangkok', 'Tokyo', 'Sydney', 'El Jadida']
             .map(findCity).filter(Boolean);
 
           const ICONS = {
