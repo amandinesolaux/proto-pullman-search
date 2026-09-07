@@ -4204,6 +4204,7 @@
         agentTurn: 0,
         agentTyping: false,
         agentNotes: [],
+        agentAssoupli: null,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -4302,6 +4303,7 @@
         agentTurn: 0,
         agentTyping: false,
         agentNotes: [],
+        agentAssoupli: null,
         // État guide (mini-triage)
         guideWork: null,
         guideGroup: null
@@ -4589,6 +4591,79 @@
       return lignes;
     }
 
+    // Ce que l'agent propose en fin d'échange. L'objet suit la demande : des salles
+    // pour un séminaire, des tables si l'on a parlé de restaurant, des hôtels sinon.
+    // Montrer trois propositions vaut mieux qu'un bouton « voir les résultats » :
+    // on juge sur pièces, et l'on voit tout de suite si la conversation a servi.
+    _agentPropositions() {
+      const st = this.state;
+      const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
+      const photo = (cle) => cle ? base + cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=420' : '';
+      const lieu = st.businessLocation && st.businessLocation !== '__ouvert__'
+        ? st.businessLocation.toLowerCase() : (st.destinationInput || '').toLowerCase();
+      const dansLaZone = (ville, pays) => !lieu
+        || (ville || '').toLowerCase().indexOf(lieu) >= 0
+        || (pays || '').toLowerCase().indexOf(lieu) >= 0;
+      const crit = st.selectedTypes || [];
+
+      // Séminaire : ce qu'on cherche, c'est une salle, pas un hôtel.
+      if (st.selectedStayType === 'event') {
+        const seuils = { 'cap-30': 30, 'cap-100': 100, 'cap-300': 300, 'cap-800': 800 };
+        const mini = crit.reduce((n, c) => Math.max(n, seuils[c] || 0), 0);
+        const out = [];
+        (window.WD_REUNIONS || []).forEach(r => {
+          if (!dansLaZone(r.ville, r.pays)) return;
+          (r.salles || []).forEach(sa => {
+            const theatre = sa[3] || 0;
+            if (mini && theatre < mini) return;
+            out.push({ titre: sa[0], sous: r.hotel + ' · ' + r.ville,
+              detail: (sa[1] ? sa[1] + ' m²' : '') + (theatre ? ' · jusqu\u2019à ' + theatre + ' en théâtre' : ''),
+              img: photo((r.imgs || [])[0]), href: null });
+          });
+        });
+        return out.slice(0, 6);
+      }
+
+      // Une table a été demandée : c'est elle qu'on montre, pas l'hôtel qui l'abrite.
+      if (crit.indexOf('restaurant') >= 0) {
+        const tables = (window.WD_RESTAURANTS || [])
+          .filter(v => dansLaZone(v.ville, v.pays))
+          .slice(0, 6)
+          .map(v => ({ titre: v.nom, sous: v.hotel + ' · ' + v.ville,
+            detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
+            img: photo(v.img), href: v.url || null }));
+        if (tables.length) return tables;
+      }
+
+      // Sinon des hôtels, filtrés par ce que la conversation a retenu. « workspace »
+      // n'a pas d'équivalent dans les services relevés : le rabattre sur « salle de
+      // réunion » ferait filtrer sur autre chose que ce qui a été demandé.
+      const vers = { spa: 'spa', pets: 'pets', kids: 'family', beach: 'beach',
+                     'meeting-room': 'meeting' };
+      const voulus = crit.map(c => vers[c]).filter(Boolean);
+      const dansLeLieu = (window.WD_HOTELS || []).filter(h => dansLaZone(h.city, h.country));
+      const carte = (h) => ({ titre: h.name, sous: h.city + ' · ' + h.country,
+        detail: (h.rating ? h.rating + '/10' : '') + (h.price ? ' · dès ' + h.price + ' €' : ''),
+        img: photo(h.img), href: h.href || null });
+
+      // Le cumul strict vide vite la liste — aucun Pullman parisien n'a de spa. Plutôt
+      // que de ne rien montrer, on relâche le dernier critère demandé et on le dit :
+      // c'est ce que fait déjà la carte quand un filtre écarte tout.
+      let restants = voulus.slice();
+      let laisse = null;
+      while (true) {
+        const trouves = dansLeLieu.filter(h => restants.every(a => (h.amenities || []).indexOf(a) >= 0));
+        if (trouves.length || !restants.length) {
+          this.state.agentAssoupli = laisse;
+          return trouves.slice(0, 6).map(carte);
+        }
+        const perdu = restants.pop();
+        const noms = { spa: 'le spa', pets: 'les animaux', family: 'l\u2019espace enfants',
+                       beach: 'le bord de mer', meeting: 'la salle de réunion' };
+        laisse = noms[perdu] || perdu;
+      }
+    }
+
     renderAgent() {
       const st = this.state;
       const tours = this._agentTours();
@@ -4605,12 +4680,27 @@
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
         : '';
-      const cloture = fini
-        ? '<div class="wd-agent__done">' +
-            '<p class="wd-agent__done-txt">C\u2019est noté. Je vous montre ce qui correspond.</p>' +
-            '<button type="button" class="wd-discovery-modal__continue is-active" data-agent-voir>Voir les résultats</button>' +
-          '</div>'
-        : '';
+      let cloture = '';
+      if (fini) {
+        const props = this._agentPropositions();
+        const quoi = st.selectedStayType === 'event' ? 'salle' : ((st.selectedTypes || []).indexOf('restaurant') >= 0 ? 'table' : 'hôtel');
+        cloture = '<div class="wd-agent__props">' +
+          (props.length
+            ? '<p class="wd-agent__props-titre">Ce que je vous propose' +
+                (this.state.agentAssoupli ? ' — en mettant de côté ' + esc(this.state.agentAssoupli) : '') + '</p>' +
+              '<div class="wd-agent__carrousel">' + props.map(p =>
+                (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
+                        : '<div class="wd-agent__prop">') +
+                  (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />' : '<span class="wd-agent__prop-img"></span>') +
+                  '<span class="wd-agent__prop-nom">' + esc(p.titre) + '</span>' +
+                  '<span class="wd-agent__prop-sous">' + esc(p.sous) + '</span>' +
+                  (p.detail ? '<span class="wd-agent__prop-detail">' + esc(p.detail) + '</span>' : '') +
+                (p.href ? '</a>' : '</div>')).join('') +
+              '</div>'
+            : '<p class="wd-agent__props-titre">Aucune ' + quoi + ' ne réunit tout cela. La liste complète vous laissera assouplir un critère.</p>') +
+          '<button type="button" class="wd-discovery-modal__continue is-active wd-agent__tout" data-agent-voir>Voir tous les résultats</button>' +
+        '</div>';
+      }
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">

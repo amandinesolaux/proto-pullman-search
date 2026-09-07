@@ -2163,9 +2163,35 @@
 .wd-agent__send svg { width: 18px; height: 18px; }
 .wd-agent__send:disabled { background: #E6EBE7; color: rgba(68,80,71,.35); cursor: not-allowed; }
 
-.wd-agent__done { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  flex-wrap: wrap; padding-top: 14px; border-top: 1px solid #E2E8E3; }
-.wd-agent__done-txt { margin: 0; font-family: var(--font-sans); font-size: 14px; color: rgba(68,80,71,.7); }
+/* Les propositions closent l'échange. Un bouton « voir les résultats » demandait de
+   faire confiance ; trois cartes montrent sur quoi la conversation a débouché, et
+   l'on juge sur pièces. Elles défilent à l'horizontale : la verticale appartient au
+   fil, et l'empiler y noierait la conversation. */
+.wd-agent__props { flex: 0 0 auto; padding-top: 14px; border-top: 1px solid #E2E8E3;
+  display: flex; flex-direction: column; gap: 10px; }
+.wd-agent__props-titre { margin: 0; font-family: var(--font-sans); font-size: 10px; font-weight: 700;
+  letter-spacing: .8px; text-transform: uppercase; color: rgba(68,80,71,.5); }
+.wd-agent__carrousel { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.wd-agent__carrousel::-webkit-scrollbar { display: none; }
+.wd-agent__prop { flex: 0 0 168px; display: flex; flex-direction: column; text-decoration: none;
+  border: 1px solid #E2E8E3; background: #fff; color: #445047; }
+a.wd-agent__prop:hover { border-color: #445047; }
+.wd-agent__prop-img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  background: #EDF2EE; }
+.wd-agent__prop-nom { font-family: var(--font-sans); font-size: 13px; font-weight: 700;
+  color: #445047; padding: 8px 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wd-agent__prop-sous { font-family: var(--font-sans); font-size: 11.5px; color: rgba(68,80,71,.7);
+  padding: 1px 10px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wd-agent__prop-detail { font-family: var(--font-sans); font-size: 11.5px; color: rgba(68,80,71,.55);
+  padding: 2px 10px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* La liste complète reste accessible, mais elle n'est plus l'action principale :
+   c'est la sortie de qui veut comparer, pas la conclusion de l'échange. */
+.wd-agent__tout { align-self: flex-start; background: transparent; color: #445047;
+  border: 1px solid #BCCABE; box-shadow: none; }
+.wd-agent__tout:hover { background: #F2F6F2; border-color: #445047; }
+
+@media (max-width: 767px) { .wd-agent__prop { flex: 0 0 152px; } }
 .wd-discovery-modal__chip--ouvert { margin-top: 12px; }
 
 @media (max-width: 767px) {
