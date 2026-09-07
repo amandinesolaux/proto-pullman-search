@@ -4581,7 +4581,7 @@
               ${propositions}
               ${cloture}
               <form class="wd-agent__composer" id="wdAgentComposer">
-                <input type="text" class="wd-agent__input" id="wdAgentInput" placeholder="Écrire un message…" autocomplete="off" ${fini ? 'disabled' : ''} />
+                <textarea class="wd-agent__input" id="wdAgentInput" rows="3" placeholder="Écrire un message…" autocomplete="off" ${fini ? 'disabled' : ''}></textarea>
                 <button type="submit" class="wd-agent__send" aria-label="Envoyer" ${fini ? 'disabled' : ''}>${ICON.arrowR || '→'}</button>
               </form>
             </div>
@@ -6938,6 +6938,17 @@
             if (choix) this._agentRepondre(choix.t, choix);
           });
         });
+
+        const champTexte = this.querySelector('#wdAgentInput');
+        if (champTexte) {
+          champTexte.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              const txt = champTexte.value.trim();
+              if (txt) this._agentRepondre(txt, null);
+            }
+          });
+        }
 
         const composer = this.querySelector('#wdAgentComposer');
         if (composer) {

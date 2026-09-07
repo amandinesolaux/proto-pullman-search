@@ -2113,11 +2113,10 @@
 .wd-discovery-modal__content--agent { display: flex; flex-direction: column; }
 .wd-agent { display: flex; flex-direction: column; gap: 16px; padding: 4px 0 0; flex: 1; min-height: 0; }
 
-.wd-agent__thread { display: flex; flex-direction: column; justify-content: flex-end; gap: 12px;
-  flex: 1; min-height: 240px; overflow-y: auto; padding: 4px 2px 4px 0; }
-/* justify-content: flex-end écrase les marges du premier élément quand ça déborde ;
-   la marge auto sur le premier message garde le défilement correct. */
-.wd-agent__thread > :first-child { margin-top: auto; }
+/* La conversation démarre en haut et descend : on lit du début. L'ancrer en bas
+   déplaçait simplement le vide au-dessus des messages, ce qui se voyait davantage. */
+.wd-agent__thread { display: flex; flex-direction: column; gap: 12px;
+  flex: 1; min-height: 0; overflow-y: auto; padding: 4px 2px 4px 0; }
 .wd-agent__msg { max-width: 86%; }
 .wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
 .wd-agent__msg--agent { align-self: flex-start; background: #EDF2EE; color: #445047; padding: 12px 14px; }
@@ -2144,9 +2143,13 @@
   min-height: 40px; transition: background .15s, border-color .15s; }
 .wd-agent__reply:hover { background: #F2F6F2; border-color: #445047; }
 
-.wd-agent__composer { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
-.wd-agent__input { flex: 1; min-height: 46px; padding: 0 14px; border: 1px solid #BCCABE;
-  background: #fff; color: #445047; font-family: var(--font-sans); font-size: 16px; }
+.wd-agent__composer { display: flex; gap: 8px; align-items: flex-end; padding-top: 4px; }
+/* Trois lignes plutôt qu'une : on écrit à cet agent des phrases entières — « une
+   vingtaine de participants et potentiellement mon mari » ne tient pas dans 46 px
+   sans qu'on perde de vue le début de ce qu'on tape. */
+.wd-agent__input { flex: 1; min-height: 86px; padding: 12px 14px; border: 1px solid #BCCABE;
+  background: #fff; color: #445047; font-family: var(--font-sans); font-size: 16px;
+  line-height: 1.45; resize: vertical; }
 .wd-agent__input::placeholder { color: rgba(68,80,71,.5); }
 .wd-agent__input:focus { outline: none; border-color: #445047; }
 .wd-agent__input:disabled { background: #F4F6F4; color: rgba(68,80,71,.4); }
