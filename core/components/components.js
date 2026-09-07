@@ -4444,6 +4444,26 @@
     // Chaque tour : une question, des réponses proposées, et ce que chacune ajoute
     // à la recherche. Les propositions ne ferment pas la saisie libre — elles
     // évitent d'avoir à écrire quand la réponse tient en un mot.
+    // Lire ce qui est écrit, plutôt que de l'archiver. L'agent reste scripté, mais
+    // scripté n'oblige pas à être sourd : un vocabulaire adossé aux critères réels
+    // suffit à reconnaître ce dont on parle, et à le dire. Ce qu'il ne reconnaît pas,
+    // il l'annonce comme tel — c'est la différence entre ne pas comprendre et faire
+    // semblant.
+    _agentLire(texte) {
+      const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const VOC = [
+        { re: /\b(chien|chienne|chat|chatte|animal|animaux)\b/, v: 'pets', dit: 'les hôtels qui acceptent les animaux' },
+        { re: /\b(spa|piscine|hammam|sauna|massage)\b/,          v: 'spa', dit: 'un spa' },
+        { re: /\b(restaurant|table|diner|dine|gastronomi\w*)\b/, v: 'restaurant', dit: 'un restaurant' },
+        { re: /\b(salle|salles|reunion|reunions|seminaire)\b/,    v: 'meeting-room', dit: 'une salle de réunion' },
+        { re: /\b(coworking|bureau|bureaux|travailler|teletravail)\b/, v: 'workspace', dit: 'un espace de travail' },
+        { re: /\b(enfant|enfants|famille|familial\w*|kids)\b/,   v: 'kids', dit: 'un espace pour les enfants' },
+        { re: /\b(plage|mer|littoral)\b/,                        v: 'beach', dit: 'le bord de mer' }
+      ];
+      const trouves = VOC.filter(o => o.re.test(t));
+      return { criteres: trouves.map(o => o.v), dits: trouves.map(o => o.dit) };
+    }
+
     _agentTours() {
       const st = this.state;
       const type = st.selectedStayType;
@@ -4453,9 +4473,21 @@
         return [
           { q: 'Combien de participants attendez-vous ?',
             r: [{ t: 'Moins de 30', v: 'cap-30' }, { t: '30 à 100', v: 'cap-100' },
-                { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }] },
+                { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }],
+            // Un nombre écrit en chiffres ou en lettres répond à la question ; le reste,
+            // non — et l'agent doit alors la reposer plutôt que d'avancer à vide.
+            lit: (t) => {
+              const mots = { vingtaine: 20, trentaine: 30, quarantaine: 40, cinquantaine: 50, centaine: 100 };
+              let n = null;
+              const chiffre = t.match(/\b(\d{1,4})\b/);
+              if (chiffre) n = Number(chiffre[1]);
+              else { for (const m in mots) if (t.indexOf(m) >= 0) { n = mots[m]; break; } }
+              if (n === null) return null;
+              return { v: n < 30 ? 'cap-30' : n <= 100 ? 'cap-100' : n <= 300 ? 'cap-300' : 'cap-800' };
+            } },
           { q: 'Sur combien de jours ?',
-            r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }] }
+            r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }],
+            lit: (t) => /\b(\d+)\s*(jour|journee)|une journee|demi-journee|deux jours|trois jours/.test(t) ? {} : null }
         ];
       }
       if (type === 'pro') {
@@ -4471,7 +4503,12 @@
         return [
           { q: 'Vous préférez être près du centre, du quartier d\u2019affaires, ou de l\u2019aéroport ?',
             r: [{ t: 'Centre-ville', z: 'centre' }, { t: 'Quartier d\u2019affaires', z: 'affaires' },
-                { t: 'Près de l\u2019aéroport', z: 'aéroport' }, { t: 'Peu importe' }] },
+                { t: 'Près de l\u2019aéroport', z: 'aéroport' }, { t: 'Peu importe' }],
+            lit: (t) => /centre|hypercentre|downtown/.test(t) ? { z: 'centre' }
+                      : /aeroport|airport/.test(t) ? { z: 'aéroport' }
+                      : /affaire|business|quartier d/.test(t) ? { z: 'affaires' }
+                      : /gare|station/.test(t) ? { z: 'gare' }
+                      : /peu importe|indifferent|pas d.importance/.test(t) ? {} : null },
           t2
         ];
       }
@@ -4614,21 +4651,43 @@
       const tours = this._agentTours();
       const tour = tours[this.state.agentTurn];
       this.state.agentThread.push({ qui: 'moi', texte: texte });
-      // Ce qui est écrit à la main est repris tel quel dans le récapitulatif. Le
-      // prototype ne sait pas l'interpréter — le redire prouve au moins qu'il l'a
-      // reçu, là où une réponse générique donne l'impression du contraire.
-      if (!choix) {
-        // Toutes les notes, pas seulement la dernière : la précédente disparaissait
-        // du récapitulatif alors qu'on venait de l'écrire.
-        this.state.agentNotes = (this.state.agentNotes || []).concat(texte);
-      }
+
+      // Les réponses alimentent vraiment la recherche : sans cela l'échange serait
+      // un décor, et les résultats ne diraient rien de ce qu'on vient de dire.
+      const retenir = (v) => { if (v && !this.state.selectedTypes.includes(v)) this.state.selectedTypes.push(v); };
+
+      let accuse = '';        // ce que l'agent a compris et qu'il redit
+      let avance = true;      // la question posée a-t-elle trouvé sa réponse ?
+
       if (choix) {
-        // La réponse alimente vraiment la recherche : sans cela l'échange serait
-        // un décor, et les résultats ne diraient rien de ce qu'on vient de dire.
-        if (choix.v && !this.state.selectedTypes.includes(choix.v)) this.state.selectedTypes.push(choix.v);
+        retenir(choix.v);
         if (choix.z) this.state.agentZone = choix.z;
+      } else {
+        const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const lu = this._agentLire(texte);
+        lu.criteres.forEach(retenir);
+        if (lu.dits.length) {
+          accuse = 'Noté : ' + lu.dits.join(' et ') + '.';
+        }
+        // La question du tour a-t-elle sa réponse dans ce qui vient d'être écrit ?
+        const rep = tour && tour.lit ? tour.lit(t) : null;
+        if (rep) {
+          retenir(rep.v);
+          if (rep.z) this.state.agentZone = rep.z;
+        } else {
+          avance = false;
+          // Rien de reconnu du tout : on le dit, plutôt que de faire semblant — et on
+          // garde la phrase pour le récapitulatif. Si quelque chose a été compris, le
+          // critère suffit : répéter la note à côté ferait doublon.
+          if (!accuse) {
+            accuse = 'Je note « ' + texte + ' ».';
+            this.state.agentNotes = (this.state.agentNotes || []).concat(texte);
+          }
+        }
       }
-      this.state.agentTurn += 1;
+
+      if (avance) this.state.agentTurn += 1;
+
       // On affiche d'abord la réponse de la personne et les trois points : une réponse
       // qui apparaît dans le même souffle que la question se lit comme un formulaire,
       // pas comme un échange.
@@ -4638,8 +4697,17 @@
       clearTimeout(this._minuteurAgent);
       this._minuteurAgent = setTimeout(() => {
         const suivant = tours[this.state.agentTurn];
-        this.state.agentThread.push({ qui: 'agent',
-          texte: suivant ? suivant.q : this._agentRecap() });
+        let dit;
+        if (!avance && tour) {
+          // Recadrage : on accuse réception, puis on repose la question restée en
+          // suspens. Sans ça l'agent enchaînait comme si on lui avait répondu.
+          dit = accuse + ' Il me manque encore votre réponse : ' + tour.q.charAt(0).toLowerCase() + tour.q.slice(1);
+        } else if (suivant) {
+          dit = (accuse ? accuse + ' ' : '') + suivant.q;
+        } else {
+          dit = (accuse ? accuse + ' ' : '') + this._agentRecap();
+        }
+        this.state.agentThread.push({ qui: 'agent', texte: dit });
         this.state.agentTyping = false;
         this._rerenderContent();
         this._agentDefiler();
@@ -4657,6 +4725,7 @@
       const bits = [];
       if (this.state.agentZone) bits.push(this.state.agentZone);
       const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
+        pets: 'animaux acceptés', beach: 'bord de mer',
         'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale',
         'cap-30': 'moins de 30 participants', 'cap-100': '30 à 100 participants', 'cap-300': '100 à 300 participants',
         'cap-800': '300 à 800 participants', 'cap-plus': 'plus de 800 participants' };
