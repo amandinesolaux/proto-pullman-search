@@ -2103,39 +2103,63 @@
 }
 
 /* ══ Conversation ═══════════════════════════════════════════════════════════════
-   L'agent prend le relais après quatre questions. L'écran n'a plus de titre ni de
-   sous-titre : le fil parle de lui-même, et une question posée deux fois — une en
-   titre, une dans une bulle — se lit comme une hésitation. */
+   La modale est blanche : les premières règles avaient été écrites pour la surface
+   sombre du panneau de recherche, et tout s'y affichait en blanc sur blanc — les
+   propositions et le champ de saisie étaient bien là, invisibles.
+
+   Deux voix, deux fonds, aucune icône à décoder : l'agent sur une surface claire
+   teintée, la personne sur le vert de la marque. Pas de rayon sur les bulles —
+   la règle vaut ici comme ailleurs, et l'alignement suffit à les distinguer. */
 .wd-discovery-modal__content--agent { display: flex; flex-direction: column; }
-.wd-agent { display: flex; flex-direction: column; gap: 14px; padding: 8px 0 4px; min-height: 320px; }
-.wd-agent__thread { display: flex; flex-direction: column; gap: 10px; max-height: 46vh; overflow-y: auto; padding-right: 4px; }
-.wd-agent__msg { max-width: 84%; }
+.wd-agent { display: flex; flex-direction: column; gap: 16px; padding: 4px 0 0; flex: 1; min-height: 0; }
+
+.wd-agent__thread { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 240px;
+  overflow-y: auto; padding: 4px 2px 4px 0; }
+.wd-agent__msg { max-width: 86%; }
 .wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
-/* L'agent parle sur la surface claire de la marque, la personne sur le vert sombre :
-   deux voix, deux fonds, aucune icône à décoder. */
-.wd-agent__msg--agent { align-self: flex-start; background: #fff; color: var(--pul-bg, #445047); padding: 12px 14px; }
-.wd-agent__msg--moi { align-self: flex-end; background: var(--pul-bg, #445047); color: #fff; padding: 12px 14px; }
+.wd-agent__msg--agent { align-self: flex-start; background: #EDF2EE; color: #445047; padding: 12px 14px; }
+.wd-agent__msg--moi { align-self: flex-end; background: #445047; color: #fff; padding: 12px 14px; }
+/* Une seule étiquette, sur la première bulle : répéter « Pullman » à chaque tour
+   n'apprend rien après la première fois. */
+.wd-agent__qui { display: block; font-family: var(--font-sans); font-size: 10px; font-weight: 700;
+  letter-spacing: .8px; text-transform: uppercase; color: rgba(68,80,71,.45); margin: 0 0 6px 2px; }
+
+/* Les trois points : l'agent répond en un temps, pas instantanément. Sans ce délai
+   la réponse paraît pré-écrite — ce qu'elle est, mais la conversation ne se lit plus. */
+.wd-agent__typing { align-self: flex-start; display: inline-flex; gap: 4px; background: #EDF2EE;
+  padding: 14px 16px; }
+.wd-agent__typing span { width: 6px; height: 6px; border-radius: 50%; background: rgba(68,80,71,.45);
+  animation: wd-agent-dot 1.1s infinite ease-in-out; }
+.wd-agent__typing span:nth-child(2) { animation-delay: .16s; }
+.wd-agent__typing span:nth-child(3) { animation-delay: .32s; }
+@keyframes wd-agent-dot { 0%,60%,100% { opacity:.3; transform: translateY(0) } 30% { opacity:1; transform: translateY(-3px) } }
+@media (prefers-reduced-motion: reduce) { .wd-agent__typing span { animation: none; opacity: .5 } }
+
 .wd-agent__replies { display: flex; flex-wrap: wrap; gap: 8px; }
-.wd-agent__reply { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff;
-  padding: 9px 14px; border-radius: 100px; font-family: var(--font-sans); font-size: 14px; cursor: pointer;
+.wd-agent__reply { border: 1px solid #BCCABE; background: #fff; color: #445047; padding: 9px 15px;
+  border-radius: 100px; font-family: var(--font-sans); font-size: 14px; cursor: pointer;
   min-height: 40px; transition: background .15s, border-color .15s; }
-.wd-agent__reply:hover { background: rgba(255,255,255,.1); border-color: #fff; }
-.wd-agent__composer { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 4px; }
-.wd-agent__input { flex: 1; min-height: 44px; padding: 0 14px; border: 1px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.04); color: #fff; font-family: var(--font-sans); font-size: 16px; }
-.wd-agent__input::placeholder { color: rgba(255,255,255,.45); }
-.wd-agent__input:disabled { opacity: .4; }
-.wd-agent__send { flex: 0 0 auto; width: 44px; height: 44px; display: inline-flex; align-items: center;
+.wd-agent__reply:hover { background: #F2F6F2; border-color: #445047; }
+
+.wd-agent__composer { display: flex; gap: 8px; align-items: center; padding-top: 4px; }
+.wd-agent__input { flex: 1; min-height: 46px; padding: 0 14px; border: 1px solid #BCCABE;
+  background: #fff; color: #445047; font-family: var(--font-sans); font-size: 16px; }
+.wd-agent__input::placeholder { color: rgba(68,80,71,.5); }
+.wd-agent__input:focus { outline: none; border-color: #445047; }
+.wd-agent__input:disabled { background: #F4F6F4; color: rgba(68,80,71,.4); }
+.wd-agent__send { flex: 0 0 auto; width: 46px; height: 46px; display: inline-flex; align-items: center;
   justify-content: center; border: none; border-radius: 100px; background: var(--pul-highlight, #5FEF91);
-  color: var(--pul-bg, #445047); cursor: pointer; }
-.wd-agent__send:disabled { background: rgba(255,255,255,.14); color: rgba(255,255,255,.4); cursor: not-allowed; }
-.wd-agent__done { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  padding-top: 12px; border-top: 1px solid rgba(255,255,255,.12); }
-.wd-agent__done-txt { margin: 0; font-family: var(--font-sans); font-size: 14px; color: rgba(255,255,255,.7); }
+  color: #445047; cursor: pointer; }
+.wd-agent__send svg { width: 18px; height: 18px; }
+.wd-agent__send:disabled { background: #E6EBE7; color: rgba(68,80,71,.35); cursor: not-allowed; }
+
+.wd-agent__done { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; padding-top: 14px; border-top: 1px solid #E2E8E3; }
+.wd-agent__done-txt { margin: 0; font-family: var(--font-sans); font-size: 14px; color: rgba(68,80,71,.7); }
 .wd-discovery-modal__chip--ouvert { margin-top: 12px; }
 
 @media (max-width: 767px) {
-  .wd-agent__thread { max-height: 40vh; }
+  .wd-agent__thread { min-height: 200px; }
   .wd-agent__msg { max-width: 92%; }
   .wd-agent__reply { min-height: 44px; font-size: 15px; }
 }

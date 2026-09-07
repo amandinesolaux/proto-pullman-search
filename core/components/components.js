@@ -4202,6 +4202,8 @@
         agentThread: [],
         agentZone: null,
         agentTurn: 0,
+        agentTyping: false,
+        agentLibre: null,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -4298,6 +4300,8 @@
         agentThread: [],
         agentZone: null,
         agentTurn: 0,
+        agentTyping: false,
+        agentLibre: null,
         // État guide (mini-triage)
         guideWork: null,
         guideGroup: null
@@ -4486,9 +4490,14 @@
       const tours = this._agentTours();
       const tour = tours[st.agentTurn];
       const fini = !tour;
-      const fil = (st.agentThread || []).map(m =>
-        '<div class="wd-agent__msg wd-agent__msg--' + m.qui + '"><p>' + m.texte + '</p></div>').join('');
-      const propositions = tour
+      let vuAgent = false;
+      const fil = (st.agentThread || []).map(m => {
+        // L'étiquette une seule fois : la répéter à chaque tour n'apprend rien.
+        const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Pullman</span>') : '';
+        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + '"><p>' + m.texte + '</p></div>';
+      }).join('')
+      + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="Pullman écrit"><span></span><span></span><span></span></div>' : '');
+      const propositions = (tour && !st.agentTyping)
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
         : '';
@@ -4540,6 +4549,10 @@
       const tours = this._agentTours();
       const tour = tours[this.state.agentTurn];
       this.state.agentThread.push({ qui: 'moi', texte: texte });
+      // Ce qui est écrit à la main est repris tel quel dans le récapitulatif. Le
+      // prototype ne sait pas l'interpréter — le redire prouve au moins qu'il l'a
+      // reçu, là où une réponse générique donne l'impression du contraire.
+      if (!choix) this.state.agentLibre = texte;
       if (choix) {
         // La réponse alimente vraiment la recherche : sans cela l'échange serait
         // un décor, et les résultats ne diraient rien de ce qu'on vient de dire.
@@ -4547,10 +4560,26 @@
         if (choix.z) this.state.agentZone = choix.z;
       }
       this.state.agentTurn += 1;
-      const suivant = tours[this.state.agentTurn];
-      if (suivant) this.state.agentThread.push({ qui: 'agent', texte: suivant.q });
-      else this.state.agentThread.push({ qui: 'agent', texte: this._agentRecap() });
+      // On affiche d'abord la réponse de la personne et les trois points : une réponse
+      // qui apparaît dans le même souffle que la question se lit comme un formulaire,
+      // pas comme un échange.
+      this.state.agentTyping = true;
       this._rerenderContent();
+      this._agentDefiler();
+      clearTimeout(this._minuteurAgent);
+      this._minuteurAgent = setTimeout(() => {
+        const suivant = tours[this.state.agentTurn];
+        this.state.agentThread.push({ qui: 'agent',
+          texte: suivant ? suivant.q : this._agentRecap() });
+        this.state.agentTyping = false;
+        this._rerenderContent();
+        this._agentDefiler();
+        const champ = this.querySelector('#wdAgentInput');
+        if (champ && !champ.disabled) champ.focus();
+      }, 700);
+    }
+
+    _agentDefiler() {
       const fil = this.querySelector('#wdAgentThread');
       if (fil) fil.scrollTop = fil.scrollHeight;
     }
@@ -4561,9 +4590,11 @@
       const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
         'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale' };
       (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
-      return bits.length
-        ? 'Je retiens : ' + bits.join(', ') + '.'
-        : 'Très bien, je regarde ce qui correspond.';
+      const libre = this.state.agentLibre;
+      if (bits.length && libre) return 'Je retiens : ' + bits.join(', ') + ', et votre note « ' + libre + ' ».';
+      if (libre) return 'Je retiens votre note « ' + libre + ' ». Je regarde ce qui correspond.';
+      if (bits.length) return 'Je retiens : ' + bits.join(', ') + '.';
+      return 'Très bien, je regarde ce qui correspond.';
     }
 
     renderQuestion1() {
