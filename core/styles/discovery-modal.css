@@ -2101,3 +2101,41 @@
     min-width: 70px;
   }
 }
+
+/* ══ Conversation ═══════════════════════════════════════════════════════════════
+   L'agent prend le relais après quatre questions. L'écran n'a plus de titre ni de
+   sous-titre : le fil parle de lui-même, et une question posée deux fois — une en
+   titre, une dans une bulle — se lit comme une hésitation. */
+.wd-discovery-modal__content--agent { display: flex; flex-direction: column; }
+.wd-agent { display: flex; flex-direction: column; gap: 14px; padding: 8px 0 4px; min-height: 320px; }
+.wd-agent__thread { display: flex; flex-direction: column; gap: 10px; max-height: 46vh; overflow-y: auto; padding-right: 4px; }
+.wd-agent__msg { max-width: 84%; }
+.wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
+/* L'agent parle sur la surface claire de la marque, la personne sur le vert sombre :
+   deux voix, deux fonds, aucune icône à décoder. */
+.wd-agent__msg--agent { align-self: flex-start; background: #fff; color: var(--pul-bg, #445047); padding: 12px 14px; }
+.wd-agent__msg--moi { align-self: flex-end; background: var(--pul-bg, #445047); color: #fff; padding: 12px 14px; }
+.wd-agent__replies { display: flex; flex-wrap: wrap; gap: 8px; }
+.wd-agent__reply { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff;
+  padding: 9px 14px; border-radius: 100px; font-family: var(--font-sans); font-size: 14px; cursor: pointer;
+  min-height: 40px; transition: background .15s, border-color .15s; }
+.wd-agent__reply:hover { background: rgba(255,255,255,.1); border-color: #fff; }
+.wd-agent__composer { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 4px; }
+.wd-agent__input { flex: 1; min-height: 44px; padding: 0 14px; border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.04); color: #fff; font-family: var(--font-sans); font-size: 16px; }
+.wd-agent__input::placeholder { color: rgba(255,255,255,.45); }
+.wd-agent__input:disabled { opacity: .4; }
+.wd-agent__send { flex: 0 0 auto; width: 44px; height: 44px; display: inline-flex; align-items: center;
+  justify-content: center; border: none; border-radius: 100px; background: var(--pul-highlight, #5FEF91);
+  color: var(--pul-bg, #445047); cursor: pointer; }
+.wd-agent__send:disabled { background: rgba(255,255,255,.14); color: rgba(255,255,255,.4); cursor: not-allowed; }
+.wd-agent__done { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding-top: 12px; border-top: 1px solid rgba(255,255,255,.12); }
+.wd-agent__done-txt { margin: 0; font-family: var(--font-sans); font-size: 14px; color: rgba(255,255,255,.7); }
+.wd-discovery-modal__chip--ouvert { margin-top: 12px; }
+
+@media (max-width: 767px) {
+  .wd-agent__thread { max-height: 40vh; }
+  .wd-agent__msg { max-width: 92%; }
+  .wd-agent__reply { min-height: 44px; font-size: 15px; }
+}

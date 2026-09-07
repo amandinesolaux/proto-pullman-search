@@ -4199,6 +4199,9 @@
         currentStep: 1,
         stepHistory: [],
         carouselIndex: 2,
+        agentThread: [],
+        agentZone: null,
+        agentTurn: 0,
         selectedWho: null,
         selectedYear: new Date().getFullYear(),
         showYearPicker: false,
@@ -4292,6 +4295,9 @@
         proContext: null,
         proNeeds: [],
         bleisureChoice: null,
+        agentThread: [],
+        agentZone: null,
+        agentTurn: 0,
         // État guide (mini-triage)
         guideWork: null,
         guideGroup: null
@@ -4354,6 +4360,8 @@
         return this.renderQuestion_BusinessDates();
       } else if (step === 'pro-needs') {
         return this.renderProNeeds();
+      } else if (step === 'agent') {
+        return this.renderAgent();
       } else if (step === 'pro-bleisure') {
         return this.renderProBleisure();
       } else if (step === 'event-family') {
@@ -4393,19 +4401,178 @@
     }
 
     _getStepTotal() {
-      switch (this.state.selectedStayType) {
-        case 'pro': return 5;
-        case 'event': return 7;
-        case 'guide': return 3;
-        default: return 7;
+      // L'événement s'arrête à trois questions : le reste se traite en conversation.
+      return this.state.selectedStayType === 'event' ? 3 : 4;
+    }
+
+    // ── L'agent ───────────────────────────────────────────────────────────────
+    // Il est scripté, pas génératif : dans un prototype, une réponse écrite tient
+    // mieux qu'une réponse inventée, et on peut la discuter. Ce qu'il démontre
+    // n'est pas la conversation en soi, c'est ce que quatre questions permettent
+    // de dire ensuite — une première phrase qui reprend le contexte au lieu de
+    // demander « comment puis-je vous aider ? ».
+    _agentContexte() {
+      const st = this.state;
+      const lieu = st.businessLocation && st.businessLocation !== '__ouvert__' ? st.businessLocation : null;
+      const mois = st.selectedMonth || null;
+      // Les dates vivent dans checkInDate / checkOutDate. « du 12 au 14 octobre » plutôt
+      // que deux dates ISO : c'est la façon dont on dit ses dates à quelqu'un.
+      const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      let dates = null;
+      if (st.checkInDate && st.checkOutDate) {
+        const a1 = new Date(st.checkInDate), a2 = new Date(st.checkOutDate);
+        dates = 'du ' + a1.getDate() + (a1.getMonth() === a2.getMonth() ? '' : ' ' + MOIS[a1.getMonth()])
+              + ' au ' + a2.getDate() + ' ' + MOIS[a2.getMonth()];
       }
+      const bits = [];
+      if (st.selectedStayType === 'pro') bits.push('Un déplacement professionnel');
+      else if (st.selectedStayType === 'event') bits.push('Un séminaire');
+      else bits.push('Un séjour');
+      if (lieu) bits.push('à ' + lieu);
+      if (dates) bits.push(dates);
+      else if (mois) bits.push('en ' + mois);
+      let phrase = bits.join(' ') + '.';
+      if (st.bleisureChoice === 'yes') phrase += ' Prolongé sur place.';
+      if (!lieu) phrase += ' Destination encore ouverte.';
+      return phrase;
+    }
+
+    // Chaque tour : une question, des réponses proposées, et ce que chacune ajoute
+    // à la recherche. Les propositions ne ferment pas la saisie libre — elles
+    // évitent d'avoir à écrire quand la réponse tient en un mot.
+    _agentTours() {
+      const st = this.state;
+      const type = st.selectedStayType;
+      const foyer = st.isConnected && st.userProfile && st.userProfile.foyer;
+
+      if (type === 'event') {
+        return [
+          { q: 'Combien de participants attendez-vous ?',
+            r: [{ t: 'Moins de 30', v: 'cap-100' }, { t: '30 à 100', v: 'cap-100' },
+                { t: '100 à 300', v: 'cap-300' }, { t: 'Plus de 300', v: 'cap-800' }] },
+          { q: 'Sur combien de jours ?',
+            r: [{ t: 'Une journée' }, { t: 'Deux jours' }, { t: 'Trois jours ou plus' }] }
+        ];
+      }
+      if (type === 'pro') {
+        const t2 = st.bleisureChoice === 'yes'
+          ? { q: 'Vous restez seul, ou quelqu\u2019un vous rejoint ?',
+              r: [{ t: 'Seul' },
+                  { t: 'Mon conjoint', v: 'restaurant' },
+                  { t: foyer ? 'Ma famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'Ma famille', v: 'kids' }] }
+          : { q: 'Un espace de travail dans l\u2019hôtel, ou ça n\u2019a pas d\u2019importance ?',
+              r: [{ t: 'Un espace de travail', v: 'workspace' },
+                  { t: 'Une salle de réunion', v: 'meeting-room' },
+                  { t: 'Peu importe' }] };
+        return [
+          { q: 'Vous préférez être près du centre, du quartier d\u2019affaires, ou de l\u2019aéroport ?',
+            r: [{ t: 'Centre-ville', z: 'centre' }, { t: 'Quartier d\u2019affaires', z: 'affaires' },
+                { t: 'Près de l\u2019aéroport', z: 'aéroport' }, { t: 'Peu importe' }] },
+          t2
+        ];
+      }
+      return [
+        { q: 'Vous verriez plutôt le bord de mer, une ville, ou la nature ?',
+          r: [{ t: 'Le bord de mer', z: 'bord de mer' }, { t: 'Une ville', z: 'ville' },
+              { t: 'La nature', z: 'nature' }, { t: 'Peu importe' }] },
+        { q: 'Quelque chose qui compte particulièrement ?',
+          r: [{ t: 'Un spa', v: 'spa' }, { t: 'Une piscine', v: 'spa' },
+              { t: 'Une bonne table', v: 'restaurant' }, { t: 'Peu importe' }] }
+      ];
+    }
+
+    renderAgent() {
+      const st = this.state;
+      const tours = this._agentTours();
+      const tour = tours[st.agentTurn];
+      const fini = !tour;
+      const fil = (st.agentThread || []).map(m =>
+        '<div class="wd-agent__msg wd-agent__msg--' + m.qui + '"><p>' + m.texte + '</p></div>').join('');
+      const propositions = tour
+        ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
+            '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
+        : '';
+      const cloture = fini
+        ? '<div class="wd-agent__done">' +
+            '<p class="wd-agent__done-txt">C\u2019est noté. Je vous montre ce qui correspond.</p>' +
+            '<button type="button" class="wd-discovery-modal__continue is-active" data-agent-voir>Voir les résultats</button>' +
+          '</div>'
+        : '';
+      return `
+        <div class="wd-discovery-modal">
+          <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">
+            <button class="wd-discovery-modal__close" aria-label="Fermer">${ICON.close}</button>
+            <div class="wd-agent">
+              <div class="wd-agent__thread" id="wdAgentThread">${fil}</div>
+              ${propositions}
+              ${cloture}
+              <form class="wd-agent__composer" id="wdAgentComposer">
+                <input type="text" class="wd-agent__input" id="wdAgentInput" placeholder="Écrire un message…" autocomplete="off" ${fini ? 'disabled' : ''} />
+                <button type="submit" class="wd-agent__send" aria-label="Envoyer" ${fini ? 'disabled' : ''}>${ICON.arrowR || '→'}</button>
+              </form>
+            </div>
+            <div class="wd-discovery-modal__footer">
+              <div class="wd-discovery-modal__stepper">Conversation</div>
+              <button class="wd-discovery-modal__back" aria-label="Retour">Retour</button>
+              <button class="wd-discovery-modal__reset" aria-label="Recommencer">Recommencer</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Amorce du fil : le contexte repris, puis la première question. C'est la
+    // seule chose que les quatre écrans servaient à préparer.
+    _agentAmorcer() {
+      if (this.state.agentThread && this.state.agentThread.length) return;
+      const tours = this._agentTours();
+      // La minuscule ne vaut qu'après un prénom : « Lisa, un déplacement… ». Sans salut,
+      // la phrase commence, et elle prend sa majuscule.
+      const prenom = this.state.isConnected && this.state.userProfile
+        ? this.state.userProfile.firstName : null;
+      const ctx = this._agentContexte();
+      this.state.agentThread = [
+        { qui: 'agent', texte: prenom ? prenom + ', ' + ctx.charAt(0).toLowerCase() + ctx.slice(1) : ctx },
+        { qui: 'agent', texte: tours[0].q }
+      ];
+    }
+
+    _agentRepondre(texte, choix) {
+      const tours = this._agentTours();
+      const tour = tours[this.state.agentTurn];
+      this.state.agentThread.push({ qui: 'moi', texte: texte });
+      if (choix) {
+        // La réponse alimente vraiment la recherche : sans cela l'échange serait
+        // un décor, et les résultats ne diraient rien de ce qu'on vient de dire.
+        if (choix.v && !this.state.selectedTypes.includes(choix.v)) this.state.selectedTypes.push(choix.v);
+        if (choix.z) this.state.agentZone = choix.z;
+      }
+      this.state.agentTurn += 1;
+      const suivant = tours[this.state.agentTurn];
+      if (suivant) this.state.agentThread.push({ qui: 'agent', texte: suivant.q });
+      else this.state.agentThread.push({ qui: 'agent', texte: this._agentRecap() });
+      this._rerenderContent();
+      const fil = this.querySelector('#wdAgentThread');
+      if (fil) fil.scrollTop = fil.scrollHeight;
+    }
+
+    _agentRecap() {
+      const bits = [];
+      if (this.state.agentZone) bits.push(this.state.agentZone);
+      const labels = { spa: 'spa', restaurant: 'restaurant', workspace: 'espace de travail',
+        'meeting-room': 'salle de réunion', kids: 'espace enfants', local: 'vie locale' };
+      (this.state.selectedTypes || []).forEach(t => { if (labels[t]) bits.push(labels[t]); });
+      return bits.length
+        ? 'Je retiens : ' + bits.join(', ') + '.'
+        : 'Très bien, je regarde ce qui correspond.';
     }
 
     renderQuestion1() {
+      // Le déplacement professionnel ouvre la rangée : c'est le cas majoritaire du
+      // site. Une tuile « escapade » en tête dirait au visiteur qu'il n'est pas chez lui.
       const options = [
-        { value: 'escapade', label: 'Une escapade', desc: 'Séjour loisir, détente, découverte', image: '../../assets/images/discovery/couple.avif' },
-        { value: 'pro', label: 'Un déplacement pro', desc: 'Voyage d\'affaires, coworking', image: '../../assets/images/discovery/business.avif' },
-        { value: 'event', label: 'Un événement', desc: 'Séminaire, mariage, célébration', image: '../../assets/images/Q1/event.webp' },
+        { value: 'pro', label: 'Un déplacement professionnel', desc: 'Mission, rendez-vous, coworking', image: '../../assets/images/discovery/business.avif' },
+        { value: 'event', label: 'Un séminaire ou un événement', desc: 'Réunion d\'équipe, célébration', image: '../../assets/images/Q1/event.webp' },
+        { value: 'escapade', label: 'Un séjour personnel', desc: 'Escapade, détente, découverte', image: '../../assets/images/discovery/couple.avif' },
         { value: 'guide', label: 'Je me laisse guider', desc: 'Pas encore sûr ? On vous oriente', image: '../../assets/images/discovery/city.avif' }
       ];
 
@@ -5533,14 +5700,10 @@
     _getStepNumber() {
       const stepMap = {
         1: 1,
-        1.5: 2,
-        2: 3,
-        3: 4, 3.1: 4, 3.2: 4, 3.3: 4, 'wishlist': 4,
-        4: 5,
-        5: 6,
-        'pro-location': 2, 'pro-dates': 3, 'pro-needs': 4, 'pro-bleisure': 5,
-        'event-family': 2, 'event-subtype': 3, 'event-location': 4, 'event-dates': 5, 'event-volume': 6, 'event-needs': 7,
-        'guide-1': 2, 'guide-2': 3
+        'pro-location': 2, 'event-location': 2,
+        'pro-dates': 3, 'event-dates': 3, 4: 3,
+        'pro-bleisure': 4, 1.5: 4,
+        3: 2, 3.1: 2, 3.2: 2, 3.3: 2, 'wishlist': 2, 2: 3, 5: 4
       };
       return stepMap[this.state.currentStep] || '?';
     }
@@ -5561,9 +5724,13 @@
               <label class="wd-discovery-modal__question-label">Dans quelle ville ou région ?</label>
 
               <div class="wd-discovery-modal__form-group wd-discovery-modal__autocomplete">
-                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation || ''}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
+                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation === '__ouvert__' ? '' : (this.state.businessLocation || '')}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
                 <ul class="wd-discovery-modal__autocomplete-list" id="businessLocationList" role="listbox" hidden></ul>
               </div>
+              <!-- On ne demande plus « avez-vous une idée de destination ? » : pour un
+                   déplacement la réponse est toujours oui, et la question coûtait un écran
+                   à la majorité. Elle devient une sortie pour la minorité qui hésite. -->
+              <button type="button" class="wd-discovery-modal__chip wd-discovery-modal__chip--ouvert${this.state.businessLocation === '__ouvert__' ? ' is-selected' : ''}" data-stub-value="__ouvert__" data-stub-field="businessLocation">Je n\u2019ai pas encore décidé</button>
             </div>
 
             <div class="wd-discovery-modal__footer">
@@ -6650,6 +6817,39 @@
         });
       });
 
+      // La conversation s'amorce au moment où l'on y entre, pas avant : le contexte
+      // repris doit refléter les quatre réponses telles qu'elles viennent d'être données.
+      if (this.state.currentStep === 'agent') {
+        this._agentAmorcer();
+        const fil = this.querySelector('#wdAgentThread');
+        if (fil && !fil.innerHTML.trim()) { this._rerenderContent(); return; }
+        if (fil) fil.scrollTop = fil.scrollHeight;
+
+        this.querySelectorAll('[data-agent-reply]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tours = this._agentTours();
+            const tour = tours[this.state.agentTurn];
+            const choix = tour && tour.r[Number(btn.dataset.agentReply)];
+            if (choix) this._agentRepondre(choix.t, choix);
+          });
+        });
+
+        const composer = this.querySelector('#wdAgentComposer');
+        if (composer) {
+          composer.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const champ = this.querySelector('#wdAgentInput');
+            const txt = champ && champ.value.trim();
+            if (!txt) return;
+            // La saisie libre avance d'un tour sans rien présumer de son contenu :
+            // un prototype qui feindrait de comprendre mentirait sur ce qu'il sait faire.
+            this._agentRepondre(txt, null);
+          });
+        }
+
+      }
+
       // Sur une question à choix unique, cliquer une carte suffit : demander ensuite
       // « Continuer » fait payer deux gestes pour une seule décision, et le second
       // n'apporte rien — il n'y a rien à confirmer quand on ne peut choisir qu'une
@@ -7105,88 +7305,49 @@
       return next;
     }
 
+    // Quatre questions, puis la conversation. Le parcours en comptait sept, dont
+    // plusieurs qu'un échange traite mieux : les services à cocher, le nombre
+    // d'enfants, les régions. On ne garde que ce qui branche la suite, se choisit
+    // plus vite qu'il ne se dit, ou rend la première phrase de l'agent spécifique.
+    //
+    // L'ordre suit la cible du site : un déplacement professionnel a une destination
+    // et des dates imposées, jamais à explorer. « Prolongez-vous sur place ? »
+    // remplace « avec qui » sur cette branche — c'est la question qui change tout le
+    // reste, et l'angle propre à la marque. L'événement s'arrête à trois : ses
+    // spécificités se traitent mal en formulaire, et c'est là que l'agent sert.
     _getNextStepByProfile(currentStep, state) {
-      // Q1 → branche selon selectedStayType
+      const type = state.selectedStayType;
+
       if (currentStep === 1) {
-        switch (state.selectedStayType) {
-          case 'escapade': return 1.5;
-          case 'pro':
-            state.selectedWho = 'business';
-            return 'pro-location';
-          case 'event':
-            state.selectedWho = 'business';
-            return 'event-family';
-          case 'guide': return 'guide-1';
-          default: return 1;
-        }
+        if (type === 'pro' || type === 'event') state.selectedWho = 'business';
+        return type === 'event' ? 'event-location' : 'pro-location';
       }
 
-      // ── Branche Escapade (flux loisir, ex-V1) ──
-      if (state.selectedStayType === 'escapade') {
-        switch (currentStep) {
-          case 1.5: return 2;
-          case 2: return 3;
-          case 3:
-            if (state.destinationIdea === 'yes') return 3.2;
-            if (state.destinationIdea === 'no' || state.destinationIdea === 'multiple') return 3.3;
-            if (state.destinationIdea === 'wishlist') return 'wishlist';
-            return 3;
-          case 3.1: return 4;
-          case 3.2: return 4;
-          case 3.3: return 4;
-          case 'wishlist': return state.destinationInput ? 4 : 'wishlist';
-          case 4: return 5;
-          case 5: return 'results';
-          default: return currentStep;
-        }
-      }
+      switch (currentStep) {
+        case 'pro-location':
+        case 'event-location':
+          // Sans destination arrêtée, des dates au jour près n'ont pas de sens :
+          // on bascule sur la période, plus large.
+          if (state.businessLocation === '__ouvert__') return 4;
+          return type === 'event' ? 'event-dates' : 'pro-dates';
 
-      // ── Branche Pro ──
-      if (state.selectedStayType === 'pro') {
-        switch (currentStep) {
-          case 'pro-location': return 'pro-dates';
-          case 'pro-dates': return 'pro-needs';
-          case 'pro-needs': return 'pro-bleisure';
-          case 'pro-bleisure': return 'results';
-          default: return currentStep;
-        }
-      }
+        case 'pro-dates':
+        case 'event-dates':
+        case 4:
+          if (type === 'pro') return 'pro-bleisure';
+          if (type === 'event') return 'agent';
+          return 1.5;
 
-      // ── Branche Événement ──
-      if (state.selectedStayType === 'event') {
-        switch (currentStep) {
-          case 'event-family': return 'event-subtype';
-          case 'event-subtype': return 'event-location';
-          case 'event-location': return 'event-dates';
-          case 'event-dates': return 'event-volume';
-          case 'event-volume': return 'event-needs';
-          case 'event-needs': return 'results';
-          default: return currentStep;
-        }
-      }
+        case 'pro-bleisure':
+        case 1.5:
+          return 'agent';
 
-      // ── Branche Guide (mini-triage) ──
-      if (state.selectedStayType === 'guide') {
-        if (currentStep === 'guide-1') {
-          if (state.guideWork === 'no') {
-            state.selectedStayType = 'escapade';
-            return 1.5;
-          }
-          return 'guide-2';
-        }
-        if (currentStep === 'guide-2') {
-          if (state.guideGroup === 'yes') {
-            state.selectedStayType = 'event';
-            return 'event-family';
-          }
-          state.selectedStayType = 'pro';
-          state.selectedWho = 'business';
-          return 'pro-location';
-        }
-        return currentStep;
-      }
+        case 'agent':
+          return 'results';
 
-      return currentStep;
+        default:
+          return 'agent';
+      }
     }
 
     restart() {
