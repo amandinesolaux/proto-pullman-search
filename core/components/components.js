@@ -4204,7 +4204,8 @@
         agentTurn: 0,
         agentTyping: false,
         agentNotes: [],
-        agentAssoupli: null,
+        agentLaisses: [],
+        agentCapacite: null,
         dateMode: 'exactes',
         dateFlex: 3,
         selectedWho: null,
@@ -4305,7 +4306,8 @@
         agentTurn: 0,
         agentTyping: false,
         agentNotes: [],
-        agentAssoupli: null,
+        agentLaisses: [],
+        agentCapacite: null,
         dateMode: 'exactes',
         dateFlex: 3,
         // État guide (mini-triage)
@@ -4659,17 +4661,17 @@
       // Le cumul strict vide vite la liste — aucun Pullman parisien n'a de spa. Plutôt
       // que de ne rien montrer, on relâche le dernier critère demandé et on le dit :
       // c'est ce que fait déjà la carte quand un filtre écarte tout.
-      const noms = { spa: 'le spa', pets: 'les animaux', family: 'l\u2019espace enfants',
-                     beach: 'le bord de mer', meeting: 'la salle de réunion' };
-      let restants = voulus.slice();
-      let retenus = [];
-      st.agentAssoupli = null;
-      while (true) {
-        retenus = peri.filter(h => restants.every(a => (h.amenities || []).indexOf(a) >= 0));
-        if (retenus.length || !restants.length) break;
-        st.agentAssoupli = noms[restants.pop()] || null;
-      }
-      if (!retenus.length) retenus = peri;      // dernier recours : jamais rien à montrer
+      // On garde le maximum : un critère n'est retenu que s'il laisse encore quelque
+      // chose à montrer. Lâcher le dernier demandé, comme avant, faisait tomber les
+      // animaux — que l'hôtel accepte pourtant — parce que le spa manquait.
+      let retenus = peri;
+      let restants = [];
+      st.agentLaisses = [];
+      voulus.forEach(a => {
+        const suite = retenus.filter(h => (h.amenities || []).indexOf(a) >= 0);
+        if (suite.length) { retenus = suite; restants.push(a); }
+        else st.agentLaisses.push(a);
+      });
       // La phrase nomme la ville qu'on propose vraiment.
       if (st.agentAilleurs && !st.agentAilleurs.sansRepere && retenus.length) {
         st.agentAilleurs.proche = retenus[0].city;
@@ -4744,31 +4746,6 @@
         img: photo(h.img), href: h.href || null }));
     }
 
-    // Ce que l'agent doit dire à côté de ses propositions : où il a dû aller les
-    // chercher, et quel critère il a laissé. Le taire donnerait une liste qui a l'air
-    // de répondre à la demande alors qu'elle y répond de biais.
-    _agentReserve() {
-      const st = this.state;
-      const bouts = [];
-      if (st.agentAilleurs) {
-        const a = st.agentAilleurs;
-        bouts.push(!a.proche
-          ? 'Je ne trouve pas de Pullman à ' + a.ville + '. Voici ailleurs.'
-          : a.filtre
-            ? 'Pullman n\u2019a pas encore d\u2019adresse à ' + a.ville
-              + '. Voici les plus proches qui répondent à votre demande.'
-            : 'Pullman n\u2019a pas encore d\u2019adresse à ' + a.ville
-              + ' — le plus proche est à ' + a.proche + '.');
-      }
-      if (st.agentCapacite) {
-        bouts.push('Aucune salle ne va jusqu\u2019à ' + st.agentCapacite
-          + ' personnes : voici les plus grandes.');
-      } else if (st.agentAssoupli) {
-        bouts.push('Aucun ne réunit tout : j\u2019ai laissé de côté ' + st.agentAssoupli + '.');
-      }
-      return bouts.join(' ');
-    }
-
     // Fin du parcours : la liste complète, filtrée par ce que l'échange a produit.
     // L'écran « nous cherchons votre hôtel idéal » disparaît — il faisait patienter
     // devant une recherche déjà faite, et laissait au passage fuiter des valeurs
@@ -4790,6 +4767,7 @@
       return 'search-results.html?' + p.toString();
     }
 
+
     renderAgent() {
       const st = this.state;
       const tours = this._agentTours();
@@ -4799,10 +4777,8 @@
       // partie de sa réponse. Posé en dessous, il devenait un encart qui n'appartenait
       // plus à l'échange.
       const props = fini ? this._agentPropositions() : [];
-      const reserve = props.length ? this._agentReserve() : '';
       const carrousel = props.length
-        ? (reserve ? '<p class="wd-agent__reserve">' + reserve + '</p>' : '')
-          + '<div class="wd-agent__carrousel">' + props.map(p =>
+        ? '<div class="wd-agent__carrousel">' + props.map(p =>
             (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
                     : '<div class="wd-agent__prop">') +
               (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
@@ -4954,46 +4930,97 @@
     }
 
     _agentRecap() {
-      // On ne récite pas des étiquettes — « je garde nature, spa » n'est pas une
-      // phrase. La zone et les critères se disent comme on décrirait l'hôtel qu'on
-      // cherche, et le carrousel qui suit dispense d'annoncer qu'on va chercher.
-      const zones = { centre: 'en centre-ville', affaires: 'dans le quartier d\u2019affaires',
-        'aéroport': 'près de l\u2019aéroport', gare: 'près de la gare', nature: 'en pleine nature',
-        ville: 'en ville', 'bord de mer': 'au bord de la mer' };
-      const avec = { spa: 'avec un spa', restaurant: 'avec un restaurant',
+      // Une seule phrase, dite par l'agent. La réserve — « aucun ne réunit tout » —
+      // vivait à côté, en petit et en gris : elle avait l'air d'une note du système
+      // collée sous la réponse, et elle contredisait la phrase juste au-dessus, qui
+      // annonçait encore le critère qu'on venait d'abandonner.
+      const st = this.state;
+      this._agentPropositions();   // renseigne agentAilleurs, agentLaisses, agentCapacite
+
+      const AVEC = { spa: 'avec un spa', restaurant: 'avec un restaurant',
         workspace: 'avec un espace de travail', 'meeting-room': 'avec une salle de réunion',
         kids: 'avec un espace pour les enfants', pets: 'qui acceptent les animaux',
         beach: 'en bord de mer', local: 'ancrés dans la vie locale' };
-      const capacites = { 'cap-30': 'pour moins de 30 personnes', 'cap-100': 'pour 30 à 100 personnes',
+      const NOM = { spa: 'le spa', pets: 'les animaux', family: 'l\u2019espace enfants',
+        beach: 'le bord de mer', meeting: 'la salle de réunion' };
+      const SANS = { spa: 'n\u2019a de spa', pets: 'n\u2019accepte les animaux',
+        family: 'n\u2019a d\u2019espace pour les enfants', beach: 'n\u2019est en bord de mer',
+        meeting: 'n\u2019a de salle de réunion' };
+      const CAP = { 'cap-30': 'pour moins de 30 personnes', 'cap-100': 'pour 30 à 100 personnes',
         'cap-300': 'pour 100 à 300 personnes', 'cap-800': 'pour plus de 300 personnes' };
+      const ZONES = { centre: 'en centre-ville', affaires: 'dans le quartier d\u2019affaires',
+        'aéroport': 'près de l\u2019aéroport', gare: 'près de la gare', nature: 'en pleine nature',
+        ville: 'en ville', 'bord de mer': 'au bord de la mer' };
+      const VERS = { spa: 'spa', pets: 'pets', kids: 'family', beach: 'beach', 'meeting-room': 'meeting' };
 
-      const quoi = this.state.selectedStayType === 'event' ? 'des salles' : 'des hôtels';
-      const morceaux = [];
-      if (this.state.agentZone && zones[this.state.agentZone]) morceaux.push(zones[this.state.agentZone]);
-      (this.state.selectedTypes || []).forEach(c => {
-        // Pour un séminaire, ce sont déjà des salles qu'on cherche : « des salles avec
-        // une salle de réunion » ne dit rien de plus.
-        if (c === 'meeting-room' && this.state.selectedStayType === 'event') return;
-        if (avec[c]) morceaux.push(avec[c]);
-        else if (capacites[c]) morceaux.push(capacites[c]);
-      });
+      const event = st.selectedStayType === 'event';
+      const quoi = event ? 'des salles' : 'des hôtels';
+      const laisses = st.agentLaisses || [];
+      const lache = (c) => laisses.indexOf(VERS[c]) >= 0;
 
-      const notes = (this.state.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
-      // « avec un restaurant et avec un espace enfants » : le second « avec » est de
-      // trop. La préposition se pose une fois et vaut pour la suite.
-      let avecPose = false;
-      const dits = morceaux.map(x => {
-        if (x.indexOf('avec ') !== 0) return x;
-        if (avecPose) return x.slice(5);
-        avecPose = true;
-        return x;
+      // « avec un restaurant et avec un espace enfants » : la préposition se pose une
+      // fois et vaut pour la suite.
+      const joindre = (bouts) => {
+        let pose = false;
+        const dits = bouts.map(x => {
+          if (x.indexOf('avec ') !== 0) return x;
+          if (pose) return x.slice(5);
+          pose = true; return x;
+        });
+        return dits.length > 1
+          ? dits.slice(0, -1).join(', ') + ' et ' + dits[dits.length - 1]
+          : (dits[0] || '');
+      };
+
+      const gardes = [];
+      (st.selectedTypes || []).forEach(c => {
+        if (lache(c)) return;
+        if (c === 'meeting-room' && event) return;   // ce sont déjà des salles
+        if (AVEC[c]) gardes.push(AVEC[c]);
+        else if (CAP[c] && !st.agentCapacite) gardes.push(CAP[c]);
       });
-      const liste = dits.length > 1
-        ? dits.slice(0, -1).join(', ') + ' et ' + dits[dits.length - 1]
-        : dits[0];
-      let p = morceaux.length
-        ? 'Je vous cherche ' + quoi + ' ' + liste + '.'
-        : 'Voici ce qui me paraît le plus proche.';
+      // « qui acceptent les animaux et avec un espace enfants » se lit de travers :
+      // les compléments en « avec » passent devant, les relatives après.
+      gardes.sort((x, y) => (x.indexOf('avec ') === 0 ? 0 : 1) - (y.indexOf('avec ') === 0 ? 0 : 1));
+      // Le quartier reste en tête : il situe, et ce qui situe se dit avant ce qui équipe.
+      if (st.agentZone && ZONES[st.agentZone]) gardes.unshift(ZONES[st.agentZone]);
+      const listeGardes = joindre(gardes);
+
+      const ville = (st.businessLocation && st.businessLocation !== '__ouvert__')
+        ? st.businessLocation : (st.destinationInput || null);
+      const ici = ville ? ' à ' + ville : '';
+      const a = st.agentAilleurs;
+      let p;
+
+      if (a && !a.proche) {
+        // Ville qu'on ne sait pas situer : on ne prétend pas à la proximité.
+        p = 'Je ne trouve pas de Pullman à ' + a.ville + ', mais voici ce que je peux vous proposer ailleurs'
+          + (listeGardes ? ' : ' + quoi + ' ' + listeGardes + '.' : '.');
+      } else if (a) {
+        p = 'Pullman n\u2019a pas encore d\u2019adresse à ' + a.ville
+          + ' — les plus proches sont à ' + a.proche + '. '
+          + (listeGardes ? 'J\u2019ai gardé ' + (event ? 'les salles ' : 'ceux ') + listeGardes + '.'
+                         : 'Voici ce qu\u2019on y trouve.');
+      } else if (st.agentCapacite) {
+        p = 'Aucune salle' + ici + ' ne va jusqu\u2019à ' + st.agentCapacite
+          + ' personnes. Voici les plus grandes.';
+      } else if (laisses.length) {
+        // Le critère abandonné se dit dans la même phrase que ce qui reste : annoncer
+        // le spa puis le retirer trois lignes plus bas ne se comprend pas.
+        const perdus = joindre(laisses.map(x => NOM[x] || x));
+        p = listeGardes
+          ? 'Aucun hôtel' + ici + ' ne réunit tout : je laisse ' + perdus
+            + ' de côté, et je vous montre ' + quoi + ' ' + listeGardes + '.'
+          : (laisses.length === 1 && SANS[laisses[0]]
+              ? 'Aucun hôtel' + ici + ' ' + SANS[laisses[0]] + '. Voici ce qui s\u2019en approche le plus.'
+              : 'Aucun hôtel' + ici + ' ne réunit ' + perdus + '. Voici ce qui s\u2019en approche le plus.');
+      } else if (listeGardes) {
+        p = 'Voici ' + quoi + ' ' + listeGardes + (ville ? ', à ' + ville : '') + '.';
+      } else {
+        p = 'Voici ce qui me paraît le plus proche de ce que vous cherchez.';
+      }
+
+      const notes = (st.agentNotes || []).map(n => '« ' + n + ' »').join(', ');
       if (notes) p += ' Je n\u2019oublie pas ' + notes + '.';
       return p;
     }
