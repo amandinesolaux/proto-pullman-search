@@ -5056,7 +5056,7 @@
             <p class="wd-discovery-modal__subtitle">Dites-nous ce qui vous amène et nous vous guiderons vers l'expérience Pullman idéale.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">1. Quel type de séjour préparez-vous ?</label>
+              <label class="wd-discovery-modal__question-label">Quel type de séjour préparez-vous ?</label>
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
                   const isSelected = this.state.selectedStayType === opt.value;
@@ -5146,7 +5146,7 @@
             <p class="wd-discovery-modal__subtitle">Dites-nous qui vous accompagne pour adapter nos suggestions.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">2. Avec qui voyagez-vous ?</label>
+              <label class="wd-discovery-modal__question-label">Avec qui voyagez-vous ?</label>
               <div class="wd-discovery-modal__chips" style="margin-bottom: 20px;">
                 ${whoOptions.map(opt => `
                   <button class="wd-discovery-modal__chip${this.state.selectedWho === opt.value ? ' is-selected' : ''}" data-who="${opt.value}">${opt.label}</button>
@@ -5184,7 +5184,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 2/${this._getStepTotal()}</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5233,7 +5233,7 @@
             <p class="wd-discovery-modal__subtitle">Choisissez une ou plusieurs destinations qui vous inspirent</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">2. Qu'est-ce qui est important pour vous pour ce séjour ? (sélection multiple possible)</label>
+              <label class="wd-discovery-modal__question-label">Qu'est-ce qui est important pour vous pour ce séjour ? (sélection multiple possible)</label>
 
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
@@ -5274,7 +5274,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 2/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5311,7 +5311,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">3. Avez-vous des idées de destination ?</label>
+              <label class="wd-discovery-modal__question-label">Avez-vous des idées de destination ?</label>
 
               <div class="wd-discovery-modal__options wd-discovery-modal__options--list">
                 ${options.map(opt => {
@@ -5329,7 +5329,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 3/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5383,7 +5383,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5418,7 +5418,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5453,7 +5453,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5489,7 +5489,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">4. Quelles régions du monde vous attirent le plus&nbsp;?</label>
+              <label class="wd-discovery-modal__question-label">Quelles régions du monde vous attirent le plus&nbsp;?</label>
 
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
@@ -5532,7 +5532,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 4/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5628,7 +5628,9 @@
               ${ICON.close}
             </button>
             ${venuDesDates ? `
-            <h2 class="wd-discovery-modal__title">${prenomPeriode ? prenomPeriode + ', quand partez-vous ?' : 'Quand partez-vous ?'}</h2>
+            <h2 class="wd-discovery-modal__title">${this.state.selectedStayType === 'event'
+              ? (prenomPeriode ? prenomPeriode + ', quand a lieu votre événement ?' : 'Quand a lieu votre événement ?')
+              : (prenomPeriode ? prenomPeriode + ', quand partez-vous ?' : 'Quand partez-vous ?')}</h2>
 
             <div class="wd-discovery-modal__question wd-discovery-modal__question--dates">
               <div class="wd-discovery-modal__dates-modes">
@@ -5640,7 +5642,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">5. À quelle période et pour quelle durée souhaitez-vous partir ?</label>`}
+              <label class="wd-discovery-modal__question-label">À quelle période et pour quelle durée souhaitez-vous partir ?</label>`}
 
               <!-- Période (même composant que le date picker business, en sélection de mois) -->
               <div class="wd-discovery-modal__form-section">
@@ -5684,7 +5686,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">${venuDesDates ? 'Étape ' + this._getStepNumber() + '/' + this._getStepTotal() : 'Étape 5/7'}</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -5744,7 +5746,7 @@
             <p class="wd-discovery-modal__subtitle">Répondez à quelques questions pour découvrir la destination qui vous correspond.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">6. Quels services sont importants pour vous ? <span style="font-weight: 400; color: #888;">(optionnel)</span></label>
+              <label class="wd-discovery-modal__question-label">Quels services sont importants pour vous ? <span style="font-weight: 400; color: #888;">(optionnel)</span></label>
 
               <div class="wd-discovery-modal__select-grid">
                 ${services.map(service => `
@@ -5760,7 +5762,7 @@
             </div>
 
             <div class="wd-discovery-modal__footer">
-              <div class="wd-discovery-modal__stepper">Étape 6/7</div>
+              <div class="wd-discovery-modal__stepper">Étape ${this._getStepNumber()}/${this._getStepTotal()}</div>
               <button class="wd-discovery-modal__back" aria-label="Retour">
                 Retour
               </button>
@@ -6187,7 +6189,7 @@
         'pro-location': 2, 'event-location': 2,
         'pro-dates': 3, 'event-dates': 3, 4: 3,
         'pro-bleisure': 4, 1.5: 4,
-        3: 2, 3.1: 2, 3.2: 2, 3.3: 2, 'wishlist': 2, 2: 3, 5: 4
+        3: 2, 3.1: 2, 3.2: 2, 3.3: 2, 'wishlist': 2, 2: 3, 5: 4, 6: 4
       };
       return stepMap[this.state.currentStep] || '?';
     }
@@ -7872,7 +7874,14 @@
         case 'event-location':
           // Sans destination arrêtée, des dates au jour près n'ont pas de sens :
           // on bascule sur la période, plus large.
-          if (state.businessLocation === '__ouvert__') return 4;
+          if (state.businessLocation === '__ouvert__') {
+            // Même état que la puce « Plutôt une période » : l'écran reprend alors
+            // l'en-tête et le compteur de la question des dates, au lieu de l'ancien
+            // écran « Trouvez votre prochain hôtel », qui affichait « Étape 5/7 ».
+            state.dateMode = 'periode';
+            state.dateStepOrigin = type === 'event' ? 'event-dates' : 'pro-dates';
+            return 4;
+          }
           return type === 'event' ? 'event-dates' : 'pro-dates';
 
         case 'pro-dates':
