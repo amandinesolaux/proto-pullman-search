@@ -2707,3 +2707,8 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   cursor: pointer;
 }
 .wd-discovery-modal__dp-apply:hover { background: #2f3a33; }
+
+/* Dates : le champ respire sous le titre — 32 px vus au lieu de 12. Et sans les
+   puces de souplesse, le pied du calendrier ne garde que ses deux actions, à droite. */
+.wd-discovery-modal__question--dates { margin-top: 20px; }
+.wd-discovery-modal__dp-footer { justify-content: flex-end; }

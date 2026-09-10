@@ -6388,9 +6388,7 @@
                   </div>
                 </div>
                 <div class="wd-discovery-modal__dp-footer">
-                  <div class="wd-discovery-modal__dp-flex" role="group" aria-label="Souplesse sur les dates">
-                    ${[[0, 'Dates exactes'], [1, '± 1 jour'], [2, '± 2 jours'], [3, '± 3 jours'], [7, '± 7 jours']].map(([n, l]) => `<button type="button" class="wd-discovery-modal__chip${(this.state.dateFlex || 0) === n ? ' is-selected' : ''}" data-dp-flex="${n}" aria-pressed="${(this.state.dateFlex || 0) === n}">${l}</button>`).join('')}
-                  </div>
+                  <!-- Souplesse retirée pour le moment (« Dates exactes · ± 1 / 2 / 3 / 7 jours »). La logique est restée : remettre ici les puces data-dp-flex suffit à la réactiver. -->
                   <div class="wd-discovery-modal__dp-actions">
                     <button type="button" class="wd-discovery-modal__dp-clear">Effacer</button>
                     <button type="button" class="wd-discovery-modal__dp-apply">Appliquer</button>
@@ -7327,13 +7325,19 @@
 
           this._dateRangeOutside = (e) => {
             if (cal.hidden) return;
+            // Le clic qui a mené à cet écran (une carte, « Continuer ») peut encore remonter
+            // jusqu'au document alors que son bouton vient d'être remplacé : ce n'est pas un
+            // clic « en dehors », il ne doit pas refermer le calendrier qu'on vient d'ouvrir.
+            if (!e.target.isConnected) return;
             if (champ.contains(e.target) || cal.contains(e.target)) return;
             fermer();
           };
           document.addEventListener('click', this._dateRangeOutside);
 
           updateField();
-          marquerCible();
+          // Ouvert d'emblée : c'est la seule chose que l'écran demande. Il se place sur la date
+          // qui manque — le départ, ou le retour si le départ est déjà posé.
+          ouvrir(this.state.checkInDate && !this.state.checkOutDate ? 'depart' : 'arrivee');
         }
       }
 
