@@ -2597,3 +2597,113 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 /* Un peu plus d'air avant « Je n'ai pas encore décidé » : 4 + 20 = 24 px vus. */
 .wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
 .wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 20px; }
+
+/* ── Destination : plus d'air entre les blocs ──────────────────────────────────
+   Chaque intitulé reste à 16 px de son contenu ; ce sont les séparations entre
+   blocs qui s'élargissent, là où l'écran gardait de la place en bas.
+     champ → suggestions : 48 px vus (44 + 4 sous le titre, à cause des flèches)
+     cartes → puce       : 32 px vus (4 de marge intérieure de la piste + 28) */
+.wd-discovery-modal__sugg { margin-top: 44px; }
+.wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
+.wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 28px; }
+
+/* ── Dates : un champ « Départ | Retour », le calendrier à la demande ───────────
+   Le même champ que celui de la destination (fond, bordure, arrondi), coupé en deux
+   moitiés comme la barre de la homepage. Ouvert, il passe au blanc avec la bordure
+   verte, et la moitié en cours de saisie se souligne. Le calendrier se déplie juste
+   dessous, dans le fil de l'écran. */
+.wd-discovery-modal__dates-champ {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 64px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: border-color .2s ease, background .2s ease;
+}
+.wd-discovery-modal__dates-champ.is-open { background: #ffffff; border-color: #5fef91; }
+
+.wd-discovery-modal__dates-moitie {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.wd-discovery-modal__dates-moitie:focus-visible { outline: 2px solid #445047; outline-offset: -2px; border-radius: 8px; }
+/* La moitié en cours de saisie : un trait vert sous elle, à l'intérieur du champ. */
+.wd-discovery-modal__dates-moitie.is-active::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  height: 2px;
+  background: #5fef91;
+}
+.wd-discovery-modal__dates-libelle {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: #717171;
+}
+.wd-discovery-modal__dates-date {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: #445047;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wd-discovery-modal__dates-date.is-placeholder { font-weight: 400; color: #9aa39c; }
+.wd-discovery-modal__dates-sep { align-self: center; width: 1px; height: 32px; background: #e0e0e0; }
+.wd-discovery-modal__dates-marge {
+  align-self: center;
+  flex: 0 0 auto;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: #EDF2EE;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 18px;
+  color: #445047;
+  white-space: nowrap;
+}
+.wd-discovery-modal__dates-marge[hidden] { display: none; }
+.wd-discovery-modal__dates-icone {
+  align-self: center;
+  flex: 0 0 auto;
+  display: flex;
+  padding: 0 16px 0 4px;
+  color: #445047;
+  pointer-events: none;
+}
+
+/* Le calendrier replié sous le champ. */
+.wd-discovery-modal__dp--panneau { margin-top: 16px; }
+.wd-discovery-modal__dp--panneau[hidden] { display: none; }
+.wd-discovery-modal__dp-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+.wd-discovery-modal__dp-apply {
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 100px;
+  background: #445047;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+}
+.wd-discovery-modal__dp-apply:hover { background: #2f3a33; }

@@ -6356,8 +6356,22 @@
                    remplace les trois pastilles « précises / flexibles / période » : des dates
                    flexibles sont des dates précises avec une marge, et une période est une
                    plage plus longue — le même geste suffit aux trois. -->
-              <p class="wd-discovery-modal__dates-valeur is-placeholder" id="dateRangeValue" aria-live="polite">Choisissez votre arrivée, puis votre départ</p>
-              <div class="wd-discovery-modal__dp" id="dateRangeCalendar" role="group" aria-label="Choisir vos dates">
+              <!-- Un champ d'abord, comme la barre de la homepage : les deux dates côte à côte,
+                   et le calendrier seulement quand on le demande. -->
+              <div class="wd-discovery-modal__dates-champ" id="dateRangeField">
+                <button type="button" class="wd-discovery-modal__dates-moitie" data-cible="arrivee" aria-haspopup="dialog" aria-expanded="false" aria-controls="dateRangeCalendar">
+                  <span class="wd-discovery-modal__dates-libelle">${isEvent ? 'Début' : 'Départ'}</span>
+                  <span class="wd-discovery-modal__dates-date is-placeholder" data-date-arrivee>Ajouter une date</span>
+                </button>
+                <span class="wd-discovery-modal__dates-sep" aria-hidden="true"></span>
+                <button type="button" class="wd-discovery-modal__dates-moitie" data-cible="depart" aria-haspopup="dialog" aria-expanded="false" aria-controls="dateRangeCalendar">
+                  <span class="wd-discovery-modal__dates-libelle">${isEvent ? 'Fin' : 'Retour'}</span>
+                  <span class="wd-discovery-modal__dates-date is-placeholder" data-date-depart>Ajouter une date</span>
+                </button>
+                <span class="wd-discovery-modal__dates-marge" data-dates-marge hidden></span>
+                <span class="wd-discovery-modal__dates-icone" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              </div>
+              <div class="wd-discovery-modal__dp wd-discovery-modal__dp--panneau" id="dateRangeCalendar" role="dialog" aria-label="Choisir vos dates" hidden>
                 <div class="wd-discovery-modal__dp-header">
                   <button type="button" class="wd-discovery-modal__dp-nav" data-nav="-1" aria-label="Mois précédent">${ICON.chevL}</button>
                   <div class="wd-discovery-modal__dp-titles"><span class="wd-discovery-modal__dp-title"></span><span class="wd-discovery-modal__dp-title"></span></div>
@@ -6377,7 +6391,10 @@
                   <div class="wd-discovery-modal__dp-flex" role="group" aria-label="Souplesse sur les dates">
                     ${[[0, 'Dates exactes'], [1, '± 1 jour'], [2, '± 2 jours'], [3, '± 3 jours'], [7, '± 7 jours']].map(([n, l]) => `<button type="button" class="wd-discovery-modal__chip${(this.state.dateFlex || 0) === n ? ' is-selected' : ''}" data-dp-flex="${n}" aria-pressed="${(this.state.dateFlex || 0) === n}">${l}</button>`).join('')}
                   </div>
-                  <button type="button" class="wd-discovery-modal__dp-clear">Effacer</button>
+                  <div class="wd-discovery-modal__dp-actions">
+                    <button type="button" class="wd-discovery-modal__dp-clear">Effacer</button>
+                    <button type="button" class="wd-discovery-modal__dp-apply">Appliquer</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -7132,23 +7149,23 @@
         }
       }
 
-      // Dates : le calendrier de la barre de réservation, posé dans l'écran. Deux mois côte à
-      // côte (un sur mobile), une plage en deux clics — le premier pose l'arrivée, le second
-      // le départ ; un clic plus tôt, ou après une plage complète, repart de ce jour. Tant
-      // que le départ manque, le survol montre la plage qu'on s'apprête à choisir. La
-      // souplesse se règle sous le calendrier, comme dans la barre.
+      // Dates : un champ d'abord, comme la barre de la homepage — les deux dates côte à côte —,
+      // et le calendrier seulement quand on le demande. Chaque moitié ouvre le calendrier sur
+      // la date qu'elle porte. Le calendrier reste ouvert une fois la plage posée, pour régler
+      // la souplesse juste dessous ; « Appliquer », un clic en dehors ou un nouveau clic sur
+      // la moitié active le referment. Tant que la seconde date manque, le survol montre la
+      // plage qu'on s'apprête à choisir.
       if (['business-dates', 'pro-dates', 'event-dates'].includes(this.state.currentStep)) {
+        const champ = this.querySelector('#dateRangeField');
         const cal = this.querySelector('#dateRangeCalendar');
-        const valueEl = this.querySelector('#dateRangeValue');
         const continueBtn = this.querySelector('.wd-discovery-modal__continue');
 
-        // Le calendrier n'est plus un menu déroulant : plus rien à refermer au clic extérieur.
         if (this._dateRangeOutside) {
           document.removeEventListener('click', this._dateRangeOutside);
           this._dateRangeOutside = null;
         }
 
-        if (cal && valueEl) {
+        if (champ && cal) {
           const MOIS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
           const MOIS_COURTS = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
           const pad = n => String(n).padStart(2, '0');
@@ -7158,27 +7175,39 @@
           const fmt = iso => { const [y, mo, d] = iso.split('-').map(Number); return `${d} ${MOIS_COURTS[mo - 1]} ${y}`; };
           const grilles = cal.querySelectorAll('[data-mois]');
           const titres = cal.querySelectorAll('.wd-discovery-modal__dp-title');
+          const moities = champ.querySelectorAll('[data-cible]');
+          const elArrivee = champ.querySelector('[data-date-arrivee]');
+          const elDepart = champ.querySelector('[data-date-depart]');
+          const elMarge = champ.querySelector('[data-dates-marge]');
 
           const debut = this.state.checkInDate ? this.state.checkInDate.split('-').map(Number) : null;
           let viewY = debut ? debut[0] : today.getFullYear();
           let viewM = debut ? debut[1] - 1 : today.getMonth();
+          let cible = 'arrivee';
           let survol = null;
 
-          const updateValue = () => {
+          const updateField = () => {
             const { checkInDate, checkOutDate } = this.state;
-            const marge = (this.state.dateFlex || 0) > 0 ? `  ·  ± ${this.state.dateFlex} j` : '';
-            if (checkInDate && checkOutDate) {
-              valueEl.textContent = `${fmt(checkInDate)} → ${fmt(checkOutDate)}${marge}`;
-              valueEl.classList.remove('is-placeholder');
-            } else if (checkInDate) {
-              valueEl.textContent = `${fmt(checkInDate)} → choisissez votre départ`;
-              valueEl.classList.remove('is-placeholder');
-            } else {
-              valueEl.textContent = 'Choisissez votre arrivée, puis votre départ';
-              valueEl.classList.add('is-placeholder');
-            }
+            const poser = (el, iso) => {
+              el.textContent = iso ? fmt(iso) : 'Ajouter une date';
+              el.classList.toggle('is-placeholder', !iso);
+            };
+            poser(elArrivee, checkInDate);
+            poser(elDepart, checkOutDate);
+            const marge = this.state.dateFlex || 0;
+            elMarge.hidden = !marge;
+            elMarge.textContent = marge ? `± ${marge} j` : '';
             const valide = checkInDate && checkOutDate && checkOutDate > checkInDate;
             if (continueBtn) continueBtn.classList.toggle('is-active', !!valide);
+          };
+
+          const marquerCible = () => {
+            const ouvert = !cal.hidden;
+            champ.classList.toggle('is-open', ouvert);
+            moities.forEach(b => {
+              b.classList.toggle('is-active', ouvert && b.dataset.cible === cible);
+              b.setAttribute('aria-expanded', String(ouvert));
+            });
           };
 
           const renderDays = () => {
@@ -7208,7 +7237,6 @@
             prec.disabled = viewY === today.getFullYear() && viewM === today.getMonth();
           };
 
-          // Aperçu de la plage au survol, sans tout redessiner.
           const apercu = () => {
             const { checkInDate, checkOutDate } = this.state;
             cal.querySelectorAll('.wd-discovery-modal__day[data-date]').forEach(el => {
@@ -7229,6 +7257,17 @@
             });
           };
 
+          const ouvrir = (c) => { cible = c; cal.hidden = false; renderDays(); marquerCible(); };
+          const fermer = () => { cal.hidden = true; survol = null; marquerCible(); };
+
+          moities.forEach(b => b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // « Retour » sans date de départ : c'est d'abord le départ qu'il faut poser.
+            const c = (b.dataset.cible === 'depart' && !this.state.checkInDate) ? 'arrivee' : b.dataset.cible;
+            if (!cal.hidden && cible === c) fermer();
+            else ouvrir(c);
+          }));
+
           cal.addEventListener('click', (e) => {
             e.stopPropagation();
             const nav = e.target.closest('[data-nav]');
@@ -7243,31 +7282,39 @@
             const jour = e.target.closest('.wd-discovery-modal__day[data-date]');
             if (jour && !jour.disabled) {
               const iso = jour.dataset.date;
-              if (!this.state.checkInDate || this.state.checkOutDate || iso <= this.state.checkInDate) {
-                this.state.checkInDate = iso;
-                this.state.checkOutDate = null;
-              } else {
+              const { checkInDate, checkOutDate } = this.state;
+              if (cible === 'depart' && checkInDate && iso > checkInDate) {
                 this.state.checkOutDate = iso;
+              } else {
+                // Nouvelle date de départ : le retour est gardé s'il reste après elle.
+                this.state.checkInDate = iso;
+                if (!checkOutDate || checkOutDate <= iso) this.state.checkOutDate = null;
+                cible = 'depart';
               }
               survol = null;
               renderDays();
-              updateValue();
+              updateField();
+              marquerCible();
               return;
             }
             const puce = e.target.closest('[data-dp-flex]');
             if (puce) {
               poserSouplesse(Number(puce.dataset.dpFlex));
-              updateValue();
+              updateField();
               return;
             }
             if (e.target.closest('.wd-discovery-modal__dp-clear')) {
               this.state.checkInDate = null;
               this.state.checkOutDate = null;
               survol = null;
+              cible = 'arrivee';
               poserSouplesse(0);
               renderDays();
-              updateValue();
+              updateField();
+              marquerCible();
+              return;
             }
+            if (e.target.closest('.wd-discovery-modal__dp-apply')) fermer();
           });
 
           cal.addEventListener('mouseover', (e) => {
@@ -7278,8 +7325,15 @@
           });
           cal.addEventListener('mouseleave', () => { survol = null; apercu(); });
 
-          renderDays();
-          updateValue();
+          this._dateRangeOutside = (e) => {
+            if (cal.hidden) return;
+            if (champ.contains(e.target) || cal.contains(e.target)) return;
+            fermer();
+          };
+          document.addEventListener('click', this._dateRangeOutside);
+
+          updateField();
+          marquerCible();
         }
       }
 
