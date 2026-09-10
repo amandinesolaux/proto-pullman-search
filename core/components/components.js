@@ -6391,7 +6391,6 @@
                   <!-- Souplesse retirée pour le moment (« Dates exactes · ± 1 / 2 / 3 / 7 jours »). La logique est restée : remettre ici les puces data-dp-flex suffit à la réactiver. -->
                   <div class="wd-discovery-modal__dp-actions">
                     <button type="button" class="wd-discovery-modal__dp-clear">Effacer</button>
-                    <button type="button" class="wd-discovery-modal__dp-apply">Appliquer</button>
                   </div>
                 </div>
               </div>
@@ -7150,8 +7149,8 @@
       // Dates : un champ d'abord, comme la barre de la homepage — les deux dates côte à côte —,
       // et le calendrier seulement quand on le demande. Chaque moitié ouvre le calendrier sur
       // la date qu'elle porte. Le calendrier reste ouvert une fois la plage posée, pour régler
-      // la souplesse juste dessous ; « Appliquer », un clic en dehors ou un nouveau clic sur
-      // la moitié active le referment. Tant que la seconde date manque, le survol montre la
+      // la souplesse juste dessous ; un clic en dehors ou un nouveau clic sur la moitié
+      // active le referment (« Appliquer » a été retiré : il ne faisait rien de plus). Tant que la seconde date manque, le survol montre la
       // plage qu'on s'apprête à choisir.
       if (['business-dates', 'pro-dates', 'event-dates'].includes(this.state.currentStep)) {
         const champ = this.querySelector('#dateRangeField');
