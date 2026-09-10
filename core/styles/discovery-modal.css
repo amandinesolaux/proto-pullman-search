@@ -2217,3 +2217,40 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 /* La marge se pose sous les dates, sans intertitre : trois pastilles se lisent seules. */
 .wd-discovery-modal__dates-flex { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
 .wd-discovery-modal__question--dates .wd-discovery-modal__question-label { display: none; }
+
+/* ── Période : le calendrier des mois, posé dans l'écran ─────────────────────────
+   Il était caché derrière un champ « Choisissez une période », suivi d'une question
+   « Durée ». La durée a disparu ; le calendrier seul répond, alors il se montre
+   d'emblée plutôt que d'attendre qu'on ouvre un menu. */
+.wd-discovery-modal__periode { display: flex; flex-direction: column; gap: 12px; }
+.wd-discovery-modal__periode-valeur {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: #445047;
+  min-height: 24px;
+}
+.wd-discovery-modal__periode-valeur.is-placeholder { font-weight: 400; color: rgba(68, 80, 71, .6); }
+
+.wd-discovery-modal__calendar--inline {
+  position: static;
+  width: 100%;
+  max-width: 420px;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Une plage de mois : les bornes gardent le vert de la sélection, les mois entre
+   elles prennent une teinte plus calme — distincte du survol, pour qu'on ne confonde
+   pas « compris dans la période » et « sous le curseur ». */
+.wd-discovery-modal__month-cell.is-in-range {
+  border-color: #EDF2EE;
+  background: #EDF2EE;
+  color: #445047;
+}
+.wd-discovery-modal__month-cell.is-in-range:hover:not(:disabled) {
+  border-color: #5fef91;
+}
