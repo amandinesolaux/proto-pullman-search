@@ -4975,7 +4975,7 @@
       const demandes = (st.selectedTypes || []).map(c => versService[c]).filter(Boolean);
       const nuits = (st.checkInDate && st.checkOutDate)
         ? Math.max(0, Math.round((new Date(st.checkOutDate) - new Date(st.checkInDate)) / 864e5)) : 0;
-      const carteHotel = (h) => {
+      const carteHotel = (h, i) => {
         const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
         const cles = (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [String(h.img || '').split(':')[0]]).filter(Boolean).slice(0, 6);
         const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=640');
@@ -4994,8 +4994,13 @@
               // Seul, aucun nombre n'est donné : c'est un voyageur, et ALL doit le savoir.
               guests: st.agentPersonnes || (st.agentAccompagne && st.agentAccompagne !== 'accompagne' ? 1 : 0) }) : null;
         const pays = h.country && h.country !== h.city ? ', ' + esc(h.country) : '';
-        return '<article class="wd-agent__hotel">'
+        // Coordonnées et rang portés par la card : la carte en tire ses pins, numérotés
+        // comme les cards.
+        const situe = h.lat != null && h.lng != null;
+        return '<article class="wd-agent__hotel" data-agent-hotel="' + i + '"'
+          + (situe ? ' data-lat="' + h.lat + '" data-lng="' + h.lng + '" data-nom="' + esc(h.name) + '"' : '') + '>'
           + '<div class="wd-agent__hotel-media"' + (photos.length > 1 ? ' data-agent-galerie' : '') + '>'
+          + (situe ? '<span class="wd-agent__hotel-numero" aria-hidden="true">' + (i + 1) + '</span>' : '')
           + photos.map((u, i) => '<img class="wd-agent__hotel-img" src="' + u + '" alt="' + (i === 0 ? esc(h.name) : '') + '"'
               + (i === 0 ? ' data-on' : ' loading="lazy"') + ' />').join('')
           + (photos.length > 1
@@ -5027,7 +5032,7 @@
           + '</div></div></div></article>';
       };
       const carrousel = props.length
-        ? '<div class="wd-agent__carrousel' + (props.some(p => p.hotel) ? ' wd-agent__carrousel--hotels' : '') + '">' + props.map(p => p.hotel ? carteHotel(p.hotel) :
+        ? '<div class="wd-agent__carrousel' + (props.some(p => p.hotel) ? ' wd-agent__carrousel--hotels' : '') + '">' + props.map((p, i) => p.hotel ? carteHotel(p.hotel, i) :
             (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
                     : '<div class="wd-agent__prop">') +
               (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
@@ -5037,6 +5042,15 @@
               (p.detail ? '<span class="wd-agent__prop-detail">' + esc(p.detail) + '</span>' : '') +
             (p.href ? '</a>' : '</div>')).join('') +
           '</div>'
+          // Sous les cards d'hôtels, de quoi les situer : la carte s'ouvre à la demande.
+          + (props.some(p => p.hotel && p.hotel.lat != null && p.hotel.lng != null)
+              ? '<div class="wd-agent__localiser">'
+                + '<button type="button" class="wd-agent__carte-bascule" data-agent-carte aria-expanded="false" aria-controls="wdAgentCarte">'
+                + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>'
+                + '<span>Voir sur la carte</span></button>'
+                + '<div class="wd-agent__carte" id="wdAgentCarte" hidden></div>'
+                + '</div>'
+              : '')
         : '';
       // Question des services, en mosaïque : deux colonnes en décalé, le nom et l'accroche en
       // légende. Un clic fait apparaître la case cochée sur la photo, un second la retire.
@@ -5140,6 +5154,7 @@
       // Un maître d'hôtel salue, puis reprend ce qu'on lui a confié — sans « je comprends
       // que », qui fait procès-verbal.
       const synthese = this._agentSynthese();
+      this.state.agentCarte = false;
       this.state.agentThread = [{ qui: 'agent',
         texte: (prenom ? 'Bonjour ' + prenom + '. ' : 'Bonjour. ')
              + synthese.charAt(0).toUpperCase() + synthese.slice(1) + ' ' + tours[0].q }];
@@ -7861,6 +7876,91 @@
             if (choix) this._agentRepondre(choix.t, choix);
           });
         });
+
+        // Carte des hôtels proposés, ouverte à la demande sous les cards. Chaque pin porte le
+        // numéro de sa card : cliquer un pin met la card en avant et la fait venir dans le
+        // carrousel ; survoler une card fait ressortir son pin. Fond clair de la même source
+        // sans clé que la carte principale, pour rester dans la bulle claire. Refaite à chaque
+        // rendu : l'ancienne carte est détruite avec le DOM qu'elle occupait.
+        if (this._agentCarteLeaflet) { this._agentCarteLeaflet.remove(); this._agentCarteLeaflet = null; }
+        const basculeCarte = this.querySelector('[data-agent-carte]');
+        if (basculeCarte) {
+          const cadre = this.querySelector('#wdAgentCarte');
+          const carrouselHotels = this.querySelector('.wd-agent__carrousel--hotels');
+          const cartesSituees = [...this.querySelectorAll('.wd-agent__hotel[data-lat]')];
+          const libelle = basculeCarte.querySelector('span');
+          let pins = [];
+          let choisi = -1;
+          const surligner = (i, depuisPin) => {
+            pins.forEach(p => {
+              const el = p.marqueur.getElement();
+              if (el) el.classList.toggle('is-actif', p.i === i);
+              p.marqueur.setZIndexOffset(p.i === i ? 1000 : 0);
+            });
+            if (!depuisPin) return;
+            choisi = i;
+            cartesSituees.forEach(c => c.classList.toggle('is-localise', Number(c.dataset.agentHotel) === i));
+            const carte = cartesSituees.find(c => Number(c.dataset.agentHotel) === i);
+            if (carte && carrouselHotels && carrouselHotels.firstElementChild) {
+              carrouselHotels.scrollTo({ left: carte.offsetLeft - carrouselHotels.firstElementChild.offsetLeft, behavior: 'smooth' });
+            }
+          };
+          const ouvrir = () => {
+            if (!window.L || !cadre) return;
+            cadre.hidden = false;
+            basculeCarte.setAttribute('aria-expanded', 'true');
+            libelle.textContent = 'Masquer la carte';
+            if (carrouselHotels) carrouselHotels.classList.add('is-carte');
+            this.state.agentCarte = true;
+            const carte = L.map(cadre, { scrollWheelZoom: false, zoomControl: false, attributionControl: false });
+            L.control.zoom({ position: 'topright' }).addTo(carte);
+            this._agentCarteLeaflet = carte;
+            const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/';
+            L.tileLayer(ESRI + 'World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(carte);
+            L.tileLayer(ESRI + 'World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(carte);
+            pins = cartesSituees.map(c => {
+              const i = Number(c.dataset.agentHotel);
+              const marqueur = L.marker([Number(c.dataset.lat), Number(c.dataset.lng)], {
+                title: c.dataset.nom, alt: c.dataset.nom,
+                icon: L.divIcon({ className: 'wd-agent__pin', html: '<span>' + (i + 1) + '</span>', iconSize: [26, 26], iconAnchor: [13, 13] })
+              }).addTo(carte);
+              marqueur.on('click', () => surligner(i, true));
+              return { i, marqueur };
+            });
+            const points = pins.map(p => p.marqueur.getLatLng());
+            if (points.length === 1) carte.setView(points[0], 14);
+            else carte.fitBounds(L.latLngBounds(points), { padding: [30, 30], maxZoom: 14 });
+            if (choisi >= 0) surligner(choisi, false);
+            setTimeout(() => { if (this._agentCarteLeaflet === carte) carte.invalidateSize(); }, 60);
+          };
+          const fermer = () => {
+            if (this._agentCarteLeaflet) { this._agentCarteLeaflet.remove(); this._agentCarteLeaflet = null; }
+            pins = [];
+            choisi = -1;
+            cadre.hidden = true;
+            basculeCarte.setAttribute('aria-expanded', 'false');
+            libelle.textContent = 'Voir sur la carte';
+            if (carrouselHotels) carrouselHotels.classList.remove('is-carte');
+            cartesSituees.forEach(c => c.classList.remove('is-localise'));
+            this.state.agentCarte = false;
+          };
+          basculeCarte.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!cadre.hidden) { fermer(); return; }
+            ouvrir();
+            // La carte s'ouvre sous le bouton : on la fait entrer dans le fil si elle dépasse.
+            const fil = this.querySelector('#wdAgentThread');
+            if (fil) {
+              const depasse = cadre.getBoundingClientRect().bottom - fil.getBoundingClientRect().bottom;
+              if (depasse > 0) fil.scrollTo({ top: fil.scrollTop + depasse + 12, behavior: 'smooth' });
+            }
+          });
+          cartesSituees.forEach(c => {
+            c.addEventListener('mouseenter', () => { if (pins.length) surligner(Number(c.dataset.agentHotel), false); });
+            c.addEventListener('mouseleave', () => { if (pins.length) surligner(choisi, false); });
+          });
+          if (this.state.agentCarte) ouvrir();
+        }
 
         // Galeries des cards hôtel : chevrons et points font défiler les photos sans quitter
         // la conversation. Liées ici plutôt qu'au gestionnaire de la carte, qui n'est pas

@@ -3125,3 +3125,91 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-agent__hotel-point,
   .wd-agent__hotel-lien { transition: none; }
 }
+
+/* ── Agent : situer les hôtels proposés ─────────────────────────────────────────
+   Sous les cards, « Voir sur la carte » ouvre une carte dans la bulle. Chaque pin porte
+   le numéro de sa card ; ce numéro n'apparaît sur les photos que carte ouverte, où il
+   sert de légende. Pins kaki cerclés de blanc, le pin choisi s'inverse ; la card
+   correspondante prend un filet kaki. */
+.wd-agent__localiser {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+}
+.wd-agent__carte-bascule {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #BCCABE;
+  border-radius: 100px;
+  background: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #445047;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+.wd-agent__carte-bascule:hover { border-color: #445047; }
+.wd-agent__carte-bascule[aria-expanded="true"] { background: #445047; border-color: #445047; color: #ffffff; }
+.wd-agent__carte-bascule:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+.wd-agent__carte {
+  align-self: stretch;
+  height: 240px;
+  background: #E3EAE4;
+}
+.wd-agent__carte .leaflet-bar { border: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, .2); }
+.wd-agent__carte .leaflet-bar,
+.wd-agent__carte .leaflet-bar a { border-radius: 0; }
+.wd-agent__carte .leaflet-bar a { color: #445047; }
+.wd-agent__pin span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 100px;
+  background: #445047;
+  box-shadow: 0 0 0 2px #ffffff, 0 2px 6px rgba(0, 0, 0, .3);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.wd-agent__pin.is-actif span {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #445047, 0 2px 8px rgba(0, 0, 0, .35);
+  color: #445047;
+  transform: scale(1.18);
+}
+.wd-agent__hotel-numero {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 100px;
+  background: #445047;
+  box-shadow: 0 0 0 1.5px #ffffff;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+.wd-agent__carrousel--hotels.is-carte .wd-agent__hotel-numero { display: flex; }
+.wd-agent__hotel.is-localise { outline: 2px solid #445047; outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) {
+  .wd-agent__pin span,
+  .wd-agent__carte-bascule { transition: none; }
+}
