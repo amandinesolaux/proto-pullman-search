@@ -2019,7 +2019,7 @@
               html += '<div class="wd-booking__dd-dest-subtitle">' + filteredHotels.length + ' hotel' + (filteredHotels.length > 1 ? 's' : '') + ' trouve' + (filteredHotels.length > 1 ? 's' : '') + '</div>';
               html += filteredHotels.slice(0, 8).map(h => {
                 const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
-                return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row">' +
+                return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row" data-dest-type="hotel" data-hotel-name="' + esc(h.name) + '" data-hotel-href="' + esc(h.href || '') + '">' +
                   '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
                   '<div class="wd-booking__dd-hotel-info">' +
                   '<span class="wd-booking__dd-hotel-name">' + esc(h.name) + '</span>' +
@@ -2058,7 +2058,7 @@
                 html += '<div class="wd-booking__dd-dest-subtitle">Hotels</div>';
                 html += matchedHotels.slice(0, 5).map(h => {
                   const imgKey = h.img.includes(':') ? h.img : h.img + ':1by1';
-                  return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row">' +
+                  return '<a href="' + (h.href || '#') + '" class="wd-booking__dd-hotel-row" data-dest-type="hotel" data-hotel-name="' + esc(h.name) + '" data-hotel-href="' + esc(h.href || '') + '">' +
                     '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + imgKey + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="' + esc(h.name) + '" loading="lazy" />' +
                     '<div class="wd-booking__dd-hotel-info">' +
                     '<span class="wd-booking__dd-hotel-name">' + esc(h.name) + '</span>' +
@@ -2507,10 +2507,21 @@
         if (hotelRow) {
           e.preventDefault();
           const name = hotelRow.dataset.hotelName;
+          if (!name) return;
           searchState.selectedHotel = searchState.selectedHotel === name ? null : name;
           renderDestList();
           renderChips();
           scheduleRecentSave(); // la sélection d'hôtel fait partie de la recherche à retenir
+          // Un hôtel choisi, la destination est réglée : la question suivante est « quand ».
+          // On referme le panneau et on ouvre le calendrier, comme on passerait au champ
+          // suivant. Le clic ne doit pas remonter : l'écouteur « clic en dehors » du
+          // calendrier le verrait et le refermerait aussitôt ouvert. Désélectionner, en
+          // revanche, ne fait avancer personne.
+          if (searchState.selectedHotel) {
+            e.stopPropagation();
+            close();
+            openDatePicker();
+          }
           return;
         }
         const item = e.target.closest('.wd-booking__dd-dest-item');
