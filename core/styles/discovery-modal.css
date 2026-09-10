@@ -2566,3 +2566,25 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
    rien trouvé au-dessus. Il garde de l'air après les cartes. */
 .wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
 .wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 24px; }
+
+/* ── Destination : un seul rythme de lecture ───────────────────────────────────
+   L'accroche devient l'intitulé du champ, au même titre que « Nos suggestions de
+   destinations » pour le carrousel : même style, et le même écart de 16 px entre
+   chaque intitulé et son contenu. Le carrousel et « Je n'ai pas encore décidé » se
+   suivent au même pas. Entre le groupe du champ et celui des suggestions, 32 px
+   marquent le changement de section.
+   Les marges tiennent compte de ce qui s'ajoute à l'œil : les flèches (32 px) sont
+   plus hautes que le titre (24 px), ce qui ajoute 4 px sous lui, et la piste garde
+   4 px de marge intérieure sous les cartes. */
+.wd-discovery-modal__subtitle.wd-discovery-modal__subtitle--libelle {
+  margin-bottom: 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  color: #445047;
+}
+.wd-discovery-modal__sugg { margin-top: 28px; }          /* 28 + 4 = 32 px vus */
+.wd-discovery-modal__sugg-tete { margin-bottom: 12px; }  /* 12 + 4 = 16 px vus */
+.wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
+.wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 12px; }  /* 4 + 12 = 16 px vus */

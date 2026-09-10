@@ -6264,7 +6264,7 @@
               ${ICON.close}
             </button>
             <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, ${title.toLowerCase()}` : title}</h2>
-            <p class="wd-discovery-modal__subtitle">Précisez votre destination pour trouver le Pullman idéal.</p>
+            <p class="wd-discovery-modal__subtitle wd-discovery-modal__subtitle--libelle">Précisez votre destination pour trouver le Pullman idéal.</p>
 
             <div class="wd-discovery-modal__question">
 
