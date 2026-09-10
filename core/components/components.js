@@ -4426,8 +4426,10 @@
     }
 
     _getStepTotal() {
-      // L'événement s'arrête à trois questions : le reste se traite en conversation.
-      return this.state.selectedStayType === 'event' ? 3 : 4;
+      // Trois questions pour l'événement et le déplacement pro : le reste — la
+      // prolongation sur place comprise — se traite en conversation.
+      const t = this.state.selectedStayType;
+      return (t === 'event' || t === 'pro') ? 3 : 4;
     }
 
     // ── L'agent ───────────────────────────────────────────────────────────────
@@ -4519,6 +4521,20 @@
       }
 
       if (type === 'pro') {
+        // La prolongation ouvre la conversation : elle vient juste après la reprise du
+        // contexte (« …du 12 au 16 septembre — 4 nuits. »), et elle décide de la suite —
+        // prolonger amène « qui vous rejoint », sinon on parle espace de travail.
+        // « Sur place » et non le nom de la ville : la phrase qui précède la cite déjà, et
+        // « …à Singapour, du 12 au 16 octobre. …prolonger un peu à Singapour ? » la
+        // répétait dans la même bulle.
+        const oui = { b: 'yes', dit: 'Bonne idée, je regarderai aussi ce qu\u2019il y a à faire autour.' };
+        const non = { b: 'no', dit: 'Entendu, on reste sur l\u2019essentiel.' };
+        tous.push({ q: 'Une fois la mission terminée, l\u2019envie de prolonger un peu sur place ?',
+          r: [Object.assign({ t: 'Oui, je prolonge' }, oui), Object.assign({ t: 'Non, retour direct' }, non)],
+          // « pourquoi pas » se teste avant « non » et « pas » : c'est un oui.
+          lit: (t) => /pourquoi pas|\boui\b|prolong|week-?end|rester|quelques jours|volontiers|avec plaisir|bonne idee/.test(t) ? oui
+                    : /\bnon\b|pas cette fois|retour direct|je rentre|pas le temps|aucune envie/.test(t) ? non
+                    : null });
         // Le quartier ne se demande que si l'on sait dans quelle ville. Sinon c'est la
         // région qui manque, et c'est elle qu'on demande.
         if (lieuConnu) {
@@ -4893,6 +4909,8 @@
       if (choix) {
         retenir(choix.v);
         if (choix.z) this.state.agentZone = choix.z;
+        if (choix.b) this.state.bleisureChoice = choix.b;
+        if (choix.dit) accuse = choix.dit;
       } else {
         const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const lu = this._agentLire(texte);
@@ -4905,6 +4923,8 @@
         if (rep) {
           retenir(rep.v);
           if (rep.z) this.state.agentZone = rep.z;
+          if (rep.b) this.state.bleisureChoice = rep.b;
+          if (rep.dit && !accuse) accuse = rep.dit;
         } else {
           avance = false;
           // Rien de reconnu du tout : on le dit, plutôt que de faire semblant — et on
@@ -7899,8 +7919,9 @@
         case 'pro-dates':
         case 'event-dates':
         case 4:
-          if (type === 'pro') return 'pro-bleisure';
-          if (type === 'event') return 'agent';
+          // « Et si vous restiez un peu plus ? » n'est plus un écran : l'agent la pose en
+          // ouvrant la conversation, juste après avoir repris ce qui a été choisi.
+          if (type === 'pro' || type === 'event') return 'agent';
           return 1.5;
 
         case 'pro-bleisure':
