@@ -2769,3 +2769,12 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-discovery-modal__dates-champ { background: #ffffff; border-color: #b9c1bb; }
 .wd-discovery-modal__dates-champ:hover { border-color: #445047; }
 .wd-discovery-modal__dates-champ.is-open { border-color: #445047; }
+
+/* La moitié en cours de saisie ne se souligne plus : le trait sous « Ajouter une date »
+   se lisait comme une bordure mal placée au milieu du champ. Elle prend une teinte
+   douce sur toute sa surface ; la bordure kaki du champ dit déjà qu'il est actif. Les
+   coins suivent l'arrondi du champ (8 px moins le filet de 1 px). */
+.wd-discovery-modal__dates-moitie.is-active::after { content: none; }
+.wd-discovery-modal__dates-moitie.is-active { background: #EDF2EE; }
+.wd-discovery-modal__dates-moitie[data-cible="arrivee"].is-active { border-radius: 7px 0 0 7px; }
+.wd-discovery-modal__dates-moitie[data-cible="depart"].is-active { border-radius: 0; }
