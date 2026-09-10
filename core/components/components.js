@@ -6231,27 +6231,26 @@
         if (!ici.length) return null;
         const salleMax = reunions.filter(r => r.ville === ville)
           .reduce((n, r) => Math.max(n, ...(r.salles || []).map(sa => sa[3] || 0)), 0);
-        return { ville, hotels: ici.length, continent: CONTINENTS[ici[0].region] || '', salleMax, img: img(VISUELS[ville]) };
+        return { ville, pays: ici[0].country || '', hotels: ici.length, continent: CONTINENTS[ici[0].region] || '', salleMax, img: img(VISUELS[ville]) };
       };
 
-      let ordre, titre;
+      // Un seul titre : le parcours se lit dans l'ordre des villes, pas dans l'intitulé.
+      const titre = 'Nos suggestions de destinations';
+      let ordre;
       if (type === 'event') {
-        titre = 'Grandes capacités d\u2019accueil';
         ordre = ['Sydney', 'Paris', 'São Paulo', 'Dubaï', 'Shanghai', 'Singapour', 'Toulouse'];
       } else if (type === 'pro') {
-        titre = 'Villes d\u2019affaires';
         ordre = ['Paris', 'Singapour', 'Dubaï', 'Shanghai', 'São Paulo', 'Sydney', 'Toulouse'];
       } else {
-        titre = 'Destinations à découvrir';
         ordre = ['Bali', 'Sydney', 'Dubaï', 'Paris', 'Singapour', 'São Paulo', 'Shanghai', 'Toulouse'];
       }
       let villes = ordre.map(fiche).filter(Boolean);
       if (type === 'event') villes.sort((a, b) => b.salleMax - a.salleMax);
-      villes = villes.map(v => Object.assign(v, {
-        kicker: (type === 'event' && v.salleMax)
-          ? 'Jusqu\u2019à ' + v.salleMax.toLocaleString('fr-FR') + ' pers.'
-          : v.continent + ' · ' + v.hotels + ' hôtel' + (v.hotels > 1 ? 's' : '')
-      }));
+      const PAYS = { 'EAU': 'Émirats arabes unis' };
+      villes = villes.map(v => {
+        const pays = PAYS[v.pays] || v.pays;
+        return Object.assign(v, { kicker: pays && pays !== v.ville ? pays : '' });
+      });
       return { titre, villes };
     }
 
@@ -6283,7 +6282,7 @@
                 if (!sug.villes.length) return '';
                 return `<section class="wd-discovery-modal__sugg" aria-label="${sug.titre}">
                 <div class="wd-discovery-modal__sugg-tete">
-                  <span class="wd-discovery-modal__sugg-titre">${sug.titre}</span>
+                  <h3 class="wd-discovery-modal__sugg-titre">${sug.titre}</h3>
                   <div class="wd-discovery-modal__sugg-nav">
                     <button type="button" class="wd-discovery-modal__dp-nav" data-sugg-nav="-1" aria-label="Destinations précédentes">${ICON.chevL}</button>
                     <button type="button" class="wd-discovery-modal__dp-nav" data-sugg-nav="1" aria-label="Destinations suivantes">${ICON.chevR}</button>
@@ -6294,7 +6293,7 @@
                     const choisie = this.state.businessLocation === v.ville;
                     return `<button type="button" class="wd-discovery-modal__sugg-carte${choisie ? ' is-selected' : ''}" data-stub-field="businessLocation" data-stub-value="${v.ville}" aria-pressed="${choisie}">
                     <span class="wd-discovery-modal__sugg-visuel" style="background-image:url('${v.img}')"></span>
-                    <span class="wd-discovery-modal__sugg-texte"><span class="wd-discovery-modal__sugg-kicker">${v.kicker}</span><span class="wd-discovery-modal__sugg-ville">${v.ville}</span></span>
+                    <span class="wd-discovery-modal__sugg-texte">${v.kicker ? `<span class="wd-discovery-modal__sugg-kicker">${v.kicker}</span>` : ''}<span class="wd-discovery-modal__sugg-ville">${v.ville}</span></span>
                   </button>`;
                   }).join('')}
                 </div>

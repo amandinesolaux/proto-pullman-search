@@ -2547,3 +2547,17 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 @media (hover: none) and (pointer: coarse) {
   .wd-discovery-modal__sugg-nav { display: none; }
 }
+
+/* Le titre des suggestions devient un intitulé de section, et non plus une petite
+   étiquette grise en capitales : c'est lui qui ouvre le bloc, les cartes suivent. */
+.wd-discovery-modal__sugg-titre {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #445047;
+}
+.wd-discovery-modal__sugg-tete { margin-bottom: 14px; }
