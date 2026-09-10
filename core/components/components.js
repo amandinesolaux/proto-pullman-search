@@ -5094,7 +5094,6 @@
             <p class="wd-discovery-modal__subtitle">Dites-nous ce qui vous amène et nous vous guiderons vers l'expérience Pullman idéale.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Quel type de séjour préparez-vous ?</label>
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
                   const isSelected = this.state.selectedStayType === opt.value;
@@ -5184,7 +5183,6 @@
             <p class="wd-discovery-modal__subtitle">Dites-nous qui vous accompagne pour adapter nos suggestions.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Avec qui voyagez-vous ?</label>
               <div class="wd-discovery-modal__chips" style="margin-bottom: 20px;">
                 ${whoOptions.map(opt => `
                   <button class="wd-discovery-modal__chip${this.state.selectedWho === opt.value ? ' is-selected' : ''}" data-who="${opt.value}">${opt.label}</button>
@@ -6224,10 +6222,9 @@
             <p class="wd-discovery-modal__subtitle">Précisez votre destination pour trouver le Pullman idéal.</p>
 
             <div class="wd-discovery-modal__question">
-              <label class="wd-discovery-modal__question-label">Dans quelle ville ou région ?</label>
 
               <div class="wd-discovery-modal__form-group wd-discovery-modal__autocomplete">
-                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation === '__ouvert__' ? '' : (this.state.businessLocation || '')}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
+                <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" aria-label="Dans quelle ville ou région ?" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation === '__ouvert__' ? '' : (this.state.businessLocation || '')}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
                 <ul class="wd-discovery-modal__autocomplete-list" id="businessLocationList" role="listbox" hidden></ul>
               </div>
               <!-- On ne demande plus « avez-vous une idée de destination ? » : pour un
