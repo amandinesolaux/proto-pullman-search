@@ -2781,8 +2781,8 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 
 /* ── Agent : les services, en mur d'inspiration ────────────────────────────────
    Les services s'affichent dans la bulle de l'agent, sous sa question, comme un
-   tableau d'inspiration : deux colonnes décalées où chaque visuel garde son format
-   (portrait 4:5, paysage 4:3), avec le nom et l'accroche en légende dessous. Rien ne
+   mosaïque : deux colonnes qui alternent cases hautes (3:4) et basses (4:3) à
+   contretemps, avec le nom et l'accroche en légende dessous. Rien ne
    signale une carte tant qu'elle n'est pas choisie : un clic fait apparaître la case
    cochée sur la photo, un second la retire. Les boutons restent en bas du fil pendant
    qu'on parcourt le mur. */
@@ -2794,13 +2794,13 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   margin-top: 14px;
   background: inherit;
 }
-.wd-agent__services-mur { display: flex; align-items: flex-start; gap: 12px; }
+.wd-agent__services-mur { display: flex; align-items: flex-start; gap: 14px; }
 .wd-agent__services-colonne {
   flex: 1 1 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
 }
 .wd-agent__service {
   display: flex;
@@ -2819,11 +2819,11 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__service-cadre {
   position: relative;
   display: block;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: #e4e8e5;
 }
-.wd-agent__service--paysage .wd-agent__service-cadre { aspect-ratio: 4 / 3; }
+.wd-agent__service--basse .wd-agent__service-cadre { aspect-ratio: 4 / 3; }
 .wd-agent__service-visuel {
   position: absolute;
   inset: 0;

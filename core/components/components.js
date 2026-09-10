@@ -4976,28 +4976,35 @@
             (p.href ? '</a>' : '</div>')).join('') +
           '</div>'
         : '';
-      // Question des services, en mur d'inspiration : deux colonnes décalées où chaque visuel
-      // garde son format (portrait ou paysage) et se place dans la colonne la plus courte,
-      // le nom et l'accroche en légende. Un clic fait apparaître la case cochée sur la photo,
-      // un second la retire. « Valider ma sélection » et « Sans préférence » suivent dans la
-      // même bulle. Les autres questions gardent leurs boutons sous le fil.
+      // Question des services, en mosaïque : deux colonnes en décalé, le nom et l'accroche en
+      // légende. Un clic fait apparaître la case cochée sur la photo, un second la retire.
+      // « Valider ma sélection » et « Sans préférence » suivent dans la même bulle. Les autres
+      // questions gardent leurs boutons sous le fil.
       const aCartes = !!(tour && tour.cartes && !st.agentTyping);
       if (tour && tour.cartes && st.agentServicesSel === undefined) st.agentServicesSel = (tour.preselection || []).slice();
       let servicesHTML = '';
       if (aCartes) {
         const COCHE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
         const sel = st.agentServicesSel || [];
-        // Hauteurs en largeurs de colonne : visuel 4:5 ou 4:3, plus la légende.
+        // Les colonnes alternent cases hautes (3:4) et basses (4:3), à contretemps l'une de
+        // l'autre : c'est ce décalage qui fait lire la mosaïque. La première case prend le
+        // format du service mis en avant, qui reste en haut à gauche ; les suivantes se
+        // remplissent dans l'ordre de lecture avec, de préférence, un visuel du bon format
+        // (portrait pour une case haute, paysage pour une basse).
+        const restantes = tour.cartes.slice();
+        const departHaut = (restantes[0].format || 'portrait') === 'portrait';
         const colonnes = [[], []];
-        const hauteurs = [0, 0];
-        tour.cartes.forEach(c => {
-          const k = hauteurs[1] < hauteurs[0] ? 1 : 0;
-          colonnes[k].push(c);
-          hauteurs[k] += (c.format === 'paysage' ? 3 / 4 : 5 / 4) + 0.25;
-        });
-        const carte = c => {
+        for (let rang = 0; restantes.length; rang++) {
+          for (let k = 0; k < 2 && restantes.length; k++) {
+            const haute = (rang + k) % 2 === 0 ? departHaut : !departHaut;
+            const voulu = haute ? 'portrait' : 'paysage';
+            const j = rang + k === 0 ? 0 : Math.max(0, restantes.findIndex(c => (c.format || 'portrait') === voulu));
+            colonnes[k].push({ c: restantes.splice(j, 1)[0], haute });
+          }
+        }
+        const carte = ({ c, haute }) => {
           const on = sel.indexOf(c.v) >= 0;
-          return '<button type="button" class="wd-agent__service wd-agent__service--' + (c.format || 'portrait') + (on ? ' is-selected' : '') + '" data-agent-service="' + c.v + '" aria-pressed="' + on + '">'
+          return '<button type="button" class="wd-agent__service wd-agent__service--' + (haute ? 'haute' : 'basse') + (on ? ' is-selected' : '') + '" data-agent-service="' + c.v + '" aria-pressed="' + on + '">'
             + '<span class="wd-agent__service-cadre"><span class="wd-agent__service-visuel" style="background-image:url(\'' + c.img + '\')"></span>'
             + '<span class="wd-agent__service-coche">' + COCHE + '</span></span>'
             + '<span class="wd-agent__service-texte"><span class="wd-agent__service-nom">' + esc(c.t) + '</span>'
