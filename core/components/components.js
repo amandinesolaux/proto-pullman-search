@@ -4535,6 +4535,50 @@
           lit: (t) => /pourquoi pas|\boui\b|prolong|week-?end|rester|quelques jours|volontiers|avec plaisir|bonne idee/.test(t) ? oui
                     : /\bnon\b|pas cette fois|retour direct|je rentre|pas le temps|aucune envie/.test(t) ? non
                     : null });
+        // Seul ou accompagné, avant le quartier : c'est ce qui dimensionne le séjour. La
+        // question du nombre ne vient que si l'on est accompagné, et pas quand la famille
+        // connue du compte l'a déjà donné. Elle reste dans la liste une fois posée (le
+        // drapeau ne dépend que de la réponse précédente), sinon les tours suivants
+        // glisseraient d'un rang et l'agent sauterait le quartier.
+        // Nombre d'accompagnants lu dans une phrase : « nous serons 3 » compte la personne
+        // elle-même, « avec 2 collègues » non.
+        const MOTS_NOMBRE = { une: 1, un: 1, deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6 };
+        const nombreDans = (t) => {
+          const chiffre = t.match(/\b(\d{1,2})\b/);
+          let n = chiffre ? Number(chiffre[1]) : null;
+          if (n === null) { for (const k in MOTS_NOMBRE) { if (new RegExp('\\b' + k + '\\b').test(t)) { n = MOTS_NOMBRE[k]; break; } } }
+          if (n === null) return null;
+          if (/nous serons|nous sommes|en tout|au total/.test(t)) n = n - 1;
+          return n >= 1 ? Math.min(n, 3) : null;
+        };
+        const pour = (n) => ({ n, dit: 'Parfait, je prévois donc un séjour pour '
+          + (n >= 3 ? 'quatre personnes ou plus' : (n === 1 ? 'deux' : 'trois')) + '.' });
+        const seul = { a: 'seul', dit: 'Très bien.' };
+        const accompagne = { a: 'accompagne', dit: 'Parfait.' };
+        const repSeul = [Object.assign({ t: 'Seul' }, seul), Object.assign({ t: 'Accompagné' }, accompagne)];
+        if (foyer) {
+          repSeul.push({ t: 'Avec ma famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)',
+            a: 'accompagne', famille: true, n: foyer.adultes - 1 + foyer.enfants.length, v: 'kids',
+            dit: 'Parfait, je tiendrai compte de votre famille.' });
+        }
+        tous.push({ q: 'Voyagez-vous seul, ou serez-vous accompagné ?', r: repSeul,
+          lit: (t) => {
+            if (/famille|enfant/.test(t)) return { a: 'accompagne', v: 'kids', dit: 'Parfait.' };
+            const accompagneIci = /pas seul|non seul/.test(t)
+              || (!/\bseul\b|\bsolo\b|personne d.autre/.test(t)
+                  && /accompagn|\bavec\b|conjoint|epouse|\bmari\b|femme|collegue|\bami|nous serons|nous sommes|\bnous\b/.test(t));
+            if (accompagneIci) {
+              const n = nombreDans(t);
+              return n ? Object.assign({ a: 'accompagne', nombre: true }, pour(n)) : accompagne;
+            }
+            return /\bseul\b|\bsolo\b|personne d.autre/.test(t) ? seul : null;
+          } });
+        if (st.agentAccompagne === 'accompagne' && !st.agentFamille && !st.agentNombreDonne) {
+          tous.push({ q: 'Combien de personnes vous accompagneront ?',
+            r: [Object.assign({ t: 'Une personne' }, pour(1)), Object.assign({ t: 'Deux personnes' }, pour(2)),
+                Object.assign({ t: 'Trois ou plus' }, pour(3))],
+            lit: (t) => { const n = nombreDans(t); return n ? pour(n) : null; } });
+        }
         // Le quartier ne se demande que si l'on sait dans quelle ville. Sinon c'est la
         // région qui manque, et c'est elle qu'on demande.
         if (lieuConnu) {
@@ -4551,13 +4595,7 @@
             r: [{ t: 'Europe' }, { t: 'Asie' }, { t: 'Moyen-Orient' }, { t: 'Amériques' }],
             lit: (t) => /europe|asie|orient|amerique|afrique|oceanie/.test(t) ? {} : null });
         }
-        tous.push(st.bleisureChoice === 'yes'
-          ? { q: 'Serez-vous seul, ou accompagné ?',
-              r: [{ t: 'Seul' }, { t: 'Avec mon conjoint', v: 'restaurant' },
-                  { t: foyer ? 'En famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'En famille', v: 'kids' }],
-              lit: (t) => /seul|personne/.test(t) ? {} : /conjoint|mari|femme|epouse|compagn/.test(t) ? { v: 'restaurant' }
-                        : /famille|enfant/.test(t) ? { v: 'kids' } : null }
-          : { q: 'Aurez-vous besoin d\u2019un espace de travail à l\u2019hôtel ?',
+        tous.push({ q: 'Aurez-vous besoin d\u2019un espace de travail à l\u2019hôtel ?',
               r: [{ t: 'Un espace de travail', v: 'workspace' }, { t: 'Une salle de réunion', v: 'meeting-room' },
                   { t: 'Sans préférence' }],
               lit: (t) => /travail|bureau|coworking/.test(t) ? { v: 'workspace' }
@@ -4916,6 +4954,9 @@
         retenir(choix.v);
         if (choix.z) this.state.agentZone = choix.z;
         if (choix.b) this.state.bleisureChoice = choix.b;
+        if (choix.a) this.state.agentAccompagne = choix.a;
+        if (choix.famille) this.state.agentFamille = true;
+        if (choix.n != null) this.state.agentPersonnes = choix.n;
         if (choix.dit) accuse = choix.dit;
       } else {
         const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -4930,6 +4971,9 @@
           retenir(rep.v);
           if (rep.z) this.state.agentZone = rep.z;
           if (rep.b) this.state.bleisureChoice = rep.b;
+          if (rep.a) this.state.agentAccompagne = rep.a;
+          if (rep.nombre) this.state.agentNombreDonne = true;
+          if (rep.n != null) this.state.agentPersonnes = rep.n;
           if (rep.dit && !accuse) accuse = rep.dit;
         } else {
           avance = false;
@@ -4959,7 +5003,10 @@
       this._agentDefiler();
       clearTimeout(this._minuteurAgent);
       this._minuteurAgent = setTimeout(() => {
-        const suivant = tours[this.state.agentTurn];
+        // La liste se relit après la réponse : « Accompagné » fait apparaître « Combien de
+        // personnes vous accompagneront ? ». Lue avant, la bulle annonçait déjà le quartier
+        // pendant que les boutons proposaient un nombre de personnes.
+        const suivant = this._agentTours()[this.state.agentTurn];
         let dit;
         if (!avance && tour) {
           // Recadrage : on accuse réception, puis on repose la question restée en
