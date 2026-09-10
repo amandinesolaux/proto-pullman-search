@@ -2344,3 +2344,83 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-discovery-modal__dp-title:nth-child(2),
   .wd-discovery-modal__dp-month:nth-child(2) { display: none; }
 }
+
+/* ── Étape 1 : des visuels plus grands, plus immersifs ─────────────────────────
+   La carte du centre ne faisait que 198 × 264 px, et ses voisines — tournées à 35°,
+   voilées à 60 %, assombries à 70 % — se lisaient comme des choix désactivés. Le
+   centre grandit (270 × 360, toujours au 3:4) ; les voisines restent lisibles et
+   débordent jusqu'au bord de la modale, pour qu'on voie à quoi ressemblent les autres
+   séjours. Le halo gris sous la carte s'allège, et le voile en dégradé devient une
+   teinte uniforme — pas de dégradé chez Pullman — : la lisibilité du texte tient à
+   son ombre portée. */
+/* 380 et non 400 : la carte fait 360 et l'ombre peut déborder. Les 20 px de plus
+   faisaient défiler l'écran de 17 px sur un portable de 760 px de haut, alors que
+   la question y tenait tout juste. */
+.wd-discovery-modal__options { height: 380px; }
+
+.wd-discovery-modal__option {
+  width: 270px;
+  height: 360px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .12);
+}
+
+.wd-discovery-modal__option:not(.wd-discovery-modal__option--choice)::before { background: rgba(0, 0, 0, .30); }
+.wd-discovery-modal__option:hover.is-active::before { background: rgba(0, 0, 0, .20); }
+
+.wd-discovery-modal__option.is-active {
+  transform: translateX(0) translateZ(0) rotateY(0deg) scale(1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .18);
+}
+.wd-discovery-modal__option.is-prev {
+  transform: translateX(-190px) translateZ(-180px) rotateY(24deg) scale(.86);
+  opacity: .9;
+  filter: brightness(.85);
+}
+.wd-discovery-modal__option.is-next {
+  transform: translateX(190px) translateZ(-180px) rotateY(-24deg) scale(.86);
+  opacity: .9;
+  filter: brightness(.85);
+}
+.wd-discovery-modal__option.is-hidden-left,
+.wd-discovery-modal__option.is-hidden-left-1 {
+  transform: translateX(-330px) translateZ(-360px) rotateY(36deg) scale(.72);
+  opacity: .55;
+  filter: brightness(.7);
+}
+.wd-discovery-modal__option.is-hidden-right,
+.wd-discovery-modal__option.is-hidden-right-1 {
+  transform: translateX(330px) translateZ(-360px) rotateY(-36deg) scale(.72);
+  opacity: .55;
+  filter: brightness(.7);
+}
+
+.wd-discovery-modal__option-content { padding: 0 20px 28px; }
+.wd-discovery-modal__option:not(.wd-discovery-modal__option--choice) span {
+  font-size: 17px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .55);
+}
+.wd-discovery-modal__option-desc {
+  font-size: 14px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .6);
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .wd-discovery-modal__option.is-prev { transform: translate(-180px, 16px) scale(.86); }
+  .wd-discovery-modal__option.is-next { transform: translate(180px, 16px) scale(.86); }
+  .wd-discovery-modal__option.is-hidden-left-1 { transform: translate(-310px, 32px) scale(.72); }
+  .wd-discovery-modal__option.is-hidden-right-1 { transform: translate(310px, 32px) scale(.72); }
+  .wd-discovery-modal__option.is-hidden-left { transform: translate(-420px, 48px) scale(.62); }
+  .wd-discovery-modal__option.is-hidden-right { transform: translate(420px, 48px) scale(.62); }
+}
+
+/* Sur mobile, les cartes reprennent le 3:4 (elles étaient en 200 × 280). */
+@media (max-width: 768px) {
+  .wd-discovery-modal__options { height: 360px; }
+  .wd-discovery-modal__option { width: 240px; height: 320px; }
+  .wd-discovery-modal__option.is-prev { transform: translate(-130px, 14px) scale(.86); }
+  .wd-discovery-modal__option.is-next { transform: translate(130px, 14px) scale(.86); }
+  .wd-discovery-modal__option.is-hidden-left-1 { transform: translate(-230px, 28px) scale(.74); }
+  .wd-discovery-modal__option.is-hidden-right-1 { transform: translate(230px, 28px) scale(.74); }
+  .wd-discovery-modal__option.is-hidden-left { transform: translate(-300px, 42px) scale(.66); }
+  .wd-discovery-modal__option.is-hidden-right { transform: translate(300px, 42px) scale(.66); }
+}
