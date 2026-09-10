@@ -2254,3 +2254,93 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-discovery-modal__month-cell.is-in-range:hover:not(:disabled) {
   border-color: #5fef91;
 }
+
+/* ── Dates : le calendrier de la barre de réservation, en clair ─────────────────
+   Deux mois côte à côte, la plage en pilule, la souplesse juste en dessous. Il se
+   pose dans l'écran au lieu d'attendre derrière un champ : c'est la seule chose
+   que la question demande. */
+.wd-discovery-modal__dates-valeur {
+  margin: 0 0 14px;
+  min-height: 24px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: #445047;
+}
+.wd-discovery-modal__dates-valeur.is-placeholder { font-weight: 400; color: rgba(68, 80, 71, .6); }
+
+.wd-discovery-modal__dp { width: 100%; }
+.wd-discovery-modal__dp-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.wd-discovery-modal__dp-titles { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.wd-discovery-modal__dp-title {
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: #445047;
+}
+.wd-discovery-modal__dp-nav {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #dfe5e0;
+  border-radius: 100px;
+  background: #ffffff;
+  color: #445047;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.wd-discovery-modal__dp-nav:hover:not(:disabled) { border-color: #445047; }
+.wd-discovery-modal__dp-nav:disabled { opacity: .35; cursor: default; }
+
+.wd-discovery-modal__dp-months { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.wd-discovery-modal__dp .wd-discovery-modal__calendar-weekdays span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+/* La plage en pilule, comme dans la barre : un jour seul est rond, les bornes d'une
+   plage s'arrondissent vers l'extérieur, les jours entre elles restent à plat. */
+.wd-discovery-modal__dp .wd-discovery-modal__day { border-radius: 100px; }
+.wd-discovery-modal__dp .wd-discovery-modal__day.is-start { border-radius: 100px 0 0 100px; }
+.wd-discovery-modal__dp .wd-discovery-modal__day.is-end { border-radius: 0 100px 100px 0; }
+.wd-discovery-modal__dp .wd-discovery-modal__day.is-in-range { border-radius: 0; }
+.wd-discovery-modal__dp .wd-discovery-modal__day.is-preview-end {
+  background: rgba(95, 239, 145, 0.20);
+  border-radius: 0 100px 100px 0;
+}
+
+.wd-discovery-modal__dp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e6ebe7;
+}
+.wd-discovery-modal__dp-flex { display: flex; flex-wrap: wrap; gap: 8px; }
+.wd-discovery-modal__dp-flex .wd-discovery-modal__chip { padding: 8px 14px; font-size: 13px; }
+.wd-discovery-modal__dp-clear {
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: #445047;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .wd-discovery-modal__dp-titles,
+  .wd-discovery-modal__dp-months { grid-template-columns: 1fr; }
+  .wd-discovery-modal__dp-title:nth-child(2),
+  .wd-discovery-modal__dp-month:nth-child(2) { display: none; }
+}
