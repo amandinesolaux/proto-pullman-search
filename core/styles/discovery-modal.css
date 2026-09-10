@@ -2779,35 +2779,51 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-discovery-modal__dates-moitie[data-cible="arrivee"].is-active { border-radius: 7px 0 0 7px; }
 .wd-discovery-modal__dates-moitie[data-cible="depart"].is-active { border-radius: 0; }
 
-/* ── Agent : les services en carrousel illustré ─────────────────────────────────
-   À la question des services, les boutons de texte laissent place à des cartes :
-   un visuel 3:4, le nom du service sur un bandeau, une coche. Plusieurs cartes se
-   cochent ; « Valider ma sélection » répond, « Sans préférence » passe. Les flèches
-   servent à la souris, le doigt fait défiler la piste. La sélection suit le kaki du
-   parcours, avec un filet blanc pour rester visible sur la photo. */
-.wd-agent__services { flex: 0 0 auto; display: flex; flex-direction: column; gap: 12px; }
-.wd-agent__services-piste {
+/* ── Agent : les services, en mur d'inspiration ────────────────────────────────
+   Les services s'affichent dans la bulle de l'agent, sous sa question, comme un
+   tableau d'inspiration : deux colonnes décalées où chaque visuel garde son format
+   (portrait 4:5, paysage 4:3), avec le nom et l'accroche en légende dessous. Rien ne
+   signale une carte tant qu'elle n'est pas choisie : un clic fait apparaître la case
+   cochée sur la photo, un second la retire. Les boutons restent en bas du fil pendant
+   qu'on parcourt le mur. */
+.wd-agent__msg--services { max-width: 100%; width: 100%; }
+.wd-agent__services {
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  padding-bottom: 2px;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+  background: inherit;
 }
-.wd-agent__services-piste::-webkit-scrollbar { display: none; }
+.wd-agent__services-mur { display: flex; align-items: flex-start; gap: 12px; }
+.wd-agent__services-colonne {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 .wd-agent__service {
-  position: relative;
-  flex: 0 0 132px;
-  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
   padding: 0;
   border: 0;
   border-radius: 0;
-  overflow: hidden;
-  background: #1a2220;
-  cursor: pointer;
-  scroll-snap-align: start;
+  background: none;
+  font: inherit;
+  color: inherit;
   text-align: left;
+  cursor: pointer;
 }
+.wd-agent__service-cadre {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #e4e8e5;
+}
+.wd-agent__service--paysage .wd-agent__service-cadre { aspect-ratio: 4 / 3; }
 .wd-agent__service-visuel {
   position: absolute;
   inset: 0;
@@ -2815,45 +2831,65 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   background-position: center;
   transition: transform .5s ease;
 }
-.wd-agent__service:hover .wd-agent__service-visuel { transform: scale(1.05); }
-.wd-agent__service-nom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 10px 12px;
-  background: rgba(7, 5, 24, .54);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 17px;
-  color: #ffffff;
-}
+.wd-agent__service:hover .wd-agent__service-visuel { transform: scale(1.04); }
 .wd-agent__service-coche {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  border: 1.5px solid #ffffff;
-  border-radius: 100px;
-  background: rgba(7, 5, 24, .3);
-  color: transparent;
+  background: #445047;
+  box-shadow: 0 0 0 2px #ffffff;
+  color: #ffffff;
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .18s ease, transform .18s ease;
 }
-.wd-agent__service.is-selected .wd-agent__service-coche { background: #445047; border-color: #445047; color: #ffffff; }
-.wd-agent__service.is-selected::after {
+.wd-agent__service.is-selected .wd-agent__service-coche { opacity: 1; transform: scale(1); }
+.wd-agent__service-texte { display: flex; flex-direction: column; gap: 2px; }
+.wd-agent__service-nom {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.wd-agent__service-accroche {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 16px;
+  opacity: .72;
+}
+.wd-agent__service:focus-visible { outline: 2px solid #445047; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .wd-agent__service-visuel,
+  .wd-agent__service-coche { transition: none; }
+}
+
+.wd-agent__services-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0 2px;
+  background: inherit;
+}
+/* Le fond de la barre descend sous elle : sinon quelques pixels d'images passent entre
+   les boutons et le bas du fil. */
+.wd-agent__services-actions::after {
   content: '';
   position: absolute;
-  inset: 0;
-  box-shadow: inset 0 0 0 3px #445047, inset 0 0 0 5px #ffffff;
-  pointer-events: none;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: inherit;
 }
-.wd-agent__service:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
-
-.wd-agent__services-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .wd-agent__services-valider {
   padding: 9px 18px;
   border: 0;
@@ -2867,78 +2903,3 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 .wd-agent__services-valider:hover:not(:disabled) { background: #2f3a33; }
 .wd-agent__services-valider:disabled { background: #d9ded9; color: #8a948c; cursor: default; }
-.wd-agent__services-nav { display: flex; gap: 8px; margin-left: auto; }
-.wd-agent__services-nav .wd-discovery-modal__dp-nav { width: 32px; height: 32px; }
-@media (hover: none) and (pointer: coarse) {
-  .wd-agent__services-nav { display: none; }
-}
-
-/* ── Agent : les services dans la réponse, en mosaïque éditoriale ───────────────
-   Le bandeau de cartes posé sous la conversation se lisait comme un sélecteur : une
-   rangée uniforme qu'il fallait faire défiler. Les services entrent dans la bulle de
-   l'agent, sous sa question, et prennent la forme d'une mosaïque sur trois colonnes :
-   le service mis en avant par le contexte occupe une grande case, avec son nom et une
-   accroche ; les autres sont des vignettes ; la dernière s'élargit pour fermer la
-   ligne. Tout est visible d'un coup, sans flèches. */
-.wd-agent__msg--services { max-width: 100%; width: 100%; }
-.wd-agent__msg--services .wd-agent__services { margin-top: 14px; gap: 14px; }
-
-.wd-agent__services-mosaique {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: 104px;
-  gap: 6px;
-}
-.wd-agent__services-mosaique .wd-agent__service {
-  flex: none;
-  aspect-ratio: auto;
-  min-height: 0;
-  scroll-snap-align: none;
-}
-.wd-agent__service--vedette { grid-column: span 2; grid-row: span 2; }
-.wd-agent__service--large-2 { grid-column: span 2; }
-.wd-agent__service--large-3 { grid-column: span 3; }
-
-.wd-agent__service-texte {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 10px;
-  background: rgba(7, 5, 24, .54);
-}
-.wd-agent__services-mosaique .wd-agent__service-nom {
-  position: static;
-  padding: 0;
-  background: none;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 17px;
-  color: #ffffff;
-}
-.wd-agent__service-accroche {
-  display: none;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  line-height: 16px;
-  color: rgba(255, 255, 255, .85);
-}
-.wd-agent__service--vedette .wd-agent__service-texte,
-.wd-agent__service--large-2 .wd-agent__service-texte,
-.wd-agent__service--large-3 .wd-agent__service-texte { padding: 12px 14px; gap: 4px; }
-.wd-agent__service--vedette .wd-agent__service-nom {
-  font-family: var(--font-serif);
-  font-size: 17px;
-  line-height: 21px;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-}
-.wd-agent__service--vedette .wd-agent__service-accroche,
-.wd-agent__service--large-2 .wd-agent__service-accroche,
-.wd-agent__service--large-3 .wd-agent__service-accroche { display: block; }
-
-.wd-agent__msg--services .wd-agent__services-actions { gap: 10px; }

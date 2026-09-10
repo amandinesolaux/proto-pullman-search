@@ -4667,12 +4667,12 @@
         // n'existe dans le prototype, et le texte libre sait déjà lire « mon chien ».
         const IMG = '../../assets/images/';
         const S = {
-          spa: { v: 'spa', t: 'Spa & bien-être', img: IMG + 'discovery/wellness.avif', dit: 'un spa', accroche: 'Un moment pour soi, entre deux rendez-vous' },
-          table: { v: 'restaurant', t: 'Belle table', img: IMG + 'discovery/gastro.avif', dit: 'une belle table', accroche: 'Une adresse qui vaut le détour' },
-          decouverte: { v: 'local', t: 'Lieux à découvrir', img: IMG + 'discovery/culture.avif', dit: 'la proximité de lieux à découvrir', accroche: 'La ville, à quelques pas' },
-          travail: { v: 'workspace', t: 'Espace de travail', img: IMG + 'Serviceshôtels/corwoking.avif', dit: 'un espace de travail', accroche: 'Travailler au calme, comme au bureau' },
-          reunion: { v: 'meeting-room', t: 'Salle de réunion', img: IMG + 'Serviceshôtels/meetingroom.avif', dit: 'une salle de réunion', accroche: 'Recevoir vos interlocuteurs sur place' },
-          enfants: { v: 'kids', t: 'Espace enfants', img: IMG + 'Serviceshôtels/kidsplayground.webp', dit: 'un espace pour les enfants', accroche: 'Des moments à eux, pendant les vôtres' }
+          spa: { v: 'spa', t: 'Spa & bien-être', format: 'portrait', img: IMG + 'discovery/wellness.avif', dit: 'un spa', accroche: 'Un moment pour soi, entre deux rendez-vous' },
+          table: { v: 'restaurant', t: 'Belle table', format: 'portrait', img: IMG + 'discovery/gastro.avif', dit: 'une belle table', accroche: 'Une adresse qui vaut le détour' },
+          decouverte: { v: 'local', t: 'Lieux à découvrir', format: 'portrait', img: IMG + 'discovery/culture.avif', dit: 'la proximité de lieux à découvrir', accroche: 'La ville, à quelques pas' },
+          travail: { v: 'workspace', t: 'Espace de travail', format: 'paysage', img: IMG + 'Serviceshôtels/corwoking.avif', dit: 'un espace de travail', accroche: 'Travailler au calme, comme au bureau' },
+          reunion: { v: 'meeting-room', t: 'Salle de réunion', format: 'paysage', img: IMG + 'Serviceshôtels/meetingroom.avif', dit: 'une salle de réunion', accroche: 'Recevoir vos interlocuteurs sur place' },
+          enfants: { v: 'kids', t: 'Espace enfants', format: 'paysage', img: IMG + 'Serviceshôtels/kidsplayground.webp', dit: 'un espace pour les enfants', accroche: 'Des moments à eux, pendant les vôtres' }
         };
         const avecEnfants = (st.selectedTypes || []).indexOf('kids') >= 0 || !!st.agentFamille;
         let cartes = st.bleisureChoice === 'yes'
@@ -4976,35 +4976,36 @@
             (p.href ? '</a>' : '</div>')).join('') +
           '</div>'
         : '';
-      // Une question à cartes (les services) s'écrit dans la bulle de l'agent, sous sa
-      // question, en mosaïque : le premier service — celui que le contexte met en avant —
-      // occupe une grande case avec son accroche, les autres des vignettes, et la dernière
-      // s'élargit pour fermer la ligne. « Valider ma sélection » et « Sans préférence »
-      // suivent dans la même bulle. Les autres questions gardent leurs boutons sous le fil.
+      // Question des services, en mur d'inspiration : deux colonnes décalées où chaque visuel
+      // garde son format (portrait ou paysage) et se place dans la colonne la plus courte,
+      // le nom et l'accroche en légende. Un clic fait apparaître la case cochée sur la photo,
+      // un second la retire. « Valider ma sélection » et « Sans préférence » suivent dans la
+      // même bulle. Les autres questions gardent leurs boutons sous le fil.
       const aCartes = !!(tour && tour.cartes && !st.agentTyping);
       if (tour && tour.cartes && st.agentServicesSel === undefined) st.agentServicesSel = (tour.preselection || []).slice();
       let servicesHTML = '';
       if (aCartes) {
         const COCHE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
         const sel = st.agentServicesSel || [];
-        const nb = tour.cartes.length;
-        // Sous la grande case (2 × 2) et ses deux voisines, les lignes vont par trois : ce
-        // qui reste sur la dernière décide de la largeur de la dernière carte.
-        const reste = Math.max(0, nb - 3) % 3;
+        // Hauteurs en largeurs de colonne : visuel 4:5 ou 4:3, plus la légende.
+        const colonnes = [[], []];
+        const hauteurs = [0, 0];
+        tour.cartes.forEach(c => {
+          const k = hauteurs[1] < hauteurs[0] ? 1 : 0;
+          colonnes[k].push(c);
+          hauteurs[k] += (c.format === 'paysage' ? 3 / 4 : 5 / 4) + 0.25;
+        });
+        const carte = c => {
+          const on = sel.indexOf(c.v) >= 0;
+          return '<button type="button" class="wd-agent__service wd-agent__service--' + (c.format || 'portrait') + (on ? ' is-selected' : '') + '" data-agent-service="' + c.v + '" aria-pressed="' + on + '">'
+            + '<span class="wd-agent__service-cadre"><span class="wd-agent__service-visuel" style="background-image:url(\'' + c.img + '\')"></span>'
+            + '<span class="wd-agent__service-coche">' + COCHE + '</span></span>'
+            + '<span class="wd-agent__service-texte"><span class="wd-agent__service-nom">' + esc(c.t) + '</span>'
+            + (c.accroche ? '<span class="wd-agent__service-accroche">' + esc(c.accroche) + '</span>' : '')
+            + '</span></button>';
+        };
         servicesHTML = '<div class="wd-agent__services" role="group" aria-label="Services souhaités">'
-          + '<div class="wd-agent__services-mosaique">' + tour.cartes.map((c, i) => {
-              const on = sel.indexOf(c.v) >= 0;
-              let forme = '';
-              if (i === 0) forme = ' wd-agent__service--vedette';
-              else if (i === nb - 1 && nb > 3 && reste === 1) forme = ' wd-agent__service--large-3';
-              else if (i === nb - 1 && nb > 3 && reste === 2) forme = ' wd-agent__service--large-2';
-              return '<button type="button" class="wd-agent__service' + forme + (on ? ' is-selected' : '') + '" data-agent-service="' + c.v + '" aria-pressed="' + on + '">'
-                + '<span class="wd-agent__service-visuel" style="background-image:url(\'' + c.img + '\')"></span>'
-                + '<span class="wd-agent__service-coche">' + COCHE + '</span>'
-                + '<span class="wd-agent__service-texte"><span class="wd-agent__service-nom">' + esc(c.t) + '</span>'
-                + (c.accroche ? '<span class="wd-agent__service-accroche">' + esc(c.accroche) + '</span>' : '')
-                + '</span></button>';
-            }).join('') + '</div>'
+          + '<div class="wd-agent__services-mur">' + colonnes.map(col => '<div class="wd-agent__services-colonne">' + col.map(carte).join('') + '</div>').join('') + '</div>'
           + '<div class="wd-agent__services-actions">'
           + '<button type="button" class="wd-agent__services-valider" data-agent-services-valider' + (sel.length ? '' : ' disabled') + '>Valider ma sélection' + (sel.length ? ' · ' + sel.length : '') + '</button>'
           + '<button type="button" class="wd-agent__reply" data-agent-reply="0">Sans préférence</button>'
@@ -7791,7 +7792,7 @@
           });
         });
 
-        // Services : on coche dans le carrousel, puis « Valider ma sélection ». La bulle de la
+        // Services : un clic coche ou décoche un visuel du mur, puis « Valider ma sélection ». La bulle de la
         // personne reprend les services choisis, l'accusé les nomme, et chacun alimente la
         // recherche.
         const zoneServices = this.querySelector('.wd-agent__services');
@@ -7799,7 +7800,6 @@
           const tourServices = this._agentTours()[this.state.agentTurn];
           const choisis = new Set(this.state.agentServicesSel || []);
           const valider = zoneServices.querySelector('[data-agent-services-valider]');
-          const piste = zoneServices.querySelector('.wd-agent__services-piste');
           const maj = () => {
             zoneServices.querySelectorAll('[data-agent-service]').forEach(b => {
               const on = choisis.has(b.dataset.agentService);
@@ -7822,11 +7822,6 @@
             const retenues = tourServices.cartes.filter(c => choisis.has(c.v));
             this._agentRepondre(retenues.map(c => c.t).join(', '), { vs: retenues.map(c => c.v), dit: tourServices.accuse(retenues), ouverture: 'Excellent choix.' });
           });
-          zoneServices.querySelectorAll('[data-services-nav]').forEach(b => b.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const carte = piste.querySelector('.wd-agent__service');
-            piste.scrollBy({ left: Number(b.dataset.servicesNav) * ((carte ? carte.offsetWidth : 132) + 10) * 2, behavior: 'smooth' });
-          }));
           maj();
         }
 
