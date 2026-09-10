@@ -4553,6 +4553,60 @@
         };
         const pour = (n) => ({ n, dit: 'Parfait, je prévois donc un séjour pour '
           + (n >= 3 ? 'quatre personnes ou plus' : (n === 1 ? 'deux' : 'trois')) + '.' });
+        // Qui accompagne, pas seulement combien. « deux personnes : mon mari et mon fils »
+        // n'était lu que comme « deux » : l'agent répondait « un séjour pour trois » sans
+        // nommer personne, et ne retenait pas l'enfant. Chaque proche reconnu est nommé dans
+        // la réponse, compte dans le nombre quand il est au singulier, et un enfant fait
+        // retenir le critère « enfants ». On consomme chaque mention trouvée, pour que « mes
+        // fils » ne soit pas relu comme « mon fils ».
+        const PROCHES = [
+          [/\bmes fils\b/, 'vos fils', null, true],
+          [/\bmes filles\b/, 'vos filles', null, true],
+          [/\bmes enfants\b|\benfants\b/, 'vos enfants', null, true],
+          [/\bmes collegues\b|\bcollegues\b/, 'vos collègues', null, false],
+          [/\bmes amies?\b|\bamis\b|\bamies\b/, 'vos amis', null, false],
+          [/\bmes parents\b|\bparents\b/, 'vos parents', 2, false],
+          [/\bmon mari\b|\bmari\b/, 'votre mari', 1, false],
+          [/\bma femme\b|\bmon epouse\b|\bepouse\b/, 'votre épouse', 1, false],
+          [/\bma conjointe\b|\bconjointe\b/, 'votre conjointe', 1, false],
+          [/\bmon conjoint\b|\bconjoint\b/, 'votre conjoint', 1, false],
+          [/\bma compagne\b|\bcompagne\b/, 'votre compagne', 1, false],
+          [/\bmon compagnon\b|\bcompagnon\b/, 'votre compagnon', 1, false],
+          [/\bmon fils\b|\bfils\b/, 'votre fils', 1, true],
+          [/\bma fille\b|\bfille\b/, 'votre fille', 1, true],
+          [/\bmon enfant\b|\benfant\b/, 'votre enfant', 1, true],
+          [/\bbebe\b/, 'votre bébé', 1, true],
+          [/\bmon collegue\b|\bma collegue\b|\bcollegue\b/, 'votre collègue', 1, false],
+          [/\bmon amie?\b|\bma amie\b/, 'votre ami', 1, false],
+          [/\bma mere\b|\bmere\b/, 'votre mère', 1, false],
+          [/\bmon pere\b|\bpere\b/, 'votre père', 1, false]
+        ];
+        const accompagnantsDans = (t) => {
+          let reste = t; const mots = []; let n = 0; let inconnu = false; let enfants = false;
+          PROCHES.forEach(([motif, dit, compte, enfant]) => {
+            if (!motif.test(reste)) return;
+            reste = reste.replace(motif, ' ');
+            mots.push(dit);
+            if (compte == null) inconnu = true; else n += compte;
+            if (enfant) enfants = true;
+          });
+          return { mots, n: (mots.length && !inconnu) ? n : null, enfants };
+        };
+        const enClair = (l) => l.length > 1 ? l.slice(0, -1).join(', ') + ' et ' + l[l.length - 1] : l[0];
+        const accueil = (n, acc) => {
+          let dit;
+          if (n) {
+            dit = 'Parfait, je prévois donc un séjour pour '
+              + (n >= 3 ? 'quatre personnes ou plus' : (n === 1 ? 'deux' : 'trois'))
+              + (acc && acc.mots.length ? ', avec ' + enClair(acc.mots) : '') + '.';
+          } else if (acc && acc.mots.length) {
+            dit = 'Parfait, vous serez donc accompagné de ' + enClair(acc.mots) + '.';
+          } else {
+            dit = 'Parfait.';
+          }
+          if (acc && acc.enfants) dit += ' Je veillerai à ce que l\u2019hôtel accueille bien les enfants.';
+          return dit;
+        };
         const seul = { a: 'seul', dit: 'Très bien.' };
         const accompagne = { a: 'accompagne', dit: 'Parfait.' };
         const repSeul = [Object.assign({ t: 'Seul' }, seul), Object.assign({ t: 'Accompagné' }, accompagne)];
@@ -4563,21 +4617,29 @@
         }
         tous.push({ q: 'Voyagez-vous seul, ou serez-vous accompagné ?', r: repSeul,
           lit: (t) => {
-            if (/famille|enfant/.test(t)) return { a: 'accompagne', v: 'kids', dit: 'Parfait.' };
-            const accompagneIci = /pas seul|non seul/.test(t)
-              || (!/\bseul\b|\bsolo\b|personne d.autre/.test(t)
-                  && /accompagn|\bavec\b|conjoint|epouse|\bmari\b|femme|collegue|\bami|nous serons|nous sommes|\bnous\b/.test(t));
-            if (accompagneIci) {
-              const n = nombreDans(t);
-              return n ? Object.assign({ a: 'accompagne', nombre: true }, pour(n)) : accompagne;
-            }
-            return /\bseul\b|\bsolo\b|personne d.autre/.test(t) ? seul : null;
+            const acc = accompagnantsDans(t);
+            const seulIci = /\bseul\b|\bsolo\b|personne d.autre/.test(t) && !/pas seul|non seul/.test(t);
+            const accompagneIci = !seulIci && (acc.mots.length > 0
+              || /pas seul|non seul|accompagn|\bavec\b|nous serons|nous sommes|\bnous\b|famille/.test(t));
+            if (!accompagneIci) return seulIci ? seul : null;
+            const n = nombreDans(t) || (acc.n ? Math.min(acc.n, 3) : null);
+            const reponse = { a: 'accompagne', dit: accueil(n, acc) };
+            if (acc.enfants || /famille/.test(t)) reponse.v = 'kids';
+            if (n) Object.assign(reponse, { n, nombre: true });
+            return reponse;
           } });
         if (st.agentAccompagne === 'accompagne' && !st.agentFamille && !st.agentNombreDonne) {
           tous.push({ q: 'Combien de personnes vous accompagneront ?',
             r: [Object.assign({ t: 'Une personne' }, pour(1)), Object.assign({ t: 'Deux personnes' }, pour(2)),
                 Object.assign({ t: 'Trois ou plus' }, pour(3))],
-            lit: (t) => { const n = nombreDans(t); return n ? pour(n) : null; } });
+            lit: (t) => {
+              const acc = accompagnantsDans(t);
+              const n = nombreDans(t) || (acc.n ? Math.min(acc.n, 3) : null);
+              if (!n) return null;
+              const reponse = { n, dit: accueil(n, acc) };
+              if (acc.enfants) reponse.v = 'kids';
+              return reponse;
+            } });
         }
         // Le quartier ne se demande que si l'on sait dans quelle ville. Sinon c'est la
         // région qui manque, et c'est elle qu'on demande.
@@ -4974,7 +5036,12 @@
           if (rep.a) this.state.agentAccompagne = rep.a;
           if (rep.nombre) this.state.agentNombreDonne = true;
           if (rep.n != null) this.state.agentPersonnes = rep.n;
-          if (rep.dit && !accuse) accuse = rep.dit;
+          if (rep.dit) {
+            // L'accusé propre à la question passe d'abord ; la lecture générale n'ajoute que ce
+            // qu'il ne dit pas déjà (les enfants y sont nommés, un chien non).
+            const autres = lu.dits.filter(d => !/enfant/.test(d));
+            accuse = rep.dit + (autres.length ? ' Je ne retiendrai que des hôtels ' + autres.join(' et ') + '.' : '');
+          }
         } else {
           avance = false;
           // Rien de reconnu du tout : on le dit, plutôt que de faire semblant — et on
