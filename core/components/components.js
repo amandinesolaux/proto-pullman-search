@@ -6209,6 +6209,52 @@
       return stepMap[this.state.currentStep] || '?';
     }
 
+    // Suggestions de destinations, dans l'esprit de « Explorez le monde autrement » sur la
+    // homepage : mêmes visuels verticaux, mêmes villes. Seules les villes où Pullman a
+    // réellement un hôtel sont proposées — le champ a déjà connu des villes fantômes. Le
+    // parcours décide de l'ordre et de ce qu'on lit sur la carte : pour un séminaire, la
+    // plus grande salle compte plus que le continent.
+    _suggestionsDestinations() {
+      const type = this.state.selectedStayType;
+      const hotels = window.WD_HOTELS || [];
+      const reunions = window.WD_REUNIONS || [];
+      const VISUELS = { 'Paris': 'GettyImages-1187421561', 'Singapour': 'aja_p_1029-36', 'Dubaï': 'aja_p_6935-96',
+        'Shanghai': 'aja_p_2810-66', 'São Paulo': 'aja_p_0626-10', 'Sydney': 'aja_p_0795-31',
+        'Toulouse': 'aja_p_7014-44', 'Bali': '6556-1' };
+      const CONTINENTS = { asie: 'Asie', europe: 'Europe', ameriques: 'Amériques', 'moyen-orient': 'Moyen-Orient',
+        oceanie: 'Pacifique', afrique: 'Afrique' };
+      const img = (cle) => 'https://m.ahstatic.com/is/image/accorhotels/' + cle
+        + ':9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=320&hei=569&qlt=80';
+
+      const fiche = (ville) => {
+        const ici = hotels.filter(h => h.city === ville);
+        if (!ici.length) return null;
+        const salleMax = reunions.filter(r => r.ville === ville)
+          .reduce((n, r) => Math.max(n, ...(r.salles || []).map(sa => sa[3] || 0)), 0);
+        return { ville, hotels: ici.length, continent: CONTINENTS[ici[0].region] || '', salleMax, img: img(VISUELS[ville]) };
+      };
+
+      let ordre, titre;
+      if (type === 'event') {
+        titre = 'Grandes capacités d\u2019accueil';
+        ordre = ['Sydney', 'Paris', 'São Paulo', 'Dubaï', 'Shanghai', 'Singapour', 'Toulouse'];
+      } else if (type === 'pro') {
+        titre = 'Villes d\u2019affaires';
+        ordre = ['Paris', 'Singapour', 'Dubaï', 'Shanghai', 'São Paulo', 'Sydney', 'Toulouse'];
+      } else {
+        titre = 'Destinations à découvrir';
+        ordre = ['Bali', 'Sydney', 'Dubaï', 'Paris', 'Singapour', 'São Paulo', 'Shanghai', 'Toulouse'];
+      }
+      let villes = ordre.map(fiche).filter(Boolean);
+      if (type === 'event') villes.sort((a, b) => b.salleMax - a.salleMax);
+      villes = villes.map(v => Object.assign(v, {
+        kicker: (type === 'event' && v.salleMax)
+          ? 'Jusqu\u2019à ' + v.salleMax.toLocaleString('fr-FR') + ' pers.'
+          : v.continent + ' · ' + v.hotels + ' hôtel' + (v.hotels > 1 ? 's' : '')
+      }));
+      return { titre, villes };
+    }
+
     renderQuestion_BusinessLocation() {
       const isEvent = this.state.selectedStayType === 'event';
       const title = isEvent ? 'Où souhaitez-vous organiser votre événement ?' : 'Où vous rendez-vous ?';
@@ -6231,6 +6277,29 @@
                    déplacement la réponse est toujours oui, et la question coûtait un écran
                    à la majorité. Elle devient une sortie pour la minorité qui hésite. -->
               <button type="button" class="wd-discovery-modal__chip wd-discovery-modal__chip--ouvert${this.state.businessLocation === '__ouvert__' ? ' is-selected' : ''}" data-stub-value="__ouvert__" data-stub-field="businessLocation">Je n\u2019ai pas encore décidé</button>
+              ${(() => {
+                // Suggestions : un clic choisit la ville et fait avancer, comme la puce.
+                const sug = this._suggestionsDestinations();
+                if (!sug.villes.length) return '';
+                return `<section class="wd-discovery-modal__sugg" aria-label="${sug.titre}">
+                <div class="wd-discovery-modal__sugg-tete">
+                  <span class="wd-discovery-modal__sugg-titre">${sug.titre}</span>
+                  <div class="wd-discovery-modal__sugg-nav">
+                    <button type="button" class="wd-discovery-modal__dp-nav" data-sugg-nav="-1" aria-label="Destinations précédentes">${ICON.chevL}</button>
+                    <button type="button" class="wd-discovery-modal__dp-nav" data-sugg-nav="1" aria-label="Destinations suivantes">${ICON.chevR}</button>
+                  </div>
+                </div>
+                <div class="wd-discovery-modal__sugg-piste">
+                  ${sug.villes.map(v => {
+                    const choisie = this.state.businessLocation === v.ville;
+                    return `<button type="button" class="wd-discovery-modal__sugg-carte${choisie ? ' is-selected' : ''}" data-stub-field="businessLocation" data-stub-value="${v.ville}" aria-pressed="${choisie}">
+                    <span class="wd-discovery-modal__sugg-visuel" style="background-image:url('${v.img}')"></span>
+                    <span class="wd-discovery-modal__sugg-texte"><span class="wd-discovery-modal__sugg-kicker">${v.kicker}</span><span class="wd-discovery-modal__sugg-ville">${v.ville}</span></span>
+                  </button>`;
+                  }).join('')}
+                </div>
+              </section>`;
+              })()}
             </div>
 
             <div class="wd-discovery-modal__footer">
@@ -7036,6 +7105,30 @@
 
           input.addEventListener('focus', () => { renderList(input.value); });
           input.addEventListener('blur', () => { setTimeout(closeList, 120); });
+        }
+      }
+
+      // Suggestions de destinations : les flèches font défiler la piste de deux cartes, et
+      // se désactivent aux extrémités. Au doigt, la piste défile nativement.
+      if (['business-location', 'pro-location', 'event-location'].includes(this.state.currentStep)) {
+        const piste = this.querySelector('.wd-discovery-modal__sugg-piste');
+        if (piste) {
+          const prec = this.querySelector('[data-sugg-nav="-1"]');
+          const suiv = this.querySelector('[data-sugg-nav="1"]');
+          const pas = () => {
+            const carte = piste.querySelector('.wd-discovery-modal__sugg-carte');
+            return carte ? (carte.offsetWidth + 12) * 2 : 288;
+          };
+          const bornes = () => {
+            if (prec) prec.disabled = piste.scrollLeft <= 2;
+            if (suiv) suiv.disabled = piste.scrollLeft + piste.clientWidth >= piste.scrollWidth - 2;
+          };
+          [prec, suiv].forEach(b => b && b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            piste.scrollBy({ left: Number(b.dataset.suggNav) * pas(), behavior: 'smooth' });
+          }));
+          piste.addEventListener('scroll', bornes, { passive: true });
+          bornes();
         }
       }
 
