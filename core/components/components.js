@@ -4669,14 +4669,13 @@
         const S = {
           spa: { v: 'spa', t: 'Spa & bien-être', format: 'portrait', img: IMG + 'discovery/wellness.avif', dit: 'un spa', accroche: 'Un moment pour soi, entre deux rendez-vous' },
           table: { v: 'restaurant', t: 'Belle table', format: 'portrait', img: IMG + 'discovery/gastro.avif', dit: 'une belle table', accroche: 'Une adresse qui vaut le détour' },
-          decouverte: { v: 'local', t: 'Lieux à découvrir', format: 'portrait', img: IMG + 'discovery/culture.avif', dit: 'la proximité de lieux à découvrir', accroche: 'La ville, à quelques pas' },
           travail: { v: 'workspace', t: 'Espace de travail', format: 'paysage', img: IMG + 'Serviceshôtels/corwoking.avif', dit: 'un espace de travail', accroche: 'Travailler au calme, comme au bureau' },
           reunion: { v: 'meeting-room', t: 'Salle de réunion', format: 'paysage', img: IMG + 'Serviceshôtels/meetingroom.avif', dit: 'une salle de réunion', accroche: 'Recevoir vos interlocuteurs sur place' },
           enfants: { v: 'kids', t: 'Espace enfants', format: 'paysage', img: IMG + 'Serviceshôtels/kidsplayground.webp', dit: 'un espace pour les enfants', accroche: 'Des moments à eux, pendant les vôtres' }
         };
         const avecEnfants = (st.selectedTypes || []).indexOf('kids') >= 0 || !!st.agentFamille;
         let cartes = st.bleisureChoice === 'yes'
-          ? [S.spa, S.table, S.decouverte, S.travail, S.reunion]
+          ? [S.spa, S.table, S.travail, S.reunion]
           : [S.travail, S.reunion, S.table, S.spa];
         if (avecEnfants) cartes = [S.enfants].concat(cartes);
         const accuserServices = (choisies) => choisies.length
@@ -4695,7 +4694,6 @@
             const trouve = [];
             if (/spa|bien.etre|massage|hammam|sauna/.test(t)) trouve.push(S.spa);
             if (/restaurant|\btable\b|gastronom|diner|cuisine/.test(t)) trouve.push(S.table);
-            if (/decouvr|visite|culture|musee|balade/.test(t)) trouve.push(S.decouverte);
             if (/travail|bureau|coworking/.test(t)) trouve.push(S.travail);
             if (/reunion|\bsalle\b|seminaire/.test(t)) trouve.push(S.reunion);
             if (/enfant|kids|jeux/.test(t)) trouve.push(S.enfants);
