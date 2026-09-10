@@ -683,6 +683,12 @@ const WD_ZOOM_HOTEL = 6;
 // En dessous de ce zoom, les hôtels d'une même ville ne font qu'un pin. Au-dessus, ils se
 // séparent : à 6 on voit la forme du pays, c'est assez fin pour les distinguer.
 const WD_ZOOM_VILLES = 6;
+// Le mode dans lequel les pins actuels ont été dessinés — regroupés par ville ou non.
+// C'est à lui qu'on compare le zoom après un déplacement, et non au zoom précédent : à
+// l'ouverture de la carte sur une ville déjà choisie, les pins étaient dessinés au zoom 2
+// puis la vue sautait au zoom 12 ; le zoom « précédent » n'existait pas encore, et
+// Singapour gardait un seul pin « · 2 » là où l'on devait voir ses deux hôtels.
+let _groupeRendu = null;
 // Nombre de services affichés dans l'encart. Au-delà, un « +N » prend le relais.
 // 3 et non 4 : avec le « +N », quatre badges débordaient sur une seconde ligne, et
 // c'est cette ligne supplémentaire qui obligeait à faire défiler le panneau.
@@ -1089,6 +1095,7 @@ function initBookingMap(continentFilter, scope) {
     _bookingMap.remove();
     _bookingMap = null;
     _markers = [];
+    _groupeRendu = null;
   }
 
   _bookingMap = L.map('wd-booking-map', {
@@ -1108,12 +1115,9 @@ function initBookingMap(continentFilter, scope) {
   // Les étiquettes se recalculent à chaque déplacement : ce qui se chevauchait à un
   // endroit tient ailleurs. Et franchir le seuil de regroupement refait les pins, pour
   // que les villes à plusieurs hôtels se séparent en approchant.
-  let _zoomPrecedent = null;
   _bookingMap.on('moveend', () => {
-    const groupeAvant = _zoomPrecedent !== null && _zoomPrecedent < WD_ZOOM_VILLES;
-    const groupeApres = _bookingMap.getZoom() < WD_ZOOM_VILLES;
-    _zoomPrecedent = _bookingMap.getZoom();
-    if (_zoomPrecedent !== null && groupeAvant !== groupeApres) _renderMarkers(_currentContinent, _currentCriteria, false);
+    const grouperIci = _bookingMap.getZoom() < WD_ZOOM_VILLES;
+    if (_groupeRendu !== null && grouperIci !== _groupeRendu) _renderMarkers(_currentContinent, _currentCriteria, false);
     else _ajusterEtiquettes();
     _elargirSelonLaVue();
   });
@@ -1165,6 +1169,7 @@ function _renderMarkers(continentFilter, criteriaSet, refit = true) {
   // endroit et écrivent son nom deux fois — « Bangkok » par-dessus « Bangkok ». On les
   // réunit tant qu'on est dézoomé, et on les sépare dès qu'on entre dans le pays.
   const grouper = _bookingMap.getZoom() < WD_ZOOM_VILLES;
+  _groupeRendu = grouper;
   const groupes = new Map();
   PULLMAN_HOTELS_MAP.forEach(hotel => {
     const cle = grouper ? (hotel.country + '|' + hotel.city) : hotel.name;
