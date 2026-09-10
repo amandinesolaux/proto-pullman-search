@@ -4985,7 +4985,9 @@
         const services = Object.keys(SERVICES_HOTEL).filter(id => (h.amenities || []).indexOf(id) >= 0);
         const ordre = services.filter(id => demandes.indexOf(id) >= 0)
           .concat(services.filter(id => demandes.indexOf(id) < 0));
-        const visibles = ordre.slice(0, 5);
+        // Trois pastilles sur une card en demi-largeur, sauf si l'échange en a demandé
+        // davantage : ce qu'on a demandé reste toujours visible.
+        const visibles = ordre.slice(0, Math.max(3, ordre.filter(id => demandes.indexOf(id) >= 0).length));
         const caches = ordre.slice(visibles.length);
         const reserver = window.WD_ALL_BOOKING_URL
           ? window.WD_ALL_BOOKING_URL(h, { checkin: st.checkInDate, nights: nuits,
@@ -5094,10 +5096,11 @@
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
         : '';
-      const cloture = fini
+      // Plus de « Voir tous les résultats » : les cards sont la conclusion de l'échange.
+      // Sans proposition, on dit comment en obtenir plutôt que de laisser la bulle seule.
+      const cloture = (fini && !props.length)
         ? '<div class="wd-agent__props">' +
-            (props.length ? '' : '<p class="wd-agent__props-titre">Rien ne réunit tout cela. La liste complète vous laissera assouplir un critère.</p>') +
-            '<a class="wd-discovery-modal__continue is-active wd-agent__tout" href="' + esc(this._agentLienResultats()) + '">Voir tous les résultats</a>' +
+            '<p class="wd-agent__props-titre">Aucun hôtel ne réunit tout cela. Recommencez en assouplissant un critère.</p>' +
           '</div>'
         : '';
 
