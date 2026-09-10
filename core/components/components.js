@@ -4657,12 +4657,51 @@
             r: [{ t: 'Europe' }, { t: 'Asie' }, { t: 'Moyen-Orient' }, { t: 'Amériques' }],
             lit: (t) => /europe|asie|orient|amerique|afrique|oceanie/.test(t) ? {} : null });
         }
-        tous.push({ q: 'Aurez-vous besoin d\u2019un espace de travail à l\u2019hôtel ?',
-              r: [{ t: 'Un espace de travail', v: 'workspace' }, { t: 'Une salle de réunion', v: 'meeting-room' },
-                  { t: 'Sans préférence' }],
-              lit: (t) => /travail|bureau|coworking/.test(t) ? { v: 'workspace' }
-                        : /reunion|salle/.test(t) ? { v: 'meeting-room' }
-                        : /peu importe|indifferent|sans preference|aucune preference|pas besoin/.test(t) ? {} : null });
+        // Les services, en dernier : l'agent sait alors s'il prolonge, pour combien, avec ou
+        // sans enfants, et où. Un carrousel illustré plutôt que des boutons de texte : on
+        // choisit mieux un spa ou une belle table en le voyant. Plusieurs choix possibles.
+        // L'ordre suit ce qu'on sait : qui prolonge voit d'abord de quoi profiter, qui ne
+        // prolonge pas d'abord de quoi travailler ; des enfants connus font proposer — et
+        // cocher — l'espace enfants en tête. L'espace de travail, qui était une question à
+        // part, devient une carte parmi les autres. Pas de carte « animaux » : aucun visuel
+        // n'existe dans le prototype, et le texte libre sait déjà lire « mon chien ».
+        const IMG = '../../assets/images/';
+        const S = {
+          spa: { v: 'spa', t: 'Spa & bien-être', img: IMG + 'discovery/wellness.avif', dit: 'un spa', accroche: 'Un moment pour soi, entre deux rendez-vous' },
+          table: { v: 'restaurant', t: 'Belle table', img: IMG + 'discovery/gastro.avif', dit: 'une belle table', accroche: 'Une adresse qui vaut le détour' },
+          decouverte: { v: 'local', t: 'Lieux à découvrir', img: IMG + 'discovery/culture.avif', dit: 'la proximité de lieux à découvrir', accroche: 'La ville, à quelques pas' },
+          travail: { v: 'workspace', t: 'Espace de travail', img: IMG + 'Serviceshôtels/corwoking.avif', dit: 'un espace de travail', accroche: 'Travailler au calme, comme au bureau' },
+          reunion: { v: 'meeting-room', t: 'Salle de réunion', img: IMG + 'Serviceshôtels/meetingroom.avif', dit: 'une salle de réunion', accroche: 'Recevoir vos interlocuteurs sur place' },
+          enfants: { v: 'kids', t: 'Espace enfants', img: IMG + 'Serviceshôtels/kidsplayground.webp', dit: 'un espace pour les enfants', accroche: 'Des moments à eux, pendant les vôtres' }
+        };
+        const avecEnfants = (st.selectedTypes || []).indexOf('kids') >= 0 || !!st.agentFamille;
+        let cartes = st.bleisureChoice === 'yes'
+          ? [S.spa, S.table, S.decouverte, S.travail, S.reunion]
+          : [S.travail, S.reunion, S.table, S.spa];
+        if (avecEnfants) cartes = [S.enfants].concat(cartes);
+        const accuserServices = (choisies) => choisies.length
+          ? 'Excellent choix. Je privilégierai des hôtels qui réunissent ' + enClair(choisies.map(c => c.dit)) + '.'
+          : 'Très bien.';
+        tous.push({
+          q: st.bleisureChoice === 'yes'
+            ? 'Pour agrémenter votre séjour, quels services aimeriez-vous trouver à l\u2019hôtel ? Vous pouvez en choisir plusieurs.'
+            : 'Quels services vous seraient utiles durant votre séjour ? Vous pouvez en choisir plusieurs.',
+          cartes,
+          preselection: avecEnfants ? ['kids'] : [],
+          accuse: accuserServices,
+          r: [{ t: 'Sans préférence', dit: 'Très bien.', ouverture: 'Très bien.' }],
+          lit: (t) => {
+            if (/peu importe|indifferent|sans preference|aucune preference|rien de particulier|pas besoin/.test(t)) return { dit: 'Très bien.', ouverture: 'Très bien.' };
+            const trouve = [];
+            if (/spa|bien.etre|massage|hammam|sauna/.test(t)) trouve.push(S.spa);
+            if (/restaurant|\btable\b|gastronom|diner|cuisine/.test(t)) trouve.push(S.table);
+            if (/decouvr|visite|culture|musee|balade/.test(t)) trouve.push(S.decouverte);
+            if (/travail|bureau|coworking/.test(t)) trouve.push(S.travail);
+            if (/reunion|\bsalle\b|seminaire/.test(t)) trouve.push(S.reunion);
+            if (/enfant|kids|jeux/.test(t)) trouve.push(S.enfants);
+            return trouve.length ? { vs: trouve.map(c => c.v), dit: accuserServices(trouve), ouverture: 'Excellent choix.' } : null;
+          }
+        });
         return tous;
       }
 
@@ -4937,6 +4976,40 @@
             (p.href ? '</a>' : '</div>')).join('') +
           '</div>'
         : '';
+      // Une question à cartes (les services) s'écrit dans la bulle de l'agent, sous sa
+      // question, en mosaïque : le premier service — celui que le contexte met en avant —
+      // occupe une grande case avec son accroche, les autres des vignettes, et la dernière
+      // s'élargit pour fermer la ligne. « Valider ma sélection » et « Sans préférence »
+      // suivent dans la même bulle. Les autres questions gardent leurs boutons sous le fil.
+      const aCartes = !!(tour && tour.cartes && !st.agentTyping);
+      if (tour && tour.cartes && st.agentServicesSel === undefined) st.agentServicesSel = (tour.preselection || []).slice();
+      let servicesHTML = '';
+      if (aCartes) {
+        const COCHE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+        const sel = st.agentServicesSel || [];
+        const nb = tour.cartes.length;
+        // Sous la grande case (2 × 2) et ses deux voisines, les lignes vont par trois : ce
+        // qui reste sur la dernière décide de la largeur de la dernière carte.
+        const reste = Math.max(0, nb - 3) % 3;
+        servicesHTML = '<div class="wd-agent__services" role="group" aria-label="Services souhaités">'
+          + '<div class="wd-agent__services-mosaique">' + tour.cartes.map((c, i) => {
+              const on = sel.indexOf(c.v) >= 0;
+              let forme = '';
+              if (i === 0) forme = ' wd-agent__service--vedette';
+              else if (i === nb - 1 && nb > 3 && reste === 1) forme = ' wd-agent__service--large-3';
+              else if (i === nb - 1 && nb > 3 && reste === 2) forme = ' wd-agent__service--large-2';
+              return '<button type="button" class="wd-agent__service' + forme + (on ? ' is-selected' : '') + '" data-agent-service="' + c.v + '" aria-pressed="' + on + '">'
+                + '<span class="wd-agent__service-visuel" style="background-image:url(\'' + c.img + '\')"></span>'
+                + '<span class="wd-agent__service-coche">' + COCHE + '</span>'
+                + '<span class="wd-agent__service-texte"><span class="wd-agent__service-nom">' + esc(c.t) + '</span>'
+                + (c.accroche ? '<span class="wd-agent__service-accroche">' + esc(c.accroche) + '</span>' : '')
+                + '</span></button>';
+            }).join('') + '</div>'
+          + '<div class="wd-agent__services-actions">'
+          + '<button type="button" class="wd-agent__services-valider" data-agent-services-valider' + (sel.length ? '' : ' disabled') + '>Valider ma sélection' + (sel.length ? ' · ' + sel.length : '') + '</button>'
+          + '<button type="button" class="wd-agent__reply" data-agent-reply="0">Sans préférence</button>'
+          + '</div></div>';
+      }
       const dernier = (st.agentThread || []).length - 1;
 
       let vuAgent = false;
@@ -4944,11 +5017,12 @@
         // L'étiquette une seule fois : la répéter à chaque tour n'apprend rien.
         const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Assistant Pullman</span>') : '';
         const porte = fini && i === dernier && m.qui === 'agent' && carrousel;
-        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + '">'
-          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + '</div>';
+        const porteServices = aCartes && i === dernier && m.qui === 'agent';
+        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + (porteServices ? ' wd-agent__msg--services' : '') + '">'
+          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + (porteServices ? servicesHTML : '') + '</div>';
       }).join('')
       + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="L\u2019assistant écrit"><span></span><span></span><span></span></div>' : '');
-      const propositions = (tour && !st.agentTyping)
+      const propositions = (tour && !st.agentTyping && !tour.cartes)
         ? '<div class="wd-agent__replies">' + tour.r.map((r, i) =>
             '<button type="button" class="wd-agent__reply" data-agent-reply="' + i + '">' + r.t + '</button>').join('') + '</div>'
         : '';
@@ -5011,9 +5085,12 @@
 
       let accuse = '';        // ce que l'agent a compris et qu'il redit
       let avance = true;      // la question posée a-t-elle trouvé sa réponse ?
+      let ouverture = '';     // mot d'accueil devant la clôture (« Excellent choix. »)
 
       if (choix) {
         retenir(choix.v);
+        if (choix.vs) choix.vs.forEach(retenir);
+        if (choix.ouverture) ouverture = choix.ouverture;
         if (choix.z) this.state.agentZone = choix.z;
         if (choix.b) this.state.bleisureChoice = choix.b;
         if (choix.a) this.state.agentAccompagne = choix.a;
@@ -5031,6 +5108,8 @@
         const rep = tour && tour.lit ? tour.lit(t) : null;
         if (rep) {
           retenir(rep.v);
+          if (rep.vs) rep.vs.forEach(retenir);
+          if (rep.ouverture) ouverture = rep.ouverture;
           if (rep.z) this.state.agentZone = rep.z;
           if (rep.b) this.state.bleisureChoice = rep.b;
           if (rep.a) this.state.agentAccompagne = rep.a;
@@ -5039,7 +5118,9 @@
           if (rep.dit) {
             // L'accusé propre à la question passe d'abord ; la lecture générale n'ajoute que ce
             // qu'il ne dit pas déjà (les enfants y sont nommés, un chien non).
-            const autres = lu.dits.filter(d => !/enfant/.test(d));
+            // Quand la réponse nomme déjà des services (« un spa »), la lecture générale ne les
+            // répète pas ; elle garde ce qui n'en est pas un, comme les animaux.
+            const autres = lu.dits.filter(d => !/enfant/.test(d) && !(rep.vs && !/animaux/.test(d)));
             accuse = rep.dit + (autres.length ? ' Je ne retiendrai que des hôtels ' + autres.join(' et ') + '.' : '');
           }
         } else {
@@ -5082,7 +5163,11 @@
         } else if (suivant) {
           dit = (accuse ? accuse + ' ' : '') + suivant.q;
         } else {
-          dit = this._agentRecap();
+          // La dernière réponse (les services) mérite un mot avant la clôture — « Excellent
+          // choix. » — sauf quand la clôture annonce qu'il a fallu renoncer à un critère :
+          // « Excellent choix. Aucun hôtel ne réunit tout… » se contredirait.
+          const recap = this._agentRecap();
+          dit = (ouverture && !/^(Aucun|Pullman n|Je ne trouve)/.test(recap) ? ouverture + ' ' : '') + recap;
         }
         this.state.agentThread.push({ qui: 'agent', texte: dit });
         this.state.agentTyping = false;
@@ -5095,7 +5180,16 @@
 
     _agentDefiler() {
       const fil = this.querySelector('#wdAgentThread');
-      if (fil) fil.scrollTop = fil.scrollHeight;
+      if (!fil) return;
+      // Une bulle plus haute que le fil — les services en mosaïque — se lit par son début :
+      // on cale le fil sur la question plutôt que tout en bas, sur les boutons.
+      const bulles = fil.querySelectorAll('.wd-agent__msg--agent');
+      const derniere = bulles[bulles.length - 1];
+      if (derniere && derniere.classList.contains('wd-agent__msg--services') && derniere.offsetHeight > fil.clientHeight) {
+        fil.scrollTop += derniere.getBoundingClientRect().top - fil.getBoundingClientRect().top - 8;
+      } else {
+        fil.scrollTop = fil.scrollHeight;
+      }
     }
 
     _agentRecap() {
@@ -5106,7 +5200,7 @@
       const st = this.state;
       this._agentPropositions();   // renseigne agentAilleurs, agentLaisses, agentCapacite
 
-      const AVEC = { spa: 'avec un spa', restaurant: 'avec un restaurant',
+      const AVEC = { spa: 'avec un spa', restaurant: 'avec une belle table',
         workspace: 'avec un espace de travail', 'meeting-room': 'avec une salle de réunion',
         kids: 'avec un espace pour les enfants', pets: 'qui acceptent les animaux',
         beach: 'en bord de mer', local: 'ancrés dans la vie locale' };
@@ -7696,6 +7790,45 @@
             if (choix) this._agentRepondre(choix.t, choix);
           });
         });
+
+        // Services : on coche dans le carrousel, puis « Valider ma sélection ». La bulle de la
+        // personne reprend les services choisis, l'accusé les nomme, et chacun alimente la
+        // recherche.
+        const zoneServices = this.querySelector('.wd-agent__services');
+        if (zoneServices) {
+          const tourServices = this._agentTours()[this.state.agentTurn];
+          const choisis = new Set(this.state.agentServicesSel || []);
+          const valider = zoneServices.querySelector('[data-agent-services-valider]');
+          const piste = zoneServices.querySelector('.wd-agent__services-piste');
+          const maj = () => {
+            zoneServices.querySelectorAll('[data-agent-service]').forEach(b => {
+              const on = choisis.has(b.dataset.agentService);
+              b.classList.toggle('is-selected', on);
+              b.setAttribute('aria-pressed', String(on));
+            });
+            valider.disabled = !choisis.size;
+            valider.textContent = 'Valider ma sélection' + (choisis.size ? ' · ' + choisis.size : '');
+            this.state.agentServicesSel = [...choisis];
+          };
+          zoneServices.querySelectorAll('[data-agent-service]').forEach(b => b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const v = b.dataset.agentService;
+            if (choisis.has(v)) choisis.delete(v); else choisis.add(v);
+            maj();
+          }));
+          valider.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!choisis.size || !tourServices || !tourServices.cartes) return;
+            const retenues = tourServices.cartes.filter(c => choisis.has(c.v));
+            this._agentRepondre(retenues.map(c => c.t).join(', '), { vs: retenues.map(c => c.v), dit: tourServices.accuse(retenues), ouverture: 'Excellent choix.' });
+          });
+          zoneServices.querySelectorAll('[data-services-nav]').forEach(b => b.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const carte = piste.querySelector('.wd-agent__service');
+            piste.scrollBy({ left: Number(b.dataset.servicesNav) * ((carte ? carte.offsetWidth : 132) + 10) * 2, behavior: 'smooth' });
+          }));
+          maj();
+        }
 
         const champTexte = this.querySelector('#wdAgentInput');
         if (champTexte) {
