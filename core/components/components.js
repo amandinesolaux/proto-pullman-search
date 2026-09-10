@@ -6224,7 +6224,7 @@
       const CONTINENTS = { asie: 'Asie', europe: 'Europe', ameriques: 'Amériques', 'moyen-orient': 'Moyen-Orient',
         oceanie: 'Pacifique', afrique: 'Afrique' };
       const img = (cle) => 'https://m.ahstatic.com/is/image/accorhotels/' + cle
-        + ':9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=320&hei=569&qlt=80';
+        + ':9by16?fmt=jpg&op_usm=1.75,0.3,2,0&wid=420&hei=747&qlt=80';
 
       const fiche = (ville) => {
         const ici = hotels.filter(h => h.city === ville);

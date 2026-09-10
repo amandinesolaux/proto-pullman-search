@@ -2588,3 +2588,12 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-discovery-modal__sugg-tete { margin-bottom: 12px; }  /* 12 + 4 = 16 px vus */
 .wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
 .wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 12px; }  /* 4 + 12 = 16 px vus */
+
+/* Cartes de suggestion plus larges : 176 × 235 (3:4) au lieu de 132 × 235 (9:16).
+   Même hauteur, donc rien ne bouge en dessous ; le visuel respire, et le pays tient
+   sur une ligne (« Émirats arabes unis » en passait deux). */
+.wd-discovery-modal__sugg-carte { flex: 0 0 176px; aspect-ratio: 3 / 4; }
+
+/* Un peu plus d'air avant « Je n'ai pas encore décidé » : 4 + 20 = 24 px vus. */
+.wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
+.wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 20px; }
