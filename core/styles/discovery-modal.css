@@ -2424,3 +2424,23 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-discovery-modal__option.is-hidden-left { transform: translate(-300px, 42px) scale(.66); }
   .wd-discovery-modal__option.is-hidden-right { transform: translate(300px, 42px) scale(.66); }
 }
+
+/* ── Étape 1 : le carrousel centré dans la hauteur disponible ──────────────────
+   Le pied de modale est poussé en bas (margin-top: auto) : tout l'espace libre
+   s'accumulait sous les points, et le carrousel paraissait collé au sous-titre.
+   La zone prend maintenant cet espace et centre son contenu. Elle ne rétrécit
+   jamais sous sa taille réelle, pour que rien ne passe sous le pied sur un écran
+   court. Marges égales au-dessus (celle du sous-titre) et sous les points. */
+.wd-discovery-modal__question--carrousel {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+.wd-discovery-modal__question--carrousel .wd-discovery-modal__carousel-nav { margin-bottom: 0; }
+/* Sur mobile, le sous-titre garde 40 px sous lui : on reprend la même marge sous
+   les points, sans quoi le carrousel remontait de 8 px. */
+@media (max-width: 768px) {
+  .wd-discovery-modal__question--carrousel { margin-bottom: 40px; }
+}

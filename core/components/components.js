@@ -5093,7 +5093,7 @@
             <h2 class="wd-discovery-modal__title">${this.state.isConnected && this.state.userProfile ? `${this.state.userProfile.firstName}, quel séjour préparez-vous ?` : 'Quel séjour préparez-vous ?'}</h2>
             <p class="wd-discovery-modal__subtitle">Dites-nous ce qui vous amène et nous vous guiderons vers l'expérience Pullman idéale.</p>
 
-            <div class="wd-discovery-modal__question">
+            <div class="wd-discovery-modal__question wd-discovery-modal__question--carrousel">
               <div class="wd-discovery-modal__options">
                 ${options.map((opt, i) => {
                   const isSelected = this.state.selectedStayType === opt.value;
