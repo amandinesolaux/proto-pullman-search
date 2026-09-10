@@ -4527,10 +4527,10 @@
         // « Sur place » et non le nom de la ville : la phrase qui précède la cite déjà, et
         // « …à Singapour, du 12 au 16 octobre. …prolonger un peu à Singapour ? » la
         // répétait dans la même bulle.
-        const oui = { b: 'yes', dit: 'Bonne idée, je regarderai aussi ce qu\u2019il y a à faire autour.' };
-        const non = { b: 'no', dit: 'Entendu, on reste sur l\u2019essentiel.' };
-        tous.push({ q: 'Une fois la mission terminée, l\u2019envie de prolonger un peu sur place ?',
-          r: [Object.assign({ t: 'Oui, je prolonge' }, oui), Object.assign({ t: 'Non, retour direct' }, non)],
+        const oui = { b: 'yes', dit: 'Avec plaisir. Je vous proposerai aussi de quoi profiter des alentours.' };
+        const non = { b: 'no', dit: 'Très bien, je m\u2019en tiens à l\u2019essentiel de votre séjour.' };
+        tous.push({ q: 'Souhaiteriez-vous prolonger votre séjour une fois vos rendez-vous terminés ?',
+          r: [Object.assign({ t: 'Oui, volontiers' }, oui), Object.assign({ t: 'Non, merci' }, non)],
           // « pourquoi pas » se teste avant « non » et « pas » : c'est un oui.
           lit: (t) => /pourquoi pas|\boui\b|prolong|week-?end|rester|quelques jours|volontiers|avec plaisir|bonne idee/.test(t) ? oui
                     : /\bnon\b|pas cette fois|retour direct|je rentre|pas le temps|aucune envie/.test(t) ? non
@@ -4538,31 +4538,31 @@
         // Le quartier ne se demande que si l'on sait dans quelle ville. Sinon c'est la
         // région qui manque, et c'est elle qu'on demande.
         if (lieuConnu) {
-          tous.push({ q: 'Vous préférez être près du centre, du quartier d\u2019affaires, ou de l\u2019aéroport ?',
+          tous.push({ q: 'Avez-vous une préférence de quartier : le centre-ville, le quartier d\u2019affaires ou la proximité de l\u2019aéroport ?',
             r: [{ t: 'Centre-ville', z: 'centre' }, { t: 'Quartier d\u2019affaires', z: 'affaires' },
-                { t: 'Près de l\u2019aéroport', z: 'aéroport' }, { t: 'Peu importe' }],
+                { t: 'Proche de l\u2019aéroport', z: 'aéroport' }, { t: 'Sans préférence' }],
             lit: (t) => /centre|hypercentre|downtown/.test(t) ? { z: 'centre' }
                       : /aeroport|airport/.test(t) ? { z: 'aéroport' }
                       : /affaire|business|quartier d/.test(t) ? { z: 'affaires' }
                       : /gare|station/.test(t) ? { z: 'gare' }
-                      : /peu importe|indifferent|pas d.importance/.test(t) ? {} : null });
+                      : /peu importe|indifferent|pas d.importance|sans preference|aucune preference/.test(t) ? {} : null });
         } else {
-          tous.push({ q: 'Sur quelle région porte ce déplacement ?',
+          tous.push({ q: 'Dans quelle région du monde se déroulera votre déplacement ?',
             r: [{ t: 'Europe' }, { t: 'Asie' }, { t: 'Moyen-Orient' }, { t: 'Amériques' }],
             lit: (t) => /europe|asie|orient|amerique|afrique|oceanie/.test(t) ? {} : null });
         }
         tous.push(st.bleisureChoice === 'yes'
-          ? { q: 'Vous restez seul, ou quelqu\u2019un vous rejoint ?',
-              r: [{ t: 'Seul' }, { t: 'Mon conjoint', v: 'restaurant' },
-                  { t: foyer ? 'Ma famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'Ma famille', v: 'kids' }],
+          ? { q: 'Serez-vous seul, ou accompagné ?',
+              r: [{ t: 'Seul' }, { t: 'Avec mon conjoint', v: 'restaurant' },
+                  { t: foyer ? 'En famille (' + foyer.adultes + ' adultes, ' + foyer.enfants.length + ' enfants)' : 'En famille', v: 'kids' }],
               lit: (t) => /seul|personne/.test(t) ? {} : /conjoint|mari|femme|epouse|compagn/.test(t) ? { v: 'restaurant' }
                         : /famille|enfant/.test(t) ? { v: 'kids' } : null }
-          : { q: 'Un espace de travail dans l\u2019hôtel, ou ça n\u2019a pas d\u2019importance ?',
+          : { q: 'Aurez-vous besoin d\u2019un espace de travail à l\u2019hôtel ?',
               r: [{ t: 'Un espace de travail', v: 'workspace' }, { t: 'Une salle de réunion', v: 'meeting-room' },
-                  { t: 'Peu importe' }],
+                  { t: 'Sans préférence' }],
               lit: (t) => /travail|bureau|coworking/.test(t) ? { v: 'workspace' }
                         : /reunion|salle/.test(t) ? { v: 'meeting-room' }
-                        : /peu importe|indifferent/.test(t) ? {} : null });
+                        : /peu importe|indifferent|sans preference|aucune preference|pas besoin/.test(t) ? {} : null });
         return tous;
       }
 
@@ -4603,7 +4603,7 @@
     _agentSynthese() {
       const st = this.state;
       const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-      const quoi = { pro: 'vous partez en déplacement professionnel',
+      const quoi = { pro: 'vous préparez un déplacement professionnel',
                      event: 'vous organisez un séminaire',
                      escapade: 'vous préparez un séjour',
                      guide: 'vous cherchez encore votre prochaine destination' };
@@ -4611,7 +4611,10 @@
 
       const lieu = st.businessLocation && st.businessLocation !== '__ouvert__'
         ? st.businessLocation : (st.destinationInput || null);
-      if (lieu) p += ' à ' + lieu;
+      // « Vous vous rendez à Singapour pour un déplacement professionnel » plutôt que « vous
+      // partez en déplacement professionnel à Singapour » : la destination d'abord.
+      if (lieu && st.selectedStayType === 'pro') p = 'vous vous rendez à ' + lieu + ' pour un déplacement professionnel';
+      else if (lieu) p += ' à ' + lieu;
 
       if (st.checkInDate && st.checkOutDate) {
         const a1 = new Date(st.checkInDate), a2 = new Date(st.checkOutDate);
@@ -4625,7 +4628,7 @@
         } else {
           p += ', du ' + jour(a1.getDate()) + (a1.getMonth() === a2.getMonth() ? '' : ' ' + MOIS[a1.getMonth()])
              + ' au ' + jour(a2.getDate()) + ' ' + MOIS[a2.getMonth()]
-             + (nuits > 0 ? ' — ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') : '');
+             + (nuits > 0 ? ', soit ' + nuits + ' nuit' + (nuits > 1 ? 's' : '') : '');
         }
       } else if (st.selectedMonth) {
         // Un mois ou une plage. Les valeurs d'état n'ont pas d'accents (« decembre ») :
@@ -4889,9 +4892,12 @@
         ? this.state.userProfile.firstName : null;
       // Une seule bulle : couper la reprise de la question en deux messages faisait
       // deux prises de parole là où il n'y en a qu'une.
+      // Un maître d'hôtel salue, puis reprend ce qu'on lui a confié — sans « je comprends
+      // que », qui fait procès-verbal.
+      const synthese = this._agentSynthese();
       this.state.agentThread = [{ qui: 'agent',
-        texte: (prenom ? prenom + ', je comprends que ' : 'Je comprends que ')
-             + this._agentSynthese() + ' ' + tours[0].q }];
+        texte: (prenom ? 'Bonjour ' + prenom + '. ' : 'Bonjour. ')
+             + synthese.charAt(0).toUpperCase() + synthese.slice(1) + ' ' + tours[0].q }];
     }
 
     _agentRepondre(texte, choix) {
@@ -4916,7 +4922,7 @@
         const lu = this._agentLire(texte);
         lu.criteres.forEach(retenir);
         if (lu.dits.length) {
-          accuse = 'Entendu, je ne garde que des hôtels ' + lu.dits.join(' et ') + '.';
+          accuse = 'Entendu. Je ne retiendrai que des hôtels ' + lu.dits.join(' et ') + '.';
         }
         // La question du tour a-t-elle sa réponse dans ce qui vient d'être écrit ?
         const rep = tour && tour.lit ? tour.lit(t) : null;
@@ -4936,8 +4942,8 @@
             // qu'on ne sait pas —, et on passe la main à qui pourra trancher.
             const question = /\?\s*$/.test(texte.trim());
             accuse = question
-              ? 'Bonne question. Je ne peux pas vous le confirmer ici, mais l\u2019hôtel le pourra — je transmets le point avec votre demande.'
-              : 'Très bien, je garde ça de côté.';
+              ? 'C\u2019est une excellente question. Je ne peux vous le confirmer ici, mais l\u2019hôtel saura vous répondre : je lui transmettrai votre demande.'
+              : 'Je vous remercie de cette précision.';
             this.state.agentNotes = (this.state.agentNotes || []).concat(texte);
           }
         }
@@ -4958,7 +4964,7 @@
         if (!avance && tour) {
           // Recadrage : on accuse réception, puis on repose la question restée en
           // suspens. Sans ça l'agent enchaînait comme si on lui avait répondu.
-          dit = accuse + ' Reste à savoir : ' + tour.q.charAt(0).toLowerCase() + tour.q.slice(1);
+          dit = accuse + ' Pour en revenir à ma question : ' + tour.q.charAt(0).toLowerCase() + tour.q.slice(1);
         } else if (suivant) {
           dit = (accuse ? accuse + ' ' : '') + suivant.q;
         } else {
