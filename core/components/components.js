@@ -6272,10 +6272,6 @@
                 <input type="text" class="wd-discovery-modal__form-input" id="businessLocationInput" aria-label="Dans quelle ville ou région ?" placeholder="Ex: Paris, Lyon, Singapour..." value="${this.state.businessLocation === '__ouvert__' ? '' : (this.state.businessLocation || '')}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="businessLocationList" />
                 <ul class="wd-discovery-modal__autocomplete-list" id="businessLocationList" role="listbox" hidden></ul>
               </div>
-              <!-- On ne demande plus « avez-vous une idée de destination ? » : pour un
-                   déplacement la réponse est toujours oui, et la question coûtait un écran
-                   à la majorité. Elle devient une sortie pour la minorité qui hésite. -->
-              <button type="button" class="wd-discovery-modal__chip wd-discovery-modal__chip--ouvert${this.state.businessLocation === '__ouvert__' ? ' is-selected' : ''}" data-stub-value="__ouvert__" data-stub-field="businessLocation">Je n\u2019ai pas encore décidé</button>
               ${(() => {
                 // Suggestions : un clic choisit la ville et fait avancer, comme la puce.
                 const sug = this._suggestionsDestinations();
@@ -6299,6 +6295,11 @@
                 </div>
               </section>`;
               })()}
+              <!-- Sous les suggestions : la sortie pour qui n'a trouvé ni dans le champ ni
+                   dans le carrousel. On ne demande plus « avez-vous une idée de destination ? » : pour un
+                   déplacement la réponse est toujours oui, et la question coûtait un écran
+                   à la majorité. Elle devient une sortie pour la minorité qui hésite. -->
+              <button type="button" class="wd-discovery-modal__chip wd-discovery-modal__chip--ouvert${this.state.businessLocation === '__ouvert__' ? ' is-selected' : ''}" data-stub-value="__ouvert__" data-stub-field="businessLocation">Je n\u2019ai pas encore décidé</button>
             </div>
 
             <div class="wd-discovery-modal__footer">

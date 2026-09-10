@@ -2561,3 +2561,8 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   color: #445047;
 }
 .wd-discovery-modal__sugg-tete { margin-bottom: 14px; }
+
+/* « Je n'ai pas encore décidé » passe sous le carrousel : c'est la sortie pour qui n'a
+   rien trouvé au-dessus. Il garde de l'air après les cartes. */
+.wd-discovery-modal__sugg + .wd-discovery-modal__chip--ouvert,
+.wd-discovery-modal__sugg ~ .wd-discovery-modal__chip--ouvert { margin-top: 24px; }
