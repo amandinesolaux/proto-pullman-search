@@ -2743,3 +2743,29 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-discovery-modal__day.is-in-range { background: rgba(95, 239, 145, 0.20); }
 .wd-discovery-modal__dp .wd-discovery-modal__day.is-preview-end { background: rgba(95, 239, 145, 0.20); }
 .wd-discovery-modal__day:hover:not(:disabled):not(.is-start):not(.is-end):not(.is-single) { background: rgba(95, 239, 145, 0.18); }
+
+/* ── Les champs ont l'air de champs ─────────────────────────────────────────────
+   Gris clair sur la modale blanche, bordure presque invisible : le champ destination
+   avait l'allure d'un champ désactivé, alors qu'il était parfaitement actif. Fond
+   blanc, bordure visible (un gris teinté de kaki), qui passe au kaki au survol et à
+   la saisie. Le champ destination prend une loupe à gauche : elle dit « tapez ici ».
+   Le champ des dates suit, puisqu'il reprend l'aspect du champ destination. */
+.wd-discovery-modal__form-input,
+.wd-discovery-modal__form-select {
+  background-color: #ffffff;
+  border-color: #b9c1bb;
+}
+.wd-discovery-modal__form-input:hover,
+.wd-discovery-modal__form-select:hover { border-color: #445047; }
+
+.wd-discovery-modal__autocomplete .wd-discovery-modal__form-input {
+  padding-left: 46px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23445047' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  background-size: 20px 20px;
+}
+
+.wd-discovery-modal__dates-champ { background: #ffffff; border-color: #b9c1bb; }
+.wd-discovery-modal__dates-champ:hover { border-color: #445047; }
+.wd-discovery-modal__dates-champ.is-open { border-color: #445047; }
