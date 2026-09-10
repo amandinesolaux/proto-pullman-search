@@ -2903,3 +2903,211 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 .wd-agent__services-valider:hover:not(:disabled) { background: #2f3a33; }
 .wd-agent__services-valider:disabled { background: #d9ded9; color: #8a948c; cursor: default; }
+
+/* ── Agent : les cards hôtel de la réponse ────────────────────────────────────────
+   Même anatomie que la card de la carte : la galerie, qu'on fait défiler sans quitter
+   la conversation ; le nom, le lieu et la note ; les services de l'hôtel, ceux que
+   l'échange a demandés en tête, pleins et cochés ; puis le prix de la nuit et les deux
+   sorties. Plus large que l'ancienne vignette : quand il y en a plusieurs, la suivante
+   dépasse du bord pour dire qu'il y a de quoi faire défiler. */
+.wd-agent__carrousel--hotels { gap: 12px; scroll-snap-type: x mandatory; }
+.wd-agent__hotel {
+  flex: 0 0 min(300px, 88%);
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #445047;
+  scroll-snap-align: start;
+}
+.wd-agent__hotel:only-child { flex-basis: min(360px, 100%); }
+.wd-agent__hotel-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #E3EAE4;
+}
+.wd-agent__hotel-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.wd-agent__hotel-img[data-on] { opacity: 1; }
+.wd-agent__hotel-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  margin-top: -15px;
+  padding: 0;
+  border: 0;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, .92);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.wd-agent__hotel-nav--prec { left: 8px; }
+.wd-agent__hotel-nav--suiv { right: 8px; }
+.wd-agent__hotel-nav::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-left: 1.8px solid #445047;
+  border-bottom: 1.8px solid #445047;
+}
+.wd-agent__hotel-nav--prec::before { transform: translate(-30%, -50%) rotate(45deg); }
+.wd-agent__hotel-nav--suiv::before { transform: translate(-70%, -50%) rotate(-135deg); }
+.wd-agent__hotel-media:hover .wd-agent__hotel-nav,
+.wd-agent__hotel-nav:focus-visible { opacity: 1; }
+.wd-agent__hotel-nav:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+@media (hover: none) { .wd-agent__hotel-nav { opacity: 1; } }
+.wd-agent__hotel-points {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.wd-agent__hotel-point {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, .55);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  cursor: pointer;
+  transition: width .2s ease, background .2s ease;
+}
+.wd-agent__hotel-point[data-on] { width: 16px; background: #ffffff; }
+
+.wd-agent__hotel-corps {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 16px;
+}
+.wd-agent__hotel-nom {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21px;
+}
+.wd-agent__hotel-nom a { color: inherit; text-decoration: none; }
+.wd-agent__hotel-nom a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.wd-agent__hotel-lieu {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(68, 80, 71, .78);
+}
+.wd-agent__hotel-lieu svg { flex-shrink: 0; }
+.wd-agent__hotel-lieu > span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wd-agent__hotel-note {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 2px 7px;
+  background: #445047;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.wd-agent__hotel-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.wd-agent__hotel-services li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: #EDF2EE;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  color: #445047;
+  white-space: nowrap;
+}
+.wd-agent__hotel-services li.is-demande { background: #445047; font-weight: 600; color: #ffffff; }
+.wd-agent__hotel-services li.wd-agent__hotel-plus {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px #BCCABE;
+  color: rgba(68, 80, 71, .78);
+  cursor: default;
+}
+.wd-agent__hotel-pied {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #E2E8E3;
+}
+.wd-agent__hotel-prix {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 700;
+  color: #445047;
+}
+.wd-agent__hotel-prix span { font-size: 12px; font-weight: 400; color: rgba(68, 80, 71, .78); }
+.wd-agent__hotel-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.wd-agent__hotel-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: #445047;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: gap .15s ease;
+}
+.wd-agent__hotel-lien:hover { gap: 9px; }
+.wd-agent__hotel-reserver {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  border: 1px solid #445047;
+  border-radius: 100px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #445047;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.wd-agent__hotel-reserver:hover { background: #445047; color: #ffffff; }
+.wd-agent__hotel-lien:focus-visible,
+.wd-agent__hotel-reserver:focus-visible,
+.wd-agent__hotel-point:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .wd-agent__hotel-img,
+  .wd-agent__hotel-nav,
+  .wd-agent__hotel-point,
+  .wd-agent__hotel-lien { transition: none; }
+}

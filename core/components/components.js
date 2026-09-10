@@ -4930,7 +4930,7 @@
 
       return retenus.slice(0, 6).map(h => ({ titre: h.name, sous: h.city + ' \u00b7 ' + h.country,
         detail: (h.rating ? h.rating + '/10' : '') + (h.price ? ' \u00b7 dès ' + h.price + ' €' : ''),
-        img: photo(h.img), href: h.href || null }));
+        img: photo(h.img), href: h.href || null, hotel: h }));
     }
 
     // Fin du parcours : la liste complète, filtrée par ce que l'échange a produit.
@@ -4964,8 +4964,70 @@
       // partie de sa réponse. Posé en dessous, il devenait un encart qui n'appartenait
       // plus à l'échange.
       const props = fini ? this._agentPropositions() : [];
+      // Hôtels : la card reprend l'anatomie de celle de la carte. La galerie d'abord, qu'on
+      // fait défiler sans quitter l'échange ; le nom, le lieu et la note ; les services de
+      // l'hôtel, ceux que la conversation a demandés en tête et cochés ; puis le prix de la
+      // nuit et les deux sorties, la fiche et la réservation — aux dates choisies. Salles et
+      // tables gardent leur vignette.
+      const SERVICES_HOTEL = { spa: 'Spa', restaurant: 'Restaurant', meeting: 'Salles de réunion',
+        family: 'Espace enfants', pool: 'Piscine', gym: 'Salle de sport', bar: 'Bar',
+        breakfast: 'Petit-déjeuner', beach: 'Bord de mer', parking: 'Parking', pets: 'Animaux acceptés' };
+      const versService = { spa: 'spa', restaurant: 'restaurant', 'meeting-room': 'meeting',
+        kids: 'family', pets: 'pets', beach: 'beach' };
+      const demandes = (st.selectedTypes || []).map(c => versService[c]).filter(Boolean);
+      const nuits = (st.checkInDate && st.checkOutDate)
+        ? Math.max(0, Math.round((new Date(st.checkOutDate) - new Date(st.checkInDate)) / 864e5)) : 0;
+      const carteHotel = (h) => {
+        const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
+        const cles = (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [String(h.img || '').split(':')[0]]).filter(Boolean).slice(0, 6);
+        const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=640');
+        const PIN = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+        const COCHE = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
+        const FLECHE = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+        const services = Object.keys(SERVICES_HOTEL).filter(id => (h.amenities || []).indexOf(id) >= 0);
+        const ordre = services.filter(id => demandes.indexOf(id) >= 0)
+          .concat(services.filter(id => demandes.indexOf(id) < 0));
+        const visibles = ordre.slice(0, 5);
+        const caches = ordre.slice(visibles.length);
+        const reserver = window.WD_ALL_BOOKING_URL
+          ? window.WD_ALL_BOOKING_URL(h, { checkin: st.checkInDate, nights: nuits,
+              // Seul, aucun nombre n'est donné : c'est un voyageur, et ALL doit le savoir.
+              guests: st.agentPersonnes || (st.agentAccompagne && st.agentAccompagne !== 'accompagne' ? 1 : 0) }) : null;
+        const pays = h.country && h.country !== h.city ? ', ' + esc(h.country) : '';
+        return '<article class="wd-agent__hotel">'
+          + '<div class="wd-agent__hotel-media"' + (photos.length > 1 ? ' data-agent-galerie' : '') + '>'
+          + photos.map((u, i) => '<img class="wd-agent__hotel-img" src="' + u + '" alt="' + (i === 0 ? esc(h.name) : '') + '"'
+              + (i === 0 ? ' data-on' : ' loading="lazy"') + ' />').join('')
+          + (photos.length > 1
+              ? '<button type="button" class="wd-agent__hotel-nav wd-agent__hotel-nav--prec" data-agent-photo="-1" aria-label="Photo précédente"></button>'
+                + '<button type="button" class="wd-agent__hotel-nav wd-agent__hotel-nav--suiv" data-agent-photo="1" aria-label="Photo suivante"></button>'
+                + '<div class="wd-agent__hotel-points">' + photos.map((u, i) =>
+                    '<button type="button" class="wd-agent__hotel-point" data-agent-point="' + i + '"' + (i === 0 ? ' data-on' : '')
+                    + ' aria-label="Photo ' + (i + 1) + ' sur ' + photos.length + '"></button>').join('') + '</div>'
+              : '')
+          + '</div>'
+          + '<div class="wd-agent__hotel-corps">'
+          + '<h4 class="wd-agent__hotel-nom">' + (h.href
+              ? '<a href="' + esc(h.href) + '" target="_blank" rel="noopener">' + esc(h.name) + '</a>' : esc(h.name)) + '</h4>'
+          + '<p class="wd-agent__hotel-lieu">' + PIN + '<span>' + esc(h.city || '') + pays + '</span>'
+          + (h.rating ? '<span class="wd-agent__hotel-note" aria-label="Note ' + esc(h.rating) + ' sur 10">' + esc(h.rating) + '</span>' : '') + '</p>'
+          + (visibles.length
+              ? '<ul class="wd-agent__hotel-services" aria-label="Services de l’hôtel">'
+                + visibles.map(id => demandes.indexOf(id) >= 0
+                    ? '<li class="is-demande">' + COCHE + esc(SERVICES_HOTEL[id]) + '</li>'
+                    : '<li>' + esc(SERVICES_HOTEL[id]) + '</li>').join('')
+                + (caches.length ? '<li class="wd-agent__hotel-plus" title="' + esc(caches.map(id => SERVICES_HOTEL[id]).join(', ')) + '">+' + caches.length + '</li>' : '')
+                + '</ul>'
+              : '')
+          + '<div class="wd-agent__hotel-pied">'
+          + (h.price ? '<p class="wd-agent__hotel-prix"><span>dès</span> ' + esc(h.price) + ' € <span>/ nuit</span></p>' : '')
+          + '<div class="wd-agent__hotel-actions">'
+          + (h.href ? '<a class="wd-agent__hotel-lien" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel ' + FLECHE + '</a>' : '')
+          + (reserver ? '<a class="wd-agent__hotel-reserver" href="' + esc(reserver) + '" target="_blank" rel="noopener">Réserver</a>' : '')
+          + '</div></div></div></article>';
+      };
       const carrousel = props.length
-        ? '<div class="wd-agent__carrousel">' + props.map(p =>
+        ? '<div class="wd-agent__carrousel' + (props.some(p => p.hotel) ? ' wd-agent__carrousel--hotels' : '') + '">' + props.map(p => p.hotel ? carteHotel(p.hotel) :
             (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
                     : '<div class="wd-agent__prop">') +
               (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
@@ -7797,6 +7859,31 @@
             const choix = tour && tour.r[Number(btn.dataset.agentReply)];
             if (choix) this._agentRepondre(choix.t, choix);
           });
+        });
+
+        // Galeries des cards hôtel : chevrons et points font défiler les photos sans quitter
+        // la conversation. Liées ici plutôt qu'au gestionnaire de la carte, qui n'est pas
+        // chargé sur toutes les pages où l'assistant s'ouvre.
+        this.querySelectorAll('[data-agent-galerie]').forEach(media => {
+          const photos = [...media.querySelectorAll('.wd-agent__hotel-img')];
+          const points = [...media.querySelectorAll('.wd-agent__hotel-point')];
+          let courant = 0;
+          const montrer = (i) => {
+            courant = (i + photos.length) % photos.length;
+            photos.forEach((im, k) => {
+              if (k === courant) { im.removeAttribute('loading'); im.setAttribute('data-on', ''); }
+              else im.removeAttribute('data-on');
+            });
+            points.forEach((pt, k) => k === courant ? pt.setAttribute('data-on', '') : pt.removeAttribute('data-on'));
+          };
+          media.querySelectorAll('[data-agent-photo]').forEach(b => b.addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            montrer(courant + Number(b.dataset.agentPhoto));
+          }));
+          points.forEach((pt, k) => pt.addEventListener('click', (e) => {
+            e.preventDefault(); e.stopPropagation();
+            montrer(k);
+          }));
         });
 
         // Services : un clic coche ou décoche un visuel du mur, puis « Valider ma sélection ». La bulle de la
