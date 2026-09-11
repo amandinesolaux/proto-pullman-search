@@ -2905,14 +2905,15 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__services-valider:disabled { background: #d9ded9; color: #8a948c; cursor: default; }
 
 /* ── Agent : les cards hôtel de la réponse ────────────────────────────────────────
-   Même anatomie que la card de la carte : la galerie, qu'on fait défiler sans quitter
-   la conversation ; le nom, le lieu et la note ; les services de l'hôtel, ceux que
-   l'échange a demandés en tête, pleins et cochés ; puis le prix de la nuit et les deux
-   sorties. Deux cards tiennent côte à côte dans la bulle, même quand il n'y en a qu'une :
-   pleine largeur, elle écrasait la réponse. Au-delà de deux, le carrousel défile. */
+   Taille et anatomie de la card de la carte (264 px) : la galerie en 16:9, qu'on fait
+   défiler sans quitter la conversation ; le nom, le lieu et la note ; les services en
+   étiquettes, ceux que l'échange a demandés en tête, pleins et cochés ; puis le prix de la
+   nuit et les deux sorties. Une card et demie tient dans la bulle : la suivante dépasse du
+   bord, et le carrousel défile. */
 .wd-agent__carrousel--hotels { gap: 12px; scroll-snap-type: x mandatory; }
 .wd-agent__hotel {
-  flex: 0 0 calc((100% - 12px) / 2);
+  flex: 0 0 264px;
+  max-width: 86%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -2922,9 +2923,9 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 .wd-agent__hotel-media {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: #E3EAE4;
+  background: #E7EDE8;
 }
 .wd-agent__hotel-img {
   position: absolute;
@@ -2936,38 +2937,38 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   transition: opacity .25s ease;
 }
 .wd-agent__hotel-img[data-on] { opacity: 1; }
+/* Chevrons de la card de la carte : discrets, révélés au survol de la photo. */
 .wd-agent__hotel-nav {
   position: absolute;
-  top: 50%;
+  top: 0;
+  bottom: 0;
   z-index: 2;
-  width: 26px;
-  height: 26px;
-  margin-top: -13px;
+  width: 34px;
   padding: 0;
   border: 0;
-  border-radius: 100px;
-  background: rgba(255, 255, 255, .92);
+  background: transparent;
   cursor: pointer;
   opacity: 0;
   transition: opacity .2s ease;
 }
-.wd-agent__hotel-nav--prec { left: 6px; }
-.wd-agent__hotel-nav--suiv { right: 6px; }
+.wd-agent__hotel-nav--prec { left: 0; }
+.wd-agent__hotel-nav--suiv { right: 0; }
 .wd-agent__hotel-nav::before {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px;
-  height: 6px;
-  border-left: 1.8px solid #445047;
-  border-bottom: 1.8px solid #445047;
+  width: 8px;
+  height: 8px;
+  border-left: 1.8px solid #ffffff;
+  border-bottom: 1.8px solid #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .6));
 }
-.wd-agent__hotel-nav--prec::before { transform: translate(-30%, -50%) rotate(45deg); }
-.wd-agent__hotel-nav--suiv::before { transform: translate(-70%, -50%) rotate(-135deg); }
+.wd-agent__hotel-nav--prec::before { transform: translate(-40%, -50%) rotate(45deg); }
+.wd-agent__hotel-nav--suiv::before { transform: translate(-60%, -50%) rotate(-135deg); }
 .wd-agent__hotel-media:hover .wd-agent__hotel-nav,
 .wd-agent__hotel-nav:focus-visible { opacity: 1; }
-.wd-agent__hotel-nav:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+.wd-agent__hotel-nav:focus-visible { outline: 2px solid #ffffff; outline-offset: -4px; }
 @media (hover: none) { .wd-agent__hotel-nav { opacity: 1; } }
 .wd-agent__hotel-points {
   position: absolute;
@@ -2977,7 +2978,7 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   z-index: 2;
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
 }
 .wd-agent__hotel-point {
   width: 5px;
@@ -2985,8 +2986,8 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   padding: 0;
   border: 0;
   border-radius: 100px;
-  background: rgba(255, 255, 255, .55);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  background: rgba(255, 255, 255, .5);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .45);
   cursor: pointer;
   transition: width .2s ease, background .2s ease;
 }
@@ -2996,22 +2997,22 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 12px 12px 14px;
+  gap: 5px;
+  padding: 11px 14px 12px;
 }
-/* Deux lignes au plus, réservées : les noms de deux cards voisines n'ont pas la même
-   longueur, et leurs lieux doivent pourtant tomber à la même hauteur. */
+/* Deux lignes au plus, réservées : les lieux de deux cards voisines tombent à la même
+   hauteur, quelle que soit la longueur des noms. */
 .wd-agent__hotel-nom {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  min-height: 36px;
+  min-height: 34px;
   margin: 0;
   overflow: hidden;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 18px;
+  line-height: 17px;
 }
 .wd-agent__hotel-nom a { color: inherit; text-decoration: none; }
 .wd-agent__hotel-nom a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -3022,10 +3023,10 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   min-width: 0;
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(68, 80, 71, .78);
 }
-.wd-agent__hotel-lieu svg { flex-shrink: 0; }
+.wd-agent__hotel-lieu svg { flex-shrink: 0; width: 11px; height: 11px; }
 .wd-agent__hotel-lieu > span:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .wd-agent__hotel-note {
   flex-shrink: 0;
@@ -3040,85 +3041,83 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   padding: 0;
   list-style: none;
 }
 .wd-agent__hotel-services li {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   max-width: 100%;
-  padding: 3px 8px;
-  border-radius: 100px;
-  background: #EDF2EE;
+  padding: 2px 7px;
+  background: rgba(68, 80, 71, .08);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  line-height: 15px;
+  line-height: 14px;
   color: #445047;
   white-space: nowrap;
 }
+.wd-agent__hotel-services li svg { width: 9px; height: 9px; }
 .wd-agent__hotel-services li.is-demande { background: #445047; font-weight: 600; color: #ffffff; }
 .wd-agent__hotel-services li.wd-agent__hotel-plus {
   background: transparent;
-  box-shadow: inset 0 0 0 1px #BCCABE;
+  box-shadow: inset 0 0 0 1px rgba(68, 80, 71, .28);
   color: rgba(68, 80, 71, .78);
   cursor: default;
 }
 .wd-agent__hotel-pied {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
   margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid #E2E8E3;
+  padding-top: 9px;
+  border-top: 1px solid #BCCABE;
 }
 .wd-agent__hotel-prix {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 700;
+  line-height: 1;
   color: #445047;
 }
-.wd-agent__hotel-prix span { font-size: 11px; font-weight: 400; color: rgba(68, 80, 71, .78); }
-/* Empilées : côte à côte, le lien et la pilule ne tiennent pas dans une demi-bulle.
-   « Réserver » d'abord, sur toute la largeur ; « Voir l'hôtel » dessous. */
-.wd-agent__hotel-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
-.wd-agent__hotel-reserver {
-  order: -1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 7px 12px;
-  border: 1px solid #445047;
-  border-radius: 100px;
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 600;
-  color: #445047;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background .15s ease, color .15s ease;
-}
-.wd-agent__hotel-reserver:hover { background: #445047; color: #ffffff; }
+.wd-agent__hotel-prix span { font-size: 10.5px; font-weight: 400; color: rgba(68, 80, 71, .78); }
+.wd-agent__hotel-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
 .wd-agent__hotel-lien {
-  align-self: center;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: #445047;
   text-decoration: none;
   white-space: nowrap;
   transition: gap .15s ease;
 }
-.wd-agent__hotel-lien:hover { gap: 8px; }
+.wd-agent__hotel-lien:hover { gap: 9px; }
+.wd-agent__hotel-reserver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border: 1px solid #445047;
+  border-radius: 100px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: #445047;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+.wd-agent__hotel-reserver:hover { background: #445047; color: #ffffff; }
 .wd-agent__hotel-lien:focus-visible,
 .wd-agent__hotel-reserver:focus-visible,
 .wd-agent__hotel-point:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+.wd-agent__hotel.is-localise { outline: 2px solid #445047; outline-offset: -2px; }
 @media (prefers-reduced-motion: reduce) {
   .wd-agent__hotel-img,
   .wd-agent__hotel-nav,
@@ -3127,10 +3126,10 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 
 /* ── Agent : situer les hôtels proposés ─────────────────────────────────────────
-   Sous les cards, « Voir sur la carte » ouvre une carte dans la bulle. Chaque pin porte
-   le numéro de sa card ; ce numéro n'apparaît sur les photos que carte ouverte, où il
-   sert de légende. Pins kaki cerclés de blanc, le pin choisi s'inverse ; la card
-   correspondante prend un filet kaki. */
+   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, dans l'habit de
+   celle de la homepage : fond Esri sombre, pins verts nommés (styles de booking-map.js),
+   boutons de zoom sombres. Les points d'intérêt majeurs de la ville s'y ajoutent à la
+   manière d'Airbnb, un cran sous les hôtels ; une légende sous la carte distingue les deux. */
 .wd-agent__localiser {
   display: flex;
   flex-direction: column;
@@ -3158,58 +3157,130 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__carte-bascule:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
 .wd-agent__carte {
   align-self: stretch;
-  height: 240px;
-  background: #E3EAE4;
+  height: 320px;
+  background: #1a1f1c;
 }
-.wd-agent__carte .leaflet-bar { border: 0; box-shadow: 0 1px 4px rgba(0, 0, 0, .2); }
-.wd-agent__carte .leaflet-bar,
-.wd-agent__carte .leaflet-bar a { border-radius: 0; }
-.wd-agent__carte .leaflet-bar a { color: #445047; }
-.wd-agent__pin span {
+.wd-agent__carte .leaflet-control-zoom { border: none; border-radius: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+.wd-agent__carte .leaflet-control-zoom a {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 0;
+  background: #1a2220;
+  font-size: 14px;
+  line-height: 28px;
+  color: #ffffff;
+}
+.wd-agent__carte .leaflet-control-zoom a:hover { background: #243330; color: #ffffff; }
+/* Points d'intérêt, à la manière d'Airbnb transposée sur le fond sombre : les emblèmes en
+   dessins clairs au trait, leur nom dessous ; musées et spectacles sur des pins saumon, lieux
+   de culte sur des pins ambre, shopping sur des pins violets — le nom dans la même teinte ;
+   les parcs en toutes lettres, vert tendre ; les transports en petits badges gris. */
+.wd-agent__poi-nom {
+  position: absolute;
+  left: 30px;
+  top: 12px;
+  transform: translateY(-50%);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(255, 255, 255, .88);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 0 2px rgba(0, 0, 0, .7);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity .15s ease;
+}
+.wd-agent__poi-nom.is-masque { opacity: 0; }
+.wd-agent__poi { transition: opacity .15s ease; }
+.wd-agent__poi.is-cache { opacity: 0; pointer-events: none; }
+.wd-agent__poi:hover { z-index: 9000 !important; }
+.wd-agent__poi:hover .wd-agent__poi-nom { opacity: 1; }
+
+.wd-agent__poi-embleme {
+  display: block;
+  width: 30px;
+  height: 30px;
+  color: #F4F1EA;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .85));
+}
+.wd-agent__poi-embleme svg { display: block; width: 30px; height: 30px; }
+.wd-agent__poi--embleme .wd-agent__poi-nom {
+  left: 50%;
+  top: 33px;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: #F4F1EA;
+}
+
+.wd-agent__poi-pin {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 100px;
-  background: #445047;
-  box-shadow: 0 0 0 2px #ffffff, 0 2px 6px rgba(0, 0, 0, .3);
-  font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
+  background: #F08A6C;
+  box-shadow: 0 0 0 1.5px #ffffff, 0 2px 5px rgba(0, 0, 0, .45);
   color: #ffffff;
-  transition: transform .15s ease, background .15s ease, color .15s ease;
 }
-.wd-agent__pin.is-actif span {
-  background: #ffffff;
-  box-shadow: 0 0 0 2px #445047, 0 2px 8px rgba(0, 0, 0, .35);
-  color: #445047;
-  transform: scale(1.18);
-}
-.wd-agent__hotel-numero {
+.wd-agent__poi-pin::after {
+  content: '';
   position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 2;
-  display: none;
+  left: 50%;
+  bottom: -6px;
+  margin-left: -4px;
+  border-top: 5px solid #ffffff;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+.wd-agent__poi-pin svg { width: 13px; height: 13px; }
+.wd-agent__poi--musee .wd-agent__poi-nom,
+.wd-agent__poi--spectacle .wd-agent__poi-nom { color: #FFB199; }
+.wd-agent__poi--culte .wd-agent__poi-pin { background: #D29B35; }
+.wd-agent__poi--culte .wd-agent__poi-nom { color: #F2C879; }
+.wd-agent__poi--shopping .wd-agent__poi-pin { background: #8F7BEF; }
+.wd-agent__poi--shopping .wd-agent__poi-nom { color: #C6B9FF; }
+
+.wd-agent__poi-feuille { display: flex; width: 14px; height: 14px; color: #8FD19E; }
+.wd-agent__poi-feuille svg { width: 14px; height: 14px; }
+.wd-agent__poi--parc .wd-agent__poi-nom { left: 18px; top: 7px; font-weight: 500; color: #8FD19E; }
+
+.wd-agent__poi-badge {
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 100px;
-  background: #445047;
-  box-shadow: 0 0 0 1.5px #ffffff;
-  font-family: var(--font-sans);
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
+  width: 18px;
+  height: 18px;
+  background: #39433F;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .5);
   color: #ffffff;
 }
-.wd-agent__carrousel--hotels.is-carte .wd-agent__hotel-numero { display: flex; }
-.wd-agent__hotel.is-localise { outline: 2px solid #445047; outline-offset: -2px; }
+.wd-agent__poi-badge svg { width: 11px; height: 11px; }
+.wd-agent__poi--transport .wd-agent__poi-nom {
+  left: 23px;
+  top: 9px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .72);
+}
+.wd-agent__carte-legende {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: rgba(68, 80, 71, .78);
+}
+.wd-agent__carte-legende[hidden] { display: none; }
+.wd-agent__carte-cle { display: inline-flex; align-items: center; gap: 6px; }
+.wd-agent__carte-cle::before { content: ''; width: 10px; height: 10px; border-radius: 100px; }
+.wd-agent__carte-cle--hotel::before { background: #5FEF91; box-shadow: 0 0 0 2px #1a2220; }
+.wd-agent__carte-cle--poi::before { background: #F08A6C; }
 @media (prefers-reduced-motion: reduce) {
-  .wd-agent__pin span,
+  .wd-agent__poi-nom,
   .wd-agent__carte-bascule { transition: none; }
 }
