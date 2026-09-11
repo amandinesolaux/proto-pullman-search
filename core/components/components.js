@@ -446,7 +446,7 @@
       { name: "Pullman London St Pancras", loc: "Londres, Royaume-Uni", lat: 51.5305, lng: -0.1240, stars: 5, price: 289, region: "europe", tags: ["business", "culture", "luxury"], services: ["gym", "restaurant", "bar", "meeting-room", "business-center", "concierge", "valet", "wifi", "room-service", "laundry", "pet-friendly"], img: "https://m.ahstatic.com/is/image/accorhotels/PullmanHeritageImage:6by5?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
       { name: "Pullman Barcelona Skipper", loc: "Barcelone, Espagne", lat: 41.3851, lng: 2.1994, stars: 5, price: 219, region: "europe", tags: ["beach", "gastro", "romance"], services: ["pool", "spa", "gym", "restaurant", "bar", "rooftop", "terrace", "wifi", "room-service", "concierge", "bike-rental", "pet-friendly"], img: "https://m.ahstatic.com/is/image/accorhotels/pullman-dinner-2:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
       { name: "Pullman Dubai Creek City Centre", loc: "Dubaï, EAU", lat: 25.2532, lng: 55.3320, stars: 5, price: 199, region: "moyen-orient", tags: ["luxury", "business", "family"], services: ["pool", "spa", "gym", "restaurant", "bar", "rooftop", "meeting-room", "business-center", "kids-club", "concierge", "valet", "wifi", "room-service", "shuttle", "laundry"], img: "https://m.ahstatic.com/is/image/accorhotels/6556-1:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
-      { name: "Pullman Singapore Orchard", loc: "Singapour", lat: 1.3048, lng: 103.8318, stars: 5, price: 229, region: "asie", tags: ["business", "luxury", "culture"], services: ["pool", "spa", "gym", "restaurant", "bar", "rooftop", "meeting-room", "business-center", "concierge", "valet", "wifi", "room-service", "laundry", "coworking"], img: "https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
+      { name: "Pullman Singapore Orchard", loc: "Singapour", lat: 1.3033, lng: 103.8363, stars: 5, price: 229, region: "asie", tags: ["business", "luxury", "culture"], services: ["pool", "spa", "gym", "restaurant", "bar", "rooftop", "meeting-room", "business-center", "concierge", "valet", "wifi", "room-service", "laundry", "coworking"], img: "https://m.ahstatic.com/is/image/accorhotels/HCM_P_4528724:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
       { name: "Pullman Nice Côte d'Azur", loc: "Nice, France", lat: 43.6653, lng: 7.2150, stars: 4, price: 185, region: "europe", tags: ["beach", "wellness", "romance"], services: ["pool", "spa", "gym", "restaurant", "bar", "terrace", "parking", "wifi", "room-service", "concierge", "bike-rental"], img: "https://m.ahstatic.com/is/image/accorhotels/aja_p_6409-72:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
       { name: "Pullman Bordeaux Lac", loc: "Bordeaux, France", lat: 44.8799, lng: -0.5640, stars: 4, price: 155, region: "europe", tags: ["gastro", "culture", "eco"], services: ["restaurant", "bar", "terrace", "meeting-room", "parking", "wifi", "room-service", "bike-rental", "ev-charging", "garden"], img: "https://m.ahstatic.com/is/image/accorhotels/aja_p_6783-26:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
       { name: "Pullman Bangkok Hotel G", loc: "Bangkok, Thaïlande", lat: 13.7248, lng: 100.5170, stars: 5, price: 139, region: "asie", tags: ["culture", "gastro", "family"], services: ["pool", "spa", "gym", "restaurant", "bar", "rooftop", "kids-club", "concierge", "wifi", "room-service", "shuttle", "laundry"], img: "https://m.ahstatic.com/is/image/accorhotels/aja_p_7258-60:1by1?fmt=jpg&op_usm=1.75,0.3,2,0&wid=200&hei=140" },
@@ -761,7 +761,7 @@
       { name:'Pullman Kuching', loc:'Kuching, Malaisie', country:'Malaisie', img:'HCM_P_7588157', imgs:['HCM_P_7588157','HCM_P_2208421','HCM_P_6588904','HCM_P_3488026'], href:'https://pullman.accor.com/fr/hotels/kuching-sarawak/6332.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
       { name:'Pullman Miri Waterfront', loc:'Miri, Malaisie', country:'Malaisie', img:'aja_p_3964-04', imgs:['aja_p_3964-04','aja_p_3964-29','aja_p_3964-38','aja_p_3964-22'], href:'https://pullman.accor.com/fr/hotels/miri/9731.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
       { name:'Pullman Singapore Hill Street', loc:'Singapour', country:'Singapour', img:'HCM_P_0020377', imgs:['HCM_P_0020377','aja_p_6825-77','aja_p_6825-78','aja_p_6825-70'], href:'https://pullman.accor.com/fr/hotels/singapore/B5L7.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
-      { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_6600-45', imgs:['aja_p_6600-45','aja_p_6600-46','aja_p_6439-75','aja_p_6547-71'], href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop','family'] },
+      { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_6600-45', imgs:['aja_p_6600-45','aja_p_6600-46','aja_p_6439-75','aja_p_6547-71'], href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop','family','parking'] },
       { name:'Pullman Maldives Maamutaa', loc:'Maldives', country:'Maldives', img:'aja_p_5241-71', imgs:['aja_p_5241-71','aja_p_5379-13','aja_p_6353-68','aja_p_5437-80'], href:'https://pullman.accor.com/fr/hotels/maamutaa-island/9924.html', badge:'NOUVEAU', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden','pets'] },
       { name:'Pullman Luang Prabang', loc:'Luang Prabang, Laos', country:'Laos', img:'aja_p_4935-28', imgs:['aja_p_4935-28','aja_p_4924-73','aja_p_4924-78','aja_p_4924-84'], href:'https://pullman.accor.com/fr/hotels/luang-prabang/9112.html', services:['pool','restaurant','bar','spa','gym','wifi','breakfast','garden','family','kids-club'] },
       { name:'Pullman Seoul', loc:'Séoul, Corée du Sud', country:'Corée du Sud', img:'aja_p_6049-58', imgs:['aja_p_6049-58','aja_p_6049-59','aja_p_6049-53','HCM_P_9986753'], href:'https://pullman.accor.com/fr/hotels/seoul/0966.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
@@ -838,7 +838,8 @@
     "Pullman Berlin Schweizerhof": [52.5033, 13.3317],
     "Pullman Barcelona Skipper": [41.3788, 2.1912],
     "Pullman Budapest": [47.5032, 19.0609],
-    "Pullman Singapore Orchard": [1.3048, 103.8318],
+    "Pullman Singapore Orchard": [1.3033, 103.8363],
+    "Pullman Singapore Hill Street": [1.2937, 103.8506],
     "Pullman Tokyo Tamachi": [35.6478, 139.7472],
     "Pullman Bangkok Hotel G": [13.7248, 100.5315],
     "Pullman Phuket Arcadia": [8.0475, 98.2761],
@@ -1003,6 +1004,18 @@
   const ALL_NAMES = REGION_HOTELS.flatMap(r => r.hotels.map(h => h.name));
   const UNAMBIGUOUS_PREFIX = Object.keys(HOTEL_COORDS)
     .filter(k => ALL_NAMES.filter(n => n.startsWith(k)).length === 1);
+
+  // Parkings publics voisins des hôtels qui n'en ont pas, relevés sur OpenStreetMap
+  // (septembre 2026). L'assistant les montre quand on lui demande si l'hôtel a un parking ;
+  // les distances se calculent depuis la position de l'hôtel.
+  const PARKINGS_VOISINS = {
+    'Pullman Singapore Hill Street': [
+      { nom: 'Capitol Singapore', adresse: '13 Stamford Road', lat: 1.293991, lng: 103.850897 },
+      { nom: 'Peninsula Plaza', adresse: '111 North Bridge Road', lat: 1.292325, lng: 103.85083 },
+      { nom: 'CHIJMES', adresse: '30 Victoria Street', lat: 1.295187, lng: 103.851857 },
+      { nom: 'Funan', adresse: '107 North Bridge Road', lat: 1.291313, lng: 103.849947 }
+    ]
+  };
 
   // Liste canonique, enrichie une seule fois au chargement.
   const WD_HOTELS = (() => {
@@ -4646,6 +4659,8 @@
         stepHistory: [],
         carouselIndex: 2,
         agentThread: [],
+        agentQuestionPosee: false,
+        agentHotelFocus: null,
         agentZone: null,
         agentTurn: 0,
         agentTyping: false,
@@ -4750,6 +4765,8 @@
         proNeeds: [],
         bleisureChoice: null,
         agentThread: [],
+        agentQuestionPosee: false,
+        agentHotelFocus: null,
         agentZone: null,
         agentTurn: 0,
         agentTyping: false,
@@ -5544,15 +5561,35 @@
           + '</div></div>';
       }
       const dernier = (st.agentThread || []).length - 1;
+      // Les cards restent dans la bulle qui les a proposées : les questions posées ensuite
+      // s'ajoutent sous elles sans les emporter.
+      const bulleProps = (st.agentThread || []).map(m => !!m.props).lastIndexOf(true);
+      const indexProps = bulleProps >= 0 ? bulleProps : dernier;
+      // Parkings voisins d'un hôtel qui n'en a pas : la carte — l'hôtel et les parkings —, puis
+      // la liste, les plus proches d'abord. La carte se monte au branchement des événements.
+      const proximiteHTML = (px, i) => '<div class="wd-agent__proximite" data-agent-proximite="' + i + '">'
+        + '<div class="wd-agent__proximite-cadre"><div class="wd-agent__carte wd-agent__proximite-carte"></div>'
+        + '<div class="wd-agent__proximite-legende" aria-hidden="true">'
+        + '<span><span class="wd-agent__legende-hotel"></span>' + esc(px.hotel.nom) + '</span>'
+        + '<span><span class="wd-agent__legende-p">P</span>Parking public</span></div></div>'
+        + '<ol class="wd-agent__proximite-liste" aria-label="Parkings publics voisins du ' + esc(px.hotel.nom) + '">'
+        + px.lieux.map((l, k) =>
+            '<li><button type="button" class="wd-agent__parking" data-agent-parking="' + k + '" aria-pressed="false">'
+            + '<span class="wd-agent__parking-p" aria-hidden="true">P</span>'
+            + '<span class="wd-agent__parking-texte"><span class="wd-agent__parking-nom">' + esc(l.nom) + '</span>'
+            + '<span class="wd-agent__parking-adresse">' + esc(l.adresse) + '</span></span>'
+            + '<span class="wd-agent__parking-distance">' + esc(l.distance) + '<span>' + esc(l.marche) + '</span></span>'
+            + '</button></li>').join('')
+        + '</ol></div>';
 
       let vuAgent = false;
       const fil = (st.agentThread || []).map((m, i) => {
         // L'étiquette une seule fois : la répéter à chaque tour n'apprend rien.
         const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Assistant Pullman</span>') : '';
-        const porte = fini && i === dernier && m.qui === 'agent' && carrousel;
+        const porte = fini && i === indexProps && m.qui === 'agent' && carrousel;
         const porteServices = aCartes && i === dernier && m.qui === 'agent';
-        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + (porteServices ? ' wd-agent__msg--services' : '') + '">'
-          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + (porteServices ? servicesHTML : '') + '</div>';
+        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + (porteServices ? ' wd-agent__msg--services' : '') + (m.proximite ? ' wd-agent__msg--proximite' : '') + '">'
+          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + (porteServices ? servicesHTML : '') + (m.proximite ? proximiteHTML(m.proximite, i) : '') + '</div>';
       }).join('')
       + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="L\u2019assistant écrit"><span></span><span></span><span></span></div>' : '');
       const propositions = (tour && !st.agentTyping && !tour.cartes)
@@ -5567,6 +5604,13 @@
           '</div>'
         : '';
 
+      // Les cards posées, l'échange reste ouvert : quelques questions à portée de clic, jusqu'à
+      // la première posée.
+      const questionsApres = (fini && props.some(p => p.hotel) && !st.agentQuestionPosee && !st.agentTyping)
+        ? '<div class="wd-agent__replies">' + ['Y a-t-il un parking ?', 'Le petit-déjeuner est-il servi ?', 'Les animaux sont-ils acceptés ?']
+            .map(q => '<button type="button" class="wd-agent__reply" data-agent-question>' + q + '</button>').join('') + '</div>'
+        : '';
+
       return `
         <div class="wd-discovery-modal">
           <div class="wd-discovery-modal__content wd-discovery-modal__content--agent">
@@ -5574,10 +5618,11 @@
             <div class="wd-agent">
               <div class="wd-agent__thread" id="wdAgentThread">${fil}</div>
               ${propositions}
+              ${questionsApres}
               ${cloture}
               <form class="wd-agent__composer" id="wdAgentComposer">
-                <textarea class="wd-agent__input" id="wdAgentInput" rows="3" placeholder="Écrire un message…" autocomplete="off" ${fini ? 'disabled' : ''}></textarea>
-                <button type="submit" class="wd-agent__send" aria-label="Envoyer" ${fini ? 'disabled' : ''}>${ICON.arrowR || '→'}</button>
+                <textarea class="wd-agent__input" id="wdAgentInput" rows="3" placeholder="${fini ? 'Une question sur ces hôtels ? Parking, piscine…' : 'Écrire un message…'}" autocomplete="off"></textarea>
+                <button type="submit" class="wd-agent__send" aria-label="Envoyer">${ICON.arrowR || '→'}</button>
               </form>
             </div>
             <div class="wd-discovery-modal__footer">
@@ -5612,6 +5657,8 @@
     _agentRepondre(texte, choix) {
       const tours = this._agentTours();
       const tour = tours[this.state.agentTurn];
+      // Questionnaire terminé : la conversation continue, sur les hôtels proposés.
+      if (!tour) { this._agentQuestionApres(texte); return; }
       this.state.agentThread.push({ qui: 'moi', texte: texte });
 
       // Les réponses alimentent vraiment la recherche : sans cela l'échange serait
@@ -5691,6 +5738,7 @@
         // pendant que les boutons proposaient un nombre de personnes.
         const suivant = this._agentTours()[this.state.agentTurn];
         let dit;
+        let proposition = false;   // la bulle qui porte les cards
         if (!avance && tour) {
           // Recadrage : on accuse réception, puis on repose la question restée en
           // suspens. Sans ça l'agent enchaînait comme si on lui avait répondu.
@@ -5703,13 +5751,111 @@
           // « Excellent choix. Aucun hôtel ne réunit tout… » se contredirait.
           const recap = this._agentRecap();
           dit = (ouverture && !/^(Aucun|Pullman n|Je ne trouve)/.test(recap) ? ouverture + ' ' : '') + recap;
+          proposition = true;
         }
-        this.state.agentThread.push({ qui: 'agent', texte: dit });
+        this.state.agentThread.push(proposition ? { qui: 'agent', texte: dit, props: true } : { qui: 'agent', texte: dit });
         this.state.agentTyping = false;
         this._rerenderContent();
         this._agentDefiler();
         const champ = this.querySelector('#wdAgentInput');
         if (champ && !champ.disabled) champ.focus();
+      }, 700);
+    }
+
+    // Après les propositions, l'échange continue : on interroge l'assistant sur les hôtels
+    // proposés. Il répond sur ce qu'il sait — les services relevés de chaque hôtel —, hôtel par
+    // hôtel. Quand un hôtel n'a pas de parking, il le dit, puis montre les parkings publics
+    // voisins sur une carte. Sur ce qu'il ne sait pas, il ne feint rien : il transmet à l'hôtel.
+    _agentQuestionApres(texte) {
+      const st = this.state;
+      st.agentQuestionPosee = true;
+      st.agentThread.push({ qui: 'moi', texte: esc(texte) });
+      const hotels = this._agentPropositions().filter(p => p.hotel).map(p => p.hotel);
+      const t = texte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      // De quel hôtel parle-t-on ? Celui qu'on nomme ; tous, si l'on dit « les hôtels » ou « les
+      // deux » ; sinon l'hôtel en vue — le dernier consulté, à défaut le premier proposé. Répondre
+      // sur tous quand on demande « l'hôtel » mêlait à la réponse celui qu'on ne regardait pas.
+      const norm = (x) => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const mots = (h) => norm(h.name).split(/[^a-z0-9]+/).filter(w => w.length > 3 && w !== 'pullman');
+      const communs = hotels.length > 1 ? mots(hotels[0]).filter(w => hotels.every(h => mots(h).indexOf(w) >= 0)) : [];
+      const nommes = hotels.filter(h => mots(h).some(w => communs.indexOf(w) < 0 && new RegExp('\\b' + w + '\\b').test(t)));
+      const tous = /\b(les|ces|des|vos) hotels\b|\bles deux\b|\blequel\b|\blesquels\b|\bchacun\b/.test(t);
+      const enVue = hotels.find(h => h.name === st.agentHotelFocus) || hotels[0];
+      const vises = nommes.length ? nommes : (tous || !enVue ? hotels : [enVue]);
+      // [service, mots qui le désignent, il a, ils ont, il n'a pas, ils n'ont pas]
+      const SUJETS = [
+        ['parking', /parking|garer|stationn|voiture|valet/, 'dispose d’un parking', 'disposent d’un parking', 'ne dispose pas de parking', 'ne disposent pas de parking'],
+        ['breakfast', /petit[- ]?dej|breakfast/, 'sert le petit-déjeuner', 'servent le petit-déjeuner', 'ne sert pas de petit-déjeuner', 'ne servent pas de petit-déjeuner'],
+        ['pool', /piscine|nager|baignade/, 'a une piscine', 'ont une piscine', 'n’a pas de piscine', 'n’ont pas de piscine'],
+        ['spa', /\bspa\b|massage|hammam|sauna/, 'a un spa', 'ont un spa', 'n’a pas de spa', 'n’ont pas de spa'],
+        ['gym', /salle de sport|fitness|\bgym|musculation/, 'a une salle de sport', 'ont une salle de sport', 'n’a pas de salle de sport', 'n’ont pas de salle de sport'],
+        ['restaurant', /restaurant|\bdiner\b|manger/, 'a un restaurant', 'ont un restaurant', 'n’a pas de restaurant', 'n’ont pas de restaurant'],
+        ['bar', /\bbars?\b|cocktail/, 'a un bar', 'ont un bar', 'n’a pas de bar', 'n’ont pas de bar'],
+        ['pets', /animal|animaux|chien|\bchats?\b/, 'accepte les animaux', 'acceptent les animaux', 'n’accepte pas les animaux', 'n’acceptent pas les animaux'],
+        ['family', /enfant|\bkids?\b|bebe/, 'a un espace enfants', 'ont un espace enfants', 'n’a pas d’espace enfants', 'n’ont pas d’espace enfants'],
+        ['beach', /plage|bord de mer/, 'est en bord de mer', 'sont en bord de mer', 'n’est pas en bord de mer', 'ne sont pas en bord de mer'],
+        ['meeting', /reunion|seminaire|conference/, 'a des salles de réunion', 'ont des salles de réunion', 'n’a pas de salle de réunion', 'n’ont pas de salle de réunion']
+      ];
+      const un = (h) => 'le ' + h.name;
+      const liste = (hs) => hs.length === 1 ? un(hs[0]) : hs.slice(0, -1).map(un).join(', ') + ' et ' + un(hs[hs.length - 1]);
+      const majuscule = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+      const offre = (h, id) => (h.amenities || []).indexOf(id) >= 0;
+      const metres = (p, q) => {
+        const rad = Math.PI / 180;
+        const x = Math.sin((q.lat - p.lat) * rad / 2) ** 2
+          + Math.cos(p.lat * rad) * Math.cos(q.lat * rad) * Math.sin((q.lng - p.lng) * rad / 2) ** 2;
+        return 2 * 6371000 * Math.asin(Math.sqrt(x));
+      };
+      const distance = (m) => m < 1000 ? Math.max(10, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km';
+
+      const phrases = [];
+      let proximite = null;
+      const sujets = hotels.length ? SUJETS.filter(s => s[1].test(t)) : [];
+      sujets.forEach(([id, , oui1, ouiN, non1, nonN]) => {
+        const avec = vises.filter(h => offre(h, id));
+        const sans = vises.filter(h => !offre(h, id));
+        const oui = avec.length ? liste(avec) + ' ' + (avec.length > 1 ? ouiN : oui1) : '';
+        const non = sans.length ? liste(sans) + ' ' + (sans.length > 1 ? nonN : non1) : '';
+        if (!sans.length) phrases.push('Oui, ' + oui + '.');
+        else if (!avec.length) phrases.push('Malheureusement, ' + non + '.');
+        else phrases.push(majuscule(oui) + '. En revanche, ' + non + '.');
+        if (id !== 'parking' || !sans.length) return;
+        // Pas de parking à l'hôtel : les parkings publics voisins, les plus proches d'abord. La
+        // marche compte un détour d'un tiers sur la ligne droite, à 80 m par minute.
+        const couvert = sans.find(h => PARKINGS_VOISINS[h.name] && h.lat != null && h.lng != null);
+        if (couvert) {
+          const lieux = PARKINGS_VOISINS[couvert.name].map(l => {
+            const m = metres(couvert, l);
+            const minutes = Math.max(1, Math.round(m * 1.3 / 80));
+            return Object.assign({}, l, { m: m, minutes: minutes, distance: distance(m), marche: minutes + ' min à pied' });
+          }).sort((x, y) => x.m - y.m);
+          proximite = { hotel: { nom: couvert.name, court: couvert.name.replace(/^Pullman\s+/, ''), lat: couvert.lat, lng: couvert.lng }, lieux: lieux };
+          phrases.push('Plusieurs parkings publics se trouvent toutefois à quelques pas ' + (sans.length > 1 ? 'du ' + couvert.name : 'de l’hôtel')
+            + ' : le plus proche, ' + lieux[0].nom + ', est à ' + lieux[0].distance + ', soit ' + lieux[0].minutes + ' minute' + (lieux[0].minutes > 1 ? 's' : '') + ' à pied. Je vous les ai situés sur la carte.');
+        }
+        sans.filter(h => h !== couvert).forEach(h => phrases.push('Pour le ' + h.name + ', la réception vous indiquera le parking public le plus proche.'));
+      });
+      if (!phrases.length) {
+        const question = /\?\s*$/.test(texte.trim());
+        phrases.push(question
+          ? 'C’est une excellente question. Je ne peux vous le confirmer ici, mais l’hôtel saura vous répondre : je lui transmettrai votre demande.'
+          : 'Je vous remercie de cette précision. Je la transmettrai à l’hôtel.');
+        st.agentNotes = (st.agentNotes || []).concat(texte);
+      }
+
+      st.agentTyping = true;
+      this._rerenderContent();
+      this._agentDefiler();
+      clearTimeout(this._minuteurAgent);
+      this._minuteurAgent = setTimeout(() => {
+        const reponse = { qui: 'agent', texte: phrases.join(' ') };
+        if (proximite) reponse.proximite = proximite;
+        st.agentThread.push(reponse);
+        st.agentTyping = false;
+        this._rerenderContent();
+        this._agentDefiler();
+        const champ = this.querySelector('#wdAgentInput');
+        if (champ) champ.focus();
       }, 700);
     }
 
@@ -5720,7 +5866,7 @@
       // on cale le fil sur la question plutôt que tout en bas, sur les boutons.
       const bulles = fil.querySelectorAll('.wd-agent__msg--agent');
       const derniere = bulles[bulles.length - 1];
-      if (derniere && derniere.classList.contains('wd-agent__msg--services') && derniere.offsetHeight > fil.clientHeight) {
+      if (derniere && (derniere.classList.contains('wd-agent__msg--services') || derniere.classList.contains('wd-agent__msg--proximite')) && derniere.offsetHeight > fil.clientHeight) {
         fil.scrollTop += derniere.getBoundingClientRect().top - fil.getBoundingClientRect().top - 8;
       } else {
         fil.scrollTop = fil.scrollHeight;
@@ -8352,6 +8498,13 @@
           }));
         };
         this.querySelectorAll('[data-agent-galerie]').forEach(lierGalerie);
+        // L'hôtel en vue : celui dont on vient de toucher la card — galerie comprise, d'où la
+        // capture, les flèches arrêtant la propagation. Les questions suivantes portent sur lui.
+        const carrouselVue = this.querySelector('.wd-agent__carrousel--hotels');
+        if (carrouselVue) carrouselVue.addEventListener('click', (e) => {
+          const card = e.target.closest('.wd-agent__hotel[data-nom]');
+          if (card) this.state.agentHotelFocus = card.dataset.nom;
+        }, true);
 
         // Carte des hôtels proposés, à la manière d'Airbnb mais aux couleurs sombres de la carte
         // de la homepage : quartiers, rues, parcs et eau sont nommés — on sait d'un coup d'œil où
@@ -8390,6 +8543,7 @@
             const source = cartesSituees.find(c => Number(c.dataset.agentHotel) === i);
             if (!source || !fiche) { cacherFiche(); return; }
             choisi = i;
+            if (source.dataset.nom) this.state.agentHotelFocus = source.dataset.nom;
             const copie = source.cloneNode(true);
             copie.classList.add('wd-agent__hotel--sur-carte');
             const croix = document.createElement('button');
@@ -8496,6 +8650,67 @@
           });
           if (this.state.agentCarte) ouvrir();
         }
+
+        // Questions suggérées sous les cards : elles passent par le même chemin qu'une saisie.
+        this.querySelectorAll('[data-agent-question]').forEach(btn => btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this._agentRepondre(btn.textContent, null);
+        }));
+
+        // Parkings voisins : l'hôtel en vert, chaque parking en pastille « P » avec sa distance,
+        // relié à l'hôtel par un pointillé quand il est choisi. La liste et les pastilles se
+        // répondent ; le plus proche est choisi d'emblée. Refaites à chaque rendu, comme la carte
+        // des hôtels.
+        (this._agentProximites || []).forEach(c => c.remove());
+        this._agentProximites = [];
+        this.querySelectorAll('[data-agent-proximite]').forEach(bloc => {
+          const message = (this.state.agentThread || [])[Number(bloc.dataset.agentProximite)];
+          const px = message && message.proximite;
+          const cadre = bloc.querySelector('.wd-agent__proximite-carte');
+          if (!px || !cadre || !window.L) return;
+          const carte = L.map(cadre, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, minZoom: 12, maxZoom: 18, zoomSnap: 0.25, zoomDelta: 0.5 });
+          // Échelle en mètres : elle dit d'un coup d'œil ce que valent 50 ou 300 m sur la carte.
+          L.control.scale({ position: 'bottomright', metric: true, imperial: false, maxWidth: 80 }).addTo(carte);
+          L.control.zoom({ position: 'topright', zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer' }).addTo(carte);
+          L.control.attribution({ position: 'topleft', prefix: false }).addAttribution('© Esri').addTo(carte);
+          L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }).addTo(carte);
+          this._agentProximites.push(carte);
+          const hotel = [px.hotel.lat, px.hotel.lng];
+          // L'hôtel en point vert, comme sur la carte de la homepage, au-dessus de tout : une étiquette
+          // recouvrait le parking le plus proche, à 50 m. Son nom est dans la légende et l'infobulle.
+          L.marker(hotel, { zIndexOffset: 3000, keyboard: false, title: px.hotel.nom, alt: px.hotel.nom,
+            icon: L.divIcon({ className: 'wd-agent__hotel-pin', iconSize: null, html: '<span class="wd-agent__hotel-dot"></span>' })
+          }).addTo(carte);
+          const boutons = [...bloc.querySelectorAll('[data-agent-parking]')];
+          let trace = null;
+          let choisir = () => {};
+          const pins = px.lieux.map((l, k) => {
+            const marqueur = L.marker([l.lat, l.lng], { zIndexOffset: 1000, title: l.nom, alt: l.nom,
+              icon: L.divIcon({ className: 'wd-agent__parking-pin', html: '<span class="wd-agent__parking-pastille"><b>P</b>' + esc(l.distance) + '</span>', iconSize: null })
+            }).addTo(carte);
+            marqueur.on('click', () => choisir(k));
+            return marqueur;
+          });
+          choisir = (k) => {
+            pins.forEach((marqueur, j) => {
+              const el = marqueur.getElement();
+              if (el) el.classList.toggle('is-choisi', j === k);
+              marqueur.setZIndexOffset(j === k ? 2000 : 1000);
+            });
+            boutons.forEach((b, j) => { b.classList.toggle('is-choisi', j === k); b.setAttribute('aria-pressed', String(j === k)); });
+            if (trace) trace.remove();
+            trace = L.polyline([hotel, [px.lieux[k].lat, px.lieux[k].lng]], { color: '#ffffff', weight: 2, opacity: .75, dashArray: '4 6', interactive: false }).addTo(carte);
+          };
+          boutons.forEach((b, k) => b.addEventListener('click', (e) => { e.stopPropagation(); choisir(k); }));
+          // Cadrage sur l'hôtel et ses parkings, refait une fois la bulle posée : calculé sur un cadre
+          // pas encore dimensionné, il dézoomait jusqu'à Marina Bay. Le bas réserve la légende, la
+          // droite les pastilles, qui s'étirent vers l'est depuis leur point.
+          const cadrer = () => carte.fitBounds(L.latLngBounds([hotel].concat(px.lieux.map(l => [l.lat, l.lng]))),
+            { paddingTopLeft: [36, 36], paddingBottomRight: [96, 52], maxZoom: 18, animate: false });
+          cadrer();
+          choisir(0);
+          setTimeout(() => { if (this._agentProximites.indexOf(carte) >= 0) { carte.invalidateSize(); cadrer(); } }, 60);
+        });
 
         // Services : un clic coche ou décoche un visuel du mur, puis « Valider ma sélection ». La bulle de la
         // personne reprend les services choisis, l'accusé les nomme, et chacun alimente la

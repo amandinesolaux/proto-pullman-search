@@ -3312,3 +3312,162 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__hotel--sur-carte .wd-agent__hotel-lien { display: none; }
 .wd-agent__hotel--sur-carte .wd-agent__hotel-reserver { padding: 6px 14px; }
 @media (prefers-reduced-motion: reduce) { .wd-agent__carte-fiche-fermer { transition: none; } }
+
+/* ── Agent : parkings voisins d'un hôtel qui n'en a pas ─────────────────────────────
+   Une question posée après les propositions (« Y a-t-il un parking ? ») : quand l'hôtel n'en a
+   pas, la réponse montre les parkings publics autour. La carte reprend le fond sombre de la
+   carte des hôtels ; l'hôtel y garde sa pastille verte, les parkings une pastille « P » avec la
+   distance. Dessous, la liste, sur fond blanc dans la bulle : nom, adresse, distance et marche. */
+.wd-agent__msg--proximite { max-width: 100%; width: 100%; }
+.wd-agent__proximite { margin-top: 12px; background: #ffffff; }
+.wd-agent__proximite-cadre { position: relative; }
+.wd-agent__carte.wd-agent__proximite-carte { height: 360px; }
+@media (max-width: 767px) { .wd-agent__carte.wd-agent__proximite-carte { height: 320px; } }
+/* Échelle en mètres, aux couleurs de la carte. */
+.wd-agent__carte.leaflet-container .leaflet-control-scale-line {
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-top: 0;
+  background: rgba(26, 34, 32, .85);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 10px;
+  color: #ffffff;
+}
+/* Légende sur la carte : l'hôtel (rond vert) et les parkings (« P »). */
+.wd-agent__proximite-legende {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 10px;
+  background: rgba(26, 34, 32, .88);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 11px;
+  color: #ffffff;
+  pointer-events: none;
+}
+.wd-agent__proximite-legende > span { display: inline-flex; align-items: center; gap: 6px; }
+.wd-agent__legende-hotel { width: 10px; height: 10px; border: 2px solid #1a2220; border-radius: 50%; background: #5FEF91; box-shadow: 0 0 6px rgba(95, 239, 145, .6); }
+.wd-agent__legende-p {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 100px;
+  background: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  color: #1a2220;
+}
+/* L'hôtel : le point vert de la carte de la homepage (.pullman-dot--large), redessiné ici — la
+   feuille de cette carte n'est pas chargée partout où l'assistant s'ouvre. */
+.wd-agent__hotel-pin { width: 0; height: 0; }
+.wd-agent__hotel-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #1a2220;
+  border-radius: 50%;
+  background: #5FEF91;
+  box-shadow: 0 0 12px rgba(95, 239, 145, .7), 0 0 24px rgba(95, 239, 145, .3), 0 2px 6px rgba(0, 0, 0, .4);
+  transform: translate(-50%, -50%);
+  animation: wd-agent-pouls 2s ease-in-out infinite;
+}
+@keyframes wd-agent-pouls { 50% { box-shadow: 0 0 18px rgba(95, 239, 145, .9), 0 0 36px rgba(95, 239, 145, .4), 0 2px 6px rgba(0, 0, 0, .4); } }
+@media (prefers-reduced-motion: reduce) { .wd-agent__hotel-dot { animation: none; } }
+.wd-agent__proximite-liste { list-style: none; margin: 0; padding: 0; }
+.wd-agent__proximite-liste li + li { border-top: 1px solid rgba(68, 80, 71, .1); }
+.wd-agent__parking {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: none;
+  font-family: var(--font-sans, sans-serif);
+  color: #445047;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.wd-agent__parking:hover { background: rgba(68, 80, 71, .05); }
+.wd-agent__parking.is-choisi { background: rgba(68, 80, 71, .09); }
+.wd-agent__parking:focus-visible { outline: 2px solid #445047; outline-offset: -2px; }
+.wd-agent__parking-p {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid #445047;
+  font-size: 14px;
+  font-weight: 700;
+  color: #445047;
+}
+.wd-agent__parking.is-choisi .wd-agent__parking-p { background: #445047; color: #ffffff; }
+.wd-agent__parking-texte { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.wd-agent__parking-nom { font-size: 14px; font-weight: 600; }
+.wd-agent__parking-adresse { font-size: 12px; color: rgba(68, 80, 71, .7); }
+.wd-agent__parking-distance {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wd-agent__parking-distance span { font-size: 12px; font-weight: 400; color: rgba(68, 80, 71, .7); }
+
+/* Pastilles « P » sur la carte : sombres par défaut, blanches une fois choisies — l'hôtel reste
+   seul en vert. */
+.wd-agent__parking-pin { width: 0; height: 0; }
+.wd-agent__parking-pastille {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px 5px 5px;
+  border-radius: 100px;
+  background: #1a2220;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 2px 8px rgba(0, 0, 0, .45);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translate(-13.5px, -50%);
+  transform-origin: 13.5px 50%;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+}
+.wd-agent__parking-pastille b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 100px;
+  background: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  color: #1a2220;
+}
+.wd-agent__parking-pin:hover .wd-agent__parking-pastille { transform: translate(-13.5px, -50%) scale(1.06); }
+.wd-agent__parking-pin.is-choisi .wd-agent__parking-pastille { background: #ffffff; color: #222222; transform: translate(-13.5px, -50%) scale(1.06); }
+.wd-agent__parking-pin.is-choisi .wd-agent__parking-pastille b { background: #1a2220; color: #ffffff; }
+@media (prefers-reduced-motion: reduce) {
+  .wd-agent__parking,
+  .wd-agent__parking-pastille { transition: none; }
+}
