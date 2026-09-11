@@ -761,7 +761,7 @@
       { name:'Pullman Kuching', loc:'Kuching, Malaisie', country:'Malaisie', img:'HCM_P_7588157', imgs:['HCM_P_7588157','HCM_P_2208421','HCM_P_6588904','HCM_P_3488026'], href:'https://pullman.accor.com/fr/hotels/kuching-sarawak/6332.html', services:['pool','restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
       { name:'Pullman Miri Waterfront', loc:'Miri, Malaisie', country:'Malaisie', img:'aja_p_3964-04', imgs:['aja_p_3964-04','aja_p_3964-29','aja_p_3964-38','aja_p_3964-22'], href:'https://pullman.accor.com/fr/hotels/miri/9731.html', services:['pool','restaurant','bar','parking','meeting-rooms','gym','wifi','breakfast','pets'] },
       { name:'Pullman Singapore Hill Street', loc:'Singapour', country:'Singapour', img:'HCM_P_0020377', imgs:['HCM_P_0020377','aja_p_6825-77','aja_p_6825-78','aja_p_6825-70'], href:'https://pullman.accor.com/fr/hotels/singapore/B5L7.html', services:['restaurant','bar','gym','meeting-rooms','wifi','breakfast'] },
-      { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_6600-45', imgs:['aja_p_6600-45','aja_p_6600-46','aja_p_6439-75','aja_p_6547-71'], href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop','family','parking'] },
+      { name:'Pullman Singapore Orchard', loc:'Singapour', country:'Singapour', img:'aja_p_6600-45', imgs:['aja_p_6600-45','aja_p_6600-46','aja_p_6439-75','aja_p_6547-71'], href:'https://pullman.accor.com/fr/hotels/singapore/B9H8.html', services:['pool','restaurant','bar','spa','gym','meeting-rooms','wifi','breakfast','rooftop','family'] },
       { name:'Pullman Maldives Maamutaa', loc:'Maldives', country:'Maldives', img:'aja_p_5241-71', imgs:['aja_p_5241-71','aja_p_5379-13','aja_p_6353-68','aja_p_5437-80'], href:'https://pullman.accor.com/fr/hotels/maamutaa-island/9924.html', badge:'NOUVEAU', services:['pool','restaurant','bar','spa','beach','gym','wifi','breakfast','garden','pets'] },
       { name:'Pullman Luang Prabang', loc:'Luang Prabang, Laos', country:'Laos', img:'aja_p_4935-28', imgs:['aja_p_4935-28','aja_p_4924-73','aja_p_4924-78','aja_p_4924-84'], href:'https://pullman.accor.com/fr/hotels/luang-prabang/9112.html', services:['pool','restaurant','bar','spa','gym','wifi','breakfast','garden','family','kids-club'] },
       { name:'Pullman Seoul', loc:'Séoul, Corée du Sud', country:'Corée du Sud', img:'aja_p_6049-58', imgs:['aja_p_6049-58','aja_p_6049-59','aja_p_6049-53','HCM_P_9986753'], href:'https://pullman.accor.com/fr/hotels/seoul/0966.html', services:['restaurant','bar','spa','parking','meeting-rooms','gym','wifi','breakfast'] },
@@ -1014,6 +1014,12 @@
       { nom: 'Peninsula Plaza', adresse: '111 North Bridge Road', lat: 1.292325, lng: 103.85083 },
       { nom: 'CHIJMES', adresse: '30 Victoria Street', lat: 1.295187, lng: 103.851857 },
       { nom: 'Funan', adresse: '107 North Bridge Road', lat: 1.291313, lng: 103.849947 }
+    ],
+    'Pullman Singapore Orchard': [
+      { nom: 'Paragon', adresse: '290 Orchard Road', lat: 1.303737, lng: 103.83552 },
+      { nom: 'Mandarin Gallery', adresse: '333A Orchard Road', lat: 1.30199, lng: 103.836553 },
+      { nom: 'Ngee Ann City', adresse: '391 Orchard Road', lat: 1.302617, lng: 103.834528 },
+      { nom: '313@somerset', adresse: '313 Orchard Road', lat: 1.301019, lng: 103.838506 }
     ]
   };
 
