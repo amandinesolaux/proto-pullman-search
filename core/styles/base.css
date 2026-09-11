@@ -625,6 +625,9 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__filtres-compte[hidden] { display: none; }
 /* Nombre de lieux par option, comme sur le site Restaurants & Bars. */
 .wd-booking__dd-criteria-compte { margin-left: 4px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; }
+/* Option sans lieu dans la destination (onglet Restaurants) : toujours là, estompée. */
+.wd-booking__dd-criteria-item--vide { color: rgba(255,255,255,.5); }
+.wd-booking__dd-criteria-item--vide .wd-booking__dd-criteria-compte { color: rgba(255,255,255,.28); }
 /* Curseur de prix à deux poignées (onglet Restaurants) : rail discret, plage et poignées au
    vert des cases cochées, valeurs au-dessus. */
 .wd-booking__prix { padding: 2px 10px 12px; }

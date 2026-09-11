@@ -2043,17 +2043,18 @@
           const distance =(d) => d < 1 ? Math.round(d * 1000) + ' m'
             : (d < 10 ? d.toFixed(1).replace('.', ',') : String(Math.round(d))) + ' km';
           const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
-          const retenues = tablesRetenuesAutour().filter(t => restoMatchesCriteria(t.v));
+          const retenues = tablesRetenuesAutour().map(t => Object.assign({ repond: restoMatchesCriteria(t.v) }, t));
           let html = '<div class="wd-booking__dd-section-title">Les plus proches de vous</div>';
           html += retenues.length
-            ? '<div class="wd-booking__dd-country-hotels wd-booking__dd-autour-liste">' + retenues.map(({ v, km }) => {
+            ? (retenues.some(t => t.repond) ? '' : '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères autour de vous.</p>')
+              + '<div class="wd-booking__dd-country-hotels wd-booking__dd-autour-liste">' + retenues.map(({ v, km, repond }) => {
                 const serie = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v) : [];
                 const cle = serie.length ? serie[0].cle : (v.img || '');
                 const choisie = searchState.selectedResto === v.nom;
                 const dits = [distance(km), window.WD_RESTO_LIBELLE ? window.WD_RESTO_LIBELLE(v.style || v.cuisines[0]) : '']
                   .concat(v.note ? ['★ ' + v.note] : [], v.prix ? ['± ' + v.prix + ' EUR'] : [])
                   .filter(Boolean).join(' · ');
-                return '<button type="button" class="wd-booking__dd-hotel-row' + (choisie ? ' wd-booking__dd-hotel-row--selected' : '') +
+                return '<button type="button" class="wd-booking__dd-hotel-row' + (choisie ? ' wd-booking__dd-hotel-row--selected' : '') + (repond ? '' : ' wd-booking__dd-hotel-row--dimmed') +
                   '" data-dest-type="resto" data-resto-name="' + esc(v.nom) + '">' +
                   '<img class="wd-booking__dd-hotel-thumb" src="' + base + cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="" loading="lazy" />' +
                   '<div class="wd-booking__dd-hotel-info">' +
@@ -2062,7 +2063,7 @@
                       '<span class="wd-booking__dd-hotel-country">' + esc(v.hotel) + '</span></span>' +
                   '</div></button>';
               }).join('') + '</div>'
-            : '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères autour de vous.</p>';
+            : '<p class="wd-booking__dd-country-empty">Aucun restaurant ni bar autour de vous.</p>';
           destListEl.innerHTML = html;
           return;
         }
@@ -2247,10 +2248,14 @@
           if (isExpanded && surRestos) {
             // On propose des tables, pas des hôtels : c'est ce qu'on cherche ici. L'hôtel
             // n'est plus le résultat, il devient le lieu où la table se trouve.
-            const tables = allInCountry.flatMap(hh => lieuxDe(hh.name).map(v => ({ v, hh })));
+            // Tous les lieux du pays, dans le même ordre ; ceux qui ne répondent pas aux critères
+            // se grisent, comme les hôtels de l'onglet Hôtels, au lieu de disparaître.
+            const tables = allInCountry.flatMap(hh => (window.WD_RESTAURANTS || []).filter(v => v.hotel === hh.name)
+              .map(v => ({ v, hh, repond: restoMatchesCriteria(v) })));
             html += '<div class="wd-booking__dd-country-hotels">' +
+              (tables.length && !tables.some(t => t.repond) ? '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères dans ce pays.</p>' : '') +
               (tables.length
-                ? tables.map(({ v, hh }) => {
+                ? tables.map(({ v, hh, repond }) => {
                     // La vignette montre la table — sa photo, ou une image « Au menu » —, plus la
                     // photo de présentation de l'hôtel, souvent une chambre.
                     const serieTable = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v) : [];
@@ -2263,7 +2268,7 @@
                       .concat(v.note ? ['★ ' + v.note] : [], v.prix ? ['± ' + v.prix + ' EUR'] : [])
                       .filter(Boolean).join(' · ');
                     return '<button type="button" class="wd-booking__dd-hotel-row' +
-                      (choisie ? ' wd-booking__dd-hotel-row--selected' : '') +
+                      (choisie ? ' wd-booking__dd-hotel-row--selected' : '') + (repond ? '' : ' wd-booking__dd-hotel-row--dimmed') +
                       '" data-dest-type="resto" data-resto-name="' + esc(v.nom) + '">' +
                       '<img class="wd-booking__dd-hotel-thumb" src="' + imgBase + cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="" loading="lazy" />' +
                       '<div class="wd-booking__dd-hotel-info">' +
@@ -2272,7 +2277,7 @@
                           '<span class="wd-booking__dd-hotel-country">' + esc(hh.name) + '</span></span>' +
                       '</div></button>';
                   }).join('')
-                : '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères dans ce pays.</p>') +
+                : '<p class="wd-booking__dd-country-empty">Aucun restaurant ni bar dans ce pays.</p>') +
             '</div>';
           } else if (isExpanded) {
             const displayHotels = hasCriteria ? hotelsInCountry : allInCountry;
@@ -2317,7 +2322,7 @@
       // en face de chaque option ; une option absente du périmètre ne s'affiche pas, sauf si
       // elle est cochée.
       const critereItemHTML = (c, checked, compte) =>
-        '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
+        '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + (compte === 0 && !checked ? ' wd-booking__dd-criteria-item--vide' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
         '<span class="wd-booking__dd-criteria-check"></span>' + esc(c.label) +
         (compte !== null ? '<span class="wd-booking__dd-criteria-compte">(' + compte + ')</span>' : '') +
         '</button>';
@@ -2345,7 +2350,9 @@
             const checked = actifs.has(c.id);
             if (!surRestos) return critereItemHTML(c, checked, null);
             const compte = perimetre.filter(v => c.id === v.type || v.cuisines.indexOf(c.id) >= 0 || v.tags.indexOf(c.id) >= 0).length;
-            return (compte || checked) ? critereItemHTML(c, checked, compte) : '';
+            // Toujours la même liste, quelle que soit la destination : une option sans lieu ici
+            // reste à sa place, estompée, avec son (0). Ce sont les lieux qui se grisent, pas les filtres.
+            return critereItemHTML(c, checked, compte);
           }).join('');
           return items ? '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + items : '';
         }).join('');
@@ -3068,6 +3075,9 @@
           .filter(restoMatchesCriteria).length;
         window.WD_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || [])
           .filter(v => v.hotel === nomHotel && restoMatchesCriteria(v));
+        // Tous les lieux d'un hôtel, qu'ils répondent ou non : la card de la carte grise ceux qui ne
+        // répondent pas plutôt que de les retirer.
+        window.WD_TOUS_LIEUX_HOTEL = (nomHotel) => (window.WD_RESTAURANTS || []).filter(v => v.hotel === nomHotel);
         // Espaces de réunion d'un hôtel, s'ils répondent aux critères cochés.
         window.WD_REUNION_HOTEL = (nomHotel) => (window.WD_REUNIONS || [])
           .filter(r => r.hotel === nomHotel && reunionMatchesCriteria(r));

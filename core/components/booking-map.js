@@ -274,6 +274,8 @@ function _addStyle() {
     '.pullman-popup__lieu[data-on] .pullman-popup__lieu-nom{color:#28332B}' +
     '.pullman-popup__lieu-nom{font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;color:#445047;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
     '.pullman-popup__lieu-type{font-family:var(--font-sans,sans-serif);font-size:10.5px;color:rgba(68,80,71,.68);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.pullman-popup__lieu--hors{cursor:default;opacity:.4}' +
+    '.pullman-popup__lieu--hors:hover .pullman-popup__lieu-nom{text-decoration:none}' +
     '.pullman-popup__lieux-pied{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:9px;border-top:1px solid #BCCABE}' +
     '.pullman-popup__lieux-retour{border:none;background:none;padding:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;color:rgba(68,80,71,.8);text-decoration:underline;text-underline-offset:2px;cursor:pointer}' +
     '.pullman-popup--deplie .pullman-popup__media,' +
@@ -599,6 +601,22 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     const premier = lieux[0];
     const autres = lieux.slice(1);
     if (premier && premier.url) lieuCta = { url: premier.url, bar: premier.type === 'bar' };
+    // Les lieux qui ne répondent pas aux critères restent dans la liste, grisés, comme les hôtels
+    // de l'onglet Hôtels : la liste de l'hôtel ne change pas selon les filtres, elle dit ce qui
+    // convient. Ceux qui répondent d'abord ; les autres ne se choisissent pas.
+    const tousLieux = typeof window.WD_TOUS_LIEUX_HOTEL === 'function' ? window.WD_TOUS_LIEUX_HOTEL(h.name) : lieux;
+    const repond = (v) => lieux.indexOf(v) >= 0;
+    const horsCriteres = tousLieux.filter(v => !repond(v));
+    const listeLieux = lieux.concat(horsCriteres);
+    const deplier = autres.length
+      ? 'et ' + composition(autres) + (horsCriteres.length ? ' · ' + horsCriteres.length + ' hors critères' : '')
+      // Un seul lieu répond : il est en vitrine, les autres suivent « hors critères ». Aucun ne
+      // répond : on propose de voir ceux de l'hôtel, tous grisés.
+      : (horsCriteres.length
+          ? (lieux.length
+              ? 'et ' + horsCriteres.length + ' lieu' + (horsCriteres.length > 1 ? 'x' : '') + ' hors critères'
+              : 'Voir ' + (horsCriteres.length > 1 ? 'les ' + horsCriteres.length + ' lieux' : 'le lieu') + ' de l’hôtel')
+          : '');
     tables = '<div class="pullman-popup__tables">' +
       (lieux.length
         ? '<div class="pullman-popup__table" data-lieu-vitrine>' +
@@ -606,23 +624,25 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
               ? '<a class="pullman-popup__table-nom" href="' + esc(premier.url) + '" target="_blank" rel="noopener">' + esc(premier.nom) + '</a>'
               : '<span class="pullman-popup__table-nom">' + esc(premier.nom) + '</span>') +
             '<span class="pullman-popup__table-type">' + esc(qualifie(premier, 2)) + '</span>' +
-          '</div>' +
-          (autres.length
-            ? '<button type="button" class="pullman-popup__tables-reste" data-lieux-deplier>et ' + esc(composition(autres)) + '</button>'
-            : '')
+          '</div>'
         : '<p class="pullman-popup__tables-reste">Aucun restaurant ni bar ne répond à vos critères.</p>') +
+      (deplier ? '<button type="button" class="pullman-popup__tables-reste" data-lieux-deplier>' + esc(deplier) + '</button>' : '') +
     '</div>' +
     // L'état déplié : pas de photo, une ligne par lieu, deux colonnes. C'est ce qui
     // permet d'en montrer sept sans jamais faire défiler la card.
-    (lieux.length > 1
+    (deplier
       ? '<div class="pullman-popup__lieux" hidden>' +
           '<div class="pullman-popup__lieux-liste">' +
-            lieux.map((v, i) =>
-              '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '"' +
-                ' data-lieu-url="' + esc(v.url || '') + '" data-lieu-bar="' + (v.type === 'bar' ? '1' : '') + '">' +
-                '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
-                '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
-              '</button>').join('') +
+            listeLieux.map((v, i) => repond(v)
+              ? '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '"' +
+                  ' data-lieu-url="' + esc(v.url || '') + '" data-lieu-bar="' + (v.type === 'bar' ? '1' : '') + '">' +
+                  '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
+                  '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
+                '</button>'
+              : '<span class="pullman-popup__lieu pullman-popup__lieu--hors" title="Ne répond pas à vos critères">' +
+                  '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
+                  '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
+                '</span>').join('') +
           '</div>' +
           '<div class="pullman-popup__lieux-pied">' +
             '<button type="button" class="pullman-popup__lieux-retour" data-lieux-replier>Revenir</button>' +
