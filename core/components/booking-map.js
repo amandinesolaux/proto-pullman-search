@@ -234,7 +234,10 @@ function _addStyle() {
     // Deux lignes de table plus la mention du reste, réservées qu'elles servent ou non :
     // la card ne doit pas changer de taille selon l'hôtel cliqué.
     // Une rangée plus la mention du reste, réservées qu'elles servent ou non.
-    '.wd-map-detail .pullman-popup__tables{min-height:62px;justify-content:flex-start}' +
+    // Rangée d'onglets comprise, le panneau doit tenir dans ses 316 px : à 318, une barre de
+    // défilement apparaissait, rétrécissait la photo (21:9, donc 4 px de moins) et restait
+    // là — 11 px de marge blanche à droite. Écart et marge resserrés de quelques pixels.
+    '.wd-map-detail .pullman-popup__tables{min-height:62px;justify-content:flex-start;gap:6px;margin-top:6px}' +
     // Même 21:9 que la card hôtel : à 32:9 la photo de la table était une bande où l'on
     // ne distinguait rien. Les 42 px que cela coûte sont repris sur le pied de card, dont
     // le bouton devient un lien.
@@ -285,7 +288,7 @@ function _addStyle() {
     '.pullman-popup__onglets-rangee{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0}' +
     '.pullman-popup__onglets-titre{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}' +
     '.pullman-popup__onglets{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:4px;flex:0 0 auto}' +
-    '.pullman-popup__onglet{min-width:24px;height:24px;padding:0 6px;border:1px solid #BCCABE;border-radius:0;background:#fff;font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:#445047;cursor:pointer;transition:background .15s,border-color .15s,color .15s}' +
+    '.pullman-popup__onglet{min-width:22px;height:22px;padding:0 6px;border:1px solid #BCCABE;border-radius:0;background:#fff;font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:#445047;cursor:pointer;transition:background .15s,border-color .15s,color .15s}' +
     '.pullman-popup__onglet:hover:not(:disabled):not([data-on]){border-color:#445047}' +
     '.pullman-popup__onglet[data-on]{background:#445047;border-color:#445047;color:#fff}' +
     '.pullman-popup__onglet:disabled{opacity:.35;cursor:default}' +
