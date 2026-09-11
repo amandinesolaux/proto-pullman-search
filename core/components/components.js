@@ -1123,6 +1123,7 @@
                 <div class="wd-booking__dd-dest-col">
                   <button class="wd-booking__filtres-btn" type="button" data-ouvre-filtres><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Filtres</span><span class="wd-booking__filtres-compte" hidden></span></button>\n                  <h3 class="wd-booking__dd-col-title">Destination</h3>
                   <div class="wd-booking__dd-continents" id="wd-continents"></div>
+                  <div class="wd-booking__dd-autour" id="wd-autour" hidden></div>
                   <nav class="wd-booking__dd-breadcrumb" id="wd-breadcrumb" aria-label="Navigation destination"></nav>
                   <div class="wd-booking__dd-dest-list" id="wd-dest-list"></div>
                 </div>
@@ -1457,6 +1458,7 @@
       };
 
       const continentsEl = this.querySelector('#wd-continents');
+      const autourEl = this.querySelector('#wd-autour');
       const breadcrumbEl = this.querySelector('#wd-breadcrumb');
       const destListEl = this.querySelector('#wd-dest-list');
       const criteriaListEl = this.querySelector('#wd-criteria-list');
@@ -1476,7 +1478,7 @@
             '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
             '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
           '</button>';
-        continentsEl.innerHTML = tuileAutour() + allCard + CONTINENTS_AFFICHES.map(r => {
+        continentsEl.innerHTML = allCard + CONTINENTS_AFFICHES.map(r => {
           // Autour de moi actif, c'est sa tuile qui est sélectionnée, pas le continent trouvé.
           const active = !autourActif() && r.id === searchState.continent;
           return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button" role="tab" aria-selected="' + active + '">' +
@@ -2306,20 +2308,23 @@
         }).join('');
       };
 
-      // Tuile « Autour de moi » : première carte de la rangée des continents, onglet Restaurants.
-      // Même format que ses voisines — elle n'ajoute aucune hauteur au panneau, et le CTA
-      // « Laissez-vous guider », calé sur le bas de cette rangée, garde sa place. Surface unie
-      // et pictogramme plutôt qu'une photo : c'est une action, pas une zone du monde.
+      // Ligne « Autour de moi » (onglet Restaurants), comme sur TheFork, en version fine : une seule
+      // ligne sous la rangée des continents. Placée sous les cartes, elle ne décale pas le CTA
+      // « Laissez-vous guider », calé sur leur bas. Masquée pendant la saisie et une fois le mode
+      // actif : la chip et la liste prennent le relais.
       let autourEtat = 'repos';
-      const tuileAutour = () => {
-        if (searchState.activeTab !== 'restaurants') return '';
-        const actif = autourActif();
+      const renderAutour = () => {
+        if (!autourEl) return;
+        const visible = searchState.activeTab === 'restaurants' && !autourActif() && !(searchState.freeText || '').trim();
+        autourEl.hidden = !visible;
+        if (!visible) { autourEl.innerHTML = ''; return; }
         const cherche = autourEtat === 'recherche';
-        return '<button class="wd-booking__dd-continent wd-booking__dd-continent--autour' + (actif ? ' wd-booking__dd-continent--active' : '') +
-          (cherche ? ' wd-booking__dd-continent--recherche' : '') + '" data-autour type="button" aria-pressed="' + actif + '"' +
-          (cherche ? ' aria-busy="true"' : '') + ' title="Les restaurants et bars Pullman les plus proches">' +
-            '<span class="wd-booking__dd-autour-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg></span>' +
-            '<span class="wd-booking__dd-continent-label">' + (cherche ? 'Localisation…' : 'Autour de moi') + '</span>' +
+        autourEl.innerHTML =
+          '<button type="button" class="wd-booking__dd-autour-btn' + (cherche ? ' is-recherche' : '') + '" data-autour' + (cherche ? ' aria-busy="true" disabled' : '') + '>' +
+            '<svg class="wd-booking__dd-autour-icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg>' +
+            '<span class="wd-booking__dd-autour-titre">Autour de moi</span>' +
+            '<span class="wd-booking__dd-autour-sous">' + (cherche ? 'Localisation en cours…' : 'Restaurants et bars Pullman les plus proches') + '</span>' +
+            '<svg class="wd-booking__dd-autour-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,2 8,6 4,10"/></svg>' +
           '</button>';
       };
 
@@ -2455,6 +2460,7 @@
 
       const renderPanel = () => {
         renderContinents();
+        renderAutour();
         renderBreadcrumb();
         renderDestList();
         renderCriteria();
@@ -2565,7 +2571,6 @@
       continentsEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.wd-booking__dd-continent');
         if (!btn) return;
-        if (btn.hasAttribute('data-autour')) { lancerAutour(); return; }
         // Choisir une zone quitte « Autour de moi » et la ville qu'il avait retenue.
         if (searchState.autour) { searchState.autour = null; searchState.city = null; }
         if (btn.dataset.continent === '__all__') {
@@ -2735,17 +2740,15 @@
       criteriaListEl.addEventListener('change', (e) => { if (poserPrix(e)) renderPanel(); });
       // Clic sur « Autour de moi » : on demande la position au navigateur. Sans réponse, un refus ou
       // un délai dépassé, la position de démonstration prend le relais — une seule fois.
-      // Re-cliquer la tuile active quitte le mode, comme on désélectionne un continent.
       const lancerAutour = () => {
         if (autourEtat === 'recherche') return;
-        if (autourActif()) { removeChip('autour'); return; }
         let fait = false;
         const appliquer = (position, demo) => {
           if (fait) return;
           fait = true;
           const proches = tablesAutour(position);
           autourEtat = 'repos';
-          if (!proches.length) { renderContinents(); return; }
+          if (!proches.length) { renderAutour(); return; }
           const premiere = proches[0].v;
           searchState.autour = { lat: position.lat, lng: position.lng, demo: demo, ville: premiere.ville, pays: premiere.pays };
           searchState.continent = premiere.region;
@@ -2760,7 +2763,7 @@
         };
         const secours = () => appliquer({ lat: POSITION_DEMO.lat, lng: POSITION_DEMO.lng }, true);
         autourEtat = 'recherche';
-        renderContinents();
+        renderAutour();
         if (!navigator.geolocation) { secours(); return; }
         setTimeout(secours, 8000);
         navigator.geolocation.getCurrentPosition(
@@ -2768,6 +2771,13 @@
           secours,
           { timeout: 7000, maximumAge: 600000 });
       };
+
+      if (autourEl) autourEl.addEventListener('click', (e) => {
+        if (!e.target.closest('[data-autour]')) return;
+        e.preventDefault();
+        e.stopPropagation(); // la ligne est redessinée : le clic ne doit pas passer pour un clic en dehors
+        lancerAutour();
+      });
 
       chipsEl.addEventListener('click', (e) => {
         const closeBtn = e.target.closest('.wd-booking__dest-chip-close');

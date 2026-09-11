@@ -482,22 +482,27 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 /* Continent cards (horizontal grid) */
 .wd-booking__dd-continents { display: flex; gap: 10px; padding: 0 0 16px; overflow-x: auto; scrollbar-width: none; }
 .wd-booking__dd-continents::-webkit-scrollbar { display: none; }
-/* « Autour de moi » (onglet Restaurants) : première tuile de la rangée des continents, même
-   format. Surface unie et pictogramme — c'est une action, pas une destination. */
+/* « Autour de moi » (onglet Restaurants) : une ligne fine sous la rangée des continents —
+   pictogramme, libellé, précision, chevron. Même langage que la ligne « Reprendre votre
+   recherche » (contour discret, sans arrondi), en plus léger. */
+.wd-booking__dd-autour { margin: 0 0 16px; }
+.wd-booking__dd-autour[hidden] { display: none; }
+.wd-booking__dd-autour-btn { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 7px 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 0; background: rgba(255,255,255,.03); color: #fff; font-family: var(--font-sans); text-align: left; cursor: pointer; transition: background .12s, border-color .12s; }
+.wd-booking__dd-autour-btn:hover:not(:disabled) { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.2); }
+.wd-booking__dd-autour-btn:focus-visible { outline: 2px solid rgba(255,255,255,.5); outline-offset: -2px; }
+.wd-booking__dd-autour-btn:disabled { cursor: progress; }
+.wd-booking__dd-autour-icone { flex: 0 0 auto; color: #fff; }
+.wd-booking__dd-autour-titre { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: #fff; }
+.wd-booking__dd-autour-sous { flex: 1; min-width: 0; font-size: 12px; color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wd-booking__dd-autour-chevron { flex: 0 0 auto; color: rgba(255,255,255,.5); }
+.wd-booking__dd-autour-btn.is-recherche .wd-booking__dd-autour-icone { animation: wd-autour-pouls 1s ease-in-out infinite alternate; }
+@keyframes wd-autour-pouls { to { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .wd-booking__dd-autour-btn { transition: none; } .wd-booking__dd-autour-btn.is-recherche .wd-booking__dd-autour-icone { animation: none; } }
+@media (max-width: 767px) { .wd-booking__dd-autour-btn { min-height: 44px; } }
 .wd-booking__dd-autour-note { margin: -4px 0 10px; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.55); }
 .wd-booking__dd-continent { position: relative; flex-shrink: 0; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid transparent; outline: none; transition: transform .15s, border-color .2s, box-shadow .2s; background: none; padding: 0; }
 .wd-booking__dd-continent:hover { transform: translateY(-2px); }
 .wd-booking__dd-continent--active { border-color: #5FEF91; box-shadow: 0 0 6px rgba(95,239,145,.4); }
-.wd-booking__dd-continent--autour { background: #2a3530; border-color: rgba(255,255,255,.14); }
-.wd-booking__dd-continent--autour:hover { border-color: rgba(255,255,255,.4); }
-.wd-booking__dd-continent--autour.wd-booking__dd-continent--active { border-color: #5FEF91; }
-.wd-booking__dd-continent--autour:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.wd-booking__dd-continent--recherche { cursor: progress; }
-.wd-booking__dd-autour-icone { position: absolute; top: 8px; left: 6px; display: flex; color: #fff; }
-.wd-booking__dd-autour-icone svg { width: 18px; height: 18px; }
-.wd-booking__dd-continent--recherche .wd-booking__dd-autour-icone { animation: wd-autour-pouls 1s ease-in-out infinite alternate; }
-@keyframes wd-autour-pouls { to { opacity: .35; } }
-@media (prefers-reduced-motion: reduce) { .wd-booking__dd-continent--recherche .wd-booking__dd-autour-icone { animation: none; } }
 .wd-booking__dd-continent-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
 .wd-booking__dd-continent:hover .wd-booking__dd-continent-img { transform: scale(1.05); }
 .wd-booking__dd-continent-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,.65) 0%, rgba(0,0,0,.15) 60%); }
