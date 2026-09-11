@@ -2000,7 +2000,8 @@
               const c = liste.find(x => x.id === id);
               const prix = window.WD_RESTO_PRIX && window.WD_RESTO_PRIX.libelle(id);
               if (prix) dits.push(prix);
-              else if (c) dits.push(c.label.toLowerCase());
+              // Restaurant ou bar est déjà dit par le mot compté (« 9 bars ») : le répéter donnait « 9 bars bar ».
+              else if (c && id !== 'restaurant' && id !== 'bar') dits.push(c.label.toLowerCase());
             });
           }
           let d = '<span class="wd-booking__dd-results-count-number">' + n + '</span> ' + motLieux(n);
@@ -5409,7 +5410,7 @@
           .slice(0, 6)
           .map(v => ({ titre: v.nom, sous: v.hotel + ' \u00b7 ' + v.ville,
             detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
-            img: photo(((window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v)[0] : null) || {}).cle || v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
+            img: photo(((window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v)[0] : null) || {}).cle || v.img || (parHotel[v.hotel] || {}).img), href: ((window.WD_RESTO_LIEN && window.WD_RESTO_LIEN(v)) || {}).url || null }));
         if (tables.length) return tables;
       }
 

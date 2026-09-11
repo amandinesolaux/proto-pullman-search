@@ -266,7 +266,7 @@ function _addStyle() {
     // photo, là où le format d'origine en montrait un seul.
     // display:none et non l'attribut hidden : la classe pose display:flex et l'emporte
     // sur le hidden du navigateur — la liste restait affichée sous la card.
-    '.pullman-popup__cta[hidden]{display:none}' +
+    '.pullman-popup__cta[hidden],.pullman-popup-card .pullman-popup__cta[hidden]{display:none}' +
     '.pullman-popup__lieux{display:none;padding:12px 14px 14px;flex-direction:column;gap:10px}' +
     '.pullman-popup__lieux-liste{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}' +
     '.pullman-popup__lieu{border:none;background:none;padding:3px 0;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0}' +
@@ -600,7 +600,10 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     };
     const premier = lieux[0];
     const autres = lieux.slice(1);
-    if (premier && premier.url) lieuCta = { url: premier.url, bar: premier.type === 'bar' };
+    // Le lien d'un lieu, ou celui du lieu frère qui le présente (FI'LIA BAR → Fi'lia Paris).
+    const lienDe = (v) => (window.WD_RESTO_LIEN ? window.WD_RESTO_LIEN(v) : (v.url ? { url: v.url, type: v.type } : null));
+    const lienPremier = premier ? lienDe(premier) : null;
+    if (lienPremier) lieuCta = { url: lienPremier.url, bar: lienPremier.type === 'bar' };
     // Les lieux qui ne répondent pas aux critères restent dans la liste, grisés, comme les hôtels
     // de l'onglet Hôtels : la liste de l'hôtel ne change pas selon les filtres, elle dit ce qui
     // convient. Ceux qui répondent d'abord ; les autres ne se choisissent pas.
@@ -620,8 +623,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     tables = '<div class="pullman-popup__tables">' +
       (lieux.length
         ? '<div class="pullman-popup__table" data-lieu-vitrine>' +
-            (premier.url
-              ? '<a class="pullman-popup__table-nom" href="' + esc(premier.url) + '" target="_blank" rel="noopener">' + esc(premier.nom) + '</a>'
+            (lienPremier
+              ? '<a class="pullman-popup__table-nom" href="' + esc(lienPremier.url) + '" target="_blank" rel="noopener">' + esc(premier.nom) + '</a>'
               : '<span class="pullman-popup__table-nom">' + esc(premier.nom) + '</span>') +
             '<span class="pullman-popup__table-type">' + esc(qualifie(premier, 2)) + '</span>' +
           '</div>'
@@ -635,7 +638,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
           '<div class="pullman-popup__lieux-liste">' +
             listeLieux.map((v, i) => repond(v)
               ? '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '"' +
-                  ' data-lieu-url="' + esc(v.url || '') + '" data-lieu-bar="' + (v.type === 'bar' ? '1' : '') + '">' +
+                  ' data-lieu-url="' + esc((lienDe(v) || {}).url || '') + '" data-lieu-bar="' + ((lienDe(v) || {}).type === 'bar' ? '1' : '') + '">' +
                   '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
                   '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
                 '</button>'

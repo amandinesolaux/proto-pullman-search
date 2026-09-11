@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=550"/>
-  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=550"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=552"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=552"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=550"></script>
-  <script src="../../core/data/reunions.js?v=550"></script>
-  <script src="../../core/components/components.js?v=550"></script>
+  <script src="../../core/data/restaurants.js?v=552"></script>
+  <script src="../../core/data/reunions.js?v=552"></script>
+  <script src="../../core/components/components.js?v=552"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=550"></script>
+  <script src="../../core/components/booking-map.js?v=552"></script>
 </head>
 <body class="brand-pullman">
 
@@ -594,7 +594,7 @@ wd-booking { margin-top: 20px; }
             '<div class="srx-card-bottom">' +
               '<span class="srx-actions">' +
                 (h.href ? '<a class="srx-link" href="' + esc(h.href) + '" target="_blank" rel="noopener">Voir l’hôtel <span aria-hidden="true">→</span></a>' : '') +
-                (v.url ? '<a class="srx-cta" href="' + esc(v.url) + '" target="_blank" rel="noopener">Voir le ' + (v.type === 'bar' ? 'bar' : 'restaurant') + '</a>' : '') +
+                ((window.WD_RESTO_LIEN && window.WD_RESTO_LIEN(v)) ? '<a class="srx-cta" href="' + esc(window.WD_RESTO_LIEN(v).url) + '" target="_blank" rel="noopener">Voir le ' + (window.WD_RESTO_LIEN(v).type === 'bar' ? 'bar' : 'restaurant') + '</a>' : '') +
               '</span>' +
             '</div>' +
           '</div></article>';

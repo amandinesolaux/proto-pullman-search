@@ -819,6 +819,12 @@ window.WD_RESTO_CRITERIA = [
   { group: 'Sélectionnez votre prix', type: 'prix', unite: 'EUR', items: [],
     min: Math.min.apply(null, window.WD_RESTAURANTS.map(v => v.prix)),
     max: Math.max.apply(null, window.WD_RESTAURANTS.map(v => v.prix)) },
+  // Restaurant ou bar : le premier choix qu'on fait, juste sous le prix. La liste et la carte
+  // savaient déjà le lire (le type du lieu), le groupe manquait au panneau.
+  { group: 'Type de lieu', items: [
+    { id: 'restaurant', label: 'Restaurant' },
+    { id: 'bar',        label: 'Bar' },
+  ]},
   { group: 'Thématique', items: [
     { id: 'terrasse',          label: 'Terrasse' },
     { id: 'ambiance-musicale', label: 'Ambiance musicale' },
@@ -946,5 +952,32 @@ window.WD_RESTO_VERRES = {"hotels":{"Pullman Paris Montparnasse":"HCM_P_0015711"
     menu.forEach(k => ajoute(k, 'Au menu'));
     salle.slice(0, 2).forEach(k => ajoute(k, ''));
     return serie;
+  };
+})();
+
+// Lien d'un lieu : sa page sur pullman.accor.com. 122 lieux n'en ont pas, surtout des bars.
+// Quand un lieu du même hôtel porte le même nom et a sa page — FI'LIA BAR et Fi'lia Paris,
+// BAR PAMPA et PAMPA —, c'est elle qui présente l'établissement : on y renvoie, et le bouton
+// dit ce qu'il ouvre (« Voir le restaurant »). Sinon, pas de lien plutôt qu'une page qui
+// parlerait d'autre chose.
+(function () {
+  const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const GENERIQUES = new Set(['bar', 'bars', 'restaurant', 'lounge', 'pool', 'rooftop', 'the', 'les', 'des', 'and',
+    'cafe', 'club', 'terrace', 'terrasse', 'sky', 'skybar', 'lobby', 'grill', 'kitchen', 'pullman', 'hotel',
+    'executive', 'room', 'roof', 'beach', 'wine', 'cocktail', 'cocktails', 'deli', 'bistro', 'brasserie',
+    'spa', 'garden', 'jardin', 'piscine']);
+  const mots = (s) => norm(s).split(/[^a-z0-9]+/).filter(w => w.length >= 3 && !GENERIQUES.has(w));
+  const connus = new Map();
+  window.WD_RESTO_LIEN = (v) => {
+    if (!v) return null;
+    if (v.url) return { url: v.url, type: v.type };
+    if (connus.has(v)) return connus.get(v);
+    const siens = mots(v.nom);
+    const frere = siens.length
+      ? window.WD_RESTAURANTS.find(x => x !== v && x.hotel === v.hotel && x.url && mots(x.nom).some(w => siens.indexOf(w) >= 0))
+      : null;
+    const lien = frere ? { url: frere.url, type: frere.type, via: frere.nom } : null;
+    connus.set(v, lien);
+    return lien;
   };
 })();
