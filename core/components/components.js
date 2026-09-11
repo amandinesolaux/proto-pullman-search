@@ -1847,7 +1847,7 @@
       // Comme sur TheFork : un raccourci en tête du panneau, qui localise la personne et montre
       // les restaurants et bars Pullman les plus proches, triés par distance. La position est
       // celle du navigateur ; refusée, indisponible ou trop lente, une position de démonstration
-      // prend le relais, et le panneau le dit. Le mode vaut tant que la destination reste la
+      // prend le relais. Le mode vaut tant que la destination reste la
       // ville trouvée : choisir un autre continent, un autre pays ou une autre ville en sort.
       const POSITION_DEMO = { lat: 48.8606, lng: 2.3470, libelle: 'Paris, Châtelet' };
       const RAYON_AUTOUR_KM = 25;
@@ -1999,9 +1999,6 @@
           const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
           const retenues = tablesRetenuesAutour().filter(t => restoMatchesCriteria(t.v));
           let html = '<div class="wd-booking__dd-section-title">Les plus proches de vous</div>';
-          if (searchState.autour.demo) {
-            html += '<p class="wd-booking__dd-autour-note">Localisation indisponible : position de démonstration, ' + esc(POSITION_DEMO.libelle) + '.</p>';
-          }
           html += retenues.length
             ? '<div class="wd-booking__dd-country-hotels wd-booking__dd-autour-liste">' + retenues.map(({ v, km }) => {
                 const serie = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v) : [];

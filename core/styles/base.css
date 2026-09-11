@@ -499,7 +499,6 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 @keyframes wd-autour-pouls { to { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .wd-booking__dd-autour-btn { transition: none; } .wd-booking__dd-autour-btn.is-recherche .wd-booking__dd-autour-icone { animation: none; } }
 @media (max-width: 767px) { .wd-booking__dd-autour-btn { min-height: 44px; } }
-.wd-booking__dd-autour-note { margin: -4px 0 10px; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.55); }
 .wd-booking__dd-continent { position: relative; flex-shrink: 0; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid transparent; outline: none; transition: transform .15s, border-color .2s, box-shadow .2s; background: none; padding: 0; }
 .wd-booking__dd-continent:hover { transform: translateY(-2px); }
 .wd-booking__dd-continent--active { border-color: #5FEF91; box-shadow: 0 0 6px rgba(95,239,145,.4); }
