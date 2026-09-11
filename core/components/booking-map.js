@@ -552,9 +552,11 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     // Viennent ensuite deux images « Au menu » et la salle ou le bar de l'hôtel, pour le lieu en
     // vitrine — plus de chambres ni de lobby derrière une table.
     const clesTables = [...new Set(lieux.map(v => v.img).filter(Boolean))];
-    if (lieux.length) {
-      const suite = window.WD_RESTO_PHOTOS
-        ? window.WD_RESTO_PHOTOS(lieux[0]).filter(p => clesTables.indexOf(p.cle) < 0) : [];
+    // Un hôtel dont aucune table ne répond aux critères montre sa salle et des images « Au menu »,
+    // jamais ses chambres : on est sur l'onglet Restaurants.
+    if (window.WD_RESTO_PHOTOS) {
+      const vitrine = lieux[0] || { nom: h.name, hotel: h.name, type: 'restaurant', img: '', themes: [] };
+      const suite = window.WD_RESTO_PHOTOS(vitrine).filter(p => clesTables.indexOf(p.cle) < 0);
       // Les images « Au menu » suivent directement la photo du lieu en vitrine : c'est lui qu'on
       // regarde. Les autres lieux de l'hôtel et la salle viennent ensuite.
       const tables = clesTables.map(k => ({ cle: k, legende: '' }));
@@ -585,8 +587,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     // ce qui manquait à une liste qui ne dit que des noms.
     // Quinze lieux sur 360 n'ont pas de visuel à eux. Sans repli, cliquer l'un d'eux
     // laissait la photo du lieu précédent : on étiquetait le restaurant d'un nom qui
-    // n'était pas le sien. Ils renvoient donc vers la première photo de l'hôtel — un
-    // visuel générique vaut mieux qu'un visuel faux.
+    // n'était pas le sien. Ils renvoient vers une image « Au menu » — un visuel générique
+    // vaut mieux qu'un visuel faux, et une chambre n'a rien à faire ici.
     // Un lieu sans photo s'ouvre sur la première image « Au menu » quand il y en a une.
     const premiereHotel = legendes.indexOf('Au menu') >= 0 ? legendes.indexOf('Au menu') : Math.min(clesTables.length, photos.length - 1);
     const indexPhoto = (v) => {

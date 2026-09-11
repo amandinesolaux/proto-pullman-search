@@ -2130,7 +2130,11 @@
             html += '<div class="wd-booking__dd-country-hotels">' +
               (tables.length
                 ? tables.map(({ v, hh }) => {
-                    const cle = window.WD_IMG_KEY ? window.WD_IMG_KEY(hh) : (hh.img || '').split(':')[0];
+                    // La vignette montre la table — sa photo, ou une image « Au menu » —, plus la
+                    // photo de présentation de l'hôtel, souvent une chambre.
+                    const serieTable = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v) : [];
+                    const cle = serieTable.length ? serieTable[0].cle
+                      : (window.WD_IMG_KEY ? window.WD_IMG_KEY(hh) : (hh.img || '').split(':')[0]);
                     const choisie = searchState.selectedResto === v.nom;
                     // Comme sur le site Restaurants & Bars : le style de nourriture, la note et
                     // le prix moyen par couvert.
@@ -4978,9 +4982,8 @@
       }
 
       // Une table a été demandée : c'est elle qu'on montre, pas l'hôtel qui l'abrite —
-      // mais seulement dans les hôtels qui tiennent le reste de la demande. Quinze
-      // lieux sur 360 n'ont pas de visuel : ils empruntent celui de leur hôtel plutôt
-      // que de laisser un rectangle vide au milieu du carrousel.
+      // mais seulement dans les hôtels qui tiennent le reste de la demande. Les lieux sans
+      // visuel montrent une image « Au menu » plutôt que la photo de leur hôtel.
       if (crit.indexOf('restaurant') >= 0) {
         const parHotel = {}, rang = {};
         retenus.forEach((h, i) => { parHotel[h.name] = h; rang[h.name] = i; });
@@ -4993,7 +4996,7 @@
           .slice(0, 6)
           .map(v => ({ titre: v.nom, sous: v.hotel + ' \u00b7 ' + v.ville,
             detail: (v.type === 'bar' ? 'Bar' : 'Restaurant'),
-            img: photo(v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
+            img: photo(((window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v)[0] : null) || {}).cle || v.img || (parHotel[v.hotel] || {}).img), href: v.url || null }));
         if (tables.length) return tables;
       }
 
