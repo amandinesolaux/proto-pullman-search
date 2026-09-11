@@ -4994,11 +4994,10 @@
               // Seul, aucun nombre n'est donné : c'est un voyageur, et ALL doit le savoir.
               guests: st.agentPersonnes || (st.agentAccompagne && st.agentAccompagne !== 'accompagne' ? 1 : 0) }) : null;
         const pays = h.country && h.country !== h.city ? ', ' + esc(h.country) : '';
-        // Coordonnées et ville portées par la card : la carte en tire ses pins et les
-        // points d'intérêt autour.
+        // Coordonnées et prix portés par la card : la carte en tire ses pastilles.
         const situe = h.lat != null && h.lng != null;
         return '<article class="wd-agent__hotel" data-agent-hotel="' + i + '"'
-          + (situe ? ' data-lat="' + h.lat + '" data-lng="' + h.lng + '" data-nom="' + esc(h.name) + '" data-ville="' + esc(h.city || '') + '"' : '') + '>'
+          + (situe ? ' data-lat="' + h.lat + '" data-lng="' + h.lng + '" data-nom="' + esc(h.name) + '" data-prix="' + esc(h.price || '') + '"' : '') + '>'
           + '<div class="wd-agent__hotel-media"' + (photos.length > 1 ? ' data-agent-galerie' : '') + '>'
           + photos.map((u, i) => '<img class="wd-agent__hotel-img" src="' + u + '" alt="' + (i === 0 ? esc(h.name) : '') + '"'
               + (i === 0 ? ' data-on' : ' loading="lazy"') + ' />').join('')
@@ -5051,11 +5050,6 @@
                   + '<div class="wd-agent__carte" id="wdAgentCarte"></div>'
                   + '<div class="wd-agent__carte-fiche" hidden></div>'
                 + '</div>'
-                + (props.some(p => p.hotel && ((window.WD_POI || {})[p.hotel.city] || []).length)
-                    ? '<p class="wd-agent__carte-legende" hidden>'
-                      + '<span class="wd-agent__carte-cle wd-agent__carte-cle--hotel">Hôtels Pullman</span>'
-                      + '<span class="wd-agent__carte-cle wd-agent__carte-cle--poi">Points d’intérêt</span></p>'
-                    : '')
                 + '</div>'
               : '')
         : '';
@@ -7911,85 +7905,30 @@
         };
         this.querySelectorAll('[data-agent-galerie]').forEach(lierGalerie);
 
-        // Carte des hôtels proposés, dans l'habit de la carte de la homepage : fond sombre, pins
-        // verts nommés, zoom en haut à droite, et les points d'intérêt de la ville (WD_POI) — un
-        // point et un nom par lieu, dans la couleur de sa catégorie. Ouverte, elle prend la place
-        // du carrousel : la card de l'hôtel choisi se pose en bas de la carte, comme sur Airbnb —
-        // le premier hôtel d'emblée, un autre au clic sur son pin ; cliquer la carte hors d'un pin
-        // ou la croix la retire. Refaite à chaque rendu : l'ancienne carte est détruite avec le
-        // DOM qu'elle occupait.
+        // Carte des hôtels proposés, à la manière d'Airbnb : un fond clair où quartiers, rues,
+        // parcs et eau sont nommés — on sait d'un coup d'œil où l'on se trouve —, et chaque hôtel
+        // en pastille de prix. Ouverte, elle prend la place du carrousel : la card de l'hôtel choisi
+        // se pose au bas de la carte, le premier d'emblée, un autre au clic sur sa pastille ; la
+        // croix ou un clic ailleurs sur la carte la retire. Refaite à chaque rendu : l'ancienne
+        // carte est détruite avec le DOM qu'elle occupait.
         if (this._agentCarteLeaflet) { this._agentCarteLeaflet.remove(); this._agentCarteLeaflet = null; }
         const basculeCarte = this.querySelector('[data-agent-carte]');
         if (basculeCarte) {
           const zone = this.querySelector('.wd-agent__carte-zone');
           const cadre = this.querySelector('#wdAgentCarte');
           const fiche = this.querySelector('.wd-agent__carte-fiche');
-          const legende = this.querySelector('.wd-agent__carte-legende');
           const carrouselHotels = this.querySelector('.wd-agent__carrousel--hotels');
           const cartesSituees = carrouselHotels ? [...carrouselHotels.querySelectorAll('.wd-agent__hotel[data-lat]')] : [];
           const libelle = basculeCarte.querySelector('span');
-          const trace = (d, epaisseur) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (epaisseur || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
-          // Un seul signe pour tous les lieux : un point au trait et son nom, dans la couleur de
-          // sa catégorie. Les pictogrammes illustrés chargeaient la carte sans aider à la lire.
-          const POINT = '<path d="M12 22v-7.5"/><circle cx="12" cy="8.5" r="6.5"/>';
-          const GENRES = { embleme: 'Monument', musee: 'Musée', spectacle: 'Culture et spectacle', culte: 'Lieu de culte',
-            shopping: 'Shopping', parc: 'Parc', gare: 'Gare', aeroport: 'Aéroport' };
-          const iconeLieu = (p) => L.divIcon({ className: 'wd-agent__poi wd-agent__poi--' + p.t,
-            html: '<span class="wd-agent__poi-point">' + trace(POINT, 2.2) + '</span><span class="wd-agent__poi-nom">' + esc(p.n) + '</span>',
-            iconSize: [14, 14], iconAnchor: [7, 14] });
-          // Monuments d'abord, transports en dernier : c'est aussi l'ordre dans lequel les lieux
-          // gardent leur place quand ils se chevauchent.
-          const RANG = { embleme: 400, musee: 300, spectacle: 300, culte: 300, shopping: 300, parc: 200, gare: 100, aeroport: 100, metro: 0 };
           let pins = [];
-          let lieux = [];
           let choisi = -1;
 
-          // Place prise sur la carte, dans l'ordre d'importance, comme chez Airbnb : la card posée
-          // sur la carte d'abord — rien ne s'affiche dessous —, puis les hôtels, l'hôtel choisi en
-          // tête, qui ne s'effacent jamais, seul leur nom peut céder ; puis les lieux par rang. Un
-          // lieu dont le point heurte ce qui est déjà posé disparaît avec son nom et revient en
-          // zoomant ; un nom qui heurte s'efface seul et revient au survol.
-          const ajusterEtiquettes = () => {
-            const poses = [];
-            const marge = (r, m) => ({ left: r.left - m, right: r.right + m, top: r.top - m, bottom: r.bottom + m });
-            const heurte = (r) => poses.some(p => r.left < p.right && r.right > p.left && r.top < p.bottom && r.bottom > p.top);
-            if (fiche && !fiche.hidden) poses.push(fiche.getBoundingClientRect());
-            pins.slice().sort((a, b) => (b.i === choisi) - (a.i === choisi)).forEach(p => {
-              const el = p.marqueur.getElement();
-              if (!el) return;
-              const nom = el.querySelector('.pullman-label');
-              const point = el.querySelector('.pullman-dot');
-              if (nom) {
-                nom.classList.remove('pullman-label--masquee');
-                const r = nom.getBoundingClientRect();
-                if (heurte(r)) nom.classList.add('pullman-label--masquee'); else poses.push(r);
-              }
-              if (point) poses.push(point.getBoundingClientRect());
-            });
-            lieux.forEach(mq => {
-              const el = mq.getElement();
-              if (!el) return;
-              const icone = el.querySelector('.wd-agent__poi-point');
-              const nom = el.querySelector('.wd-agent__poi-nom');
-              el.classList.remove('is-cache');
-              if (nom) nom.classList.remove('is-masque');
-              if (icone) {
-                const ri = marge(icone.getBoundingClientRect(), 3);
-                if (heurte(ri)) { el.classList.add('is-cache'); return; }
-                poses.push(ri);
-              }
-              if (!nom) return;
-              const rn = nom.getBoundingClientRect();
-              if (heurte(rn)) nom.classList.add('is-masque'); else poses.push(rn);
-            });
-          };
           const marquer = () => {
             pins.forEach(p => {
               const el = p.marqueur.getElement();
-              if (el) el.classList.toggle('pullman-map-marker--selected', p.i === choisi);
+              if (el) el.classList.toggle('is-choisi', p.i === choisi);
               p.marqueur.setZIndexOffset(p.i === choisi ? 2000 : 1000);
             });
-            ajusterEtiquettes();
           };
           // Hauteur que la card prend au bas de la carte, marge comprise : le cadrage la réserve.
           const reserveFiche = () => (fiche && !fiche.hidden ? fiche.offsetHeight + 24 : 28);
@@ -7999,7 +7938,7 @@
             marquer();
           };
           // La card de l'hôtel choisi, copiée du carrousel et mise en largeur pour tenir au bas
-          // de la carte. Si son pin tombe sous la card, la carte se décale pour le montrer.
+          // de la carte. Si sa pastille tombe sous la card, la carte se décale pour la montrer.
           const montrerFiche = (i, recentrer) => {
             const source = cartesSituees.find(c => Number(c.dataset.agentHotel) === i);
             if (!source || !fiche) { cacherFiche(); return; }
@@ -8020,75 +7959,59 @@
             const carte = this._agentCarteLeaflet;
             const pin = pins.find(p => p.i === i);
             if (recentrer && carte && pin) {
-              carte.panInside(pin.marqueur.getLatLng(), { paddingTopLeft: [40, 40], paddingBottomRight: [40, reserveFiche() + 16] });
+              carte.panInside(pin.marqueur.getLatLng(), { paddingTopLeft: [48, 48], paddingBottomRight: [48, reserveFiche() + 16] });
             }
           };
 
           const ouvrir = () => {
             if (!window.L || !zone || !cadre) return;
             zone.hidden = false;
-            if (legende) legende.hidden = false;
             if (carrouselHotels) carrouselHotels.hidden = true;
             basculeCarte.setAttribute('aria-expanded', 'true');
             libelle.textContent = 'Afficher la liste';
             this.state.agentCarte = true;
-            const carte = L.map(cadre, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 16 });
-            L.control.zoom({ position: 'topright' }).addTo(carte);
+            const carte = L.map(cadre, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 18 });
+            L.control.zoom({ position: 'topright', zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer' }).addTo(carte);
+            L.control.attribution({ position: 'topleft', prefix: false }).addAttribution('© Esri').addTo(carte);
             this._agentCarteLeaflet = carte;
-            // Même fond que la carte de la homepage : Esri Dark Gray, gratuit sans clé.
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom: 16 }).addTo(carte);
-            // Plusieurs hôtels : leur nom sans « Pullman », comme sur la homepage une fois les pins
-            // d'une ville séparés. Un seul : son nom entier.
-            const plusieurs = cartesSituees.length > 1;
+            // Esri World Street Map, sans clé — les tuiles CARTO sont filigranées « API key
+            // required ». C'est le seul fond gratuit qui nomme quartiers et rues ; ses couleurs
+            // sont adoucies en CSS pour approcher la lecture calme d'Airbnb.
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }).addTo(carte);
+            // Pastille de prix, comme sur Airbnb ; le nom de l'hôtel, sans « Pullman », quand le
+            // prix manque. Le nom entier reste en infobulle.
             pins = cartesSituees.map(c => {
               const i = Number(c.dataset.agentHotel);
-              const nom = plusieurs ? c.dataset.nom.replace(/^Pullman\s+/, '') : c.dataset.nom;
+              const texte = c.dataset.prix ? c.dataset.prix + ' €' : c.dataset.nom.replace(/^Pullman\s+/, '');
               const marqueur = L.marker([Number(c.dataset.lat), Number(c.dataset.lng)], {
                 title: c.dataset.nom, alt: c.dataset.nom, zIndexOffset: 1000,
-                icon: L.divIcon({ className: 'pullman-map-marker pullman-map-marker--labeled',
-                  html: '<div class="pullman-dot pullman-dot--large"></div><span class="pullman-label">' + esc(nom) + '</span>',
-                  iconSize: [14, 14], iconAnchor: [7, 7] })
+                icon: L.divIcon({ className: 'wd-agent__prix-pin', html: '<span class="wd-agent__prix">' + esc(texte) + '</span>', iconSize: null })
               }).addTo(carte);
               marqueur.on('click', () => montrerFiche(i, true));
               return { i, marqueur };
             });
-            const poi = [];
-            [...new Set(cartesSituees.map(c => c.dataset.ville))].forEach(v =>
-              ((window.WD_POI || {})[v] || []).forEach(p => { if (!poi.some(x => x.n === p.n)) poi.push(p); }));
-            // Les stations de métro restent hors carte : sans leur nom, elles ne disaient rien.
-            lieux = poi.filter(p => p.t !== 'metro').sort((a, b) => (RANG[b.t] || 0) - (RANG[a.t] || 0)).map(p => L.marker([p.lat, p.lng], {
-              title: p.n + ' · ' + (GENRES[p.t] || 'Point d’intérêt'), alt: p.n, keyboard: false,
-              zIndexOffset: -1000 + (RANG[p.t] || 0), icon: iconeLieu(p)
-            }).addTo(carte));
-            // Cliquer la carte hors d'un pin retire la card : même geste que sur la homepage.
             carte.on('click', cacherFiche);
             // La première card d'emblée : on voit tout de suite un hôtel, et où il se trouve.
             if (cartesSituees.length) montrerFiche(Number(cartesSituees[0].dataset.agentHotel), false);
-            // Cadrage : les hôtels et les lieux à moins de 5 km d'eux, au-dessus de la card.
-            // L'aéroport reste sur la carte, mais on ne dézoome pas jusqu'à lui.
-            const hotels = pins.map(p => p.marqueur.getLatLng());
-            const proches = poi.filter(p => p.t !== 'aeroport' && p.t !== 'metro' && hotels.some(h => h.distanceTo([p.lat, p.lng]) < 5000))
-              .map(p => L.latLng(p.lat, p.lng));
-            const cadrage = hotels.concat(proches);
+            // Cadrage sur les hôtels, au-dessus de la card. Un seul hôtel : le quartier autour,
+            // assez large pour lire les noms des quartiers voisins.
+            const points = pins.map(p => p.marqueur.getLatLng());
             const bas = reserveFiche();
-            if (cadrage.length === 1) {
-              carte.setView(cadrage[0], 14, { animate: false });
+            if (points.length === 1) {
+              carte.setView(points[0], 14, { animate: false });
               carte.panBy([0, bas / 2], { animate: false });
-            } else {
-              carte.fitBounds(L.latLngBounds(cadrage), { paddingTopLeft: [28, 28], paddingBottomRight: [28, bas], maxZoom: 15, animate: false });
+            } else if (points.length > 1) {
+              carte.fitBounds(L.latLngBounds(points), { paddingTopLeft: [56, 56], paddingBottomRight: [56, bas + 16], maxZoom: 15, animate: false });
             }
-            carte.on('zoomend moveend', ajusterEtiquettes);
             marquer();
-            setTimeout(() => { if (this._agentCarteLeaflet === carte) { carte.invalidateSize(); ajusterEtiquettes(); } }, 60);
+            setTimeout(() => { if (this._agentCarteLeaflet === carte) carte.invalidateSize(); }, 60);
           };
           const fermer = () => {
             if (this._agentCarteLeaflet) { this._agentCarteLeaflet.remove(); this._agentCarteLeaflet = null; }
             pins = [];
-            lieux = [];
             choisi = -1;
             if (fiche) { fiche.hidden = true; fiche.innerHTML = ''; }
             zone.hidden = true;
-            if (legende) legende.hidden = true;
             if (carrouselHotels) carrouselHotels.hidden = false;
             basculeCarte.setAttribute('aria-expanded', 'false');
             libelle.textContent = 'Voir sur la carte';

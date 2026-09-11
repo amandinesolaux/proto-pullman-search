@@ -3127,10 +3127,9 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 
 /* ── Agent : situer les hôtels proposés ─────────────────────────────────────────
-   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, dans l'habit de
-   celle de la homepage : fond Esri sombre, pins verts nommés (styles de booking-map.js),
-   boutons de zoom sombres. Les points d'intérêt majeurs de la ville s'y ajoutent à la
-   manière d'Airbnb, un cran sous les hôtels ; une légende sous la carte distingue les deux. */
+   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, à la manière d'Airbnb :
+   fond clair où quartiers, rues, parcs et eau sont nommés, hôtels en pastilles de prix,
+   boutons de zoom blancs. */
 .wd-agent__localiser {
   display: flex;
   flex-direction: column;
@@ -3160,75 +3159,73 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__carte-zone[hidden] { display: none; }
 .wd-agent__carte {
   height: 440px;
-  background: #1a1f1c;
+  background: #EEF0EC;
+}
+/* Fond Esri nettement désaturé et éclairci : les noms de quartiers et de rues restent lisibles,
+   les ocres et les orangés du fond d'origine s'effacent, et les pastilles priment. Comparé au
+   gris clair d'Esri, trop muet à l'échelle du quartier pour savoir où l'on se trouve. */
+.wd-agent__carte .leaflet-tile-pane { filter: saturate(.3) contrast(.92) brightness(1.08); }
+.wd-agent__carte .leaflet-control-attribution {
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, .8);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 9px;
+  color: rgba(34, 34, 34, .6);
 }
 @media (max-width: 767px) { .wd-agent__carte { height: 400px; } }
-.wd-agent__carte .leaflet-control-zoom { border: none; border-radius: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+/* Zoom blanc, en pilule, comme sur Airbnb. */
+.wd-agent__carte .leaflet-control-zoom {
+  overflow: hidden;
+  border: 0;
+  border-radius: 100px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 2px 8px rgba(0, 0, 0, .18);
+}
 .wd-agent__carte .leaflet-control-zoom a {
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(255, 255, 255, .15);
+  width: 36px;
+  height: 36px;
+  border: 0;
   border-radius: 0;
-  background: #1a2220;
-  font-size: 14px;
-  line-height: 28px;
-  color: #ffffff;
+  background: #ffffff;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 36px;
+  color: #222222;
 }
-.wd-agent__carte .leaflet-control-zoom a:hover { background: #243330; color: #ffffff; }
-/* Points d'intérêt : un point au trait et un nom, dans la couleur de la catégorie —
-   monuments en blanc cassé, musées et spectacles en saumon, lieux de culte en ambre,
-   shopping en violet, parcs en vert tendre, gares et aéroports en gris. */
-.wd-agent__poi { color: #F4F1EA; transition: opacity .15s ease; }
-.wd-agent__poi.is-cache { opacity: 0; pointer-events: none; }
-.wd-agent__poi:hover { z-index: 9000 !important; }
-.wd-agent__poi-point {
-  display: flex;
-  width: 14px;
-  height: 14px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8));
-}
-.wd-agent__poi-point svg { width: 14px; height: 14px; }
-.wd-agent__poi-nom {
+.wd-agent__carte .leaflet-control-zoom a:first-child { border-bottom: 1px solid #EBEBEB; }
+.wd-agent__carte .leaflet-control-zoom a:hover { background: #F7F7F7; color: #222222; }
+.wd-agent__carte .leaflet-control-zoom a:focus-visible { outline: 2px solid #445047; outline-offset: -2px; }
+
+/* Pastilles de prix. Blanches par défaut ; l'hôtel choisi passe en kaki, texte blanc. */
+.wd-agent__prix-pin { width: 0; height: 0; }
+.wd-agent__prix {
   position: absolute;
-  left: 18px;
-  top: 7px;
-  transform: translateY(-50%);
-  font-family: var(--font-sans, sans-serif);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.2;
-  color: currentColor;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .9), 0 0 2px rgba(0, 0, 0, .7);
-  white-space: nowrap;
-  pointer-events: none;
-  transition: opacity .15s ease;
-}
-.wd-agent__poi-nom.is-masque { opacity: 0; }
-.wd-agent__poi:hover .wd-agent__poi-nom { opacity: 1; }
-.wd-agent__poi--musee,
-.wd-agent__poi--spectacle { color: #FFB199; }
-.wd-agent__poi--culte { color: #F2C879; }
-.wd-agent__poi--shopping { color: #C6B9FF; }
-.wd-agent__poi--parc { color: #8FD19E; }
-.wd-agent__poi--gare,
-.wd-agent__poi--aeroport { color: rgba(255, 255, 255, .72); }
-.wd-agent__carte-legende {
-  display: flex;
-  flex-wrap: wrap;
+  left: 0;
+  top: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 6px 16px;
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 11px;
-  color: rgba(68, 80, 71, .78);
+  padding: 7px 11px;
+  border-radius: 100px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 2px 6px rgba(0, 0, 0, .22);
+  font-family: var(--font-sans, sans-serif);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: #222222;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
 }
-.wd-agent__carte-legende[hidden] { display: none; }
-.wd-agent__carte-cle { display: inline-flex; align-items: center; gap: 6px; }
-.wd-agent__carte-cle::before { content: ''; width: 10px; height: 10px; border-radius: 100px; }
-.wd-agent__carte-cle--hotel::before { background: #5FEF91; box-shadow: 0 0 0 2px #1a2220; }
-.wd-agent__carte-cle--poi::before { background: transparent; box-shadow: inset 0 0 0 2px #7D8A80; }
+.wd-agent__prix-pin:hover .wd-agent__prix { transform: translate(-50%, -50%) scale(1.06); }
+.wd-agent__prix-pin.is-choisi .wd-agent__prix {
+  background: #445047;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .3);
+  color: #ffffff;
+  transform: translate(-50%, -50%) scale(1.08);
+}
 @media (prefers-reduced-motion: reduce) {
-  .wd-agent__poi-nom,
+  .wd-agent__prix,
   .wd-agent__carte-bascule { transition: none; }
 }
 
