@@ -3127,9 +3127,9 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 
 /* ── Agent : situer les hôtels proposés ─────────────────────────────────────────
-   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, à la manière d'Airbnb :
-   fond clair où quartiers, rues, parcs et eau sont nommés, hôtels en pastilles de prix,
-   boutons de zoom blancs. */
+   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, à la manière d'Airbnb
+   mais aux couleurs sombres de la homepage : quartiers, rues, parcs et eau nommés, hôtels en
+   pastilles de prix, boutons de zoom sombres. */
 .wd-agent__localiser {
   display: flex;
   flex-direction: column;
@@ -3159,43 +3159,48 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__carte-zone[hidden] { display: none; }
 .wd-agent__carte {
   height: 440px;
-  background: #EEF0EC;
+  background: #1a1f1c;
 }
-/* Fond Esri nettement désaturé et éclairci : les noms de quartiers et de rues restent lisibles,
-   les ocres et les orangés du fond d'origine s'effacent, et les pastilles priment. Comparé au
-   gris clair d'Esri, trop muet à l'échelle du quartier pour savoir où l'on se trouve. */
-.wd-agent__carte .leaflet-tile-pane { filter: saturate(.3) contrast(.92) brightness(1.08); }
-.wd-agent__carte .leaflet-control-attribution {
+/* leaflet.css est chargé après cette feuille : à spécificité égale, ses règles l'emportaient —
+   fond #ddd pendant le chargement des tuiles, attribution sur fond blanc, zoom à 30 px bordé de
+   2 px. Les surcharges de la carte portent donc aussi la classe .leaflet-container. */
+.wd-agent__carte.leaflet-container { background: #1a1f1c; }
+/* Fond Esri Street passé en sombre : inversé puis ramené au gris neutre, adouci pour
+   approcher le gris foncé de la carte de la homepage. Les noms de quartiers et de rues, eux,
+   restent lisibles — ce que le fond gris foncé d'Esri ne donnait pas à cette échelle. */
+.wd-agent__carte .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) saturate(.12) brightness(.95) contrast(.8); }
+.wd-agent__carte.leaflet-container .leaflet-control-attribution {
   padding: 1px 6px;
-  background: rgba(255, 255, 255, .8);
+  background: rgba(26, 34, 32, .7);
   font-family: var(--font-sans, sans-serif);
   font-size: 9px;
-  color: rgba(34, 34, 34, .6);
+  color: rgba(255, 255, 255, .6);
 }
 @media (max-width: 767px) { .wd-agent__carte { height: 400px; } }
-/* Zoom blanc, en pilule, comme sur Airbnb. */
-.wd-agent__carte .leaflet-control-zoom {
+/* Zoom en pilule, aux couleurs sombres des boutons de la carte de la homepage. */
+.wd-agent__carte.leaflet-container .leaflet-control-zoom {
   overflow: hidden;
   border: 0;
   border-radius: 100px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .06), 0 2px 8px rgba(0, 0, 0, .18);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .15), 0 2px 8px rgba(0, 0, 0, .4);
 }
-.wd-agent__carte .leaflet-control-zoom a {
+.wd-agent__carte.leaflet-container .leaflet-control-zoom a {
   width: 36px;
   height: 36px;
   border: 0;
   border-radius: 0;
-  background: #ffffff;
+  background: #1a2220;
   font-size: 18px;
   font-weight: 400;
   line-height: 36px;
-  color: #222222;
+  color: #ffffff;
 }
-.wd-agent__carte .leaflet-control-zoom a:first-child { border-bottom: 1px solid #EBEBEB; }
-.wd-agent__carte .leaflet-control-zoom a:hover { background: #F7F7F7; color: #222222; }
-.wd-agent__carte .leaflet-control-zoom a:focus-visible { outline: 2px solid #445047; outline-offset: -2px; }
+.wd-agent__carte.leaflet-container .leaflet-control-zoom a:first-child { border-bottom: 1px solid rgba(255, 255, 255, .15); }
+.wd-agent__carte.leaflet-container .leaflet-control-zoom a:hover { background: #243330; color: #ffffff; }
+.wd-agent__carte.leaflet-container .leaflet-control-zoom a:focus-visible { outline: 2px solid #ffffff; outline-offset: -2px; }
 
-/* Pastilles de prix. Blanches par défaut ; l'hôtel choisi passe en kaki, texte blanc. */
+/* Pastilles de prix. Blanches par défaut ; l'hôtel choisi passe au vert de la marque, comme
+   les pins de la carte de la homepage — le kaki se perdait sur le fond sombre. */
 .wd-agent__prix-pin { width: 0; height: 0; }
 .wd-agent__prix {
   position: absolute;
@@ -3206,7 +3211,7 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   padding: 7px 11px;
   border-radius: 100px;
   background: #ffffff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .08), 0 2px 6px rgba(0, 0, 0, .22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .45);
   font-family: var(--font-sans, sans-serif);
   font-size: 13px;
   font-weight: 700;
@@ -3219,9 +3224,9 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 .wd-agent__prix-pin:hover .wd-agent__prix { transform: translate(-50%, -50%) scale(1.06); }
 .wd-agent__prix-pin.is-choisi .wd-agent__prix {
-  background: #445047;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, .3);
-  color: #ffffff;
+  background: #5FEF91;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .5);
+  color: #17321f;
   transform: translate(-50%, -50%) scale(1.08);
 }
 @media (prefers-reduced-motion: reduce) {

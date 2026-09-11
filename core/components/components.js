@@ -7905,9 +7905,9 @@
         };
         this.querySelectorAll('[data-agent-galerie]').forEach(lierGalerie);
 
-        // Carte des hôtels proposés, à la manière d'Airbnb : un fond clair où quartiers, rues,
-        // parcs et eau sont nommés — on sait d'un coup d'œil où l'on se trouve —, et chaque hôtel
-        // en pastille de prix. Ouverte, elle prend la place du carrousel : la card de l'hôtel choisi
+        // Carte des hôtels proposés, à la manière d'Airbnb mais aux couleurs sombres de la carte
+        // de la homepage : quartiers, rues, parcs et eau sont nommés — on sait d'un coup d'œil où
+        // l'on se trouve —, et chaque hôtel est une pastille de prix. Ouverte, elle prend la place du carrousel : la card de l'hôtel choisi
         // se pose au bas de la carte, le premier d'emblée, un autre au clic sur sa pastille ; la
         // croix ou un clic ailleurs sur la carte la retire. Refaite à chaque rendu : l'ancienne
         // carte est détruite avec le DOM qu'elle occupait.
@@ -7975,8 +7975,8 @@
             L.control.attribution({ position: 'topleft', prefix: false }).addAttribution('© Esri').addTo(carte);
             this._agentCarteLeaflet = carte;
             // Esri World Street Map, sans clé — les tuiles CARTO sont filigranées « API key
-            // required ». C'est le seul fond gratuit qui nomme quartiers et rues ; ses couleurs
-            // sont adoucies en CSS pour approcher la lecture calme d'Airbnb.
+            // required ». C'est le seul fond gratuit qui nomme quartiers et rues ; il est passé en
+            // sombre en CSS. Le gris foncé d'Esri, lui, restait muet à l'échelle du quartier.
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18 }).addTo(carte);
             // Pastille de prix, comme sur Airbnb ; le nom de l'hôtel, sans « Pullman », quand le
             // prix manque. Le nom entier reste en infobulle.
