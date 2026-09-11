@@ -78,7 +78,8 @@ function _installerGalerie() {
   document.documentElement.dataset.wdGalerie = '1';
   // Onglets numérotés des restaurants et bars d'un hôtel : un clic, ou les flèches, passe au lieu
   // choisi — son nom et son lien, son qualificatif, sa photo et le bouton qui y mène.
-  const choisirLieu = (carte, onglet) => {
+  // sansPhoto : la galerie vient d'arriver sur ce lieu, elle n'a pas à y retourner.
+  const choisirLieu = (carte, onglet, sansPhoto) => {
     carte.querySelectorAll('[data-lieu-onglet]').forEach(o => {
       const actif = o === onglet;
       if (actif) o.setAttribute('data-on', ''); else o.removeAttribute('data-on');
@@ -99,7 +100,7 @@ function _installerGalerie() {
       if (typ) typ.textContent = onglet.dataset.lieuType || '';
     }
     const i = Number(onglet.dataset.lieuPhoto);
-    if (i >= 0) {
+    if (!sansPhoto && i >= 0) {
       const pt = carte.querySelector('.pullman-popup__point[data-point="' + i + '"]');
       if (pt) pt.click();
     }
@@ -160,6 +161,13 @@ function _installerGalerie() {
       const texte = photos[cible].dataset.legende || '';
       legende.textContent = texte;
       legende.hidden = !texte;
+    }
+    // Photo d'un autre lieu de l'hôtel : son onglet s'active, avec son nom et son bouton.
+    const lieu = photos[cible].dataset.lieuIndex;
+    const carte = media.closest('.pullman-popup');
+    if (lieu !== undefined && carte) {
+      const onglet = carte.querySelector('[data-lieu-onglet][data-lieu-index="' + lieu + '"]');
+      if (onglet && !onglet.hasAttribute('data-on')) choisirLieu(carte, onglet, true);
     }
   });
 }
@@ -274,9 +282,9 @@ function _addStyle() {
     '.pullman-popup__cta[hidden],.pullman-popup-card .pullman-popup__cta[hidden]{display:none}' +
     // Onglets numérotés des lieux d'un hôtel : carrés, sans arrondi ; le lieu affiché en kaki,
     // ceux qui ne répondent pas aux critères estompés.
-    '.pullman-popup__onglets-rangee{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}' +
+    '.pullman-popup__onglets-rangee{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-width:0}' +
     '.pullman-popup__onglets-titre{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}' +
-    '.pullman-popup__onglets{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;flex:0 0 auto}' +
+    '.pullman-popup__onglets{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:4px;flex:0 0 auto}' +
     '.pullman-popup__onglet{min-width:24px;height:24px;padding:0 6px;border:1px solid #BCCABE;border-radius:0;background:#fff;font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:#445047;cursor:pointer;transition:background .15s,border-color .15s,color .15s}' +
     '.pullman-popup__onglet:hover:not(:disabled):not([data-on]){border-color:#445047}' +
     '.pullman-popup__onglet[data-on]{background:#445047;border-color:#445047;color:#fff}' +
@@ -465,6 +473,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
   // Légende de chaque photo, au même rang — renseignée pour les tables seulement.
   const legendes = [];
+  const lieuDePhoto = []; // onglet Restaurants : le lieu que montre chaque photo (-1 : l'hôtel)
   const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
@@ -545,32 +554,62 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   const surRestos = _surRestos();
   if (surRestos) {
     const lieux = _lieuxDe(h.name);
-    // La card montre les tables : ce sont leurs photos qu'on met en tête, celles de
-    // l'hôtel derrière. Sans cela on présentait un lobby pour parler d'un rooftop.
-    // Une photo par lieu, dans leur ordre : c'est ce qui permet à un clic sur le
-    // cinquième restaurant de montrer le cinquième visuel. Le plafond de 4 valait quand
-    // la card n'en montrait qu'un — au-delà, les lieux suivants n'avaient plus de photo
-    // à désigner et gardaient celle du précédent.
-    // Viennent ensuite deux images « Au menu » et la salle ou le bar de l'hôtel, pour le lieu en
-    // vitrine — plus de chambres ni de lobby derrière une table.
-    const clesTables = [...new Set(lieux.map(v => v.img).filter(Boolean))];
-    // Un hôtel dont aucune table ne répond aux critères montre sa salle et des images « Au menu »,
-    // jamais ses chambres : on est sur l'onglet Restaurants.
+    // Les lieux de l'hôtel : ceux qui répondent aux critères d'abord, les autres ensuite, grisés,
+    // comme les hôtels de l'onglet Hôtels. La liste ne change pas selon les filtres.
+    const tousLieux = typeof window.WD_TOUS_LIEUX_HOTEL === 'function' ? window.WD_TOUS_LIEUX_HOTEL(h.name) : lieux;
+    const repond = (v) => lieux.indexOf(v) >= 0;
+    const horsCriteres = tousLieux.filter(v => !repond(v));
+    const listeLieux = lieux.concat(horsCriteres);
+    // Les photos, lieu par lieu, dans l'ordre des onglets, et chacune sait à quel lieu elle
+    // appartient : arriver sur une photo du lieu 2 active l'onglet 2, cliquer l'onglet 2 ouvre sa
+    // première photo. Deux par lieu quand l'hôtel en compte plusieurs — la sienne, puis une image
+    // « Au menu » ou la salle —, sans reprendre une image déjà montrée pour un autre lieu : les
+    // plats d'un hôtel sont les mêmes pour tous ses restaurants. Un seul lieu garde sa série
+    // complète. Jamais de chambre : on est sur l'onglet Restaurants.
+    const debutPhotos = {};
     if (window.WD_RESTO_PHOTOS) {
-      const vitrine = lieux[0] || { nom: h.name, hotel: h.name, type: 'restaurant', img: '', themes: [] };
-      const suite = window.WD_RESTO_PHOTOS(vitrine).filter(p => clesTables.indexOf(p.cle) < 0);
-      // Les images « Au menu » suivent directement la photo du lieu en vitrine : c'est lui qu'on
-      // regarde. Les autres lieux de l'hôtel et la salle viennent ensuite.
-      const tables = clesTables.map(k => ({ cle: k, legende: '' }));
-      const serie = tables.slice(0, 1).concat(suite.filter(p => p.legende), tables.slice(1), suite.filter(p => !p.legende));
+      const vues = new Set();
+      const serie = [];
+      const parLieu = lieux.length > 1 ? 2 : 5;
+      lieux.forEach((v, k) => {
+        const siennes = window.WD_RESTO_PHOTOS(v);
+        const neuves = siennes.filter(p => !vues.has(p.cle));
+        let choix = neuves.filter(p => p.cle === v.img)
+          .concat(neuves.filter(p => p.cle !== v.img && p.legende), neuves.filter(p => p.cle !== v.img && !p.legende))
+          .slice(0, parLieu);
+        // Tout a déjà servi : une image encore libre — la salle ou le bar de l'hôtel, puis un
+        // cocktail pour un bar, un plat pour un restaurant —, et seulement à défaut sa première
+        // image. Deux lieux ne montrent jamais la même photo.
+        if (!choix.length) {
+          const galerie = (window.WD_RESTO_GALERIES || {})[v.hotel] || {};
+          const reserve = [].concat(galerie.restaurants || [], galerie.bars || []).map(c => ({ cle: c, legende: '' }))
+            .concat((v.type === 'bar'
+              ? ((window.WD_RESTO_VERRES || {}).selection || [])
+              : [].concat.apply([], Object.values(window.WD_RESTO_PLATS || {}))).map(c => ({ cle: c, legende: 'Au menu' })));
+          const libre = reserve.find(ph => !vues.has(ph.cle));
+          choix = libre ? [libre] : siennes.slice(0, 1);
+        }
+        if (choix.length) debutPhotos[k] = serie.length;
+        choix.forEach(p => { vues.add(p.cle); serie.push({ cle: p.cle, legende: p.legende, lieu: k }); });
+      });
+      // Aucun lieu ne répond aux critères : la salle et des images « Au menu » de l'hôtel.
+      if (!lieux.length) {
+        window.WD_RESTO_PHOTOS({ nom: h.name, hotel: h.name, type: 'restaurant', img: '', themes: [] })
+          .forEach(p => serie.push({ cle: p.cle, legende: p.legende, lieu: -1 }));
+      }
       if (serie.length) {
         photos.length = 0;
         legendes.length = 0;
-        serie.forEach(p => { photos.push(base + p.cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'); legendes.push(p.legende); });
+        lieuDePhoto.length = 0;
+        serie.forEach(p => {
+          photos.push(base + p.cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
+          legendes.push(p.legende);
+          lieuDePhoto.push(p.lieu);
+        });
       }
     }
+    const indexPhoto = (v) => { const k = lieux.indexOf(v); return k in debutPhotos ? debutPhotos[k] : -1; };
     // Le qualificatif d'un lieu : sa cuisine si elle est déclarée, son cadre sinon.
-    // Les bars n'ont jamais de cuisine renseignée chez Accor.
     // Comme sur le site Restaurants & Bars : le style de nourriture, une thématique quand la
     // place le permet, puis la note et le prix moyen par couvert.
     const qualifie = (v, n) => [_libelleResto(v.style || v.cuisines[0])]
@@ -579,43 +618,22 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       .filter(Boolean).join(' · ');
     // « 3 restaurants · 2 bars » plutôt qu'un nom collectif. Aucun ne convenait : « table »
     // ne couvre pas un bar de piscine, et Pullman lui-même titre « Restaurants et vie
-    // nocturne ». Compter par type dit la composition sans avoir à déplier.
+    // nocturne ». Compter par type dit la composition d'un coup d'œil.
     const composition = (liste) => {
       const r = liste.filter(v => v.type !== 'bar').length, b = liste.length - r;
       return [r ? r + ' restaurant' + (r > 1 ? 's' : '') : null,
               b ? b + ' bar' + (b > 1 ? 's' : '') : null].filter(Boolean).join(' · ');
-    };
-    // Chaque lieu retrouve sa photo dans la galerie : c'est la récompense du clic, et
-    // ce qui manquait à une liste qui ne dit que des noms.
-    // Quinze lieux sur 360 n'ont pas de visuel à eux. Sans repli, cliquer l'un d'eux
-    // laissait la photo du lieu précédent : on étiquetait le restaurant d'un nom qui
-    // n'était pas le sien. Ils renvoient vers une image « Au menu » — un visuel générique
-    // vaut mieux qu'un visuel faux, et une chambre n'a rien à faire ici.
-    // Un lieu sans photo s'ouvre sur la première image « Au menu » quand il y en a une.
-    const premiereHotel = legendes.indexOf('Au menu') >= 0 ? legendes.indexOf('Au menu') : Math.min(clesTables.length, photos.length - 1);
-    const indexPhoto = (v) => {
-      if (!v.img) return premiereHotel;
-      const i = photos.findIndex(u => u.indexOf(v.img) >= 0);
-      return i >= 0 ? i : premiereHotel;
     };
     const premier = lieux[0];
     // Le lien d'un lieu, ou celui du lieu frère qui le présente (FI'LIA BAR → Fi'lia Paris).
     const lienDe = (v) => (window.WD_RESTO_LIEN ? window.WD_RESTO_LIEN(v) : (v.url ? { url: v.url, type: v.type } : null));
     const lienPremier = premier ? lienDe(premier) : null;
     if (lienPremier) lieuCta = { url: lienPremier.url, bar: lienPremier.type === 'bar' };
-    // Les lieux qui ne répondent pas aux critères restent dans la liste, grisés, comme les hôtels
-    // de l'onglet Hôtels : la liste de l'hôtel ne change pas selon les filtres, elle dit ce qui
-    // convient. Ceux qui répondent d'abord ; les autres ne se choisissent pas.
-    const tousLieux = typeof window.WD_TOUS_LIEUX_HOTEL === 'function' ? window.WD_TOUS_LIEUX_HOTEL(h.name) : lieux;
-    const repond = (v) => lieux.indexOf(v) >= 0;
-    const horsCriteres = tousLieux.filter(v => !repond(v));
-    const listeLieux = lieux.concat(horsCriteres);
     // Plusieurs lieux : des onglets numérotés dans la card, pour passer de l'un à l'autre sans la
     // quitter. Ceux qui répondent aux critères d'abord ; les autres gardent leur numéro, grisés et
     // inactifs, comme dans la liste. La rangée dit aussi ce que l'hôtel compte de lieux.
     const onglets = listeLieux.length > 1
       ? '<div class="pullman-popup__onglets-rangee">' +
-          '<span class="pullman-popup__onglets-titre">' + esc(composition(listeLieux)) + '</span>' +
           '<div class="pullman-popup__onglets" role="tablist" aria-label="Restaurants et bars de l’hôtel">' +
             listeLieux.map((v, i) => {
               const ok = repond(v);
@@ -624,7 +642,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
               return '<button type="button" class="pullman-popup__onglet" role="tab" aria-selected="' + actif + '"' +
                 (actif ? ' data-on' : '') + ' tabindex="' + (actif ? '0' : '-1') + '"' +
                 (ok
-                  ? ' data-lieu-onglet data-lieu-photo="' + indexPhoto(v) + '" data-lieu-url="' + esc(lien.url || '') + '"' +
+                  ? ' data-lieu-onglet data-lieu-index="' + i + '" data-lieu-photo="' + indexPhoto(v) + '" data-lieu-url="' + esc(lien.url || '') + '"' +
                     ' data-lieu-bar="' + (lien.type === 'bar' ? '1' : '') + '" data-lieu-nom="' + esc(v.nom) + '"' +
                     ' data-lieu-type="' + esc(qualifie(v, 2)) + '"'
                   : ' disabled') +
@@ -632,6 +650,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
                 ' aria-label="' + esc((i + 1) + '. ' + v.nom + (ok ? '' : ', ne répond pas à vos critères')) + '">' + (i + 1) + '</button>';
             }).join('') +
           '</div>' +
+          '<span class="pullman-popup__onglets-titre">' + esc(composition(listeLieux)) + '</span>' +
         '</div>'
       : '';
     tables = '<div class="pullman-popup__tables">' +
@@ -684,6 +703,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
         // trois photos à chaque ouverture.
         '<img class="pullman-popup__img" src="' + u + '" alt="' + esc(h.name) + '"' +
         (legendes[i] ? ' data-legende="' + esc(legendes[i]) + '"' : '') +
+        (lieuDePhoto[i] >= 0 ? ' data-lieu-index="' + lieuDePhoto[i] + '"' : '') +
         (i === 0 ? ' data-on' : '') + (i === 0 ? '' : ' loading="lazy"') + '/>').join('') +
       (legendes.some(Boolean)
         ? '<span class="pullman-popup__legende" data-galerie-legende' + (legendes[0] ? '' : ' hidden') + '>' + esc(legendes[0] || '') + '</span>'
