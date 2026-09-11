@@ -2126,7 +2126,9 @@
    n'auraient plus la place de défiler. */
 .wd-agent__msg--props { max-width: 100%; width: 100%; }
 .wd-agent__msg--props .wd-agent__carrousel { margin-top: 12px; }
-.wd-agent__msg p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
+/* Le texte du message seulement : écrit « .wd-agent__msg p », la règle atteignait aussi les
+   paragraphes des cards et de la légende posées dans la bulle, et leur imposait 15 px. */
+.wd-agent__msg > p { margin: 0; font-family: var(--font-sans); font-size: 15px; line-height: 1.5; }
 .wd-agent__msg--agent { align-self: flex-start; background: #EDF2EE; color: #445047; padding: 12px 14px; }
 .wd-agent__msg--moi { align-self: flex-end; background: #445047; color: #fff; padding: 12px 14px; }
 /* Une seule étiquette, sur la première bulle : répéter « Pullman » à chaque tour
@@ -3117,7 +3119,6 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__hotel-lien:focus-visible,
 .wd-agent__hotel-reserver:focus-visible,
 .wd-agent__hotel-point:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
-.wd-agent__hotel.is-localise { outline: 2px solid #445047; outline-offset: -2px; }
 @media (prefers-reduced-motion: reduce) {
   .wd-agent__hotel-img,
   .wd-agent__hotel-nav,
@@ -3155,11 +3156,13 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 .wd-agent__carte-bascule:hover { border-color: #445047; }
 .wd-agent__carte-bascule[aria-expanded="true"] { background: #445047; border-color: #445047; color: #ffffff; }
 .wd-agent__carte-bascule:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+.wd-agent__carte-zone { position: relative; align-self: stretch; }
+.wd-agent__carte-zone[hidden] { display: none; }
 .wd-agent__carte {
-  align-self: stretch;
-  height: 320px;
+  height: 440px;
   background: #1a1f1c;
 }
+@media (max-width: 767px) { .wd-agent__carte { height: 400px; } }
 .wd-agent__carte .leaflet-control-zoom { border: none; border-radius: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
 .wd-agent__carte .leaflet-control-zoom a {
   width: 28px;
@@ -3228,3 +3231,63 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-agent__poi-nom,
   .wd-agent__carte-bascule { transition: none; }
 }
+
+/* ── Agent : la card de l'hôtel posée sur la carte ─────────────────────────────────
+   Carte ouverte, le carrousel s'efface et la card de l'hôtel choisi se pose au bas de la
+   carte, comme sur Airbnb. En largeur, pour laisser voir la carte au-dessus : la galerie à
+   gauche, le nom, le lieu et la note, une rangée de services, le prix et « Réserver » à
+   droite — le nom mène déjà à la fiche de l'hôtel. Même ombre que le panneau de la homepage ;
+   la croix reprend celle de ses messages, foncée sur fond clair. */
+.wd-agent__carrousel[hidden] { display: none; }
+.wd-agent__carte-fiche {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 800;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, .45);
+}
+.wd-agent__carte-fiche[hidden] { display: none; }
+.wd-agent__carte-fiche-fermer {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 100px;
+  background-color: rgba(68, 80, 71, .12);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23445047' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M3 3 L9 9 M9 3 L3 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 11px 11px;
+  cursor: pointer;
+  transition: background-color .15s ease;
+}
+.wd-agent__carte-fiche-fermer:hover { background-color: rgba(68, 80, 71, .24); }
+.wd-agent__carte-fiche-fermer:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+.wd-agent__hotel--sur-carte {
+  display: grid;
+  grid-template-columns: 42% minmax(0, 1fr);
+  width: 100%;
+  max-width: none;
+}
+.wd-agent__hotel--sur-carte .wd-agent__hotel-media { aspect-ratio: auto; height: 100%; min-height: 150px; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-corps { gap: 4px; padding: 10px 40px 11px 12px; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-nom { min-height: 0; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-services { max-height: 18px; overflow: hidden; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-pied {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 8px;
+  margin-right: -28px;
+  padding-top: 8px;
+}
+.wd-agent__hotel--sur-carte .wd-agent__hotel-prix { font-size: 13px; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-lien { display: none; }
+.wd-agent__hotel--sur-carte .wd-agent__hotel-reserver { padding: 6px 14px; }
+@media (prefers-reduced-motion: reduce) { .wd-agent__carte-fiche-fermer { transition: none; } }
