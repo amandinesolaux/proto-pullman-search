@@ -143,6 +143,14 @@ function _installerGalerie() {
       else im.removeAttribute('data-on');
     });
     points.forEach((pt, i) => i === cible ? pt.setAttribute('data-on', '') : pt.removeAttribute('data-on'));
+    // Légende de la photo affichée — « Au menu » sur les cards restaurant. Elle suit la
+    // photo, et s'efface quand celle-ci n'en porte pas.
+    const legende = media.querySelector('[data-galerie-legende]');
+    if (legende) {
+      const texte = photos[cible].dataset.legende || '';
+      legende.textContent = texte;
+      legende.hidden = !texte;
+    }
   });
 }
 
@@ -338,6 +346,11 @@ function _addStyle() {
     '.pullman-popup__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;' +
       'opacity:0;transition:opacity .25s}' +
     '.pullman-popup__img[data-on]{opacity:1}' +
+    // Légende de photo (« Au menu ») : pastille sombre en haut à gauche, lisible sur toute image.
+    '.pullman-popup__legende{position:absolute;top:8px;left:8px;z-index:3;padding:3px 9px;border-radius:100px;' +
+      'background:rgba(26,34,32,.8);font-family:var(--font-sans,sans-serif);font-size:10px;font-weight:600;' +
+      'letter-spacing:.4px;text-transform:uppercase;color:#fff;pointer-events:none}' +
+    '.pullman-popup__legende[hidden]{display:none}' +
     '.pullman-popup__points{position:absolute;left:0;right:0;bottom:7px;z-index:2;' +
       'display:flex;justify-content:center;gap:5px;pointer-events:auto}' +
     '.pullman-popup__point{width:5px;height:5px;padding:0;border:none;border-radius:50%;cursor:pointer;' +
@@ -448,6 +461,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
   // muette sur ce qu'on vient voir : l'établissement.
   const cles = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [key];
   const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528');
+  // Légende de chaque photo, au même rang — renseignée pour les tables seulement.
+  const legendes = [];
   const pin = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
   const arrow = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
   const check = '<svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
@@ -534,12 +549,21 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     // cinquième restaurant de montrer le cinquième visuel. Le plafond de 4 valait quand
     // la card n'en montrait qu'un — au-delà, les lieux suivants n'avaient plus de photo
     // à désigner et gardaient celle du précédent.
+    // Viennent ensuite deux images « Au menu » et la salle ou le bar de l'hôtel, pour le lieu en
+    // vitrine — plus de chambres ni de lobby derrière une table.
     const clesTables = [...new Set(lieux.map(v => v.img).filter(Boolean))];
-    if (clesTables.length) {
-      const melange = clesTables.concat(cles.filter(k => clesTables.indexOf(k) < 0))
-        .slice(0, Math.max(4, clesTables.length + 1));
-      photos.length = 0;
-      melange.forEach(k => photos.push(base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'));
+    if (lieux.length) {
+      const suite = window.WD_RESTO_PHOTOS
+        ? window.WD_RESTO_PHOTOS(lieux[0]).filter(p => clesTables.indexOf(p.cle) < 0) : [];
+      // Les images « Au menu » suivent directement la photo du lieu en vitrine : c'est lui qu'on
+      // regarde. Les autres lieux de l'hôtel et la salle viennent ensuite.
+      const tables = clesTables.map(k => ({ cle: k, legende: '' }));
+      const serie = tables.slice(0, 1).concat(suite.filter(p => p.legende), tables.slice(1), suite.filter(p => !p.legende));
+      if (serie.length) {
+        photos.length = 0;
+        legendes.length = 0;
+        serie.forEach(p => { photos.push(base + p.cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=528'); legendes.push(p.legende); });
+      }
     }
     // Le qualificatif d'un lieu : sa cuisine si elle est déclarée, son cadre sinon.
     // Les bars n'ont jamais de cuisine renseignée chez Accor.
@@ -563,7 +587,8 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     // laissait la photo du lieu précédent : on étiquetait le restaurant d'un nom qui
     // n'était pas le sien. Ils renvoient donc vers la première photo de l'hôtel — un
     // visuel générique vaut mieux qu'un visuel faux.
-    const premiereHotel = Math.min(clesTables.length, photos.length - 1);
+    // Un lieu sans photo s'ouvre sur la première image « Au menu » quand il y en a une.
+    const premiereHotel = legendes.indexOf('Au menu') >= 0 ? legendes.indexOf('Au menu') : Math.min(clesTables.length, photos.length - 1);
     const indexPhoto = (v) => {
       if (!v.img) return premiereHotel;
       const i = photos.findIndex(u => u.indexOf(v.img) >= 0);
@@ -641,7 +666,11 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
         // fait défiler, et la card s'ouvre au clic sur un pin — on ne fait pas payer
         // trois photos à chaque ouverture.
         '<img class="pullman-popup__img" src="' + u + '" alt="' + esc(h.name) + '"' +
+        (legendes[i] ? ' data-legende="' + esc(legendes[i]) + '"' : '') +
         (i === 0 ? ' data-on' : '') + (i === 0 ? '' : ' loading="lazy"') + '/>').join('') +
+      (legendes.some(Boolean)
+        ? '<span class="pullman-popup__legende" data-galerie-legende' + (legendes[0] ? '' : ' hidden') + '>' + esc(legendes[0] || '') + '</span>'
+        : '') +
       (photos.length > 1
         ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
           '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +

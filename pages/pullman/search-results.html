@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=531"/>
-  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=531"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=533"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=533"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=531"></script>
-  <script src="../../core/data/reunions.js?v=531"></script>
-  <script src="../../core/components/components.js?v=531"></script>
+  <script src="../../core/data/restaurants.js?v=533"></script>
+  <script src="../../core/data/reunions.js?v=533"></script>
+  <script src="../../core/components/components.js?v=533"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=531"></script>
+  <script src="../../core/components/booking-map.js?v=533"></script>
 </head>
 <body class="brand-pullman">
 
@@ -557,18 +557,24 @@ wd-booking { margin-top: 20px; }
       if (!items.length) { vide(); return; }
       listEl.innerHTML = items.map(v => {
         const h = parNom.get(v.hotel) || {};
-        // La photo de la table d'abord — c'est elle qu'on vient voir. Les visuels de
-        // l'hôtel suivent dans la galerie, pour situer le lieu. Quinze tables sur 360
-        // n'ont pas de photo propre : elles montrent celles de leur hôtel, comme avant.
+        // La photo de la table d'abord — c'est elle qu'on vient voir —, puis deux images « Au
+        // menu » et la salle ou le bar de l'hôtel (WD_RESTO_PHOTOS). Les photos de l'hôtel
+        // ne servent plus qu'à défaut de cette série.
         const duLieu = window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [(h.img || 'aja_p_6783-26').split(':')[0]];
-        const cles = (v.img ? [v.img] : []).concat(duLieu.filter(k => k !== v.img)).slice(0, 4);
+        const serie = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v)
+          : (v.img ? [v.img] : []).concat(duLieu.filter(k => k !== v.img)).slice(0, 4).map(k => ({ cle: k, legende: '' }));
+        const cles = serie.map(p => p.cle);
         const photo = (k) => D.imgBase + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400';
         // Le style de nourriture puis les thématiques, comme sur le site Restaurants & Bars.
         const badges = [libelle(v.style || v.cuisines[0])].concat((v.themes || []).map(libelle)).slice(0, 4);
         return '<article class="srx-card" data-resto="' + esc(v.nom) + '" data-hotel="' + esc(v.hotel) + '">' +
           '<div class="srx-card-media"' + (cles.length > 1 ? ' data-galerie' : '') + '>' +
             cles.map((k, i) => '<img class="srx-card-img" src="' + photo(k) + '" alt="' + esc(v.nom) + '"' +
+              (serie[i].legende ? ' data-legende="' + esc(serie[i].legende) + '"' : '') +
               (i === 0 ? ' data-on' : ' loading="lazy"') + '/>').join('') +
+            (serie.some(p => p.legende)
+              ? '<span class="pullman-popup__legende" data-galerie-legende' + (serie[0].legende ? '' : ' hidden') + '>' + esc(serie[0].legende) + '</span>'
+              : '') +
             (cles.length > 1
               ? '<button type="button" class="pullman-popup__nav pullman-popup__nav--prev" data-photo="-1" aria-label="Photo précédente"></button>' +
                 '<button type="button" class="pullman-popup__nav pullman-popup__nav--next" data-photo="1" aria-label="Photo suivante"></button>' +
