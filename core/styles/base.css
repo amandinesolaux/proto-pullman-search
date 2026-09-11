@@ -344,6 +344,8 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 
 /* Separator — Figma token: rgb(217,230,218) */
 .wd-booking__sep { width: 0; height: 56px; border-left: 1px solid rgba(217, 230, 218, .5); flex-shrink: 0; }
+/* Champ « heure » et son séparateur : présents sur l'onglet Restaurants seulement. */
+.wd-booking__field[hidden], .wd-booking__sep[hidden] { display: none; }
 
 /* CTA — Figma: #5FEF91 bg, dark green text, pill radius 99, padding 24h 12v */
 .wd-booking__cta { flex-shrink: 0; border-radius: 99px; padding: 12px 24px; font-family: 'Noto Sans', var(--font-sans); font-size: 16px; font-weight: 400; line-height: 24px; height: 56px; box-sizing: border-box; }
@@ -885,6 +887,9 @@ wd-section-heading { display: block; }
 .wd-booking__dp-flex-chip { padding: 6px 12px; border: 1px solid rgba(255,255,255,.12); border-radius: 20px; background: transparent; font-family: var(--font-sans); font-size: 12px; font-weight: 400; color: rgba(255,255,255,.6); cursor: pointer; transition: all .15s; }
 .wd-booking__dp-flex-chip:hover { border-color: rgba(255,255,255,.25); color: rgba(255,255,255,.85); }
 .wd-booking__dp-flex-chip--active { background: rgba(95,239,145,.12); border-color: rgba(95,239,145,.3); color: #5FEF91; font-weight: 500; }
+/* Mode jour (Restaurants) : une table se réserve à une date précise, pas à ± n jours. */
+.wd-booking__datepicker[data-mode="jour"] .wd-booking__dp-flex-options { display: none; }
+.wd-booking__datepicker[data-mode="jour"] .wd-booking__dp-actions { margin-left: auto; }
 
 .wd-booking__dp-actions { display: flex; gap: 12px; align-items: center; }
 .wd-booking__dp-clear { padding: 6px 4px; background: transparent; border: none; font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); cursor: pointer; transition: color .15s; text-decoration: underline; text-underline-offset: 2px; }
@@ -894,6 +899,30 @@ wd-section-heading { display: block; }
 .wd-booking__dp-apply { padding: 8px 20px; border: none; border-radius: 6px; background: var(--pul-highlight, #5FEF91); font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-bg, #445047); cursor: pointer; transition: all .15s; }
 .wd-booking__dp-apply:hover { background: var(--pul-highlight-hover, #4DD87A); transform: translateY(-1px); }
 .wd-booking__dp-apply:disabled { background: rgba(255,255,255,.14); color: rgba(255,255,255,.4); cursor: not-allowed; transform: none; }
+
+/* ---------- Heure (onglet Restaurants) ----------
+   Frère du calendrier et du panneau voyageurs : même fond, même ancrage sous la barre, placé
+   sous son champ. Créneaux en pills ; le créneau choisi prend le vert de la date choisie. */
+.wd-booking__heure { position: absolute; left: 0; top: calc(100% - 40px); z-index: 201; width: 380px; background: #1a2220; border-radius: 0 0 8px 8px; box-shadow: 0 20px 60px rgba(0,0,0,.4); max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s ease, opacity .2s ease; }
+.wd-booking__heure[data-state="open"] { max-height: 520px; opacity: 1; overflow-y: auto; }
+.wd-booking__hp-body { padding: 24px 32px 20px; }
+.wd-booking__hp-groupe + .wd-booking__hp-groupe { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.wd-booking__hp-titre { display: block; margin-bottom: 12px; font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: rgba(255,255,255,.35); }
+.wd-booking__hp-creneaux { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.wd-booking__hp-creneau { height: 36px; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 100px; background: transparent; font-family: var(--font-sans); font-size: 13px; font-variant-numeric: tabular-nums; color: #fff; cursor: pointer; transition: border-color .15s, background .15s; }
+.wd-booking__hp-creneau:hover:not(:disabled):not(.is-choisi) { border-color: #fff; background: rgba(255,255,255,.06); }
+.wd-booking__hp-creneau.is-choisi { background: #5FEF91; border-color: #5FEF91; color: #1a2a1e; font-weight: 600; }
+.wd-booking__hp-creneau:disabled { opacity: .25; cursor: default; }
+.wd-booking__hp-creneau:focus-visible { outline: 2px solid var(--pul-highlight, #5FEF91); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .wd-booking__heure { transition: none; } }
+@media (max-width: 767px) {
+  /* Même feuille en bas d'écran que le calendrier. */
+  .wd-booking__heure { position: fixed; left: 0; right: 0; top: auto; bottom: 0; width: auto; border-radius: 8px 8px 0 0; }
+  .wd-booking__heure[data-state="open"] { max-height: 78vh; }
+  .wd-booking__hp-body { padding: 16px 14px 14px; }
+  .wd-booking__hp-creneau { height: 44px; font-size: 15px; }
+  wd-booking[data-plein-ecran] .wd-booking__field--heure { display: none; }
+}
 
 /* ---------- Voyageurs / chambres ----------
    Mêmes bornes que le moteur Pullman (7 chambres, 1-9 adultes, 0-6 enfants, âges 0-11).
@@ -936,6 +965,7 @@ wd-section-heading { display: block; }
 .wd-booking__gp-add { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; padding: 0; background: none; border: none; font-family: var(--font-sans); font-size: 13px; font-weight: 600; color: var(--pul-highlight, #5FEF91); cursor: pointer; transition: opacity .15s; }
 .wd-booking__gp-add:hover:not(:disabled) { opacity: .8; }
 .wd-booking__gp-add:disabled { color: rgba(255,255,255,.3); cursor: not-allowed; }
+.wd-booking__gp-add[hidden] { display: none; }
 
 /* Résumé sur sa propre ligne : à 380px de large il se comprimait contre les boutons */
 .wd-booking__gp-footer { display: flex; flex-direction: column; align-items: stretch; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08); }

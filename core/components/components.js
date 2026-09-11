@@ -1108,6 +1108,8 @@
           </div>
           <div class="wd-booking__sep"></div>
           <div class="wd-booking__field wd-booking__field--dates"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="5" width="18" height="15" rx="1.5"/><path d="M3 9h18M8 3v3M16 3v3" stroke-linecap="round"/></svg><div><span class="wd-booking__label">À quelles dates ?</span><span class="wd-booking__value">01/04/2025 &nbsp;<svg width="12" height="9" viewBox="0 0 14 9" fill="none" style="vertical-align:-1px"><path d="M1 4.5h12M9 1l4 3.5L9 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>&nbsp; 02/04/2025</span></div></div>
+          <div class="wd-booking__sep wd-booking__sep--heure" hidden></div>
+          <div class="wd-booking__field wd-booking__field--heure" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-controls="wd-heure-panel" hidden><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">À quelle heure ?</span><span class="wd-booking__value">20:00</span></div></div>
           <div class="wd-booking__sep"></div>
           <div class="wd-booking__field wd-booking__field--guests" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-controls="wd-guests-panel"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 18v-2h18v2M3 16V14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M7 12V9.5A1.5 1.5 0 0 1 8.5 8h7a1.5 1.5 0 0 1 1.5 1.5V12" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">Combien serez-vous ?</span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
           <a href="#" class="wd-btn wd-btn--primary wd-booking__cta">${esc(btn)}</a>
@@ -1213,6 +1215,9 @@
             </div>
           </div>
         </div>
+        <div class="wd-booking__heure" id="wd-heure-panel" data-state="closed" role="dialog" aria-label="Heure de réservation">
+          <div class="wd-booking__hp-body" id="wd-heure-creneaux"></div>
+        </div>
       </div>`;
     }
 
@@ -1240,6 +1245,8 @@
           const inp = this.querySelector('.wd-booking__dest-input');
           if (cfg && inp) inp.placeholder = cfg.placeholder;
           if (cfg && guestsLabel) guestsLabel.textContent = cfg.guests;
+          // Restaurants : un jour, une heure, des convives. Les autres onglets gardent le séjour.
+          appliquerModeOnglet();
           // L'onglet Restaurants a maintenant ses propres critères : ses chips s'affichent
           // comme les autres. Elles étaient masquées du temps où il n'en avait aucun.
           const chips = this.querySelector('#wd-dest-chips');
@@ -3128,7 +3135,7 @@
       const dpGrids = datepicker.querySelectorAll('.wd-booking__dp-grid');
       const dpMonthLabels = datepicker.querySelectorAll('.wd-booking__dp-month-label');
       const allFields = this.querySelectorAll('.wd-booking__field');
-      const dateField = allFields[1];
+      const dateField = this.querySelector('.wd-booking__field--dates');
       const dateLabel = dateField ? dateField.querySelector('.wd-booking__label') : null;
       const dateValue = dateField ? dateField.querySelector('.wd-booking__value') : null;
 
@@ -3145,6 +3152,9 @@
       let dpCheckOut = demain;
       let dpHover = null;
       let dpFlex = 0;
+      // Onglet Restaurants : une table se réserve pour un jour précis, pas pour un séjour.
+      let rDate = new Date(today);
+      const modeTable = () => searchState.activeTab === 'restaurants';
 
       const isSameDay = (a, b) => a && b && a.getTime() === b.getTime();
       const isBetween = (d, start, end) => d > start && d < end;
@@ -3164,12 +3174,15 @@
           for (let i = 0; i < startDay; i++) html += '<span class="wd-booking__dp-day wd-booking__dp-day--empty"></span>';
           for (let d = 1; d <= daysInMonth; d++) {
             const date = new Date(year, month, d);
-            const isPast = date < today;
+            const jour = modeTable();
+            // Mode jour : après le dernier service, aujourd'hui n'est plus réservable.
+            const isPast = date < today || (jour && isSameDay(date, today) && TOUTES_HEURES.every(h => creneauPasse(h, date)));
             const isToday = isSameDay(date, today);
-            const isCheckIn = isSameDay(date, dpCheckIn);
-            const isCheckOut = isSameDay(date, dpCheckOut);
-            const inRange = dpCheckIn && dpCheckOut && isBetween(date, dpCheckIn, dpCheckOut);
-            const inPreview = dpCheckIn && !dpCheckOut && dpHover && date > dpCheckIn && date <= dpHover;
+            // Mode jour : un seul jour, pastille pleine, ni plage ni aperçu.
+            const isCheckIn = jour ? isSameDay(date, rDate) : isSameDay(date, dpCheckIn);
+            const isCheckOut = jour ? isCheckIn : isSameDay(date, dpCheckOut);
+            const inRange = !jour && dpCheckIn && dpCheckOut && isBetween(date, dpCheckIn, dpCheckOut);
+            const inPreview = !jour && dpCheckIn && !dpCheckOut && dpHover && date > dpCheckIn && date <= dpHover;
 
             let cls = 'wd-booking__dp-day';
             if (isPast) cls += ' wd-booking__dp-day--past';
@@ -3186,6 +3199,13 @@
 
       const formatDateField = () => {
         scheduleRecentSave(); // les dates font partie de la recherche à retenir
+        if (modeTable()) {
+          dateField.classList.add('wd-booking__field--selected');
+          if (dateLabel) dateLabel.textContent = 'Quel jour ?';
+          const JOURS = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+          if (dateValue) dateValue.textContent = JOURS[rDate.getDay()] + ' ' + rDate.getDate() + ' ' + MONTH_SHORT[rDate.getMonth()] + ' ' + rDate.getFullYear();
+          return;
+        }
         if (!dpCheckIn) {
           dateField.classList.remove('wd-booking__field--selected');
           if (dateLabel) dateLabel.innerHTML = 'À quelles dates ? <span style="font-weight:300;opacity:.6">(facultatif)</span>';
@@ -3215,6 +3235,7 @@
         }
         // le champ Dates stoppe la propagation : on referme le panneau voyageurs explicitement
         if (guestsPanel && guestsPanel.dataset.state === 'open') closeGuests();
+        if (heurePanel && heurePanel.dataset.state === 'open') closeHeure();
         datepicker.dataset.state = 'open';
         dateField.classList.add('wd-booking__field--editing');
         renderCalendars();
@@ -3242,6 +3263,16 @@
         if (day && !day.classList.contains('wd-booking__dp-day--past') && !day.classList.contains('wd-booking__dp-day--empty')) {
           const [y, m, d] = day.dataset.date.split('-').map(Number);
           const clicked = new Date(y, m - 1, d);
+          if (modeTable()) {
+            // Un jour suffit : on le retient et le calendrier se referme.
+            rDate = clicked;
+            ajusterHeure();
+            renderCalendars();
+            formatDateField();
+            formatHeureField();
+            setTimeout(() => closeDatePicker(), 300);
+            return;
+          }
           if (!dpCheckIn || (dpCheckIn && dpCheckOut) || clicked < dpCheckIn) {
             dpCheckIn = clicked;
             dpCheckOut = null;
@@ -3281,6 +3312,14 @@
           return;
         }
         if (e.target.closest('.wd-booking__dp-clear')) {
+          if (modeTable()) {
+            rDate = jourParDefaut();
+            ajusterHeure();
+            renderCalendars();
+            formatDateField();
+            formatHeureField();
+            return;
+          }
           // « Effacer » revient au séjour par défaut plutôt que de vider : une recherche
           // porte toujours des dates, sinon le tarif redeviendrait inaffichable et la
           // page de résultats afficherait autre chose que la barre.
@@ -3300,6 +3339,7 @@
       });
 
       datepicker.addEventListener('mouseover', (e) => {
+        if (modeTable()) return; // pas d'aperçu de plage pour un jour seul
         const day = e.target.closest('.wd-booking__dp-day');
         if (day && dpCheckIn && !dpCheckOut && !day.classList.contains('wd-booking__dp-day--past') && !day.classList.contains('wd-booking__dp-day--empty')) {
           const [y, m, d] = day.dataset.date.split('-').map(Number);
@@ -3325,13 +3365,113 @@
       formatDateField();
       // ===== END DATE PICKER =====
 
+      // ===== HEURE (onglet Restaurants) =====
+      // Comme sur The Hoxton : une table se réserve pour un jour et une heure. Créneaux de
+      // service à la demi-heure ; ceux déjà passés aujourd'hui sont grisés.
+      const CRENEAUX = [
+        { titre: 'Déjeuner', heures: ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30'] },
+        { titre: 'Dîner', heures: ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30'] }
+      ];
+      const TOUTES_HEURES = CRENEAUX.flatMap(c => c.heures);
+      const heureField = this.querySelector('.wd-booking__field--heure');
+      const heureSep = this.querySelector('.wd-booking__sep--heure');
+      const heureValue = heureField ? heureField.querySelector('.wd-booking__value') : null;
+      const heurePanel = this.querySelector('.wd-booking__heure');
+      const heureCreneaux = this.querySelector('#wd-heure-creneaux');
+      let rHeure = '20:00';
+      const creneauPasse = (h, jour) => {
+        if (!isSameDay(jour || rDate, today)) return false;
+        const [hh, mm] = h.split(':').map(Number);
+        const maintenant = new Date();
+        return hh * 60 + mm <= maintenant.getHours() * 60 + maintenant.getMinutes();
+      };
+      // Heure retenue déjà passée pour le jour choisi : le prochain créneau libre de ce jour.
+      const ajusterHeure = () => {
+        if (!creneauPasse(rHeure)) return;
+        const suivante = TOUTES_HEURES.find(h => !creneauPasse(h));
+        if (suivante) rHeure = suivante;
+      };
+      // Après le dernier service, la table par défaut est pour demain.
+      const jourParDefaut = () => {
+        const j = new Date(today);
+        if (TOUTES_HEURES.every(h => creneauPasse(h, j))) j.setDate(j.getDate() + 1);
+        return j;
+      };
+      rDate = jourParDefaut();
+      ajusterHeure();
+
+      const renderHeure = () => {
+        heureCreneaux.innerHTML = CRENEAUX.map(c =>
+          '<div class="wd-booking__hp-groupe" role="group" aria-label="' + c.titre + '">' +
+            '<span class="wd-booking__hp-titre">' + c.titre + '</span>' +
+            '<div class="wd-booking__hp-creneaux">' + c.heures.map(h => {
+              const choisie = h === rHeure;
+              return '<button type="button" class="wd-booking__hp-creneau' + (choisie ? ' is-choisi' : '') + '" data-heure="' + h + '" aria-pressed="' + choisie + '"' +
+                (creneauPasse(h) ? ' disabled' : '') + '>' + h + '</button>';
+            }).join('') + '</div>' +
+          '</div>').join('');
+      };
+      const formatHeureField = () => { if (heureValue) heureValue.textContent = rHeure; };
+
+      const openHeure = () => {
+        if (dropdown.dataset.state === 'open') { dropdown.dataset.state = 'closed'; destField.classList.remove('wd-booking__field--editing'); }
+        if (datepicker.dataset.state === 'open') closeDatePicker();
+        if (guestsPanel && guestsPanel.dataset.state === 'open') closeGuests();
+        renderHeure();
+        // Sous son champ, comme le calendrier sous le sien ; sur mobile, feuille en bas d'écran.
+        if (surMobile()) {
+          heurePanel.style.left = '';
+        } else {
+          const repere = heurePanel.offsetParent || this;
+          const gauche = heureField.getBoundingClientRect().left - repere.getBoundingClientRect().left;
+          heurePanel.style.left = Math.max(0, Math.min(gauche, repere.clientWidth - heurePanel.offsetWidth)) + 'px';
+        }
+        heurePanel.dataset.state = 'open';
+        heureField.classList.add('wd-booking__field--editing');
+        heureField.setAttribute('aria-expanded', 'true');
+      };
+      const closeHeure = () => {
+        heurePanel.dataset.state = 'closed';
+        heureField.classList.remove('wd-booking__field--editing');
+        heureField.setAttribute('aria-expanded', 'false');
+        formatHeureField();
+        scheduleRecentSave();
+      };
+
+      if (heureField && heurePanel) {
+        heureField.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (heurePanel.dataset.state === 'open') closeHeure(); else openHeure();
+        });
+        heureField.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); heureField.click(); }
+        });
+        heurePanel.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const creneau = e.target.closest('[data-heure]');
+          if (!creneau || creneau.disabled) return;
+          rHeure = creneau.dataset.heure;
+          renderHeure();
+          formatHeureField();
+          setTimeout(() => closeHeure(), 250);
+        });
+        document.addEventListener('click', (e) => {
+          if (heurePanel.dataset.state === 'open' && !heurePanel.contains(e.target) && !heureField.contains(e.target)) closeHeure();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && heurePanel.dataset.state === 'open') { closeHeure(); heureField.focus(); }
+        });
+        formatHeureField();
+      }
+      // ===== FIN HEURE =====
+
       // ===== VOYAGEURS / CHAMBRES =====
       // Bornes relevées sur le moteur de réservation Pullman (pullman.accor.com) :
       // 7 chambres max, 1 à 9 adultes et 0 à 6 enfants par chambre, âge requis de 0 à 11 ans
       // (12 ans et plus compte comme un adulte).
       const GP = { rooms: 7, adults: 9, children: 6, childAge: 11 };
       const guestsPanel = this.querySelector('.wd-booking__guests');
-      const guestsField = allFields[2];
+      const guestsField = this.querySelector('.wd-booking__field--guests');
       const gpRoomsEl = this.querySelector('#wd-gp-rooms');
       const gpAddBtn = this.querySelector('#wd-gp-add');
       const gpHintEl = this.querySelector('#wd-gp-hint');
@@ -3341,6 +3481,9 @@
       // et on empêche la validation tant qu'il en reste.
       const newRoom = () => ({ adults: 1, children: [] });
       let gpRooms = [newRoom()];
+      // Onglet Restaurants : des convives, sans chambres ni âges.
+      const CONVIVES_MAX = 20;
+      let convives = 2;
 
       const gpTotals = () => gpRooms.reduce((a, r) => ({
         adults: a.adults + r.adults,
@@ -3352,6 +3495,7 @@
       const plural = (n, s, p) => n + ' ' + (n > 1 ? (p || s + 's') : s);
 
       const gpSummary = () => {
+        if (modeTable()) return plural(convives, 'personne');
         const { adults, children } = gpTotals();
         // « 1 personne » reste plus naturel que « 1 adulte » quand on voyage seul
         const who = (adults === 1 && !children) ? '1 personne'
@@ -3400,6 +3544,30 @@
       };
 
       const renderGuests = () => {
+        if (modeTable()) {
+          if (persoEl) persoEl.hidden = true;
+          gpAddBtn.hidden = true;
+          gpRoomsEl.innerHTML = '<div class="wd-booking__gp-room">' +
+            '<div class="wd-booking__gp-counter">' +
+              '<span class="wd-booking__gp-counter-label">Convives</span>' +
+              '<div class="wd-booking__gp-counter-ctrl">' +
+                '<button type="button" class="wd-booking__gp-btn" data-gp="minus" data-kind="convives"' + (convives <= 1 ? ' disabled' : '') + ' aria-label="Retirer un convive">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>' +
+                '<span class="wd-booking__gp-count" aria-live="polite">' + convives + '</span>' +
+                '<button type="button" class="wd-booking__gp-btn" data-gp="plus" data-kind="convives"' + (convives >= CONVIVES_MAX ? ' disabled' : '') + ' aria-label="Ajouter un convive">' +
+                  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+          gpHintEl.textContent = convives >= CONVIVES_MAX
+            ? 'Au-delà de ' + CONVIVES_MAX + ' convives, contactez directement le restaurant.'
+            : gpSummary();
+          gpHintEl.classList.remove('wd-booking__gp-hint--warn');
+          const applyBtnTable = guestsPanel.querySelector('.wd-booking__gp-apply');
+          if (applyBtnTable) applyBtnTable.disabled = false;
+          return;
+        }
+        gpAddBtn.hidden = false;
         majPerso();
         const multi = gpRooms.length > 1;
         gpRoomsEl.innerHTML = gpRooms.map((room, i) => {
@@ -3453,6 +3621,7 @@
       const openGuests = () => {
         if (dropdown.dataset.state === 'open') { dropdown.dataset.state = 'closed'; destField.classList.remove('wd-booking__field--editing'); }
         if (datepicker.dataset.state === 'open') closeDatePicker();
+        if (heurePanel && heurePanel.dataset.state === 'open') closeHeure();
         guestsPanel.dataset.state = 'open';
         guestsField.classList.add('wd-booking__field--editing');
         guestsField.setAttribute('aria-expanded', 'true');
@@ -3482,6 +3651,11 @@
           const btn = e.target.closest('[data-gp]');
           if (!btn || btn.disabled) return;
           if (btn.dataset.gp === 'foyer') { appliquerFoyer(); return; }
+          if (btn.dataset.kind === 'convives') {
+            convives = Math.min(CONVIVES_MAX, Math.max(1, convives + (btn.dataset.gp === 'plus' ? 1 : -1)));
+            renderGuests();
+            return;
+          }
           const i = Number(btn.dataset.room);
           const room = gpRooms[i];
           if (btn.dataset.gp === 'remove-room') { gpRooms.splice(i, 1); renderGuests(); return; }
@@ -3510,10 +3684,10 @@
         });
 
         guestsPanel.querySelector('.wd-booking__gp-reset').addEventListener('click', (e) => {
-          e.stopPropagation(); gpRooms = [newRoom()]; renderGuests();
+          e.stopPropagation(); if (modeTable()) convives = 2; else gpRooms = [newRoom()]; renderGuests();
         });
         guestsPanel.querySelector('.wd-booking__gp-apply').addEventListener('click', (e) => {
-          e.stopPropagation(); if (!gpMissingAges()) closeGuests();
+          e.stopPropagation(); if (modeTable() || !gpMissingAges()) closeGuests();
         });
 
         document.addEventListener('click', (e) => {
@@ -3527,6 +3701,26 @@
 
       // Exposé pour la construction de l'URL de recherche
       this._guestsState = () => ({ rooms: gpRooms, totals: gpTotals(), summary: gpSummary() });
+
+      // Bascule d'onglet : Restaurants passe la barre en « jour, heure, convives ».
+      const ICONE_SEJOUR = guestsField ? guestsField.querySelector('.wd-booking__field-icon').outerHTML : '';
+      const ICONE_CONVIVES = '<svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19v-.5A4.5 4.5 0 0 1 8 14h2a4.5 4.5 0 0 1 4.5 4.5v.5"/><circle cx="17" cy="9" r="2.3"/><path d="M16 14h1a3.5 3.5 0 0 1 3.5 3.5v.5"/></svg>';
+      const appliquerModeOnglet = () => {
+        const table = modeTable();
+        if (datepicker.dataset.state === 'open') closeDatePicker();
+        if (heurePanel && heurePanel.dataset.state === 'open') closeHeure();
+        if (guestsPanel && guestsPanel.dataset.state === 'open') closeGuests();
+        datepicker.dataset.mode = table ? 'jour' : 'sejour';
+        if (heureField) heureField.hidden = !table;
+        if (heureSep) heureSep.hidden = !table;
+        if (guestsPanel) guestsPanel.setAttribute('aria-label', table ? 'Convives' : 'Voyageurs et chambres');
+        const icone = guestsField && guestsField.querySelector('.wd-booking__field-icon');
+        if (icone) icone.outerHTML = table ? ICONE_CONVIVES : ICONE_SEJOUR;
+        formatDateField();
+        formatHeureField();
+        formatGuestsField();
+      };
+      appliquerModeOnglet();
       // ===== FIN VOYAGEURS / CHAMBRES =====
 
       destField.addEventListener('click', () => { if (dropdown.dataset.state !== 'open') open(); });
@@ -3559,16 +3753,23 @@
           if (crit.length) p.set('criteria', crit.join(','));
           const q = destInput.value.trim();
           if (q) p.set('q', q);
-          if (dpCheckIn) p.set('checkin', fmtISO(dpCheckIn));
-          if (dpCheckOut) p.set('checkout', fmtISO(dpCheckOut));
-          if (dpFlex > 0) p.set('flex', String(dpFlex));
-          // Occupation : on ne pousse dans l'URL que ce qui s'écarte du défaut (1 adulte, 1 chambre)
-          const g = gpTotals();
-          if (g.adults !== 1) p.set('adults', String(g.adults));
-          if (g.children) p.set('children', String(g.children));
-          if (gpRooms.length !== 1) p.set('rooms', String(gpRooms.length));
-          const ages = gpRooms.flatMap(r => r.children).filter(a => a !== null);
-          if (ages.length) p.set('ages', ages.join(','));
+          if (modeTable()) {
+            // Restaurants : le jour, l'heure et les convives de la table.
+            p.set('date', fmtISO(rDate));
+            p.set('heure', rHeure);
+            p.set('convives', String(convives));
+          } else {
+            if (dpCheckIn) p.set('checkin', fmtISO(dpCheckIn));
+            if (dpCheckOut) p.set('checkout', fmtISO(dpCheckOut));
+            if (dpFlex > 0) p.set('flex', String(dpFlex));
+            // Occupation : on ne pousse dans l'URL que ce qui s'écarte du défaut (1 adulte, 1 chambre)
+            const g = gpTotals();
+            if (g.adults !== 1) p.set('adults', String(g.adults));
+            if (g.children) p.set('children', String(g.children));
+            if (gpRooms.length !== 1) p.set('rooms', String(gpRooms.length));
+            const ages = gpRooms.flatMap(r => r.children).filter(a => a !== null);
+            if (ages.length) p.set('ages', ages.join(','));
+          }
           const qs = p.toString();
           window.location.href = searchBase + (qs ? '?' + qs : '');
         });
@@ -3579,6 +3780,13 @@
         const p = new URLSearchParams(window.location.search);
         if (![...p.keys()].length) return;
         let touched = false;
+        // L'onglet d'abord : les critères restaurés vont dans le jeu de l'onglet actif, et la
+        // barre passe en « jour, heure, convives » sur Restaurants.
+        const onglet = p.get('tab');
+        if (onglet && onglet !== searchState.activeTab) {
+          const bouton = this.querySelector('.wd-booking__tab[data-tab="' + onglet + '"]');
+          if (bouton) bouton.click();
+        }
         const cont = p.get('continent');
         if (cont === 'all') { searchState.showAll = true; touched = true; }
         else if (cont && REGION_HOTELS.some(r => r.id === cont)) { searchState.continent = cont; touched = true; }
@@ -3590,6 +3798,14 @@
         if (p.get('checkin')) { dpCheckIn = new Date(p.get('checkin') + 'T12:00:00'); touched = true; }
         if (p.get('checkout')) { dpCheckOut = new Date(p.get('checkout') + 'T12:00:00'); touched = true; }
         if (p.get('flex')) { dpFlex = parseInt(p.get('flex'), 10) || 0; }
+        // Restaurants : jour, heure et convives de la table.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(p.get('date') || '')) {
+          const [a, m, j] = p.get('date').split('-').map(Number);
+          const jourUrl = new Date(a, m - 1, j);
+          if (jourUrl >= today) { rDate = jourUrl; touched = true; }
+        }
+        if (TOUTES_HEURES.includes(p.get('heure'))) { rHeure = p.get('heure'); touched = true; }
+        if (p.get('convives')) { convives = Math.min(CONVIVES_MAX, Math.max(1, parseInt(p.get('convives'), 10) || 2)); touched = true; }
         // Occupation : on répartit les adultes puis les enfants sur les chambres demandées,
         // en respectant les mêmes bornes que le panneau (9 adultes / 6 enfants par chambre).
         const nRooms = Math.min(GP.rooms, Math.max(1, parseInt(p.get('rooms'), 10) || 1));
@@ -3613,7 +3829,7 @@
           formatGuestsField();
           touched = true;
         }
-        if (touched) { formatDateField(); renderChips(); }
+        if (touched) { formatDateField(); formatHeureField(); formatGuestsField(); renderChips(); }
       })();
 
       // Données de recherche exposées pour la page de résultats (source unique : REGION_HOTELS)
