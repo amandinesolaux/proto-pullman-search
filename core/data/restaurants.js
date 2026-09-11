@@ -15,9 +15,9 @@
 // ses fiches, et un filtre qui promettrait mieux mentirait sur les données.
 //
 // Les filtres reprennent ceux du site Restaurants & Bars d'Accor (restaurantsandbars.accor.com) :
-// prix, disponibilité, thématique, style de nourriture, préférences alimentaires, notes des
-// clients, offres et fidélité. Le style de nourriture et une partie des thématiques (terrasse,
-// rooftop, vue) partent des relevés ci-dessous ; prix moyen, note, disponibilité, menus, offres
+// prix, thématique, style de nourriture, préférences alimentaires, notes des clients, offres et
+// fidélité — sans la disponibilité, retirée du prototype. Le style de nourriture et une partie des thématiques (terrasse,
+// rooftop, vue) partent des relevés ci-dessous ; prix moyen, note, menus, offres
 // et le reste des thématiques n'existent pas dans la source : ce sont des valeurs de prototype,
 // calculées plus bas à partir du nom du lieu pour rester stables, comme les prix et notes des
 // hôtels. Choix assumé pour aligner le prototype sur le site — à remplacer par les vraies
@@ -808,7 +808,6 @@ window.WD_RESTO_PDJ = ['Pullman Abidjan','Pullman Adelaide','Pullman Auckland Ai
     v.tags = themes.concat(menus,
       v.note !== null && v.note >= 4 ? ['note-4'] : [],
       v.note !== null && v.note >= 3 ? ['note-3'] : [],
-      v.disponible ? ['disponible'] : [],
       v.offre ? ['offre'] : [],
       v.points ? ['points'] : []);
   });
@@ -820,9 +819,6 @@ window.WD_RESTO_CRITERIA = [
   { group: 'Sélectionnez votre prix', type: 'prix', unite: 'EUR', items: [],
     min: Math.min.apply(null, window.WD_RESTAURANTS.map(v => v.prix)),
     max: Math.max.apply(null, window.WD_RESTAURANTS.map(v => v.prix)) },
-  { group: 'Disponibilité des restaurants', items: [
-    { id: 'disponible', label: 'Disponible seulement' },
-  ]},
   { group: 'Thématique', items: [
     { id: 'terrasse',          label: 'Terrasse' },
     { id: 'ambiance-musicale', label: 'Ambiance musicale' },
