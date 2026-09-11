@@ -1,15 +1,13 @@
-// Points d'intérêt majeurs autour des hôtels Pullman, pour la carte de l'assistant — à la
-// manière d'Airbnb : les emblèmes de la ville en pictogrammes dessinés, les musées, salles de
-// spectacle, lieux de culte et adresses de shopping en pins de couleur, les parcs en toutes
-// lettres, les transports en badges. Sélection éditoriale ; coordonnées contrôlées sur
-// Wikidata. Clé : la ville telle qu'écrite dans WD_HOTELS.
-//   t : embleme (i = pictogramme) · musee · spectacle · culte · shopping · parc · gare · metro · aeroport
+// Points d'intérêt majeurs autour des hôtels Pullman, pour la carte de l'assistant : un point
+// et un nom par lieu, dans la couleur de sa catégorie. Sélection éditoriale ; coordonnées
+// contrôlées sur Wikidata. Clé : la ville telle qu'écrite dans WD_HOTELS.
+//   t : embleme · musee · spectacle · culte · shopping · parc · gare · aeroport · metro (non affiché)
 window.WD_POI = {
   "Singapour": [
-    { "n": "Marina Bay Sands", "t": "embleme", "i": "marina-bay-sands", "lat": 1.28340, "lng": 103.86070 },
-    { "n": "Gardens by the Bay", "t": "embleme", "i": "supertree", "lat": 1.28160, "lng": 103.86360 },
-    { "n": "Merlion", "t": "embleme", "i": "merlion", "lat": 1.28680, "lng": 103.85447 },
-    { "n": "Singapore Flyer", "t": "embleme", "i": "grande-roue", "lat": 1.28930, "lng": 103.86310 },
+    { "n": "Marina Bay Sands", "t": "embleme", "lat": 1.28340, "lng": 103.86070 },
+    { "n": "Gardens by the Bay", "t": "embleme", "lat": 1.28160, "lng": 103.86360 },
+    { "n": "Merlion", "t": "embleme", "lat": 1.28680, "lng": 103.85447 },
+    { "n": "Singapore Flyer", "t": "embleme", "lat": 1.28930, "lng": 103.86310 },
     { "n": "Esplanade", "t": "spectacle", "lat": 1.28980, "lng": 103.85550 },
     { "n": "National Gallery Singapore", "t": "musee", "lat": 1.29030, "lng": 103.85150 },
     { "n": "ArtScience Museum", "t": "musee", "lat": 1.28630, "lng": 103.85930 },
@@ -26,12 +24,12 @@ window.WD_POI = {
     { "n": "Aéroport de Changi", "t": "aeroport", "lat": 1.36440, "lng": 103.99150 }
   ],
   "Paris": [
-    { "n": "Tour Eiffel", "t": "embleme", "i": "tour-eiffel", "lat": 48.85826, "lng": 2.29450 },
-    { "n": "Arc de Triomphe", "t": "embleme", "i": "arc", "lat": 48.87378, "lng": 2.29504 },
-    { "n": "Palais Garnier", "t": "embleme", "i": "opera", "lat": 48.87197, "lng": 2.33160 },
-    { "n": "Notre-Dame", "t": "embleme", "i": "cathedrale", "lat": 48.85296, "lng": 2.34990 },
-    { "n": "Sacré-Cœur", "t": "embleme", "i": "basilique", "lat": 48.88670, "lng": 2.34310 },
-    { "n": "Tour Montparnasse", "t": "embleme", "i": "gratte-ciel", "lat": 48.84210, "lng": 2.32190 },
+    { "n": "Tour Eiffel", "t": "embleme", "lat": 48.85826, "lng": 2.29450 },
+    { "n": "Arc de Triomphe", "t": "embleme", "lat": 48.87378, "lng": 2.29504 },
+    { "n": "Palais Garnier", "t": "embleme", "lat": 48.87197, "lng": 2.33160 },
+    { "n": "Notre-Dame", "t": "embleme", "lat": 48.85296, "lng": 2.34990 },
+    { "n": "Sacré-Cœur", "t": "embleme", "lat": 48.88670, "lng": 2.34310 },
+    { "n": "Tour Montparnasse", "t": "embleme", "lat": 48.84210, "lng": 2.32190 },
     { "n": "Musée du Louvre", "t": "musee", "lat": 48.86110, "lng": 2.33590 },
     { "n": "Musée d'Orsay", "t": "musee", "lat": 48.85999, "lng": 2.32656 },
     { "n": "Centre Pompidou", "t": "musee", "lat": 48.86064, "lng": 2.35236 },
@@ -53,7 +51,7 @@ window.WD_POI = {
     { "n": "Aéroport d'Orly", "t": "aeroport", "lat": 48.72330, "lng": 2.37940 }
   ],
   "Paris La Défense": [
-    { "n": "Grande Arche", "t": "embleme", "i": "arche", "lat": 48.89259, "lng": 2.23600 },
+    { "n": "Grande Arche", "t": "embleme", "lat": 48.89259, "lng": 2.23600 },
     { "n": "Paris La Défense Arena", "t": "spectacle", "lat": 48.89570, "lng": 2.22940 }
   ]
 };

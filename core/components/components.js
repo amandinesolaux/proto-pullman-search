@@ -7884,7 +7884,7 @@
         // Carte des hôtels proposés, ouverte à la demande sous les cards, dans l'habit de la
         // carte de la homepage : fond sombre, pins verts nommés, zoom en haut à droite. Autour
         // des hôtels, les points d'intérêt majeurs de leur ville (WD_POI), à la manière d'Airbnb :
-        // emblèmes dessinés, pins de couleur par catégorie, parcs en vert, transports en badges. Cliquer un pin d'hôtel met sa card en avant
+        // un point et un nom par lieu, dans la couleur de sa catégorie. Cliquer un pin d'hôtel met sa card en avant
         // et la fait venir dans le carrousel ; survoler une card fait ressortir son pin. Quand
         // des noms se chevauchent, le moins important s'efface et revient au survol. Refaite
         // à chaque rendu : l'ancienne carte est détruite avec le DOM qu'elle occupait.
@@ -7897,60 +7897,15 @@
           const cartesSituees = [...this.querySelectorAll('.wd-agent__hotel[data-lat]')];
           const libelle = basculeCarte.querySelector('span');
           const trace = (d, epaisseur) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (epaisseur || 2) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
-          // Emblèmes : un dessin par monument, au trait, comme les icônes illustrées d'Airbnb.
-          const EMBLEMES = {
-            'tour-eiffel': '<path d="M12 1.5V4"/><path d="M10.8 4h2.4l1.3 6h-5z"/><path d="M8.6 10h6.8"/><path d="M9.3 10 6 22.5h3.2c.4-3 1.4-4.8 2.8-4.8s2.4 1.8 2.8 4.8H18L14.7 10"/><path d="M7.6 16h8.8"/>',
-            'arc': '<path d="M3 22V6h18v16h-5.5v-6a3.5 3.5 0 0 0-7 0v6z"/><path d="M2 6h20M3 9.5h18"/>',
-            'opera': '<path d="M2.5 22h19M4 22v-8.5h16V22"/><path d="M6 13.5V11h12v2.5"/><path d="M8 11a4 3.2 0 0 1 8 0"/><path d="M12 5.5v2.3"/><path d="M7 16.5V22M10.3 16.5V22M13.7 16.5V22M17 16.5V22"/>',
-            'cathedrale': '<path d="M4 22V8.5L6 5l2 3.5V22M16 22V8.5L18 5l2 3.5V22"/><path d="M8 22v-8h8v8M8 12.5h8"/><path d="M11 22v-3a1 1 0 0 1 2 0v3"/>',
-            'basilique': '<path d="M3 22h18M5 22v-7h14v7"/><path d="M7.5 15a4.5 4.5 0 0 1 9 0"/><path d="M12 4.5v6M10.5 6h3"/><path d="M9 22v-3M15 22v-3"/>',
-            'gratte-ciel': '<path d="M8 22V2.5h8V22M5.5 22h13"/><path d="M10.5 6.5h3M10.5 10.5h3M10.5 14.5h3M10.5 18.5h3"/>',
-            'arche': '<path d="M3 22V3.5h18V22h-5.5V9.5h-7V22z"/>',
-            'marina-bay-sands': '<path d="M1.5 6.5h21"/><path d="M4.2 6.5 5 21.5h2.3l.8-15M10.8 6.5l.4 15h1.6l.4-15M15.9 6.5l.8 15H19l.8-15"/><path d="M2 21.5h20"/>',
-            'supertree': '<path d="M12 22V12"/><path d="M4.5 6.5c2.2 2.8 4.7 4.5 7.5 5.5 2.8-1 5.3-2.7 7.5-5.5z"/><path d="M9.5 22 12 16.5l2.5 5.5"/><path d="M7 22h10"/>',
-            'grande-roue': '<circle cx="12" cy="10" r="7.5"/><circle cx="12" cy="10" r="1.2"/><path d="M12 2.5v15M4.5 10h15M6.7 4.7l10.6 10.6M17.3 4.7 6.7 15.3"/><path d="M8.5 22 12 11.5 15.5 22M6.5 22h11"/>',
-            'merlion': '<path d="M8 22h8M9.5 22v-3.5h5V22"/><path d="M11 18.5c-2.8-.3-4.2-2.8-4.2-6.2 0-3.6 2.2-6.8 5.5-6.8 2.2 0 3.7 1.6 3.7 3.8 0 1.7-1 2.9-2.3 3.4"/><path d="M16 8.5c2.3.2 4.2 1.4 5.2 3.5"/><path d="M9.5 9.5h.01"/>',
-            monument: '<path d="M12 2 9 20h6z"/><path d="M6 21h12"/>'
-          };
-          // Catégories : un pictogramme blanc posé sur un pin de couleur, ou sur un badge pour
-          // les transports.
-          const PICTOS = {
-            musee: '<path d="M3 9l9-5 9 5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 21h18"/>',
-            spectacle: '<path d="M4 4h16v6a8 8 0 0 1-16 0z"/><path d="M9 13c1.5 1.5 4.5 1.5 6 0"/>',
-            culte: '<path d="M12 2v5M9.5 4.5h5"/><path d="M6 21V11l6-4 6 4v10z"/>',
-            shopping: '<path d="M5 8h14l-1 13H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
-            parc: '<path d="M12 22v-7"/><path d="M12 15c-4 0-6-3-6-6.5C6 5 8.7 2 12 2s6 3 6 6.5c0 3.5-2 6.5-6 6.5z"/>',
-            gare: '<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l1.5-4M15 21l-1.5-4"/>',
-            metro: '<path d="M5 19V5l7 8 7-8v14"/>',
-            aeroport: '<path d="M12 2.5v15M3 13l9-4 9 4M8.5 21.5l3.5-4 3.5 4"/>'
-          };
+          // Un seul signe pour tous les lieux : un point au trait et son nom, dans la couleur de
+          // sa catégorie. Les pictogrammes illustrés chargeaient la carte sans aider à la lire.
+          const POINT = '<path d="M12 22v-7.5"/><circle cx="12" cy="8.5" r="6.5"/>';
           const GENRES = { embleme: 'Monument', musee: 'Musée', spectacle: 'Culture et spectacle', culte: 'Lieu de culte',
-            shopping: 'Shopping', parc: 'Parc', gare: 'Gare', metro: 'Métro', aeroport: 'Aéroport' };
-          // Forme de chaque lieu. Les emblèmes se lisent dessin au-dessus, nom dessous ; les
-          // pins pointent sur le lieu, nom à droite ; les stations de métro restent muettes —
-          // leur nom vient au survol, comme les badges RER d'Airbnb.
-          const iconeLieu = (p) => {
-            const nom = '<span class="wd-agent__poi-nom">' + esc(p.n) + '</span>';
-            if (p.t === 'embleme') {
-              return L.divIcon({ className: 'wd-agent__poi wd-agent__poi--embleme',
-                html: '<span class="wd-agent__poi-embleme">' + trace(EMBLEMES[p.i] || EMBLEMES.monument, 1.5) + '</span>' + nom,
-                iconSize: [30, 30], iconAnchor: [15, 29] });
-            }
-            if (p.t === 'parc') {
-              return L.divIcon({ className: 'wd-agent__poi wd-agent__poi--parc',
-                html: '<span class="wd-agent__poi-feuille">' + trace(PICTOS.parc) + '</span>' + nom,
-                iconSize: [14, 14], iconAnchor: [7, 7] });
-            }
-            if (p.t === 'gare' || p.t === 'metro' || p.t === 'aeroport') {
-              return L.divIcon({ className: 'wd-agent__poi wd-agent__poi--transport wd-agent__poi--' + p.t,
-                html: '<span class="wd-agent__poi-badge">' + trace(PICTOS[p.t], 2.2) + '</span>' + (p.t === 'metro' ? '' : nom),
-                iconSize: [18, 18], iconAnchor: [9, 9] });
-            }
-            return L.divIcon({ className: 'wd-agent__poi wd-agent__poi--pin wd-agent__poi--' + p.t,
-              html: '<span class="wd-agent__poi-pin">' + trace(PICTOS[p.t] || PICTOS.musee, 2.2) + '</span>' + nom,
-              iconSize: [24, 30], iconAnchor: [12, 30] });
-          };
-          // Emblèmes au-dessus des autres lieux, transports en dessous : c'est aussi l'ordre dans
+            shopping: 'Shopping', parc: 'Parc', gare: 'Gare', aeroport: 'Aéroport' };
+          const iconeLieu = (p) => L.divIcon({ className: 'wd-agent__poi wd-agent__poi--' + p.t,
+            html: '<span class="wd-agent__poi-point">' + trace(POINT, 2.2) + '</span><span class="wd-agent__poi-nom">' + esc(p.n) + '</span>',
+            iconSize: [14, 14], iconAnchor: [7, 14] });
+          // Monuments d'abord, transports en dernier : c'est aussi l'ordre dans
           // lequel les noms gardent leur place quand ils se chevauchent.
           const RANG = { embleme: 400, musee: 300, spectacle: 300, culte: 300, shopping: 300, parc: 200, gare: 100, aeroport: 100, metro: 0 };
           let pins = [];
@@ -7982,7 +7937,7 @@
             lieux.forEach(mq => {
               const el = mq.getElement();
               if (!el) return;
-              const icone = el.querySelector('.wd-agent__poi-embleme, .wd-agent__poi-pin, .wd-agent__poi-feuille, .wd-agent__poi-badge');
+              const icone = el.querySelector('.wd-agent__poi-point');
               const nom = el.querySelector('.wd-agent__poi-nom');
               el.classList.remove('is-cache');
               if (nom) nom.classList.remove('is-masque');
@@ -8044,7 +7999,8 @@
             const poi = [];
             [...new Set(cartesSituees.map(c => c.dataset.ville))].forEach(v =>
               ((window.WD_POI || {})[v] || []).forEach(p => { if (!poi.some(x => x.n === p.n)) poi.push(p); }));
-            lieux = poi.slice().sort((a, b) => (RANG[b.t] || 0) - (RANG[a.t] || 0)).map(p => L.marker([p.lat, p.lng], {
+            // Les stations de métro restent hors carte : sans leur nom, elles ne disaient rien.
+            lieux = poi.filter(p => p.t !== 'metro').sort((a, b) => (RANG[b.t] || 0) - (RANG[a.t] || 0)).map(p => L.marker([p.lat, p.lng], {
               title: p.n + ' · ' + (GENRES[p.t] || 'Point d’intérêt'), alt: p.n, keyboard: false,
               zIndexOffset: -1000 + (RANG[p.t] || 0), icon: iconeLieu(p)
             }).addTo(carte));
