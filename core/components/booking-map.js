@@ -76,50 +76,60 @@ function _makeLargeIcon(cityName, greyed, nombre) {
 function _installerGalerie() {
   if (document.documentElement.dataset.wdGalerie) return;
   document.documentElement.dataset.wdGalerie = '1';
-  // Déplier la liste des restaurants et bars, en revenir, ou en choisir un — auquel cas
-  // la card se referme sur ce lieu et lui donne sa photo. Le geste de la navigation
-  // séquentielle, mais après le choix plutôt qu'à sa place.
+  // Onglets numérotés des restaurants et bars d'un hôtel : un clic, ou les flèches, passe au lieu
+  // choisi — son nom et son lien, son qualificatif, sa photo et le bouton qui y mène.
+  const choisirLieu = (carte, onglet) => {
+    carte.querySelectorAll('[data-lieu-onglet]').forEach(o => {
+      const actif = o === onglet;
+      if (actif) o.setAttribute('data-on', ''); else o.removeAttribute('data-on');
+      o.setAttribute('aria-selected', String(actif));
+      o.tabIndex = actif ? 0 : -1;
+    });
+    const url = onglet.dataset.lieuUrl || '';
+    const vitrine = carte.querySelector('[data-lieu-vitrine]');
+    if (vitrine) {
+      // Le nom est un lien quand le lieu a une page, un simple texte sinon.
+      const ancien = vitrine.querySelector('.pullman-popup__table-nom');
+      const nom = document.createElement(url ? 'a' : 'span');
+      nom.className = 'pullman-popup__table-nom';
+      nom.textContent = onglet.dataset.lieuNom || '';
+      if (url) { nom.href = url; nom.target = '_blank'; nom.rel = 'noopener'; }
+      if (ancien) ancien.replaceWith(nom); else vitrine.prepend(nom);
+      const typ = vitrine.querySelector('.pullman-popup__table-type');
+      if (typ) typ.textContent = onglet.dataset.lieuType || '';
+    }
+    const i = Number(onglet.dataset.lieuPhoto);
+    if (i >= 0) {
+      const pt = carte.querySelector('.pullman-popup__point[data-point="' + i + '"]');
+      if (pt) pt.click();
+    }
+    // Le bouton suit : il mène au lieu affiché. Sans page, il disparaît plutôt que de renvoyer
+    // ailleurs.
+    const cta = carte.querySelector('[data-lieu-cta]');
+    if (cta) {
+      cta.textContent = 'Voir le ' + (onglet.dataset.lieuBar ? 'bar' : 'restaurant');
+      if (url) { cta.setAttribute('href', url); cta.hidden = false; }
+      else { cta.removeAttribute('href'); cta.hidden = true; }
+    }
+  };
   document.addEventListener('click', (e) => {
-    const carte = e.target.closest('.pullman-popup');
-    if (!carte) return;
-    if (e.target.closest('[data-lieux-deplier]')) {
-      e.preventDefault(); carte.classList.add('pullman-popup--deplie');
-      const l = carte.querySelector('.pullman-popup__lieux'); if (l) l.hidden = false;
-      return;
-    }
-    if (e.target.closest('[data-lieux-replier]')) {
-      e.preventDefault(); carte.classList.remove('pullman-popup--deplie');
-      return;
-    }
-    const choix = e.target.closest('[data-lieu]');
-    if (choix) {
-      e.preventDefault();
-      carte.classList.remove('pullman-popup--deplie');
-      // La vitrine reprend le lieu choisi : son nom, son qualificatif, sa photo.
-      const vitrine = carte.querySelector('[data-lieu-vitrine]');
-      if (vitrine) {
-        const nom = vitrine.querySelector('.pullman-popup__table-nom');
-        const typ = vitrine.querySelector('.pullman-popup__table-type');
-        if (nom) nom.textContent = choix.querySelector('.pullman-popup__lieu-nom').textContent;
-        if (typ) typ.textContent = choix.querySelector('.pullman-popup__lieu-type').textContent;
-      }
-      carte.querySelectorAll('[data-lieu]').forEach(b => b.removeAttribute('data-on'));
-      choix.setAttribute('data-on', '');
-      const i = Number(choix.dataset.lieuPhoto);
-      if (i >= 0) {
-        const pt = carte.querySelector('.pullman-popup__point[data-point="' + i + '"]');
-        if (pt) pt.click();
-      }
-      // Le CTA suit : il mène au lieu affiché, pas à celui d'avant. Sans page propre,
-      // il disparaît plutôt que de renvoyer ailleurs.
-      const cta = carte.querySelector('[data-lieu-cta]');
-      if (cta) {
-        const url = choix.dataset.lieuUrl || '';
-        cta.textContent = 'Voir le ' + (choix.dataset.lieuBar ? 'bar' : 'restaurant');
-        if (url) { cta.setAttribute('href', url); cta.hidden = false; }
-        else { cta.removeAttribute('href'); cta.hidden = true; }
-      }
-    }
+    const onglet = e.target.closest('.pullman-popup [data-lieu-onglet]');
+    if (!onglet) return;
+    e.preventDefault();
+    choisirLieu(onglet.closest('.pullman-popup'), onglet);
+  });
+  // Flèches, Début et Fin passent d'un onglet actif à l'autre, comme le veut le motif des onglets.
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(e.key) < 0) return;
+    const onglet = e.target.closest && e.target.closest('.pullman-popup [data-lieu-onglet]');
+    if (!onglet) return;
+    const actifs = [...onglet.parentElement.querySelectorAll('[data-lieu-onglet]')];
+    const i = actifs.indexOf(onglet);
+    const j = e.key === 'Home' ? 0 : e.key === 'End' ? actifs.length - 1
+      : (i + (e.key === 'ArrowRight' ? 1 : -1) + actifs.length) % actifs.length;
+    e.preventDefault();
+    actifs[j].focus();
+    choisirLieu(onglet.closest('.pullman-popup'), actifs[j]);
   });
 
   document.addEventListener('click', (e) => {
@@ -259,31 +269,21 @@ function _addStyle() {
     // message très long n'aurait pas défilé, il aurait été coupé net par le bord de la
     // carte, boutons compris. Le cas ne se présente pas — 295 px mesurés pour 316 — mais
     // la troncature silencieuse est le mauvais échec à retenir.
-    // Le compteur devient un bouton : il annonçait des lieux sans jamais y mener.
-    '.pullman-popup__tables-reste{border:none;background:none;padding:0;font:inherit;text-align:left;color:#445047;text-decoration:underline;text-underline-offset:2px;cursor:pointer}' +
-    'button.pullman-popup__tables-reste:hover{color:#28332B}' +
-    // Deux colonnes, une ligne par lieu : sept tiennent dans la hauteur d'une card sans
-    // photo, là où le format d'origine en montrait un seul.
-    // display:none et non l'attribut hidden : la classe pose display:flex et l'emporte
-    // sur le hidden du navigateur — la liste restait affichée sous la card.
+    // display:none et non l'attribut hidden seul : la classe de la card pose display:inline-flex et
+    // l'emportait — un bouton sans lien restait affiché.
     '.pullman-popup__cta[hidden],.pullman-popup-card .pullman-popup__cta[hidden]{display:none}' +
-    '.pullman-popup__lieux{display:none;padding:12px 14px 14px;flex-direction:column;gap:10px}' +
-    '.pullman-popup__lieux-liste{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}' +
-    '.pullman-popup__lieu{border:none;background:none;padding:3px 0;font:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;min-width:0}' +
-    '.pullman-popup__lieu:hover .pullman-popup__lieu-nom{text-decoration:underline;text-underline-offset:2px}' +
-    '.pullman-popup__lieu[data-on] .pullman-popup__lieu-nom{color:#28332B}' +
-    '.pullman-popup__lieu-nom{font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;color:#445047;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-    '.pullman-popup__lieu-type{font-family:var(--font-sans,sans-serif);font-size:10.5px;color:rgba(68,80,71,.68);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-    '.pullman-popup__lieu--hors{cursor:default;opacity:.4}' +
-    '.pullman-popup__lieu--hors:hover .pullman-popup__lieu-nom{text-decoration:none}' +
-    '.pullman-popup__lieux-pied{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:9px;border-top:1px solid #BCCABE}' +
-    '.pullman-popup__lieux-retour{border:none;background:none;padding:0;font-family:var(--font-sans,sans-serif);font-size:11.5px;color:rgba(68,80,71,.8);text-decoration:underline;text-underline-offset:2px;cursor:pointer}' +
-    '.pullman-popup--deplie .pullman-popup__media,' +
-    '.pullman-popup--deplie .pullman-popup__location,' +
-    '.pullman-popup--deplie .pullman-popup__tables,' +
-    '.pullman-popup--deplie .pullman-popup__foot{display:none}' +
-    '.pullman-popup--deplie .pullman-popup__lieux{display:flex}' +
-    '.pullman-popup--deplie .pullman-popup__body{padding-bottom:0}' +
+    // Onglets numérotés des lieux d'un hôtel : carrés, sans arrondi ; le lieu affiché en kaki,
+    // ceux qui ne répondent pas aux critères estompés.
+    '.pullman-popup__onglets-rangee{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}' +
+    '.pullman-popup__onglets-titre{font-family:var(--font-sans,sans-serif);font-size:11px;color:rgba(68,80,71,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}' +
+    '.pullman-popup__onglets{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;flex:0 0 auto}' +
+    '.pullman-popup__onglet{min-width:24px;height:24px;padding:0 6px;border:1px solid #BCCABE;border-radius:0;background:#fff;font-family:var(--font-sans,sans-serif);font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1;color:#445047;cursor:pointer;transition:background .15s,border-color .15s,color .15s}' +
+    '.pullman-popup__onglet:hover:not(:disabled):not([data-on]){border-color:#445047}' +
+    '.pullman-popup__onglet[data-on]{background:#445047;border-color:#445047;color:#fff}' +
+    '.pullman-popup__onglet:disabled{opacity:.35;cursor:default}' +
+    '.pullman-popup__onglet:focus-visible{outline:2px solid #445047;outline-offset:2px}' +
+    '@media (max-width:767px){.pullman-popup__onglet{min-width:36px;height:36px;font-size:13px}}' +
+    '@media (prefers-reduced-motion:reduce){.pullman-popup__onglet{transition:none}}' +
     '.wd-map-detail--avis{width:344px;overflow-y:auto;overscroll-behavior:contain}' +
     // L'air se prend en hauteur : marges hautes et basses plus généreuses que les côtés,
     // interlignes plus amples, et de vrais intervalles entre le titre, le texte et les
@@ -599,7 +599,6 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
       return i >= 0 ? i : premiereHotel;
     };
     const premier = lieux[0];
-    const autres = lieux.slice(1);
     // Le lien d'un lieu, ou celui du lieu frère qui le présente (FI'LIA BAR → Fi'lia Paris).
     const lienDe = (v) => (window.WD_RESTO_LIEN ? window.WD_RESTO_LIEN(v) : (v.url ? { url: v.url, type: v.type } : null));
     const lienPremier = premier ? lienDe(premier) : null;
@@ -611,16 +610,32 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     const repond = (v) => lieux.indexOf(v) >= 0;
     const horsCriteres = tousLieux.filter(v => !repond(v));
     const listeLieux = lieux.concat(horsCriteres);
-    const deplier = autres.length
-      ? 'et ' + composition(autres) + (horsCriteres.length ? ' · ' + horsCriteres.length + ' hors critères' : '')
-      // Un seul lieu répond : il est en vitrine, les autres suivent « hors critères ». Aucun ne
-      // répond : on propose de voir ceux de l'hôtel, tous grisés.
-      : (horsCriteres.length
-          ? (lieux.length
-              ? 'et ' + horsCriteres.length + ' lieu' + (horsCriteres.length > 1 ? 'x' : '') + ' hors critères'
-              : 'Voir ' + (horsCriteres.length > 1 ? 'les ' + horsCriteres.length + ' lieux' : 'le lieu') + ' de l’hôtel')
-          : '');
+    // Plusieurs lieux : des onglets numérotés dans la card, pour passer de l'un à l'autre sans la
+    // quitter. Ceux qui répondent aux critères d'abord ; les autres gardent leur numéro, grisés et
+    // inactifs, comme dans la liste. La rangée dit aussi ce que l'hôtel compte de lieux.
+    const onglets = listeLieux.length > 1
+      ? '<div class="pullman-popup__onglets-rangee">' +
+          '<span class="pullman-popup__onglets-titre">' + esc(composition(listeLieux)) + '</span>' +
+          '<div class="pullman-popup__onglets" role="tablist" aria-label="Restaurants et bars de l’hôtel">' +
+            listeLieux.map((v, i) => {
+              const ok = repond(v);
+              const actif = ok && v === premier;
+              const lien = lienDe(v) || {};
+              return '<button type="button" class="pullman-popup__onglet" role="tab" aria-selected="' + actif + '"' +
+                (actif ? ' data-on' : '') + ' tabindex="' + (actif ? '0' : '-1') + '"' +
+                (ok
+                  ? ' data-lieu-onglet data-lieu-photo="' + indexPhoto(v) + '" data-lieu-url="' + esc(lien.url || '') + '"' +
+                    ' data-lieu-bar="' + (lien.type === 'bar' ? '1' : '') + '" data-lieu-nom="' + esc(v.nom) + '"' +
+                    ' data-lieu-type="' + esc(qualifie(v, 2)) + '"'
+                  : ' disabled') +
+                ' title="' + esc(v.nom + (ok ? '' : ' — ne répond pas à vos critères')) + '"' +
+                ' aria-label="' + esc((i + 1) + '. ' + v.nom + (ok ? '' : ', ne répond pas à vos critères')) + '">' + (i + 1) + '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>'
+      : '';
     tables = '<div class="pullman-popup__tables">' +
+      onglets +
       (lieux.length
         ? '<div class="pullman-popup__table" data-lieu-vitrine>' +
             (lienPremier
@@ -629,30 +644,7 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
             '<span class="pullman-popup__table-type">' + esc(qualifie(premier, 2)) + '</span>' +
           '</div>'
         : '<p class="pullman-popup__tables-reste">Aucun restaurant ni bar ne répond à vos critères.</p>') +
-      (deplier ? '<button type="button" class="pullman-popup__tables-reste" data-lieux-deplier>' + esc(deplier) + '</button>' : '') +
-    '</div>' +
-    // L'état déplié : pas de photo, une ligne par lieu, deux colonnes. C'est ce qui
-    // permet d'en montrer sept sans jamais faire défiler la card.
-    (deplier
-      ? '<div class="pullman-popup__lieux" hidden>' +
-          '<div class="pullman-popup__lieux-liste">' +
-            listeLieux.map((v, i) => repond(v)
-              ? '<button type="button" class="pullman-popup__lieu" data-lieu="' + i + '" data-lieu-photo="' + indexPhoto(v) + '"' +
-                  ' data-lieu-url="' + esc((lienDe(v) || {}).url || '') + '" data-lieu-bar="' + ((lienDe(v) || {}).type === 'bar' ? '1' : '') + '">' +
-                  '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
-                  '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
-                '</button>'
-              : '<span class="pullman-popup__lieu pullman-popup__lieu--hors" title="Ne répond pas à vos critères">' +
-                  '<span class="pullman-popup__lieu-nom">' + esc(v.nom) + '</span>' +
-                  '<span class="pullman-popup__lieu-type">' + esc(qualifie(v, 1)) + '</span>' +
-                '</span>').join('') +
-          '</div>' +
-          '<div class="pullman-popup__lieux-pied">' +
-            '<button type="button" class="pullman-popup__lieux-retour" data-lieux-replier>Revenir</button>' +
-            '<a class="pullman-popup__link" href="search-results.html?tab=restaurants&hotel=' + encodeURIComponent(h.name) + '">Voir dans la liste</a>' +
-          '</div>' +
-        '</div>'
-      : '');
+    '</div>';
   }
 
   // Deux destinations distinctes : la fiche hôtel sur le site de marque, et la
