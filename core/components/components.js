@@ -5029,8 +5029,27 @@
           + (reserver ? '<a class="wd-agent__hotel-reserver" href="' + esc(reserver) + '" target="_blank" rel="noopener">Réserver</a>' : '')
           + '</div></div></div></article>';
       };
+      // Liste ou carte : une barre au-dessus des propositions, dès qu'un hôtel peut être situé —
+      // le nombre d'hôtels à gauche, deux onglets à droite. Le bouton posé sous les cards obligeait
+      // à faire défiler pour changer de vue, et son libellé changeait selon l'état ; les onglets
+      // disent en permanence où l'on est et ce qu'il y a à côté.
+      const situables = props.some(p => p.hotel && p.hotel.lat != null && p.hotel.lng != null);
+      const nbHotels = props.filter(p => p.hotel).length;
+      const barreVues = situables
+        ? '<div class="wd-agent__vues-barre">'
+          + '<span class="wd-agent__vues-compte">' + nbHotels + ' hôtel' + (nbHotels > 1 ? 's' : '') + '</span>'
+          + '<div class="wd-agent__vues" role="tablist" aria-label="Affichage des hôtels">'
+          + '<button type="button" class="wd-agent__vue is-active" id="wdAgentOngletListe" role="tab" aria-selected="true" aria-controls="wdAgentListe" data-agent-vue="liste">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>'
+          + '<span>Liste</span></button>'
+          + '<button type="button" class="wd-agent__vue" id="wdAgentOngletCarte" role="tab" aria-selected="false" aria-controls="wdAgentCarteZone" tabindex="-1" data-agent-vue="carte">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>'
+          + '<span>Carte</span></button>'
+          + '</div></div>'
+        : '';
       const carrousel = props.length
-        ? '<div class="wd-agent__carrousel' + (props.some(p => p.hotel) ? ' wd-agent__carrousel--hotels' : '') + '">' + props.map((p, i) => p.hotel ? carteHotel(p.hotel, i) :
+        ? barreVues + '<div class="wd-agent__carrousel' + (props.some(p => p.hotel) ? ' wd-agent__carrousel--hotels' : '') + '"'
+          + (situables ? ' id="wdAgentListe" role="tabpanel" aria-labelledby="wdAgentOngletListe"' : '') + '>' + props.map((p, i) => p.hotel ? carteHotel(p.hotel, i) :
             (p.href ? '<a class="wd-agent__prop" href="' + esc(p.href) + '" target="_blank" rel="noopener">'
                     : '<div class="wd-agent__prop">') +
               (p.img ? '<img class="wd-agent__prop-img" src="' + p.img + '" alt="" loading="lazy" />'
@@ -5040,17 +5059,12 @@
               (p.detail ? '<span class="wd-agent__prop-detail">' + esc(p.detail) + '</span>' : '') +
             (p.href ? '</a>' : '</div>')).join('') +
           '</div>'
-          // Sous les cards d'hôtels, de quoi les situer : la carte s'ouvre à la demande.
-          + (props.some(p => p.hotel && p.hotel.lat != null && p.hotel.lng != null)
-              ? '<div class="wd-agent__localiser">'
-                + '<button type="button" class="wd-agent__carte-bascule" data-agent-carte aria-expanded="false" aria-controls="wdAgentCarte">'
-                + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>'
-                + '<span>Voir sur la carte</span></button>'
-                + '<div class="wd-agent__carte-zone" hidden>'
-                  + '<div class="wd-agent__carte" id="wdAgentCarte"></div>'
-                  + '<div class="wd-agent__carte-fiche" hidden></div>'
-                + '</div>'
-                + '</div>'
+          // Panneau de l'onglet Carte, masqué tant que la liste est affichée.
+          + (situables
+              ? '<div class="wd-agent__carte-zone" id="wdAgentCarteZone" role="tabpanel" aria-labelledby="wdAgentOngletCarte" hidden>'
+                + '<div class="wd-agent__carte" id="wdAgentCarte"></div>'
+                + '<div class="wd-agent__carte-fiche" hidden></div>'
+              + '</div>'
               : '')
         : '';
       // Question des services, en mosaïque : deux colonnes en décalé, le nom et l'accroche en
@@ -7912,14 +7926,13 @@
         // croix ou un clic ailleurs sur la carte la retire. Refaite à chaque rendu : l'ancienne
         // carte est détruite avec le DOM qu'elle occupait.
         if (this._agentCarteLeaflet) { this._agentCarteLeaflet.remove(); this._agentCarteLeaflet = null; }
-        const basculeCarte = this.querySelector('[data-agent-carte]');
-        if (basculeCarte) {
+        const ongletsVue = [...this.querySelectorAll('[data-agent-vue]')];
+        if (ongletsVue.length) {
           const zone = this.querySelector('.wd-agent__carte-zone');
           const cadre = this.querySelector('#wdAgentCarte');
           const fiche = this.querySelector('.wd-agent__carte-fiche');
           const carrouselHotels = this.querySelector('.wd-agent__carrousel--hotels');
           const cartesSituees = carrouselHotels ? [...carrouselHotels.querySelectorAll('.wd-agent__hotel[data-lat]')] : [];
-          const libelle = basculeCarte.querySelector('span');
           let pins = [];
           let choisi = -1;
 
@@ -7963,12 +7976,20 @@
             }
           };
 
+          // Onglet actif : sélectionné pour les lecteurs d'écran, seul atteignable à la tabulation
+          // — les flèches passent à l'autre, comme le veut le motif des onglets.
+          const activerOnglet = (vue) => ongletsVue.forEach(o => {
+            const actif = o.dataset.agentVue === vue;
+            o.classList.toggle('is-active', actif);
+            o.setAttribute('aria-selected', String(actif));
+            o.tabIndex = actif ? 0 : -1;
+          });
+
           const ouvrir = () => {
             if (!window.L || !zone || !cadre) return;
             zone.hidden = false;
             if (carrouselHotels) carrouselHotels.hidden = true;
-            basculeCarte.setAttribute('aria-expanded', 'true');
-            libelle.textContent = 'Afficher la liste';
+            activerOnglet('carte');
             this.state.agentCarte = true;
             const carte = L.map(cadre, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 18 });
             L.control.zoom({ position: 'topright', zoomInTitle: 'Zoomer', zoomOutTitle: 'Dézoomer' }).addTo(carte);
@@ -8013,21 +8034,31 @@
             if (fiche) { fiche.hidden = true; fiche.innerHTML = ''; }
             zone.hidden = true;
             if (carrouselHotels) carrouselHotels.hidden = false;
-            basculeCarte.setAttribute('aria-expanded', 'false');
-            libelle.textContent = 'Voir sur la carte';
+            activerOnglet('liste');
             this.state.agentCarte = false;
           };
-          basculeCarte.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (!zone.hidden) { fermer(); return; }
-            ouvrir();
-            // La carte prend la place des cards : on amène le bouton en haut du fil pour la
-            // montrer entière.
+          const choisirVue = (vue) => {
+            const surCarte = !zone.hidden;
+            if (vue === 'carte' && !surCarte) ouvrir();
+            else if (vue === 'liste' && surCarte) fermer();
+            else return;
+            // Les deux vues n'ont pas la même hauteur : la barre remonte en haut du fil pour que
+            // la vue choisie commence sous elle, entière.
             const fil = this.querySelector('#wdAgentThread');
-            if (fil) {
-              const ecart = basculeCarte.getBoundingClientRect().top - fil.getBoundingClientRect().top - 12;
+            const barre = this.querySelector('.wd-agent__vues-barre');
+            if (fil && barre) {
+              const ecart = barre.getBoundingClientRect().top - fil.getBoundingClientRect().top - 12;
               if (ecart > 0) fil.scrollTo({ top: fil.scrollTop + ecart, behavior: 'smooth' });
             }
+          };
+          ongletsVue.forEach(o => {
+            o.addEventListener('click', (e) => { e.stopPropagation(); choisirVue(o.dataset.agentVue); });
+            o.addEventListener('keydown', (e) => {
+              if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+              e.preventDefault();
+              const autre = ongletsVue.find(x => x !== o);
+              if (autre) { autre.focus(); choisirVue(autre.dataset.agentVue); }
+            });
           });
           if (this.state.agentCarte) ouvrir();
         }

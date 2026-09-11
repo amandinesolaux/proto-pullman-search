@@ -3127,35 +3127,54 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 
 /* ── Agent : situer les hôtels proposés ─────────────────────────────────────────
-   Sous les cards, « Voir sur la carte » ouvre la carte dans la bulle, à la manière d'Airbnb
+   Deux onglets, Liste et Carte, au-dessus des propositions ; la carte prend la place des
+   cards, à la manière d'Airbnb
    mais aux couleurs sombres de la homepage : quartiers, rues, parcs et eau nommés, hôtels en
    pastilles de prix, boutons de zoom sombres. */
-.wd-agent__localiser {
+/* Barre des vues : le nombre d'hôtels à gauche, le sélecteur Liste / Carte à droite. Un
+   sélecteur segmenté en pilule blanche sur le fond de la bulle ; l'onglet actif en kaki,
+   comme les états sélectionnés du parcours. */
+.wd-agent__vues-barre {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 12px;
-}
-.wd-agent__carte-bascule {
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border: 1px solid #BCCABE;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+}
+.wd-agent__vues-compte {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: #445047;
+}
+.wd-agent__vues {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
   border-radius: 100px;
   background: #ffffff;
+  box-shadow: inset 0 0 0 1px #D6DDD7;
+}
+.wd-agent__vue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 100px;
+  background: transparent;
   font-family: var(--font-sans);
   font-size: 13px;
   font-weight: 600;
   color: #445047;
   cursor: pointer;
-  transition: border-color .15s ease, background .15s ease, color .15s ease;
+  transition: background .15s ease, color .15s ease;
 }
-.wd-agent__carte-bascule:hover { border-color: #445047; }
-.wd-agent__carte-bascule[aria-expanded="true"] { background: #445047; border-color: #445047; color: #ffffff; }
-.wd-agent__carte-bascule:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
-.wd-agent__carte-zone { position: relative; align-self: stretch; }
+.wd-agent__vue svg { width: 14px; height: 14px; flex-shrink: 0; }
+.wd-agent__vue:hover:not(.is-active) { background: #EDF2EE; }
+.wd-agent__vue.is-active { background: #445047; color: #ffffff; cursor: default; }
+.wd-agent__vue:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+.wd-agent__carte-zone { position: relative; align-self: stretch; margin-top: 12px; }
 .wd-agent__carte-zone[hidden] { display: none; }
 .wd-agent__carte {
   height: 440px;
@@ -3231,7 +3250,7 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
 }
 @media (prefers-reduced-motion: reduce) {
   .wd-agent__prix,
-  .wd-agent__carte-bascule { transition: none; }
+  .wd-agent__vue { transition: none; }
 }
 
 /* ── Agent : la card de l'hôtel posée sur la carte ─────────────────────────────────
