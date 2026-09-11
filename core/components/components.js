@@ -1023,6 +1023,26 @@
     ]
   };
 
+  // Hôtels du réseau Accor, hors Pullman, que l'assistant propose en relais quand l'hôtel
+  // retenu n'a pas un service demandé. Relevés sur leurs fiches all.accor.com (septembre 2026) :
+  // adresse, services, note (sur 5, ramenée sur 10 comme les autres cards), photos. Position
+  // relevée sur OpenStreetMap. Le prix est une valeur de prototype, comme partout ailleurs.
+  const PHOTO_ALL = (cle) => 'https://www.ahstatic.com/photos/' + cle + '_p_1024x768.jpg';
+  const ALTERNATIVES_ACCOR = {
+    'Singapour': [
+      { name: 'Fairmont Singapore', city: 'Singapour', country: 'Singapour', adresse: '80 Bras Basah Road',
+        lat: 1.294004, lng: 103.853966, rating: '9.4', price: 289,
+        href: 'https://all.accor.com/hotel/A5G8/index.fr.shtml',
+        photos: ['a5g8_ho_00', 'a5g8_ho_01', 'a5g8_ho_02', 'a5g8_sw_00'].map(PHOTO_ALL),
+        amenities: ['parking', 'spa', 'pool', 'gym', 'restaurant', 'bar'] },
+      { name: 'Swissôtel The Stamford', city: 'Singapour', country: 'Singapour', adresse: '2 Stamford Road',
+        lat: 1.293317, lng: 103.853398, rating: '9.2', price: 259,
+        href: 'https://all.accor.com/hotel/A5D3/index.fr.shtml',
+        photos: ['a5d3_ho_00', 'a5d3_ho_01', 'a5d3_ho_02', 'a5d3_sw_00'].map(PHOTO_ALL),
+        amenities: ['parking', 'spa', 'pool', 'gym', 'restaurant', 'bar'] }
+    ]
+  };
+
   // Liste canonique, enrichie une seule fois au chargement.
   const WD_HOTELS = (() => {
     const seen = {};
@@ -5435,16 +5455,19 @@
       const carteHotel = (h, i) => {
         const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
         const cles = (window.WD_IMG_KEYS ? window.WD_IMG_KEYS(h) : [String(h.img || '').split(':')[0]]).filter(Boolean).slice(0, 6);
-        const photos = cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=640');
+        // Un hôtel du réseau Accor hors Pullman porte ses photos all.accor.com en adresses complètes.
+        const photos = h.photos ? h.photos.slice(0, 6) : cles.map(k => base + k + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=640');
         const PIN = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
         const COCHE = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 6.5 4.8 9 10 3.5"/></svg>';
         const FLECHE = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
         const services = Object.keys(SERVICES_HOTEL).filter(id => (h.amenities || []).indexOf(id) >= 0);
-        const ordre = services.filter(id => demandes.indexOf(id) >= 0)
-          .concat(services.filter(id => demandes.indexOf(id) < 0));
+        // Ce que l'échange a demandé, plus ce que la card vient apporter — le parking d'un relais.
+        const voulus = demandes.concat(h.enAvant || []);
+        const ordre = services.filter(id => voulus.indexOf(id) >= 0)
+          .concat(services.filter(id => voulus.indexOf(id) < 0));
         // Trois pastilles sur une card en demi-largeur, sauf si l'échange en a demandé
         // davantage : ce qu'on a demandé reste toujours visible.
-        const visibles = ordre.slice(0, Math.max(3, ordre.filter(id => demandes.indexOf(id) >= 0).length));
+        const visibles = ordre.slice(0, Math.max(3, ordre.filter(id => voulus.indexOf(id) >= 0).length));
         const caches = ordre.slice(visibles.length);
         const reserver = window.WD_ALL_BOOKING_URL
           ? window.WD_ALL_BOOKING_URL(h, { checkin: st.checkInDate, nights: nuits,
@@ -5473,7 +5496,7 @@
           + (h.rating ? '<span class="wd-agent__hotel-note" aria-label="Note ' + esc(h.rating) + ' sur 10">' + esc(h.rating) + '</span>' : '') + '</p>'
           + (visibles.length
               ? '<ul class="wd-agent__hotel-services" aria-label="Services de l’hôtel">'
-                + visibles.map(id => demandes.indexOf(id) >= 0
+                + visibles.map(id => voulus.indexOf(id) >= 0
                     ? '<li class="is-demande">' + COCHE + esc(SERVICES_HOTEL[id]) + '</li>'
                     : '<li>' + esc(SERVICES_HOTEL[id]) + '</li>').join('')
                 + (caches.length ? '<li class="wd-agent__hotel-plus" title="' + esc(caches.map(id => SERVICES_HOTEL[id]).join(', ')) + '">+' + caches.length + '</li>' : '')
@@ -5586,7 +5609,17 @@
             + '<span class="wd-agent__parking-adresse">' + esc(l.adresse) + '</span></span>'
             + '<span class="wd-agent__parking-distance">' + esc(l.distance) + '<span>' + esc(l.marche) + '</span></span>'
             + '</button></li>').join('')
-        + '</ol></div>';
+        + '</ol>'
+        // La suite : poursuivre avec l'hôtel sur sa fiche ALL, ou voir d'autres hôtels du groupe.
+        // Le second bouton s'efface une fois les relais montrés.
+        + (px.suite
+            ? '<div class="wd-agent__suite">'
+              + '<a class="wd-agent__suite-continuer" href="' + esc(px.suite.url) + '" target="_blank" rel="noopener">Continuer avec cet hôtel</a>'
+              + (px.suite.alternatives && !px.suite.vues
+                  ? '<button type="button" class="wd-agent__reply" data-agent-alternatives="' + i + '">Proposez-moi d’autres hôtels du réseau Accor</button>' : '')
+              + '</div>'
+            : '')
+        + '</div>';
 
       let vuAgent = false;
       const fil = (st.agentThread || []).map((m, i) => {
@@ -5594,8 +5627,10 @@
         const etiquette = (m.qui === 'agent' && !vuAgent) ? (vuAgent = true, '<span class="wd-agent__qui">Assistant Pullman</span>') : '';
         const porte = fini && i === indexProps && m.qui === 'agent' && carrousel;
         const porteServices = aCartes && i === dernier && m.qui === 'agent';
-        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + (porteServices ? ' wd-agent__msg--services' : '') + (m.proximite ? ' wd-agent__msg--proximite' : '') + '">'
-          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + (porteServices ? servicesHTML : '') + (m.proximite ? proximiteHTML(m.proximite, i) : '') + '</div>';
+        return etiquette + '<div class="wd-agent__msg wd-agent__msg--' + m.qui + (porte ? ' wd-agent__msg--props' : '') + (porteServices ? ' wd-agent__msg--services' : '') + (m.proximite ? ' wd-agent__msg--proximite' : '') + (m.alternatives ? ' wd-agent__msg--props wd-agent__msg--relais' : '') + '">'
+          + '<p>' + m.texte + '</p>' + (porte ? carrousel : '') + (porteServices ? servicesHTML : '') + (m.proximite ? proximiteHTML(m.proximite, i) : '')
+          + (m.alternatives && m.alternatives.length ? '<div class="wd-agent__carrousel wd-agent__carrousel--hotels wd-agent__carrousel--relais">' + m.alternatives.map((h, k) => carteHotel(h, 'relais-' + i + '-' + k)).join('') + '</div>' : '')
+          + '</div>';
       }).join('')
       + (st.agentTyping ? '<div class="wd-agent__typing" aria-label="L\u2019assistant écrit"><span></span><span></span><span></span></div>' : '');
       const propositions = (tour && !st.agentTyping && !tour.cartes)
@@ -5836,6 +5871,13 @@
             return Object.assign({}, l, { m: m, minutes: minutes, distance: distance(m), marche: minutes + ' min à pied' });
           }).sort((x, y) => x.m - y.m);
           proximite = { hotel: { nom: couvert.name, court: couvert.name.replace(/^Pullman\s+/, ''), lat: couvert.lat, lng: couvert.lng }, lieux: lieux };
+          // « Continuer avec cet hôtel » mène à sa fiche ALL, dont le code est celui de sa page Pullman.
+          const code = (couvert.href || '').match(/\/([A-Za-z0-9]{4})\.html?$/);
+          proximite.suite = {
+            url: code ? 'https://all.accor.com/hotel/' + code[1] + '/index.fr.shtml' : couvert.href,
+            ville: couvert.city,
+            alternatives: (ALTERNATIVES_ACCOR[couvert.city] || []).some(a => a.amenities.indexOf('parking') >= 0)
+          };
           phrases.push('Plusieurs parkings publics se trouvent toutefois à quelques pas ' + (sans.length > 1 ? 'du ' + couvert.name : 'de l’hôtel')
             + ' : le plus proche, ' + lieux[0].nom + ', est à ' + lieux[0].distance + ', soit ' + lieux[0].minutes + ' minute' + (lieux[0].minutes > 1 ? 's' : '') + ' à pied. Je vous les ai situés sur la carte.');
         }
@@ -5865,6 +5907,50 @@
       }, 700);
     }
 
+    // « Proposez-moi d'autres hôtels du réseau Accor » : deux hôtels du groupe, d'autres marques,
+    // qui ont ce qui manquait — le parking — et, quand l'échange l'a demandé, le spa ; les plus
+    // proches de l'hôtel d'abord. Posés en cards sous la réponse, comme les propositions.
+    _agentAlternatives(i) {
+      const st = this.state;
+      const source = (st.agentThread || [])[i];
+      const px = source && source.proximite;
+      if (!px || !px.suite || px.suite.vues || st.agentTyping) return;
+      px.suite.vues = true;
+      const VERS = { spa: 'spa', pets: 'pets', kids: 'family', beach: 'beach', 'meeting-room': 'meeting' };
+      const voulus = (st.selectedTypes || []).map(c => VERS[c]).filter(Boolean);
+      const metres = (a) => {
+        const rad = Math.PI / 180;
+        const x = Math.sin((a.lat - px.hotel.lat) * rad / 2) ** 2
+          + Math.cos(px.hotel.lat * rad) * Math.cos(a.lat * rad) * Math.sin((a.lng - px.hotel.lng) * rad / 2) ** 2;
+        return 2 * 6371000 * Math.asin(Math.sqrt(x));
+      };
+      let relais = (ALTERNATIVES_ACCOR[px.suite.ville] || []).filter(a => a.amenities.indexOf('parking') >= 0);
+      const complets = relais.filter(a => voulus.every(v => a.amenities.indexOf(v) >= 0));
+      if (complets.length) relais = complets;
+      relais = relais.map(a => Object.assign({}, a, { enAvant: ['parking'], m: metres(a) }))
+        .sort((a, b) => a.m - b.m).slice(0, 2);
+
+      st.agentThread.push({ qui: 'moi', texte: 'Proposez-moi d’autres hôtels du réseau Accor' });
+      const distance = (m) => m < 1000 ? Math.round(m / 50) * 50 + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km';
+      const avecSpa = voulus.indexOf('spa') >= 0 && relais.every(a => a.amenities.indexOf('spa') >= 0);
+      const texte = relais.length
+        ? 'Voici ' + (relais.length > 1 ? 'deux hôtels' : 'un hôtel') + ' du réseau Accor, à environ ' + distance(relais[0].m)
+          + ' du ' + px.hotel.nom + ', qui ' + (relais.length > 1 ? 'disposent' : 'dispose') + ' d’un parking'
+          + (avecSpa ? ' et d’un spa, comme vous le souhaitiez' : '') + ' :'
+        : 'Je n’ai pas d’autre hôtel du réseau Accor à vous proposer à proximité.';
+
+      st.agentTyping = true;
+      this._rerenderContent();
+      this._agentDefiler();
+      clearTimeout(this._minuteurAgent);
+      this._minuteurAgent = setTimeout(() => {
+        st.agentThread.push(relais.length ? { qui: 'agent', texte: texte, alternatives: relais } : { qui: 'agent', texte: texte });
+        st.agentTyping = false;
+        this._rerenderContent();
+        this._agentDefiler();
+      }, 700);
+    }
+
     _agentDefiler() {
       const fil = this.querySelector('#wdAgentThread');
       if (!fil) return;
@@ -5872,7 +5958,7 @@
       // on cale le fil sur la question plutôt que tout en bas, sur les boutons.
       const bulles = fil.querySelectorAll('.wd-agent__msg--agent');
       const derniere = bulles[bulles.length - 1];
-      if (derniere && (derniere.classList.contains('wd-agent__msg--services') || derniere.classList.contains('wd-agent__msg--proximite')) && derniere.offsetHeight > fil.clientHeight) {
+      if (derniere && (derniere.classList.contains('wd-agent__msg--services') || derniere.classList.contains('wd-agent__msg--proximite') || derniere.classList.contains('wd-agent__msg--relais')) && derniere.offsetHeight > fil.clientHeight) {
         fil.scrollTop += derniere.getBoundingClientRect().top - fil.getBoundingClientRect().top - 8;
       } else {
         fil.scrollTop = fil.scrollHeight;
@@ -8661,6 +8747,10 @@
         this.querySelectorAll('[data-agent-question]').forEach(btn => btn.addEventListener('click', (e) => {
           e.stopPropagation();
           this._agentRepondre(btn.textContent, null);
+        }));
+        this.querySelectorAll('[data-agent-alternatives]').forEach(btn => btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          this._agentAlternatives(Number(btn.dataset.agentAlternatives));
         }));
 
         // Parkings voisins : l'hôtel en vert, chaque parking en pastille « P » avec sa distance,

@@ -3471,3 +3471,33 @@ a.wd-agent__prop:hover .wd-agent__prop-nom { text-decoration: underline; text-un
   .wd-agent__parking,
   .wd-agent__parking-pastille { transition: none; }
 }
+
+/* ── Agent : la suite d'une réponse « service absent » ───────────────────────────────
+   Sous les parkings voisins, deux sorties : poursuivre avec l'hôtel (sa fiche ALL, l'action
+   principale, pleine comme « Valider ma sélection ») ou voir d'autres hôtels du groupe (en
+   contour, comme les réponses proposées). Les hôtels relais se posent ensuite en cards. */
+.wd-agent__suite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid rgba(68, 80, 71, .1);
+}
+.wd-agent__suite-continuer {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 9px 18px;
+  border-radius: 100px;
+  background: #445047;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  text-decoration: none;
+  transition: background .15s ease;
+}
+.wd-agent__suite-continuer:hover { background: #2f3a33; }
+.wd-agent__suite-continuer:focus-visible { outline: 2px solid #445047; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .wd-agent__suite-continuer { transition: none; } }
