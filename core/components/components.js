@@ -2305,8 +2305,8 @@
         }).join('');
       };
 
-      // Ligne « Autour de moi » (onglet Restaurants), comme sur TheFork, en version fine : une seule
-      // ligne sous la rangée des continents. Placée sous les cartes, elle ne décale pas le CTA
+      // Ligne « Autour de moi » (onglet Restaurants), comme sur TheFork, avec l'UI de la ligne
+      // « Reprendre votre recherche » (mêmes classes), sous la rangée des continents. Placée sous les cartes, elle ne décale pas le CTA
       // « Laissez-vous guider », calé sur leur bas. Masquée pendant la saisie et une fois le mode
       // actif : la chip et la liste prennent le relais.
       let autourEtat = 'repos';
@@ -2317,11 +2317,15 @@
         if (!visible) { autourEl.innerHTML = ''; return; }
         const cherche = autourEtat === 'recherche';
         autourEl.innerHTML =
-          '<button type="button" class="wd-booking__dd-autour-btn' + (cherche ? ' is-recherche' : '') + '" data-autour' + (cherche ? ' aria-busy="true" disabled' : '') + '>' +
-            '<svg class="wd-booking__dd-autour-icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg>' +
-            '<span class="wd-booking__dd-autour-titre">Autour de moi</span>' +
-            '<span class="wd-booking__dd-autour-sous">' + (cherche ? 'Localisation en cours…' : 'Restaurants et bars Pullman les plus proches') + '</span>' +
-            '<svg class="wd-booking__dd-autour-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="4,2 8,6 4,10"/></svg>' +
+          '<button type="button" class="wd-booking__dd-recent-row wd-booking__dd-autour-btn' + (cherche ? ' is-recherche' : '') + '" data-autour' + (cherche ? ' aria-busy="true" disabled' : '') + '>' +
+            '<span class="wd-booking__dd-recent">' +
+              '<span class="wd-booking__dd-recent-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg></span>' +
+              '<span class="wd-booking__dd-recent-main">' +
+                '<span class="wd-booking__dd-recent-title">Autour de moi</span>' +
+                '<span class="wd-booking__dd-recent-sub">' + (cherche ? 'Localisation en cours…' : 'Restaurants et bars Pullman les plus proches') + '</span>' +
+              '</span>' +
+            '</span>' +
+            '<span class="wd-booking__dd-recent-del wd-booking__dd-autour-chevron" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,2 8,6 4,10"/></svg></span>' +
           '</button>';
       };
 
