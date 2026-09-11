@@ -543,8 +543,12 @@ function wdHotelPopupHTML(h, active, showPrice, stay) {
     }
     // Le qualificatif d'un lieu : sa cuisine si elle est déclarée, son cadre sinon.
     // Les bars n'ont jamais de cuisine renseignée chez Accor.
-    const qualifie = (v, n) => [v.type === 'bar' ? 'Bar' : 'Restaurant']
-      .concat(v.cuisines.concat(v.tags).slice(0, n).map(_libelleResto)).join(' · ');
+    // Comme sur le site Restaurants & Bars : le style de nourriture, une thématique quand la
+    // place le permet, puis la note et le prix moyen par couvert.
+    const qualifie = (v, n) => [_libelleResto(v.style || v.cuisines[0])]
+      .concat((v.themes || []).slice(0, Math.max(0, n - 1)).map(_libelleResto),
+        v.note ? ['★ ' + v.note] : [], v.prix ? ['± ' + v.prix + ' EUR'] : [])
+      .filter(Boolean).join(' · ');
     // « 3 restaurants · 2 bars » plutôt qu'un nom collectif. Aucun ne convenait : « table »
     // ne couvre pas un bar de piscine, et Pullman lui-même titre « Restaurants et vie
     // nocturne ». Compter par type dit la composition sans avoir à déplier.

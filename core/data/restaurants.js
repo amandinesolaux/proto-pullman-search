@@ -13,6 +13,15 @@
 // Les effectifs sont volontairement laissés tels quels, sans arrondi ni complément :
 // « International » écrase tout avec 93 lieux parce que c'est ainsi qu'Accor renseigne
 // ses fiches, et un filtre qui promettrait mieux mentirait sur les données.
+//
+// Les filtres reprennent ceux du site Restaurants & Bars d'Accor (restaurantsandbars.accor.com) :
+// prix, disponibilité, thématique, style de nourriture, préférences alimentaires, notes des
+// clients, offres et fidélité. Le style de nourriture et une partie des thématiques (terrasse,
+// rooftop, vue) partent des relevés ci-dessous ; prix moyen, note, disponibilité, menus, offres
+// et le reste des thématiques n'existent pas dans la source : ce sont des valeurs de prototype,
+// calculées plus bas à partir du nom du lieu pour rester stables, comme les prix et notes des
+// hôtels. Choix assumé pour aligner le prototype sur le site — à remplacer par les vraies
+// données dès qu'elles seront disponibles.
 
 window.WD_RESTAURANTS = [
   { nom:'L\'Aquitania', hotel:'Pullman Bordeaux Lac', ville:'Bordeaux', pays:'France', region:'europe', type:'restaurant', cuisines:['francais'], tags:['terrasse','vin'], img:'aja_p_4919-07', url:'https://pullman.accor.com/fr/hotels/bordeaux-le-lac/0669/restaurants/r001.html',
@@ -741,37 +750,147 @@ window.WD_RESTAURANTS = [
 // Conservé comme fait relevé, non exploité en filtre (voir plus bas).
 window.WD_RESTO_PDJ = ['Pullman Abidjan','Pullman Adelaide','Pullman Auckland Airport','Pullman Auckland Hotel & Apts','Pullman Bali Legian Beach','Pullman Bandung Grand Central','Pullman Bangkok Hotel G','Pullman Bangkok King Power','Pullman Basel Europe','Pullman Beijing South','Pullman Berlin Schweizerhof','Pullman Bordeaux Lac','Pullman Brisbane Airport','Pullman Brisbane King George Sq.','Pullman Brussels Centre Midi','Pullman Bucharest WTC','Pullman Budapest','Pullman Bunker Bay Resort','Pullman Cairns International','Pullman Cannes Mandelieu','Pullman Cape Town','Pullman Chennai Anna Salai','Pullman Ciawi Vimala Hills','Pullman Cologne','Pullman Dakar Teranga','Pullman Dali','Pullman Danang Beach Resort','Pullman Doha West Bay','Pullman Dubai Creek City Centre','Pullman Dubai Downtown','Pullman Dubai JLT','Pullman Eindhoven Cocagne','Pullman Guangzhou Baiyun Airport','Pullman Hai Phong','Pullman Hanoi','Pullman Istanbul','Pullman Jakarta Central Park','Pullman Jakarta Indonesia','Pullman Khao Lak Resort','Pullman Khon Kaen Raja Orchid','Pullman Kinshasa Grand Hôtel','Pullman Kuala Lumpur City Centre','Pullman Kuching','Pullman Lijiang Resort & Spa','Pullman Lima Miraflores','Pullman Lima San Isidro','Pullman Liverpool','Pullman Lombok Merujani','Pullman London St Pancras','Pullman Luang Prabang','Pullman Lubumbashi Grand Karavia','Pullman Lyon','Pullman Magenta Shores Resort','Pullman Maldives Maamutaa','Pullman Mazagan Royal Golf & Spa','Pullman Melbourne Albert Park','Pullman Melbourne City Centre','Pullman Miami Airport','Pullman Miri Waterfront','Pullman Montpellier Centre','Pullman Munich','Pullman Nairobi Upper Hill','Pullman Oceanview Sanya Bay','Pullman Palm Cove Sea Temple','Pullman Paris Centre - Bercy','Pullman Paris La Défense','Pullman Paris Montparnasse','Pullman Paris Tour Eiffel','Pullman Pattaya Hotel G','Pullman Phu Quoc Beach Resort','Pullman Phuket Arcadia','Pullman Phuket Panwa Beach','Pullman Port Douglas Sea Temple','Pullman Quay Grand Sydney Harbour','Pullman Reef Hotel Casino','Pullman Resort Al Marjan Island','Pullman Riga Old Town','Pullman Rotorua','Pullman Saigon Centre','Pullman Sails in the Desert','Pullman Santiago El Bosque','Pullman Santiago Vitacura','Pullman Seoul','Pullman Shanghai Central','Pullman Shanghai Jing\\','Pullman Sharjah','Pullman Singapore Hill Street','Pullman Singapore Orchard','Pullman Stuttgart Fontana','Pullman Sydney Airport','Pullman Sydney Hyde Park','Pullman Sydney Olympic Park','Pullman Sydney Penrith','Pullman São Paulo Guarulhos Airport','Pullman São Paulo Ibirapuera','Pullman São Paulo Vila Olímpia','Pullman Tbilisi Axis Towers','Pullman Tokyo Tamachi','Pullman Toulouse Airport','Pullman Viña del Mar','Pullman Zagreb','Pullman Zhangjiajie'];
 
-// Critères de l'onglet Restaurants. Chaque libellé correspond à un champ réellement
-// renseigné par la source ; aucun n'a été inventé pour étoffer la liste.
+// ── Alignement sur le site Restaurants & Bars ────────────────────────────────────────────
+// Chaque lieu reçoit les champs que filtre le site : un style de nourriture, des thématiques,
+// des préférences alimentaires, une note, un prix moyen par couvert, une disponibilité et des
+// offres. Les relevés d'origine restent consultables dans `source`. Le style et la terrasse,
+// le rooftop et la vue traduisent la source ; le reste est tiré d'un hachage du nom, pour que
+// les valeurs restent identiques d'une page à l'autre.
+(function alignerSurRestaurantsEtBars() {
+  const hache = (texte, graine) => {
+    let h = (2166136261 ^ graine) >>> 0;
+    for (let i = 0; i < texte.length; i++) { h ^= texte.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h / 4294967295;
+  };
+  const STYLES = { international: 'international', asiatique: 'asiatique', francais: 'francais', cafe: 'cafe',
+    regional: 'regional', mediterraneen: 'mediterraneen', italien: 'italien', grillades: 'barbecue',
+    gastronomique: 'gastronomique', sain: 'healthy' };
+  // Prix moyen par couvert, en euros, selon le style ; 22 à 55 pour les autres.
+  const PRIX = { 'bar-cocktails': [12, 28], 'bar-vin': [14, 30], cafe: [10, 20], healthy: [16, 30],
+    barbecue: [28, 60], gastronomique: [70, 160] };
+  (window.WD_RESTAURANTS || []).forEach(v => {
+    const tire = (graine) => hache(v.nom + '|' + v.hotel, graine);
+    const source = { cuisines: v.cuisines.slice(), tags: v.tags.slice() };
+    const aTag = (t) => source.tags.indexOf(t) >= 0;
+    const bar = v.type === 'bar';
+    const style = bar ? (aTag('vin') ? 'bar-vin' : 'bar-cocktails') : (STYLES[source.cuisines[0]] || 'international');
+
+    const themes = [];
+    if (aTag('terrasse') || aTag('piscine')) themes.push('terrasse');
+    if ((bar && aTag('cocktails') && tire(1) < .6) || (!bar && tire(1) < .1)) themes.push('ambiance-musicale');
+    if (tire(2) < (bar ? .25 : .1)) themes.push('soirees-theme');
+    if (aTag('rooftop')) themes.push('rooftop');
+    if (aTag('rooftop') || (aTag('piscine') && tire(3) < .5)) themes.push('vue');
+    if (!bar && tire(4) < (aTag('buffet') ? .4 : .08)) themes.push('brunch');
+
+    const menus = [];
+    if (!bar && (aTag('buffet') || tire(5) < .55)) menus.push('menu-enfant');
+    if (style === 'healthy' || tire(6) < (bar ? .1 : .65)) menus.push('menu-vegetarien');
+    if (style === 'healthy' || tire(7) < .12) menus.push('menu-leger');
+    if (style === 'healthy' || tire(8) < (bar ? .15 : .4)) menus.push('menu-sans-gluten');
+    if (!bar && tire(9) < .08) menus.push('menu-sans-sel');
+
+    const fourchette = PRIX[style] || [22, 55];
+    v.source = source;
+    v.style = style;
+    v.themes = themes;
+    v.menus = menus;
+    v.prix = Math.round(fourchette[0] + tire(10) * (fourchette[1] - fourchette[0]));
+    // Un lieu sur dix n'a pas encore d'avis, comme sur le site.
+    v.note = tire(11) < .1 ? null : Math.round((3.6 + tire(12) * 1.3) * 10) / 10;
+    v.avis = v.note === null ? 0 : Math.round(20 + tire(13) * 2600);
+    v.disponible = tire(14) < .9;
+    v.offre = tire(15) < .12;
+    v.points = tire(16) < .04;
+    // Les filtres à cocher se lisent toujours sur `cuisines` et `tags` : le style de nourriture
+    // d'un côté, tout le reste de l'autre.
+    v.cuisines = [style];
+    v.tags = themes.concat(menus,
+      v.note !== null && v.note >= 4 ? ['note-4'] : [],
+      v.note !== null && v.note >= 3 ? ['note-3'] : [],
+      v.disponible ? ['disponible'] : [],
+      v.offre ? ['offre'] : [],
+      v.points ? ['points'] : []);
+  });
+})();
+
+// Critères de l'onglet Restaurants, dans l'ordre et avec les libellés du site Restaurants &
+// Bars. Le prix est un curseur à deux poignées, bornes tirées des prix des lieux.
 window.WD_RESTO_CRITERIA = [
-  { group: 'Type de lieu', items: [
-    { id: 'restaurant', label: 'Restaurant' },
-    { id: 'bar',        label: 'Bar' },
+  { group: 'Sélectionnez votre prix', type: 'prix', unite: 'EUR', items: [],
+    min: Math.min.apply(null, window.WD_RESTAURANTS.map(v => v.prix)),
+    max: Math.max.apply(null, window.WD_RESTAURANTS.map(v => v.prix)) },
+  { group: 'Disponibilité des restaurants', items: [
+    { id: 'disponible', label: 'Disponible seulement' },
   ]},
-  { group: 'Cuisine', items: [
-    { id: 'international',  label: 'International' },
-    { id: 'asiatique',      label: 'Asiatique' },
-    { id: 'francais',       label: 'Française' },
-    { id: 'cafe',           label: 'Café' },
-    { id: 'regional',       label: 'Régionale' },
-    { id: 'mediterraneen',  label: 'Méditerranéenne' },
-    { id: 'italien',        label: 'Italienne' },
-    { id: 'gastronomique',  label: 'Gastronomique' },
-    { id: 'grillades',      label: 'Grillades' },
-    { id: 'sain',           label: 'Végétarienne & healthy' },
+  { group: 'Thématique', items: [
+    { id: 'terrasse',          label: 'Terrasse' },
+    { id: 'ambiance-musicale', label: 'Ambiance musicale' },
+    { id: 'soirees-theme',     label: 'Soirées à thème' },
+    { id: 'rooftop',           label: 'Rooftop' },
+    { id: 'vue',               label: 'Vue exceptionnelle' },
+    { id: 'brunch',            label: 'Brunch' },
   ]},
-  { group: 'Cadre', items: [
-    { id: 'rooftop',  label: 'Rooftop & vue' },
-    { id: 'piscine',  label: 'Bord de piscine' },
-    { id: 'terrasse', label: 'Terrasse' },
+  { group: 'Style de nourriture', items: [
+    { id: 'francais',      label: 'Français' },
+    { id: 'international', label: 'International' },
+    { id: 'bar-cocktails', label: 'Bar à cocktails' },
+    { id: 'mediterraneen', label: 'Méditerranéen' },
+    { id: 'italien',       label: 'Italien' },
+    { id: 'asiatique',     label: 'Asiatique' },
+    { id: 'regional',      label: 'Régional' },
+    { id: 'gastronomique', label: 'Gastronomique' },
+    { id: 'barbecue',      label: 'Barbecue' },
+    { id: 'healthy',       label: 'Healthy' },
+    { id: 'cafe',          label: 'Café' },
+    { id: 'bar-vin',       label: 'Bar à vin' },
   ]},
-  { group: 'Carte & service', items: [
-    { id: 'cocktails', label: 'Bar à cocktails' },
-    { id: 'vin',       label: 'Bar à vin' },
-    { id: 'buffet',    label: 'Buffet' },
-    { id: 'journee',   label: 'Service continu' },
+  { group: 'Préférences alimentaires', items: [
+    { id: 'menu-enfant',      label: 'Menu enfant' },
+    { id: 'menu-vegetarien',  label: 'Menu végétarien' },
+    { id: 'menu-leger',       label: 'Menu léger' },
+    { id: 'menu-sans-gluten', label: 'Menu sans gluten' },
+    { id: 'menu-sans-sel',    label: 'Menu sans sel' },
+  ]},
+  { group: 'Notes des clients', items: [
+    { id: 'note-4', label: '4 et plus' },
+    { id: 'note-3', label: '3 et plus' },
+  ]},
+  { group: 'Offres et fidélité', items: [
+    { id: 'offre',  label: 'Offre disponible' },
+    { id: 'points', label: 'Gagnez des points' },
   ]},
 ];
+
+// Le prix voyage parmi les critères actifs sous un identifiant « prix:MIN-MAX », posé seulement
+// quand le curseur est resserré : il part ainsi dans l'URL avec les autres, sans mécanique à part.
+window.WD_RESTO_PRIX = {
+  lire: (ids) => {
+    const id = [...(ids || [])].find(x => /^prix:\d+-\d+$/.test(x));
+    if (!id) return null;
+    const bornes = id.slice(5).split('-').map(Number);
+    return { id: id, min: Math.min(bornes[0], bornes[1]), max: Math.max(bornes[0], bornes[1]) };
+  },
+  id: (min, max) => 'prix:' + min + '-' + max,
+  repond: (v, ids) => {
+    const p = window.WD_RESTO_PRIX.lire(ids);
+    return !p || (v.prix >= p.min && v.prix <= p.max);
+  },
+  libelle: (id) => {
+    const m = /^prix:(\d+)-(\d+)$/.exec(id || '');
+    return m ? m[1] + ' – ' + m[2] + ' EUR' : null;
+  },
+};
+// Libellé d'un critère restaurant, prix compris.
+window.WD_RESTO_LIBELLE = (id) => {
+  const prix = window.WD_RESTO_PRIX.libelle(id);
+  if (prix) return prix;
+  for (const g of window.WD_RESTO_CRITERIA) {
+    const it = g.items.find(x => x.id === id);
+    if (it) return it.label;
+  }
+  return id;
+};
 
 // « Petit-déjeuner » n'est volontairement pas un filtre : 102 des 109 hôtels en servent
 // un. Le proposer donnerait un critère qui écarte sept établissements et laisse croire

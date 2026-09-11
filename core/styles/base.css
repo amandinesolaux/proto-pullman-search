@@ -604,6 +604,25 @@ wd-booking { display: block; position: relative; z-index: 100; margin-top: -268p
 .wd-booking__dd-criteria-item--checked .wd-booking__dd-criteria-check { background: #5FEF91; border-color: #5FEF91; }
 .wd-booking__dd-criteria-item--checked .wd-booking__dd-criteria-check::after { content: ''; display: block; width: 6px; height: 10px; border: solid #1a2220; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
 .wd-booking__dd-criteria-item--checked { color: #fff; }
+/* Pastille du bouton Filtres : cachée sans filtre actif. La règle mobile qui la met en flex
+   l'emportait sur l'attribut hidden et affichait « 0 ». */
+.wd-booking__filtres-compte[hidden] { display: none; }
+/* Nombre de lieux par option, comme sur le site Restaurants & Bars. */
+.wd-booking__dd-criteria-compte { margin-left: 4px; color: rgba(255,255,255,.45); font-variant-numeric: tabular-nums; }
+/* Curseur de prix à deux poignées (onglet Restaurants) : rail discret, plage et poignées au
+   vert des cases cochées, valeurs au-dessus. */
+.wd-booking__prix { padding: 2px 10px 12px; }
+.wd-booking__prix-valeurs { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: var(--font-sans); font-size: 12px; font-weight: 600; color: #fff; font-variant-numeric: tabular-nums; }
+.wd-booking__prix-rail { position: relative; height: 22px; }
+.wd-booking__prix-rail::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 4px; margin-top: -2px; border-radius: 100px; background: rgba(255,255,255,.18); }
+.wd-booking__prix-plage { position: absolute; top: 50%; height: 4px; margin-top: -2px; border-radius: 100px; background: #5FEF91; }
+.wd-booking__prix-curseur { position: absolute; left: 0; top: 0; width: 100%; height: 22px; margin: 0; background: none; pointer-events: none; -webkit-appearance: none; appearance: none; }
+.wd-booking__prix-curseur::-webkit-slider-runnable-track { background: none; border: 0; }
+.wd-booking__prix-curseur::-moz-range-track { background: none; border: 0; }
+.wd-booking__prix-curseur::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 100px; background: #fff; border: 2px solid #5FEF91; box-shadow: 0 1px 4px rgba(0,0,0,.4); cursor: pointer; pointer-events: auto; }
+.wd-booking__prix-curseur::-moz-range-thumb { width: 18px; height: 18px; border-radius: 100px; background: #fff; border: 2px solid #5FEF91; box-shadow: 0 1px 4px rgba(0,0,0,.4); cursor: pointer; pointer-events: auto; }
+.wd-booking__prix-curseur:focus-visible::-webkit-slider-thumb { outline: 2px solid #fff; outline-offset: 2px; }
+.wd-booking__prix-curseur:focus-visible::-moz-range-thumb { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* Chips in search field */
 /* min-width:0 : sans lui le champ hérite de min-width:auto et refuse de descendre sous

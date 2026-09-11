@@ -1419,7 +1419,8 @@
         const activeCriteriaList = getActiveCriteriaList();
         activeCriteria.forEach(cId => {
           const c = activeCriteriaList.find(x => x.id === cId);
-          if (c) chips.push({ type: 'criteria', id: cId, label: c.label });
+          const prix = window.WD_RESTO_PRIX && window.WD_RESTO_PRIX.libelle(cId);
+          if (c || prix) chips.push({ type: 'criteria', id: cId, label: c ? c.label : prix });
         });
         return chips;
       };
@@ -1645,7 +1646,7 @@
         let best = null;
         // Un lieu répond-il à un sous-ensemble de critères ? Même règle que le filtre :
         // ET entre les groupes, OU à l'intérieur.
-        const repond = (v, ids2) => getActiveCriteriaGroups().every(g => {
+        const repond = (v, ids2) => (!window.WD_RESTO_PRIX || window.WD_RESTO_PRIX.repond(v, ids2)) && getActiveCriteriaGroups().every(g => {
           const coches = g.items.map(it => it.id).filter(id => ids2.has(id));
           if (!coches.length) return true;
           return coches.some(id => id === v.type || v.cuisines.indexOf(id) >= 0 || v.tags.indexOf(id) >= 0);
@@ -1655,7 +1656,7 @@
           const gardes = pool.filter(v => repond(v, reduits));
           if (gardes.length && (!best || gardes.length > best.count)) {
             const c = liste.find(x => x.id === cId);
-            best = { id: cId, label: c ? c.label : cId, count: gardes.length, hotel: { name: gardes[0].nom } };
+            best = { id: cId, label: c ? c.label : (window.WD_RESTO_LIBELLE ? window.WD_RESTO_LIBELLE(cId) : cId), count: gardes.length, hotel: { name: gardes[0].nom } };
           }
         });
         return { best };
@@ -1834,8 +1835,10 @@
       // Lieux de restauration du périmètre courant. Même géographie que la liste d'hôtels
       // — pays déplié s'il y en a un, continent sinon — pour que les deux onglets ne se
       // contredisent pas quand on passe de l'un à l'autre.
-      const restosDuPerimetre = () => {
-        const tous = searchState.selectedResto
+      // `sansLieuChoisi` : la destination seule, sans le restaurant choisi — c'est sur elle que
+      // se comptent les options des filtres, qui tomberaient sinon toutes à un.
+      const restosDuPerimetre = (sansLieuChoisi) => {
+        const tous = searchState.selectedResto && !sansLieuChoisi
           ? (window.WD_RESTAURANTS || []).filter(v => v.nom === searchState.selectedResto)
           : (window.WD_RESTAURANTS || []);
         if (searchState.selectedHotel) return tous.filter(v => v.hotel === searchState.selectedHotel);
@@ -1851,6 +1854,7 @@
       const restoMatchesCriteria = (v) => {
         const actifs = getActiveCriteria();
         if (!actifs.size) return true;
+        if (window.WD_RESTO_PRIX && !window.WD_RESTO_PRIX.repond(v, actifs)) return false;
         return getActiveCriteriaGroups().every(g => {
           const coches = g.items.map(it => it.id).filter(id => actifs.has(id));
           if (!coches.length) return true;
@@ -1900,8 +1904,9 @@
             const liste = getActiveCriteriaList();
             actifs.forEach(id => {
               const c = liste.find(x => x.id === id);
-              // Le type est déjà dit par le mot compté : on ne le répète pas.
-              if (c && id !== 'restaurant' && id !== 'bar') dits.push(c.label.toLowerCase());
+              const prix = window.WD_RESTO_PRIX && window.WD_RESTO_PRIX.libelle(id);
+              if (prix) dits.push(prix);
+              else if (c) dits.push(c.label.toLowerCase());
             });
           }
           let d = '<span class="wd-booking__dd-results-count-number">' + n + '</span> ' + motLieux(n);
@@ -1938,7 +1943,7 @@
       const GENERIC_QUERY_TERMS = new Set(['hotel', 'hotels', 'hôtel', 'hôtels', 'hotellerie', 'hôtellerie', 'pullman']);
       const isGenericQuery = (q) => { const t = (q || '').trim(); return t.length > 0 && t.split(/\s+/).every(w => GENERIC_QUERY_TERMS.has(w)); };
       let lastScrolledCountry = null; // évite de re-scroller à chaque re-rendu (critères, etc.)
-      const renderDestList = () => {
+      const dessinerDestList = () => {
         const query = searchState.freeText.toLowerCase();
         if (isIntermediate()) {
           // Continents seuls + reprise des recherches récentes ; le repère chiffré reste en pied
@@ -2127,11 +2132,11 @@
                 ? tables.map(({ v, hh }) => {
                     const cle = window.WD_IMG_KEY ? window.WD_IMG_KEY(hh) : (hh.img || '').split(':')[0];
                     const choisie = searchState.selectedResto === v.nom;
-                    const dits = [v.type === 'bar' ? 'Bar' : 'Restaurant']
-                      .concat(v.cuisines.concat(v.tags).slice(0, 2).map(id => {
-                        const c = getActiveCriteriaList().find(x => x.id === id);
-                        return c ? c.label : id;
-                      })).join(' · ');
+                    // Comme sur le site Restaurants & Bars : le style de nourriture, la note et
+                    // le prix moyen par couvert.
+                    const dits = [window.WD_RESTO_LIBELLE ? window.WD_RESTO_LIBELLE(v.style || v.cuisines[0]) : v.cuisines[0]]
+                      .concat(v.note ? ['★ ' + v.note] : [], v.prix ? ['± ' + v.prix + ' EUR'] : [])
+                      .filter(Boolean).join(' · ');
                     return '<button type="button" class="wd-booking__dd-hotel-row' +
                       (choisie ? ' wd-booking__dd-hotel-row--selected' : '') +
                       '" data-dest-type="resto" data-resto-name="' + esc(v.nom) + '">' +
@@ -2182,21 +2187,56 @@
         }
       };
 
+      // Groupes de critères, communs à la vue liste et à la vue carte. Onglet Restaurants, comme
+      // sur le site Restaurants & Bars : un curseur de prix, et le nombre de lieux du périmètre
+      // en face de chaque option ; une option absente du périmètre ne s'affiche pas, sauf si
+      // elle est cochée.
+      const critereItemHTML = (c, checked, compte) =>
+        '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
+        '<span class="wd-booking__dd-criteria-check"></span>' + esc(c.label) +
+        (compte !== null ? '<span class="wd-booking__dd-criteria-compte">(' + compte + ')</span>' : '') +
+        '</button>';
+      const groupesCriteresHTML = () => {
+        const actifs = getActiveCriteria();
+        const surRestos = searchState.activeTab === 'restaurants';
+        const perimetre = surRestos ? restosDuPerimetre(true) : [];
+        return getActiveCriteriaGroups().map(g => {
+          if (g.type === 'prix') {
+            const p = (window.WD_RESTO_PRIX && window.WD_RESTO_PRIX.lire(actifs)) || { min: g.min, max: g.max };
+            const pct = (x) => ((x - g.min) / Math.max(1, g.max - g.min)) * 100;
+            const unite = esc(g.unite || 'EUR');
+            return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' +
+              '<div class="wd-booking__prix" data-prix-min="' + g.min + '" data-prix-max="' + g.max + '">' +
+                '<div class="wd-booking__prix-valeurs"><span data-prix-valeur="min">' + p.min + ' ' + unite + '</span>' +
+                  '<span data-prix-valeur="max">' + p.max + ' ' + unite + '</span></div>' +
+                '<div class="wd-booking__prix-rail">' +
+                  '<span class="wd-booking__prix-plage" style="left:' + pct(p.min) + '%;right:' + (100 - pct(p.max)) + '%"></span>' +
+                  '<input type="range" class="wd-booking__prix-curseur" data-prix="min" min="' + g.min + '" max="' + g.max + '" step="1" value="' + p.min + '" aria-label="Prix minimum par couvert">' +
+                  '<input type="range" class="wd-booking__prix-curseur" data-prix="max" min="' + g.min + '" max="' + g.max + '" step="1" value="' + p.max + '" aria-label="Prix maximum par couvert">' +
+                '</div>' +
+              '</div>';
+          }
+          const items = g.items.map(c => {
+            const checked = actifs.has(c.id);
+            if (!surRestos) return critereItemHTML(c, checked, null);
+            const compte = perimetre.filter(v => c.id === v.type || v.cuisines.indexOf(c.id) >= 0 || v.tags.indexOf(c.id) >= 0).length;
+            return (compte || checked) ? critereItemHTML(c, checked, compte) : '';
+          }).join('');
+          return items ? '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + items : '';
+        }).join('');
+      };
+
       const renderCriteria = () => {
         if (isIntermediate()) { criteriaListEl.innerHTML = ''; return; }
-        const groups = getActiveCriteriaGroups();
-        const activeCriteria = getActiveCriteria();
-        if (!groups.length) { criteriaListEl.innerHTML = ''; return; }
-        criteriaListEl.innerHTML = groups.map(g => {
-          const groupItems = g.items.map(c => {
-            const checked = activeCriteria.has(c.id);
-            return '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
-              '<span class="wd-booking__dd-criteria-check"></span>' +
-              esc(c.label) +
-              '</button>';
-          }).join('');
-          return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
-        }).join('');
+        criteriaListEl.innerHTML = getActiveCriteriaGroups().length ? groupesCriteresHTML() : '';
+      };
+
+      // La liste des destinations redessinée, les nombres de l'onglet Restaurants suivent : ils
+      // portent sur la destination choisie. Déplier un pays gardait sinon les nombres du
+      // continent en face de chaque option.
+      const renderDestList = () => {
+        dessinerDestList();
+        if (searchState.activeTab === 'restaurants') renderCriteria();
       };
 
       // Bouton « tout effacer » (façon Spotify) : visible dès qu'il y a une recherche en cours
@@ -2562,6 +2602,36 @@
         else activeCriteria.add(id);
         renderPanel();
       });
+      // Curseur de prix : les valeurs suivent la poignée pendant le geste ; le critère n'est posé
+      // qu'au relâché, pour ne pas reconstruire le panneau sous le doigt.
+      const suivrePrix = (e) => {
+        const curseur = e.target.closest && e.target.closest('.wd-booking__prix-curseur');
+        if (!curseur) return null;
+        const bloc = curseur.closest('.wd-booking__prix');
+        const bmin = Number(bloc.dataset.prixMin), bmax = Number(bloc.dataset.prixMax);
+        const cMin = bloc.querySelector('[data-prix="min"]'), cMax = bloc.querySelector('[data-prix="max"]');
+        let a = Number(cMin.value), b = Number(cMax.value);
+        if (a > b) {
+          if (curseur === cMin) { a = b; cMin.value = String(a); } else { b = a; cMax.value = String(b); }
+        }
+        const pct = (x) => ((x - bmin) / Math.max(1, bmax - bmin)) * 100;
+        const plage = bloc.querySelector('.wd-booking__prix-plage');
+        plage.style.left = pct(a) + '%';
+        plage.style.right = (100 - pct(b)) + '%';
+        bloc.querySelector('[data-prix-valeur="min"]').textContent = a + ' EUR';
+        bloc.querySelector('[data-prix-valeur="max"]').textContent = b + ' EUR';
+        return { a: a, b: b, bmin: bmin, bmax: bmax };
+      };
+      const poserPrix = (e) => {
+        const r = suivrePrix(e);
+        if (!r || !window.WD_RESTO_PRIX) return false;
+        const actifs = getActiveCriteria();
+        [...actifs].filter(id => /^prix:/.test(id)).forEach(id => actifs.delete(id));
+        if (r.a > r.bmin || r.b < r.bmax) actifs.add(window.WD_RESTO_PRIX.id(r.a, r.b));
+        return true;
+      };
+      criteriaListEl.addEventListener('input', suivrePrix);
+      criteriaListEl.addEventListener('change', (e) => { if (poserPrix(e)) renderPanel(); });
       chipsEl.addEventListener('click', (e) => {
         const closeBtn = e.target.closest('.wd-booking__dest-chip-close');
         if (!closeBtn) return;
@@ -2712,14 +2782,7 @@
           }).join('');
           // Les critères de l'onglet courant, et non ceux des hôtels en dur : passer sur
           // Restaurants puis sur la carte faisait réapparaître piscine, spa et parking.
-          mapViewCriteria.innerHTML = getActiveCriteriaGroups().map(g => {
-            const groupItems = g.items.map(c => {
-              const checked = getActiveCriteria().has(c.id);
-              return '<button class="wd-booking__dd-criteria-item' + (checked ? ' wd-booking__dd-criteria-item--checked' : '') + '" data-criteria="' + c.id + '" type="button" role="checkbox" aria-checked="' + checked + '">' +
-                '<span class="wd-booking__dd-criteria-check"></span>' + esc(c.label) + '</button>';
-            }).join('');
-            return '<div class="wd-booking__dd-group-label">' + esc(g.group) + '</div>' + groupItems;
-          }).join('');
+          mapViewCriteria.innerHTML = groupesCriteresHTML();
           // Le rattrapage de la vue carte est désormais rendu par la carte elle-même, dans
           // son panneau blanc — le même que celui qui annonce l'écartement d'un hôtel.
           // Le bloc en surimpression qui vivait ici faisait une seconde voix, qui finissait
@@ -2772,6 +2835,14 @@
           renderMapPanel();
           renderPanel();
           if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(ac);
+        });
+
+        mapViewCriteria.addEventListener('input', suivrePrix);
+        mapViewCriteria.addEventListener('change', (e) => {
+          if (!poserPrix(e)) return;
+          renderMapPanel();
+          renderPanel();
+          if (typeof updateBookingMapCriteria === 'function') updateBookingMapCriteria(getActiveCriteria());
         });
 
         // La carte élargit d'elle-même quand un critère vide le pays choisi : elle
