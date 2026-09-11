@@ -1288,6 +1288,8 @@
         // Table choisie dans la liste, sur l'onglet Restaurants. Distincte de l'hôtel :
         // on cherche un lieu où manger, pas où dormir.
         selectedResto: null,
+        // « Autour de moi » : position retenue et ville la plus proche, onglet Restaurants.
+        autour: null,
         tabCriteria: {
           hotels: new Set(),
           restaurants: new Set(),
@@ -1404,6 +1406,8 @@
         const chips = [];
         if (searchState.selectedHotel) {
           chips.push({ type: 'hotel', id: searchState.selectedHotel, label: searchState.selectedHotel, icon: '<svg viewBox="0 0 14 14" class="wd-booking__chip-icon"><path d="M2 11V5.5L7 2l5 3.5V11H9V8H5v3H2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>' });
+        } else if (autourActif()) {
+          chips.push({ type: 'autour', id: 'autour', label: 'Autour de moi', icon: '<svg viewBox="0 0 24 24" class="wd-booking__chip-icon" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg>' });
         } else if (searchState.city) {
           chips.push({ type: 'city', id: searchState.city, label: searchState.city });
         } else if (searchState.expandedCountry) {
@@ -1430,6 +1434,10 @@
         else if (type === 'city') { searchState.city = null; searchState.selectedHotel = null; }
         else if (type === 'hotel') { searchState.selectedHotel = null; }
         else if (type === 'resto') { searchState.selectedResto = null; }
+        else if (type === 'autour') {
+          searchState.autour = null; searchState.city = null; searchState.expandedCountry = null;
+          searchState.continent = null; searchState.selectedResto = null;
+        }
         else if (type === 'criteria') { getActiveCriteria().delete(id); }
         renderPanel();
       };
@@ -1468,8 +1476,9 @@
             '<span class="wd-booking__dd-continent-fallback" style="display:none">Tous les continents</span>' +
             '<span class="wd-booking__dd-continent-label">Tous les continents</span>' +
           '</button>';
-        continentsEl.innerHTML = allCard + CONTINENTS_AFFICHES.map(r => {
-          const active = r.id === searchState.continent;
+        continentsEl.innerHTML = tuileAutour() + allCard + CONTINENTS_AFFICHES.map(r => {
+          // Autour de moi actif, c'est sa tuile qui est sélectionnée, pas le continent trouvé.
+          const active = !autourActif() && r.id === searchState.continent;
           return '<button class="wd-booking__dd-continent' + (active ? ' wd-booking__dd-continent--active' : '') + '" data-continent="' + r.id + '" type="button" role="tab" aria-selected="' + active + '">' +
             '<img class="wd-booking__dd-continent-img" src="' + r.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'none\';this.parentElement.querySelector(\'.wd-booking__dd-continent-fallback\').style.display=\'flex\'" />' +
             '<div class="wd-booking__dd-continent-overlay"></div>' +
@@ -1832,6 +1841,39 @@
         });
       };
 
+      // ── Autour de moi (onglet Restaurants) ────────────────────────────────────────────
+      // Comme sur TheFork : un raccourci en tête du panneau, qui localise la personne et montre
+      // les restaurants et bars Pullman les plus proches, triés par distance. La position est
+      // celle du navigateur ; refusée, indisponible ou trop lente, une position de démonstration
+      // prend le relais, et le panneau le dit. Le mode vaut tant que la destination reste la
+      // ville trouvée : choisir un autre continent, un autre pays ou une autre ville en sort.
+      const POSITION_DEMO = { lat: 48.8606, lng: 2.3470, libelle: 'Paris, Châtelet' };
+      const RAYON_AUTOUR_KM = 25;
+      const distanceKm = (a, b) => {
+        const rad = Math.PI / 180;
+        const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+        const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+        return 2 * 6371 * Math.asin(Math.sqrt(x));
+      };
+      const autourActif = () => !!(searchState.autour && searchState.activeTab === 'restaurants'
+        && searchState.city === searchState.autour.ville
+        && searchState.expandedCountry === searchState.autour.pays
+        && !searchState.selectedHotel);
+      // Toutes les tables, les plus proches de la position d'abord, avec leur distance.
+      const tablesAutour = (position) => {
+        const hotels = new Map((window.WD_HOTELS || []).filter(h => h.lat != null && h.lng != null).map(h => [h.name, h]));
+        return (window.WD_RESTAURANTS || [])
+          .filter(v => hotels.has(v.hotel))
+          .map(v => ({ v: v, km: distanceKm(position, hotels.get(v.hotel)) }))
+          .sort((a, b) => a.km - b.km || a.v.nom.localeCompare(b.v.nom));
+      };
+      // Tables retenues autour de soi : celles du rayon, ou à défaut celles de la ville la plus proche.
+      const tablesRetenuesAutour = () => {
+        const proches = tablesAutour(searchState.autour);
+        const dansRayon = proches.filter(t => t.km <= RAYON_AUTOUR_KM);
+        return dansRayon.length ? dansRayon : proches.filter(t => t.v.ville === searchState.autour.ville);
+      };
+
       // Lieux de restauration du périmètre courant. Même géographie que la liste d'hôtels
       // — pays déplié s'il y en a un, continent sinon — pour que les deux onglets ne se
       // contredisent pas quand on passe de l'un à l'autre.
@@ -1841,6 +1883,10 @@
         const tous = searchState.selectedResto && !sansLieuChoisi
           ? (window.WD_RESTAURANTS || []).filter(v => v.nom === searchState.selectedResto)
           : (window.WD_RESTAURANTS || []);
+        if (autourActif()) {
+          const retenues = new Set(tablesRetenuesAutour().map(t => t.v));
+          return tous.filter(v => retenues.has(v));
+        }
         if (searchState.selectedHotel) return tous.filter(v => v.hotel === searchState.selectedHotel);
         if (searchState.city) return tous.filter(v => v.ville === searchState.city);
         if (searchState.expandedCountry) return tous.filter(v => v.pays === searchState.expandedCountry);
@@ -1897,7 +1943,7 @@
         if (searchState.activeTab === 'restaurants') {
           const lieux = restosDuPerimetre().filter(restoMatchesCriteria);
           const n = lieux.length;
-          const { label } = getResultsPool();
+          const label = autourActif() ? 'Autour de moi' : getResultsPool().label;
           const actifs = getActiveCriteria();
           const dits = [];
           if (actifs.size) {
@@ -1945,6 +1991,36 @@
       let lastScrolledCountry = null; // évite de re-scroller à chaque re-rendu (critères, etc.)
       const dessinerDestList = () => {
         const query = searchState.freeText.toLowerCase();
+        if (autourActif() && !query.trim()) {
+          const distance =(d) => d < 1 ? Math.round(d * 1000) + ' m'
+            : (d < 10 ? d.toFixed(1).replace('.', ',') : String(Math.round(d))) + ' km';
+          const base = window.WD_IMG_BASE || 'https://m.ahstatic.com/is/image/accorhotels/';
+          const retenues = tablesRetenuesAutour().filter(t => restoMatchesCriteria(t.v));
+          let html = '<div class="wd-booking__dd-section-title">Les plus proches de vous</div>';
+          if (searchState.autour.demo) {
+            html += '<p class="wd-booking__dd-autour-note">Localisation indisponible : position de démonstration, ' + esc(POSITION_DEMO.libelle) + '.</p>';
+          }
+          html += retenues.length
+            ? '<div class="wd-booking__dd-country-hotels wd-booking__dd-autour-liste">' + retenues.map(({ v, km }) => {
+                const serie = window.WD_RESTO_PHOTOS ? window.WD_RESTO_PHOTOS(v) : [];
+                const cle = serie.length ? serie[0].cle : (v.img || '');
+                const choisie = searchState.selectedResto === v.nom;
+                const dits = [distance(km), window.WD_RESTO_LIBELLE ? window.WD_RESTO_LIBELLE(v.style || v.cuisines[0]) : '']
+                  .concat(v.note ? ['★ ' + v.note] : [], v.prix ? ['± ' + v.prix + ' EUR'] : [])
+                  .filter(Boolean).join(' · ');
+                return '<button type="button" class="wd-booking__dd-hotel-row' + (choisie ? ' wd-booking__dd-hotel-row--selected' : '') +
+                  '" data-dest-type="resto" data-resto-name="' + esc(v.nom) + '">' +
+                  '<img class="wd-booking__dd-hotel-thumb" src="' + base + cle + '?fmt=jpg&op_usm=1.75,0.3,2,0&wid=400&hei=280" alt="" loading="lazy" />' +
+                  '<div class="wd-booking__dd-hotel-info">' +
+                    '<span class="wd-booking__dd-hotel-name">' + esc(v.nom) + '</span>' +
+                    '<span class="wd-booking__dd-hotel-loc">' + esc(dits) +
+                      '<span class="wd-booking__dd-hotel-country">' + esc(v.hotel) + '</span></span>' +
+                  '</div></button>';
+              }).join('') + '</div>'
+            : '<p class="wd-booking__dd-country-empty">Aucune table ne répond à vos critères autour de vous.</p>';
+          destListEl.innerHTML = html;
+          return;
+        }
         if (isIntermediate()) {
           // Continents seuls + reprise des recherches récentes ; le repère chiffré reste en pied
           const clockIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7.5v5l3.5 2"/></svg>';
@@ -2230,6 +2306,23 @@
         }).join('');
       };
 
+      // Tuile « Autour de moi » : première carte de la rangée des continents, onglet Restaurants.
+      // Même format que ses voisines — elle n'ajoute aucune hauteur au panneau, et le CTA
+      // « Laissez-vous guider », calé sur le bas de cette rangée, garde sa place. Surface unie
+      // et pictogramme plutôt qu'une photo : c'est une action, pas une zone du monde.
+      let autourEtat = 'repos';
+      const tuileAutour = () => {
+        if (searchState.activeTab !== 'restaurants') return '';
+        const actif = autourActif();
+        const cherche = autourEtat === 'recherche';
+        return '<button class="wd-booking__dd-continent wd-booking__dd-continent--autour' + (actif ? ' wd-booking__dd-continent--active' : '') +
+          (cherche ? ' wd-booking__dd-continent--recherche' : '') + '" data-autour type="button" aria-pressed="' + actif + '"' +
+          (cherche ? ' aria-busy="true"' : '') + ' title="Les restaurants et bars Pullman les plus proches">' +
+            '<span class="wd-booking__dd-autour-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 3 10.5l7.5 2.9L13.4 21z"/></svg></span>' +
+            '<span class="wd-booking__dd-continent-label">' + (cherche ? 'Localisation…' : 'Autour de moi') + '</span>' +
+          '</button>';
+      };
+
       const renderCriteria = () => {
         if (isIntermediate()) { criteriaListEl.innerHTML = ''; return; }
         criteriaListEl.innerHTML = getActiveCriteriaGroups().length ? groupesCriteresHTML() : '';
@@ -2258,6 +2351,7 @@
         searchState.expandedCountry = null;
         searchState.selectedHotel = null;
         searchState.freeText = '';
+        searchState.autour = null;
         getActiveCriteria().clear();
         destInput.value = '';
         suggestionsEl.style.display = 'none';
@@ -2471,6 +2565,9 @@
       continentsEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.wd-booking__dd-continent');
         if (!btn) return;
+        if (btn.hasAttribute('data-autour')) { lancerAutour(); return; }
+        // Choisir une zone quitte « Autour de moi » et la ville qu'il avait retenue.
+        if (searchState.autour) { searchState.autour = null; searchState.city = null; }
         if (btn.dataset.continent === '__all__') {
           // Toggle : re-cliquer « Tous les continents » désélectionne
           const wasAll = searchState.showAll && !searchState.continent;
@@ -2636,6 +2733,42 @@
       };
       criteriaListEl.addEventListener('input', suivrePrix);
       criteriaListEl.addEventListener('change', (e) => { if (poserPrix(e)) renderPanel(); });
+      // Clic sur « Autour de moi » : on demande la position au navigateur. Sans réponse, un refus ou
+      // un délai dépassé, la position de démonstration prend le relais — une seule fois.
+      // Re-cliquer la tuile active quitte le mode, comme on désélectionne un continent.
+      const lancerAutour = () => {
+        if (autourEtat === 'recherche') return;
+        if (autourActif()) { removeChip('autour'); return; }
+        let fait = false;
+        const appliquer = (position, demo) => {
+          if (fait) return;
+          fait = true;
+          const proches = tablesAutour(position);
+          autourEtat = 'repos';
+          if (!proches.length) { renderContinents(); return; }
+          const premiere = proches[0].v;
+          searchState.autour = { lat: position.lat, lng: position.lng, demo: demo, ville: premiere.ville, pays: premiere.pays };
+          searchState.continent = premiere.region;
+          searchState.showAll = false;
+          searchState.expandedCountry = premiere.pays;
+          searchState.city = premiere.ville;
+          searchState.selectedHotel = null;
+          searchState.selectedResto = null;
+          searchState.freeText = '';
+          destInput.value = '';
+          renderPanel();
+        };
+        const secours = () => appliquer({ lat: POSITION_DEMO.lat, lng: POSITION_DEMO.lng }, true);
+        autourEtat = 'recherche';
+        renderContinents();
+        if (!navigator.geolocation) { secours(); return; }
+        setTimeout(secours, 8000);
+        navigator.geolocation.getCurrentPosition(
+          (p) => appliquer({ lat: p.coords.latitude, lng: p.coords.longitude }, false),
+          secours,
+          { timeout: 7000, maximumAge: 600000 });
+      };
+
       chipsEl.addEventListener('click', (e) => {
         const closeBtn = e.target.closest('.wd-booking__dest-chip-close');
         if (!closeBtn) return;
