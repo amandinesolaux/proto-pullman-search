@@ -7930,6 +7930,21 @@
           const pullmanCities = [...cityMap.values()];
           const findCity = name => pullmanCities.find(c => norm(c.city) === norm(name));
 
+          // Les pays, agrégés de la même base : « maroc » ne trouvait rien alors que la marque y
+          // a un hôtel — seules les villes étaient cherchées. Et les hôtels eux-mêmes, pour qui
+          // tape « mazagan » ou « tour eiffel » plutôt qu'une ville.
+          const paysMap = new Map();
+          (window.WD_HOTELS || []).forEach(h => {
+            const pays = (h.country || '').trim();
+            if (!pays) return;
+            if (!paysMap.has(pays)) paysMap.set(pays, { name: pays, count: 0, villes: new Set() });
+            const p = paysMap.get(pays);
+            p.count++;
+            if (h.city) p.villes.add(h.city);
+          });
+          const pullmanPays = [...paysMap.values()];
+          const pullmanHotels = (window.WD_HOTELS || []).filter(h => h.name && h.city);
+
           // Quartiers & lieux emblématiques (rattachés à une ville Pullman)
           const lieux = (MOCK_AUTOCOMPLETE.lieux || []);
 
@@ -8022,6 +8037,7 @@
             const hotels = c.count > 1 ? `${c.count} hôtels` : '1 hôtel';
             return c.country ? `${c.country} · ${hotels}` : hotels;
           };
+          const paysMeta = (p) => `${p.villes.size} ville${p.villes.size > 1 ? 's' : ''} · ${p.count} hôtel${p.count > 1 ? 's' : ''}`;
 
           const renderList = (rawQuery) => {
             const query = (rawQuery || '').trim();
@@ -8047,9 +8063,23 @@
             const regionMatches = regions.filter(r => norm(r.name).includes(q));
             const lieuMatches = lieux.filter(l => norm(l.name).includes(q));
 
+            const paysMatches = pullmanPays.filter(p => norm(p.name).includes(q))
+              .sort((a, b) => norm(a.name).indexOf(q) - norm(b.name).indexOf(q) || b.count - a.count);
+            // Un hôtel mène à sa ville : c'est le périmètre que la suite du parcours sait lire,
+            // et l'hôtel cherché y est forcément proposé.
+            const hotelMatches = pullmanHotels.filter(h => norm(h.name).includes(q)).slice(0, 4);
+
             if (cityMatches.length) {
               html += groupLi('Villes Pullman');
               html += cityMatches.slice(0, 6).map(c => itemLi(c.city, hi(c.city), cityMeta(c), 'city')).join('');
+            }
+            if (paysMatches.length) {
+              html += groupLi('Pays');
+              html += paysMatches.slice(0, 4).map(p => itemLi(p.name, hi(p.name), paysMeta(p), 'region')).join('');
+            }
+            if (hotelMatches.length) {
+              html += groupLi('Hôtels Pullman');
+              html += hotelMatches.map(h => itemLi(h.city, hi(h.name), `${h.city}${h.country ? ' · ' + h.country : ''}`, 'lieu')).join('');
             }
             if (regionMatches.length) {
               html += groupLi('Régions');
