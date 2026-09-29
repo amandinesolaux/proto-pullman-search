@@ -15,6 +15,7 @@ const CONTINENT_BOUNDS = {
 };
 
 let _bookingMap = null;
+let _veilleTaille = null;   // la carte suit la largeur qu'on lui laisse
 let _markers = [];
 let _currentContinent = null;
 // Hôtel dont le détail est ouvert, pour pouvoir le réafficher après un recalcul des pins.
@@ -1156,6 +1157,22 @@ function initBookingMap(continentFilter, scope) {
   const mapElement = document.getElementById('wd-booking-map');
   if (!mapElement || typeof L === 'undefined') return;
 
+  // La colonne des critères disparaît quand il n'y a plus rien à filtrer : la carte s'élargit
+  // alors sans que Leaflet le sache, et la bande gagnée reste grise, sans tuiles. ResizeObserver
+  // n'a pas vu ce changement-là à l'essai — on compare donc nous-mêmes, quatre fois par seconde,
+  // ce que Leaflet croit mesurer et la largeur réelle du cadre. C'est deux lectures par seconde
+  // sur un élément déjà en page : rien à côté du rendu d'une tuile.
+  clearInterval(_veilleTaille);
+  _veilleTaille = setInterval(() => {
+    if (!_bookingMap) return;
+    const cadre = _bookingMap.getContainer();
+    if (!cadre || !cadre.isConnected || !cadre.clientWidth) return;
+    const vue = _bookingMap.getSize();
+    if (Math.abs(vue.x - cadre.clientWidth) > 1 || Math.abs(vue.y - cadre.clientHeight) > 1) {
+      _bookingMap.invalidateSize({ animate: false });
+    }
+  }, 250);
+
   // Le continent courant n'était mémorisé que par updateBookingMapContinent : quand la
   // carte s'ouvrait déjà filtrée, il restait nul, et la fermeture du détail renvoyait
   // sur la vue du monde au lieu du continent affiché.
@@ -1208,6 +1225,11 @@ function initBookingMap(continentFilter, scope) {
   }).addTo(_bookingMap);
 
   _renderMarkers(continentFilter, _currentCriteria);
+
+  // La colonne des critères peut disparaître dans le même souffle que la carte est refaite —
+  // retirer le dernier critère, par exemple. Leaflet lit alors la largeur d'avant et laisse une
+  // bande sans tuiles à droite. Un recalcul au rendu suivant, quand la mise en page est posée.
+  requestAnimationFrame(() => { if (_bookingMap) _bookingMap.invalidateSize({ animate: false }); });
 }
 
 function _renderMarkers(continentFilter, criteriaSet, refit = true) {
