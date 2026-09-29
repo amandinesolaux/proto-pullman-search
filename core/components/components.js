@@ -1198,7 +1198,6 @@
         </div>
         <div class="wd-booking__datepicker" data-state="closed">
           <div class="wd-booking__dp-body">
-            <span class="wd-booking__dp-poignee" aria-hidden="true"></span>
             <button type="button" class="wd-booking__dp-fermer" aria-label="Fermer le calendrier">${ICON.close}</button>
             <div class="wd-booking__dp-header">
               <button class="wd-booking__dp-nav wd-booking__dp-prev" aria-label="Mois précédent">${ICON.chevL || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</button>
@@ -3398,36 +3397,6 @@
           return;
         }
       });
-
-      // Refermer en glissant vers le bas, comme une feuille : c'est le geste attendu sur mobile,
-      // et il vaut mieux que d'aller chercher la croix du pouce. On ne prend la main que depuis
-      // l'en-tête, ou quand le contenu est déjà en haut — sinon on empêcherait de faire défiler.
-      const corpsCalendrier = datepicker.querySelector('.wd-booking__dp-body');
-      let glisseDepart = null;
-      let glisseDistance = 0;
-      datepicker.addEventListener('touchstart', (e) => {
-        if (!surMobile() || datepicker.dataset.state !== 'open' || e.touches.length !== 1) return;
-        const depuisLeHaut = !!e.target.closest('.wd-booking__dp-poignee, .wd-booking__dp-header');
-        if (!depuisLeHaut && corpsCalendrier && corpsCalendrier.scrollTop > 0) return;
-        glisseDepart = e.touches[0].clientY;
-        glisseDistance = 0;
-        datepicker.classList.add('is-glisse');
-      }, { passive: true });
-      datepicker.addEventListener('touchmove', (e) => {
-        if (glisseDepart === null) return;
-        glisseDistance = Math.max(0, e.touches[0].clientY - glisseDepart);
-        datepicker.style.transform = glisseDistance ? 'translateY(' + glisseDistance + 'px)' : '';
-      }, { passive: true });
-      const finDuGlissement = () => {
-        if (glisseDepart === null) return;
-        const assezLoin = glisseDistance > 110;
-        glisseDepart = null;
-        datepicker.classList.remove('is-glisse');
-        datepicker.style.transform = '';
-        if (assezLoin) closeDatePicker();
-      };
-      datepicker.addEventListener('touchend', finDuGlissement);
-      datepicker.addEventListener('touchcancel', finDuGlissement);
 
       datepicker.addEventListener('mouseover', (e) => {
         if (modeTable()) return; // pas d'aperçu de plage pour un jour seul

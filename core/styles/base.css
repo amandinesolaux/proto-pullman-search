@@ -873,8 +873,6 @@ wd-section-heading { display: block; }
 /* La croix ne sert qu'au plein écran mobile : sur desktop, le calendrier se ferme en cliquant
    en dehors, ou par « Appliquer ». */
 .wd-booking__dp-fermer { display: none; }
-/* Poignée et glissement : mobile seulement. */
-.wd-booking__dp-poignee { display: none; }
 .wd-booking__dp-nav:hover { background: rgba(255,255,255,.12); color: #fff; }
 
 .wd-booking__dp-calendars { display: flex; gap: 32px; }
@@ -1488,11 +1486,12 @@ wd-footer { display: block; }
     width: 44px; height: 44px; padding: 0; border: none; border-radius: 100px;
     background: rgba(255,255,255,.08); color: #fff; cursor: pointer; }
   .wd-booking__dp-fermer svg { width: 20px; height: 20px; }
-  /* La poignée dit que la feuille se tire vers le bas ; le geste la referme au-delà de 110 px. */
-  .wd-booking__dp-poignee { display: block; width: 44px; height: 5px; margin: 0 auto 12px;
-    border-radius: 100px; background: rgba(255,255,255,.35); }
-  .wd-booking__datepicker { transition: transform .2s ease, opacity .2s ease; }
-  .wd-booking__datepicker.is-glisse { transition: none; }
+  /* Le calendrier se centre dans la hauteur : collé sous l'en-tête, il laissait un grand vide
+     sous lui et se lisait trop haut dans l'écran. */
+  .wd-booking__dp-calendars { flex: 1 1 auto; flex-direction: column; justify-content: center; padding-bottom: 8px; }
+  /* Le mois ne s'étire plus sur toute la hauteur : sans cela il poussait la grille en haut,
+     et le centrage restait sans effet. */
+  .wd-booking__dp-month { flex: 0 0 auto; }
   /* La croix occupe le coin : le titre du mois lui laisse la place. */
   .wd-booking__dp-header { padding-right: 52px; }
   .wd-booking__dp-months { flex-direction: column; gap: 20px; }
