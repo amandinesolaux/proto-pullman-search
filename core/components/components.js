@@ -3919,8 +3919,9 @@
       const img = this.attr("img", "");
       const kicker = this.attr("kicker", "Kicker");
       const title = this.attr("title", "Title");
-      const base = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-      return `<a href="${base}search-results.html?q=${encodeURIComponent(title)}" class="wd-dest-card" style="background-image:url('${img}')">
+      // Vitrine, pas navigation : les cartes du carrousel de la homepage ne mènent nulle part.
+      // Elles ouvraient les résultats de recherche, ce qui sortait de la démonstration.
+      return `<div class="wd-dest-card" style="background-image:url('${img}')">
         <div class="wd-dest-card__overlay">
           <div class="wd-dest-card__overlay-gradient"></div>
           <div class="wd-dest-card__overlay-solid">
@@ -3930,7 +3931,7 @@
             </div>
           </div>
         </div>
-      </a>`;
+      </div>`;
     }
   });
 
