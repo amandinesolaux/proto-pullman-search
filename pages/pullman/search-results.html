@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=559"/>
-  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=559"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=560"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=560"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=559"></script>
-  <script src="../../core/data/reunions.js?v=559"></script>
-  <script src="../../core/components/components.js?v=559"></script>
+  <script src="../../core/data/restaurants.js?v=560"></script>
+  <script src="../../core/data/reunions.js?v=560"></script>
+  <script src="../../core/components/components.js?v=560"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=559"></script>
+  <script src="../../core/components/booking-map.js?v=560"></script>
 </head>
 <body class="brand-pullman">
 
@@ -43,7 +43,7 @@
   <div class="srx-head">
     <div class="srx-head-main">
       <nav class="srx-crumb" aria-label="Fil d'Ariane">
-        <a href="proto-pullman-v3-booking-wizard.html">Accueil</a>
+        <a href="proto-pullman-v3-booking-wizard.html" id="srx-retour">Accueil</a>
         <span aria-hidden="true">›</span>
         <span class="srx-crumb-current">Résultats de recherche</span>
       </nav>
@@ -276,6 +276,11 @@ wd-booking { margin-top: 20px; }
   function ready(retries) {
     if (!window.WD_SEARCH_DATA) { if (retries > 0) setTimeout(() => ready(retries - 1), 100); return; }
     // L'onglet vient de la barre de recherche : il décide de ce que cette page liste.
+    // Revenir à l'accueil garde la recherche : la barre de la homepage relit ces paramètres et
+    // retrouve l'onglet, la destination, les filtres, le jour, l'heure et les convives.
+    const retour = document.getElementById('srx-retour');
+    if (retour && location.search) retour.href = 'proto-pullman-v3-booking-wizard.html' + location.search;
+
     if (P.get('tab') === 'restaurants') initRestaurants(window.WD_SEARCH_DATA);
     else if (P.get('tab') === 'reunions') initReunions(window.WD_SEARCH_DATA);
     else init(window.WD_SEARCH_DATA);
