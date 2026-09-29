@@ -1267,7 +1267,9 @@
       const destStaticLabel = this.querySelector('.wd-booking__label');
       const destStaticTyping = this.querySelector('.wd-booking__value--typing');
       const TAB_CONFIG = {
-        hotels: { label: 'Où voyagez-vous ? (obligatoire)', placeholder: 'Destination, nom d\'hôtel', value: 'Destination, nom d\'hôtel', guests: 'Combien serez-vous ?' },
+        // Mêmes libellés que le gabarit : revenir sur Hôtels après un détour par un autre onglet
+        // rebaptisait le champ (« Où voyagez-vous ? »), alors qu'il s'ouvre sur « Que recherchez-vous ? ».
+        hotels: { label: 'Que recherchez-vous ?', placeholder: 'Une destination, un hôtel, une envie...', value: 'Une destination, un hôtel, une envie...', guests: 'Combien serez-vous ?' },
         restaurants: { label: 'Où manger ?', placeholder: 'Restaurant, cuisine, ville...', value: 'Restaurant, cuisine, ville...', guests: 'Combien serez-vous ?' },
         reunions: { label: 'Organisez votre réunion', placeholder: 'Ville, hôtel, type de réunion...', value: 'Ville, hôtel, type de réunion...', guests: 'Combien de participants ?' },
         celebrations: { label: 'Célébrez un moment unique', placeholder: 'Ville, hôtel, type de célébration...', value: 'Ville, hôtel, type de célébration...', guests: 'Combien d\'invités ?' },
