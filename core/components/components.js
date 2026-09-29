@@ -1153,7 +1153,7 @@
           <div class="wd-booking__field wd-booking__field--guests" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" aria-controls="wd-guests-panel"><svg class="wd-booking__field-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 18v-2h18v2M3 16V14a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M7 12V9.5A1.5 1.5 0 0 1 8.5 8h7a1.5 1.5 0 0 1 1.5 1.5V12" stroke-linecap="round" stroke-linejoin="round"/></svg><div><span class="wd-booking__label">Combien serez-vous ?</span><span class="wd-booking__value">1 personne, 1 chambre</span></div></div>
           <a href="#" class="wd-btn wd-btn--primary wd-booking__cta">${esc(btn)}</a>
         </div>
-        <div class="wd-booking__special-rates"><span class="wd-booking__special-rates-line"></span><a href="#" class="wd-booking__special-rates-link">Special rates and accessibility <svg width="14" height="8" viewBox="0 0 14 8" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="wd-booking__special-rates-line"></span></div>
+        <div class="wd-booking__special-rates"><span class="wd-booking__special-rates-line"></span><a href="#" class="wd-booking__special-rates-link">Tarifs spéciaux et accessibilité <svg width="14" height="8" viewBox="0 0 14 8" fill="none"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="wd-booking__special-rates-line"></span></div>
         <div class="wd-booking__dropdown" data-state="closed">
           <div class="wd-booking__dd-body">
             <div class="wd-booking__dd-suggestions" id="wd-suggestions" style="display:none">
@@ -3903,7 +3903,7 @@
       const title = this.attr("title");
       const desc = this.attr("desc");
       const link = this.attr("link");
-      const linkLabel = this.attr("link-label", "Link label");
+      const linkLabel = this.attr("link-label", "Libellé du lien");
       return `<div class="wd-sh">
         ${kicker ? `<p class="t-eyebrow">${esc(kicker)}</p>` : ""}
         <h2 class="t-serif-lg pul-title">${esc(title)}</h2>
@@ -3917,8 +3917,8 @@
   def("wd-dest-card", class extends WdEl {
     render() {
       const img = this.attr("img", "");
-      const kicker = this.attr("kicker", "Kicker");
-      const title = this.attr("title", "Title");
+      const kicker = this.attr("kicker", "Surtitre");
+      const title = this.attr("title", "Titre");
       // Vitrine, pas navigation : les cartes du carrousel de la homepage ne mènent nulle part.
       // Elles ouvraient les résultats de recherche, ce qui sortait de la démonstration.
       return `<div class="wd-dest-card" style="background-image:url('${img}')">
@@ -3949,7 +3949,7 @@
             ${tabs.length ? `<div class="wd-carousel__tabs">${tabs.map((t,i) => `<button class="wd-carousel__tab${i===0 ? " is-active" : ""}">${esc(t)} <span class="wd-carousel__count">(24)</span></button>`).join("")}</div>` : ""}
           </div>
           <div class="wd-carousel__controls">
-            ${showmap ? `<button class="wd-btn wd-btn--outline wd-carousel__map">${ICON.pin} Show map</button>` : ""}
+            ${showmap ? `<button class="wd-btn wd-btn--outline wd-carousel__map">${ICON.pin} Voir la carte</button>` : ""}
             ${seeall ? `<a href="#" class="wd-link wd-link--green">${esc(seeall)} ${ICON.arrowR}</a>` : ""}
           </div>
         </div>` : ""}
@@ -3964,7 +3964,7 @@
     render() {
       const img = this.attr("img", "");
       const kicker = this.attr("kicker");
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const desc = this.attr("desc", "");
       const cta = this.attr("cta");
       const imgLeft = this.has("image-left");
@@ -4005,9 +4005,9 @@
   def("wd-callout-card", class extends WdEl {
     render() {
       const img = this.attr("img", "");
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const desc = this.attr("desc", "");
-      const cta = this.attr("cta", "Button label");
+      const cta = this.attr("cta", "Libellé du bouton");
       return `<a href="#" class="wd-callout-card">
         <div class="wd-callout-card__img"><img src="${img}" alt="" loading="lazy"/></div>
         <div class="wd-callout-card__body">
@@ -4021,10 +4021,10 @@
   /* ---------- wd-marketing ---------- */
   def("wd-marketing", class extends WdEl {
     render() {
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const desc = this.attr("desc");
       const link = this.attr("link");
-      const linkLabel = this.attr("link-label", "See all");
+      const linkLabel = this.attr("link-label", "Tout voir");
       const tabs = this.list("tabs");
       const img = this.attr("img", "");
       const kicker = this.attr("kicker");
@@ -4060,7 +4060,7 @@
     render() {
       const img = this.attr("img", "");
       const kicker = this.attr("kicker");
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const desc = this.attr("desc", "");
       const cta1 = this.attr("cta1");
       const cta2 = this.attr("cta2");
@@ -4084,7 +4084,7 @@
   def("wd-billboard", class extends WdEl {
     render() {
       const kicker = this.attr("kicker");
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const desc = this.attr("desc", "");
       const img = this.attr("img", "");
       return `<div class="wd-billboard">
@@ -4128,10 +4128,10 @@
   /* ---------- wd-loyalty ---------- */
   def("wd-loyalty", class extends WdEl {
     render() {
-      const title = this.attr("title", "Title");
+      const title = this.attr("title", "Titre");
       const benefits = this.list("benefits");
       const cta1 = this.attr("cta1", "Join for free");
-      const cta2 = this.attr("cta2", "Learn more");
+      const cta2 = this.attr("cta2", "En savoir plus");
       const img = this.attr("img", "");
       const caption = this.attr("caption");
       return `<div class="wd-loyalty">
@@ -4153,26 +4153,26 @@
     render() {
       const brand = brandName();
       return `<footer class="wd-footer">
-        <nav class="wd-footer__breadcrumb"><a href="#">Index</a> ${ICON.chevR} <a href="#">Second page</a> ${ICON.chevR} <a href="#">Third page</a> ${ICON.chevR} <span>Current page</span></nav>
+        <nav class="wd-footer__breadcrumb"><a href="#">Accueil</a> ${ICON.chevR} <a href="#">Deuxième page</a> ${ICON.chevR} <a href="#">Troisième page</a> ${ICON.chevR} <span>Page courante</span></nav>
         <div class="wd-footer__logo">${wordmark(this)}</div>
         <div class="wd-footer__newsletter">
           <div class="wd-footer__nl-left">
-            <h3 class="t-sans-lg">Exclusive offers</h3>
-            <p class="t-sans-sm">Unlock Insider Access: ${brand}'s Exclusive Newsletter</p>
-            <form class="wd-footer__form"><input type="email" placeholder="Email adress" class="wd-footer__input"/><button type="submit" class="wd-btn wd-btn--outline">Sign up ${ICON.arrowR}</button></form>
+            <h3 class="t-sans-lg">Offres exclusives</h3>
+            <p class="t-sans-sm">Recevez les offres réservées aux abonnés de la newsletter ${brand}</p>
+            <form class="wd-footer__form"><input type="email" placeholder="Adresse e-mail" class="wd-footer__input"/><button type="submit" class="wd-btn wd-btn--outline">S'inscrire ${ICON.arrowR}</button></form>
           </div>
           <div class="wd-footer__nl-right">
-            <h3 class="t-sans-lg">Need help?</h3>
-            <a href="#" class="t-sans-md">Manage bookings</a>
+            <h3 class="t-sans-lg">Besoin d’aide ?</h3>
+            <a href="#" class="t-sans-md">Gérer mes réservations</a>
             <a href="#" class="t-sans-md">Assistance</a>
-            <a href="#" class="t-sans-md">Book by phone</a>
+            <a href="#" class="t-sans-md">Réserver par téléphone</a>
           </div>
         </div>
         <div class="wd-footer__links">
-          <div><h4>Company</h4><a href="#">Accor Group</a><a href="#">Management & franchises</a><a href="#">Careers</a><a href="#">Sustainable development</a><a href="#">Affiliate programme</a></div>
-          <div><h4>Professional Solutions</h4><a href="#">Business Travel</a><a href="#">Meetings & Events</a><a href="#">Travel professionals</a></div>
-          <div><h4>Navigation</h4><a href="#">Web accessibility</a><a href="#">Site map</a><a href="#">All our services</a></div>
-          <div><h4>Mobile App</h4><a href="#">Mobile services</a><a href="#">iOS app</a><a href="#">Android app</a></div>
+          <div><h4>Le groupe</h4><a href="#">Groupe Accor</a><a href="#">Management et franchises</a><a href="#">Carrières</a><a href="#">Développement durable</a><a href="#">Programme d’affiliation</a></div>
+          <div><h4>Solutions professionnelles</h4><a href="#">Voyages d’affaires</a><a href="#">Réunions et événements</a><a href="#">Professionnels du voyage</a></div>
+          <div><h4>Navigation</h4><a href="#">Accessibilité numérique</a><a href="#">Plan du site</a><a href="#">Tous nos services</a></div>
+          <div><h4>Application mobile</h4><a href="#">Services mobiles</a><a href="#">Application iOS</a><a href="#">Application Android</a></div>
         </div>
         <div class="wd-footer__social">
           <a href="#" aria-label="Facebook"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -4185,15 +4185,15 @@
         <div class="wd-footer__portfolio">
           <div class="wd-footer__all-logo"><svg viewBox="0 0 80 40" fill="none" aria-hidden="true"><text x="10" y="28" font-family="system-ui" font-size="20" font-weight="700" fill="currentColor">ALL</text><text x="10" y="38" font-family="system-ui" font-size="8" fill="currentColor">ACCOR</text></svg></div>
           <div class="wd-footer__brands">
-            <div class="wd-footer__tier"><span>Luxury</span><span>(11)</span></div>
+            <div class="wd-footer__tier"><span>Luxe</span><span>(11)</span></div>
             <div class="wd-footer__tier"><span>Premium</span><span>(11)</span></div>
-            <div class="wd-footer__tier"><span>Midscale</span><span>(11)</span></div>
-            <div class="wd-footer__tier"><span>Economy</span><span>(11)</span></div>
+            <div class="wd-footer__tier"><span>Milieu de gamme</span><span>(11)</span></div>
+            <div class="wd-footer__tier"><span>Économique</span><span>(11)</span></div>
             <div class="wd-footer__tier"><span>Lifestyle<br/>by Ennismore</span><span>(11)</span></div>
           </div>
         </div>
         <div class="wd-footer__legal">
-          <p class="t-sans-sm">Terms & Conditions &nbsp; Adagio Terms & Conditions &nbsp; Privacy &nbsp; Legal notice</p>
+          <p class="t-sans-sm">Conditions générales &nbsp; Conditions Adagio &nbsp; Confidentialité &nbsp; Mentions légales</p>
           <p class="t-sans-sm" style="color:var(--pul-muted)">© Accor 2019</p>
         </div>
       </footer>`;
@@ -4453,7 +4453,7 @@
 
     async loadData() {
       // Données inline pour éviter fetch en file://
-      const data = {"questions":{"q1":{"title":"Avec qui voyagez-vous ?","subtitle":"Répondez à 2 questions rapides pour découvrir votre prochaine destination","options":[{"value":"solo","label":"Solo","icon":"person","image":"../../assets/images/discovery/solo.jpg"},{"value":"couple","label":"En couple","icon":"hearts","image":"../../assets/images/discovery/couple.jpg"},{"value":"family","label":"En famille","icon":"family","image":"../../assets/images/discovery/family.jpg"},{"value":"friends","label":"Entre amis","icon":"group","image":"../../assets/images/discovery/friends.jpg"},{"value":"business","label":"Business","icon":"briefcase","image":"../../assets/images/discovery/business.jpg"}]},"q2":{"title":"Quel type de voyage ?","subtitle":"Sélectionnez l'expérience qui vous inspire","options":[{"value":"wellness","label":"Détente & Wellness","icon":"bed","image":"../../assets/images/discovery/wellness.jpg"},{"value":"culture","label":"Découverte culturelle","icon":"pin","image":"../../assets/images/discovery/culture.jpg"},{"value":"city","label":"City break","icon":"pin","image":"../../assets/images/discovery/city.jpg"},{"value":"gastro","label":"Gastronomie","icon":"utensils","image":"../../assets/images/discovery/gastro.jpg"},{"value":"events","label":"Business & Events","icon":"presentation","image":"../../assets/images/discovery/events.jpg"}]}},"destinations":[{"id":"paris","name":"Paris","image":"https://m.ahstatic.com/is/image/accorhotels/GettyImages-1187421561:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["culture","gastro","city"],"descriptions":{"couple-city":"Parfait pour un city break en couple","couple-culture":"Idéal pour une découverte culturelle à deux","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-city":"Idéal pour un city break en solo","solo-culture":"Parfait pour une découverte culturelle en solo","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-city":"Parfait pour un city break entre amis","friends-culture":"Idéal pour une découverte culturelle entre amis","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"singapore","name":"Singapour","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends","business"],"type":["city","gastro","culture","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Idéal pour un voyage business","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"bali","name":"Bali","image":"https://m.ahstatic.com/is/image/accorhotels/6556-1:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["wellness","culture"],"descriptions":{"couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"dubai","name":"Dubaï","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","business"],"type":["city","wellness","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","business-events":"Parfait pour un voyage business","couple-wellness":"Idéal pour un séjour détente en couple","family-wellness":"Parfait pour des vacances détente en famille"}},{"id":"shanghai","name":"Shanghai","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_2810-66:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","culture","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-culture":"Idéal pour une découverte culturelle en solo","friends-culture":"Parfait pour une découverte culturelle entre amis"}},{"id":"sao-paulo","name":"São Paulo","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0626-10:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","gastro","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"sydney","name":"Sydney","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["city","culture","wellness"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis"}},{"id":"toulouse","name":"Toulouse","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_7014-44:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["city","culture","gastro"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}}]};
+      const data = {"questions":{"q1":{"title":"Avec qui voyagez-vous ?","subtitle":"Répondez à 2 questions rapides pour découvrir votre prochaine destination","options":[{"value":"solo","label":"Solo","icon":"person","image":"../../assets/images/discovery/solo.jpg"},{"value":"couple","label":"En couple","icon":"hearts","image":"../../assets/images/discovery/couple.jpg"},{"value":"family","label":"En famille","icon":"family","image":"../../assets/images/discovery/family.jpg"},{"value":"friends","label":"Entre amis","icon":"group","image":"../../assets/images/discovery/friends.jpg"},{"value":"business","label":"Affaires","icon":"briefcase","image":"../../assets/images/discovery/business.jpg"}]},"q2":{"title":"Quel type de voyage ?","subtitle":"Sélectionnez l'expérience qui vous inspire","options":[{"value":"wellness","label":"Détente & Wellness","icon":"bed","image":"../../assets/images/discovery/wellness.jpg"},{"value":"culture","label":"Découverte culturelle","icon":"pin","image":"../../assets/images/discovery/culture.jpg"},{"value":"city","label":"City break","icon":"pin","image":"../../assets/images/discovery/city.jpg"},{"value":"gastro","label":"Gastronomie","icon":"utensils","image":"../../assets/images/discovery/gastro.jpg"},{"value":"events","label":"Business & Events","icon":"presentation","image":"../../assets/images/discovery/events.jpg"}]}},"destinations":[{"id":"paris","name":"Paris","image":"https://m.ahstatic.com/is/image/accorhotels/GettyImages-1187421561:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["culture","gastro","city"],"descriptions":{"couple-city":"Parfait pour un city break en couple","couple-culture":"Idéal pour une découverte culturelle à deux","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-city":"Idéal pour un city break en solo","solo-culture":"Parfait pour une découverte culturelle en solo","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-city":"Parfait pour un city break entre amis","friends-culture":"Idéal pour une découverte culturelle entre amis","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"singapore","name":"Singapour","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_1029-36:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends","business"],"type":["city","gastro","culture","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Idéal pour un voyage business","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"bali","name":"Bali","image":"https://m.ahstatic.com/is/image/accorhotels/6556-1:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["wellness","culture"],"descriptions":{"couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis"}},{"id":"dubai","name":"Dubaï","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_6935-96:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","business"],"type":["city","wellness","events"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","business-events":"Parfait pour un voyage business","couple-wellness":"Idéal pour un séjour détente en couple","family-wellness":"Parfait pour des vacances détente en famille"}},{"id":"shanghai","name":"Shanghai","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_2810-66:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","culture","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-culture":"Idéal pour une découverte culturelle en solo","friends-culture":"Parfait pour une découverte culturelle entre amis"}},{"id":"sao-paulo","name":"São Paulo","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0626-10:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["solo","friends","business"],"type":["city","gastro","events"],"descriptions":{"solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","business-events":"Parfait pour un voyage business","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}},{"id":"sydney","name":"Sydney","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_0795-31:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","family","friends"],"type":["city","culture","wellness"],"descriptions":{"couple-city":"Parfait pour un city break en couple","family-city":"Idéal pour un city break en famille","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","family-culture":"Parfait pour une découverte culturelle en famille","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-wellness":"Parfait pour un séjour détente en couple","family-wellness":"Idéal pour des vacances détente en famille","friends-wellness":"Parfait pour un séjour détente entre amis"}},{"id":"toulouse","name":"Toulouse","image":"https://m.ahstatic.com/is/image/accorhotels/aja_p_7014-44:9by16?fmt=jpg&wid=480&hei=853&qlt=80","who":["couple","solo","friends"],"type":["city","culture","gastro"],"descriptions":{"couple-city":"Parfait pour un city break en couple","solo-city":"Idéal pour un city break en solo","friends-city":"Parfait pour un city break entre amis","couple-culture":"Idéal pour une découverte culturelle à deux","solo-culture":"Parfait pour une découverte culturelle en solo","friends-culture":"Idéal pour une découverte culturelle entre amis","couple-gastro":"Parfait pour une escapade gastronomique en couple","solo-gastro":"Idéal pour une escapade gastronomique en solo","friends-gastro":"Parfait pour une escapade gastronomique entre amis"}}]};
       this.questions = data.questions;
       this.destinations = data.destinations;
     }
