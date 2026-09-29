@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Résultats — Pullman Hotels &amp; Resorts</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=561"/>
-  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=561"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=562"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=562"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script src="../../core/data/restaurants.js?v=561"></script>
-  <script src="../../core/data/reunions.js?v=561"></script>
-  <script src="../../core/components/components.js?v=561"></script>
+  <script src="../../core/data/restaurants.js?v=562"></script>
+  <script src="../../core/data/reunions.js?v=562"></script>
+  <script src="../../core/components/components.js?v=562"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=561"></script>
+  <script src="../../core/components/booking-map.js?v=562"></script>
 </head>
 <body class="brand-pullman">
 
@@ -115,7 +115,7 @@ wd-booking { margin-top: 20px; }
   gap: 8px;
   min-height: 36px;
   padding: 7px 16px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   border: 1px solid rgba(255,255,255,.35);
   border-radius: 100px;
   font-family: var(--font-sans);
@@ -137,14 +137,17 @@ wd-booking { margin-top: 20px; }
 
 .srx {
   max-width: 1320px;
-  margin: 40px auto 120px;
-  padding: 0 48px;
+  /* 60 px et non 48 : la barre de recherche ajoute 12 px de gouttière interne, si bien que son
+     premier onglet et la boîte du champ commencent 12 px plus à droite. Le bouton, le titre et
+     les cards s'alignent sur ce bord visible, pas sur le conteneur. */
+  margin: 56px auto 120px;
+  padding: 0 60px;
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(440px, 1.15fr);
   gap: 16px 28px;
   align-items: start;
 }
-.srx-head { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 8px; }
+.srx-head { grid-column: 1 / -1; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 16px; }
 .srx-title { font-family: var(--font-serif); font-weight: 800; font-size: 32px; line-height: 1.05; text-transform: uppercase; color: #fff; margin: 0 0 8px; }
 .srx-title strong { color: var(--pul-highlight, #5FEF91); }
 .srx-sub { font-family: var(--font-sans); font-size: 14px; color: var(--pul-muted, #D9E6D0); margin: 0; }
