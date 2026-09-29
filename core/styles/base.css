@@ -870,6 +870,9 @@ wd-section-heading { display: block; }
 /* Les chevrons n'ont ni attribut de taille ni règle CSS : Safari les ramenait alors à rien,
    et les deux ronds de navigation apparaissaient vides sur iPhone. */
 .wd-booking__dp-nav svg { width: 20px; height: 20px; }
+/* La croix ne sert qu'au plein écran mobile : sur desktop, le calendrier se ferme en cliquant
+   en dehors, ou par « Appliquer ». */
+.wd-booking__dp-fermer { display: none; }
 .wd-booking__dp-nav:hover { background: rgba(255,255,255,.12); color: #fff; }
 
 .wd-booking__dp-calendars { display: flex; gap: 32px; }
@@ -1469,10 +1472,22 @@ wd-footer { display: block; }
   /* Le calendrier montre deux mois côte à côte : 446 px de large, pensés pour la barre
      desktop. Sur mobile il occupe la largeur de l'écran et n'affiche qu'un mois — le
      second se rejoint par la flèche suivante. */
-  .wd-booking__datepicker { position: fixed; left: 0; right: 0; transform: none; top: auto;
-    bottom: 0; width: auto; border-radius: 8px 8px 0 0; }
-  .wd-booking__datepicker[data-state="open"] { max-height: 78vh; overflow-y: auto; }
-  .wd-booking__dp-body { padding: 16px 14px 14px; }
+  /* Plein écran, et non feuille basse : la barre de recherche restait visible au-dessus, à
+     moitié couverte — on ne savait plus ce qu'on réglait. Le calendrier prend tout l'écran et
+     se ferme par sa croix ou par « Appliquer ». */
+  .wd-booking__datepicker { position: fixed; inset: 0; transform: none;
+    height: 100vh; height: 100dvh; width: auto; border-radius: 0; z-index: 1100; }
+  .wd-booking__datepicker[data-state="open"] { max-height: none; overflow: hidden; }
+  .wd-booking__dp-body { display: flex; flex-direction: column; height: 100%; overflow-y: auto;
+    padding: calc(16px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); }
+  .wd-booking__dp-calendars { flex: 1 1 auto; }
+  .wd-booking__dp-fermer { display: inline-flex; align-items: center; justify-content: center;
+    position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 10px; z-index: 2;
+    width: 44px; height: 44px; padding: 0; border: none; border-radius: 100px;
+    background: rgba(255,255,255,.08); color: #fff; cursor: pointer; }
+  .wd-booking__dp-fermer svg { width: 20px; height: 20px; }
+  /* La croix occupe le coin : le titre du mois lui laisse la place. */
+  .wd-booking__dp-header { padding-right: 52px; }
   .wd-booking__dp-months { flex-direction: column; gap: 20px; }
   .wd-booking__dp-months-title { gap: 0; }
   .wd-booking__dp-month-label { min-width: 0; }

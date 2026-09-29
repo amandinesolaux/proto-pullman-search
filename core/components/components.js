@@ -1198,6 +1198,7 @@
         </div>
         <div class="wd-booking__datepicker" data-state="closed">
           <div class="wd-booking__dp-body">
+            <button type="button" class="wd-booking__dp-fermer" aria-label="Fermer le calendrier">${ICON.close}</button>
             <div class="wd-booking__dp-header">
               <button class="wd-booking__dp-nav wd-booking__dp-prev" aria-label="Mois précédent">${ICON.chevL || '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</button>
               <div class="wd-booking__dp-months-title">
@@ -3316,6 +3317,8 @@
 
       datepicker.addEventListener('click', (e) => {
         e.stopPropagation();
+        // Plein écran sur mobile : sans croix, on ne pouvait plus atteindre « en dehors ».
+        if (e.target.closest('.wd-booking__dp-fermer')) { closeDatePicker(); return; }
         const day = e.target.closest('.wd-booking__dp-day');
         if (day && !day.classList.contains('wd-booking__dp-day--past') && !day.classList.contains('wd-booking__dp-day--empty')) {
           const [y, m, d] = day.dataset.date.split('-').map(Number);
