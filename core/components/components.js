@@ -3154,7 +3154,12 @@
 
         mapToggle.addEventListener('click', (e) => {
           e.stopPropagation();
-          const showing = ddMapview.style.display !== 'none';
+          // Depuis la barre fermée, le bouton ne montrait rien : la vue basculait dans un panneau
+          // qui restait fermé. On ouvre d'abord le panneau — en plein écran sur mobile —, puis la
+          // carte s'affiche, quel que soit l'état laissé par un clic précédent.
+          const panneauFerme = dropdown.dataset.state !== 'open';
+          if (panneauFerme) open();
+          const showing = !panneauFerme && ddMapview.style.display !== 'none';
           if (showing) {
             ddMapview.style.display = 'none';
             searchPanelEl.style.display = '';
