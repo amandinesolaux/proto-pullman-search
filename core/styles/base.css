@@ -867,6 +867,9 @@ wd-section-heading { display: block; }
 .wd-booking__dp-months-title { display: flex; gap: 80px; }
 .wd-booking__dp-month-label { font-family: var(--font-sans); font-size: 15px; font-weight: 600; color: #fff; min-width: 140px; text-align: center; }
 .wd-booking__dp-nav { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: rgba(255,255,255,.06); border-radius: 50%; color: rgba(255,255,255,.7); cursor: pointer; transition: all .15s; }
+/* Les chevrons n'ont ni attribut de taille ni règle CSS : Safari les ramenait alors à rien,
+   et les deux ronds de navigation apparaissaient vides sur iPhone. */
+.wd-booking__dp-nav svg { width: 20px; height: 20px; }
 .wd-booking__dp-nav:hover { background: rgba(255,255,255,.12); color: #fff; }
 
 .wd-booking__dp-calendars { display: flex; gap: 32px; }
@@ -1476,6 +1479,13 @@ wd-footer { display: block; }
   /* Le second mois se rejoint par la navigation : deux grilles côte à côte tiennent mal
      sur 375 px, et les jours y deviennent des cibles de 30 px. */
   .wd-booking__dp-month:nth-child(2) { display: none; }
+  /* Le pied tenait sur une ligne : 472 px de contenu pour 358 disponibles, « Appliquer » sortait
+     de l'écran. Les souplesses défilent à l'horizontale, les actions passent dessous. */
+  .wd-booking__dp-footer { flex-wrap: wrap; gap: 12px; }
+  .wd-booking__dp-flex-options { flex: 1 1 100%; overflow-x: auto; scrollbar-width: none; }
+  .wd-booking__dp-flex-options::-webkit-scrollbar { display: none; }
+  .wd-booking__dp-flex-chip { flex: 0 0 auto; }
+  .wd-booking__dp-actions { flex: 1 1 100%; justify-content: flex-end; }
   .wd-booking__dp-month-label:nth-child(2) { display: none; }
 
   /* ── Feuille de filtres ────────────────────────────────────────────────────────
