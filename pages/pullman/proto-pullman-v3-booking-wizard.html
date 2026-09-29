@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pullman Hotels & Resorts — Booking + Wizard (V3)</title>
   <link rel="stylesheet" href="../../core/tokens/brands.css"/>
-  <link rel="stylesheet" href="../../core/styles/base.css?v=564"/>
-  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=564"/>
+  <link rel="stylesheet" href="../../core/styles/base.css?v=565"/>
+  <link rel="stylesheet" href="../../core/styles/discovery-modal.css?v=565"/>
   <link rel="stylesheet" href="../../brands/pullman/pullman.css"/>
 
   <!-- Leaflet.js pour la carte interactive -->
@@ -17,11 +17,11 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
 
-  <script src="../../core/data/restaurants.js?v=564"></script>
-  <script src="../../core/data/reunions.js?v=564"></script>
-  <script src="../../core/components/components.js?v=564"></script>
+  <script src="../../core/data/restaurants.js?v=565"></script>
+  <script src="../../core/data/reunions.js?v=565"></script>
+  <script src="../../core/components/components.js?v=565"></script>
   <script src="../../brands/pullman/pullman.js"></script>
-  <script src="../../core/components/booking-map.js?v=564"></script>
+  <script src="../../core/components/booking-map.js?v=565"></script>
   <script src="../../core/components/map-interface-enhance.js?v=220"></script>
 </head>
 <body class="brand-pullman">
@@ -476,11 +476,11 @@ body.brand-pullman .wd-booking__dd-results-bar--hint { background: none; padding
      seul élément à s'y ancrer, rien d'autre ne bouge. */
   wd-booking[data-plein-ecran] .wd-booking__dd-body { position: static; }
   wd-booking[data-plein-ecran] .wd-booking__wizard-cta {
-    position: absolute; left: 14px; right: 14px; bottom: 76px; top: auto;
+    position: absolute; left: 14px; right: 14px; bottom: calc(76px + env(safe-area-inset-bottom)); top: auto;
     width: auto; margin: 0; z-index: 1050; background: #1a2220; }
   wd-booking[data-plein-ecran] .wd-booking__wizard-cta:hover { background: #232e2a; }
   /* La zone de défilement s'arrête au-dessus des deux boutons : 12 + 48 + 16 + 48 + 16. */
-  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 140px; }
+  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
   /* En vue carte, la carte occupe tout : le CTA y est masqué, rien à réserver. */
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dropdown { padding-bottom: 0; }
 }

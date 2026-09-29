@@ -1336,7 +1336,11 @@ wd-footer { display: block; }
      visualViewport pour qu'elle s'arrête au-dessus du clavier : elle ne faisait plus
      que 370 px et on voyait la page d'accueil dessous. Une fenêtre de recherche ne
      laisse rien paraître derrière elle. */
-  wd-booking[data-plein-ecran] { position: fixed; inset: 0; z-index: 1000; margin: 0;
+  /* 100dvh : sur iPhone, inset:0 se cale sur la fenêtre « haute », celle qui passe SOUS la barre
+     de Safari. Le bas du panneau — donc « Rechercher » — se retrouvait derrière elle. La hauteur
+     dynamique suit la zone réellement visible. */
+  wd-booking[data-plein-ecran] { position: fixed; inset: 0; height: 100vh; height: 100dvh;
+    z-index: 1000; margin: 0;
     display: flex; flex-direction: column; background: #1a2220; overflow: hidden; }
   wd-booking[data-plein-ecran] .wd-booking { margin: 0; border-radius: 0; height: 100%;
     display: flex; flex-direction: column; }
@@ -1360,9 +1364,11 @@ wd-footer { display: block; }
      clavier le recouvre le temps qu'on tape. La rangée de champs repasse en static pour
      ne pas servir de repère : elle est haute de 76 px, le bouton s'y calait. */
   wd-booking[data-plein-ecran] .wd-booking__fields { position: static; }
+  /* env(safe-area-inset-bottom) : l'indicateur d'accueil des iPhone récents mange le bas de
+     l'écran ; sans cette réserve, le bouton s'y colle. */
   wd-booking[data-plein-ecran] .wd-booking__cta { position: absolute; left: 14px; right: 14px;
-    bottom: 12px; z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
-  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: 72px; }
+    bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 1050; width: auto; box-shadow: 0 6px 24px rgba(0,0,0,.5); }
+  wd-booking[data-plein-ecran] .wd-booking__dropdown { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 
   /* ── Le plein écran ne sert qu'au premier champ ────────────────────────────────
      Ouvrir « Que recherchez-vous ? » ouvre une fenêtre dédiée à cette question. Les
@@ -1435,7 +1441,7 @@ wd-footer { display: block; }
   wd-booking[data-plein-ecran][data-vue-carte] .wd-booking__dd-map-col .wd-booking__filtres-btn {
     /* left: 0 et non 14 : la colonne porte déjà les 14 px de gouttière, la pastille
        se posait sinon à 28 quand tout le reste tient sur 14. */
-    position: absolute; left: 0; bottom: 76px; z-index: 500; margin: 0;
+    position: absolute; left: 0; bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 500; margin: 0;
     background: #1a2220; border-color: rgba(255,255,255,.3);
     box-shadow: 0 4px 16px rgba(0,0,0,.45); }
 
